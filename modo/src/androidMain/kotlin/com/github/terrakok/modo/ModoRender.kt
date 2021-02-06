@@ -17,7 +17,7 @@ open class ModoRender(
         for (i in 0 until fragmentManager.backStackEntryCount) {
             fragmentManager.getBackStackEntryAt(i).name?.let { names.add(it) }
         }
-        restoreStateFromIds(names)
+        restoreStateFromScreenStrings(names)
     }
 
     override fun invoke(state: NavigationState) {
@@ -49,12 +49,16 @@ open class ModoRender(
     }
 
     protected fun push(screens: List<Screen>) {
-        if (screens.any { it !is AppScreen }) error("ModoRender works with AppScreens only!")
         screens.map { screen ->
+            screen as? AppScreen ?: error("ModoRender works with AppScreens only!")
             fragmentManager.beginTransaction().apply {
-                replace(containerId, (screen as AppScreen).create(), screen.id)
                 setReorderingAllowed(true)
-                addToBackStack(screen.id)
+                if (screen.replacePreviousScreen) {
+                    replace(containerId, screen.create(), screen.id)
+                } else {
+                    add(containerId, screen.create(), screen.id)
+                }
+                addToBackStack(screen.stringify())
             }.commit()
         }
     }

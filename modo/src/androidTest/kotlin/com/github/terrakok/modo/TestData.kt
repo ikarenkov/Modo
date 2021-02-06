@@ -1,21 +1,7 @@
 package com.github.terrakok.modo
 
-internal object A : Screen {
-    override val id = "A"
-}
-
-internal object B : Screen {
-    override val id = "B"
-}
-
-internal object C : Screen {
-    override val id = "C"
-}
-
-internal object D : Screen {
-    override val id = "D"
-}
-
-internal object E : Screen {
-    override val id = "E"
-}
+val A = AppScreen("A") { error("stub") }
+val B = AppScreen("B") { error("stub") }
+val C = AppScreen("C") { error("stub") }
+val D = AppScreen("D") { error("stub") }
+val E = AppScreen("E") { error("stub") }

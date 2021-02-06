@@ -8,24 +8,21 @@ class ModoStateTest {
     @Test
     fun serializationTest1() {
         val state = NavigationState(listOf(A, B, C, D, E))
-        val str = saveStateToString(state)
-        val restored = restoreStateFromString(str)
+        val restored = state.stringify().asNavigationState()
         assertEquals(state, restored)
     }
 
     @Test
     fun serializationTest2() {
         val state = NavigationState()
-        val str = saveStateToString(state)
-        val restored = restoreStateFromString(str)
+        val restored = state.stringify().asNavigationState()
         assertEquals(state, restored)
     }
 
     @Test
     fun serializationTest3() {
         val state = NavigationState(listOf(A))
-        val str = saveStateToString(state)
-        val restored = restoreStateFromString(str)
+        val restored = state.stringify().asNavigationState()
         assertEquals(state, restored)
     }
 }
