@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:columnCount="2">
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_rowWeight="1"
+        android:layout_columnSpan="2"
+        android:layout_columnWeight="1"
+        android:layout_margin="4dp"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="Name"
+        android:textColor="@android:color/black"
+        android:textSize="28sp" />
+
+    <TextView
+        android:id="@+id/back_command"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_rowWeight="1"
+        android:layout_columnWeight="1"
+        android:layout_margin="4dp"
+        android:background="@android:color/holo_green_dark"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="Back"
+        android:textColor="@android:color/white"
+        android:textSize="28sp" />
+
+    <TextView
+        android:id="@+id/forward_command"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_rowWeight="1"
+        android:layout_columnWeight="1"
+        android:layout_margin="4dp"
+        android:background="@android:color/holo_blue_dark"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="Forward"
+        android:textColor="@android:color/white"
+        android:textSize="28sp" />
+
+    <TextView
+        android:id="@+id/replace_command"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_rowWeight="1"
+        android:layout_columnWeight="1"
+        android:layout_margin="4dp"
+        android:background="@android:color/holo_orange_dark"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="Replace"
+        android:textColor="@android:color/white"
+        android:textSize="28sp" />
+
+    <TextView
+        android:id="@+id/new_chain_command"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_rowWeight="1"
+        android:layout_columnWeight="1"
+        android:layout_margin="4dp"
+        android:background="@android:color/holo_red_dark"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="New chain"
+        android:textColor="@android:color/white"
+        android:textSize="28sp" />
+
+    <TextView
+        android:id="@+id/new_root_chain_command"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_rowWeight="1"
+        android:layout_columnWeight="1"
+        android:layout_margin="4dp"
+        android:background="@android:color/holo_green_dark"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="New root chain"
+        android:textColor="@android:color/white"
+        android:textSize="28sp" />
+
+    <TextView
+        android:id="@+id/new_root_command"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_rowWeight="1"
+        android:layout_columnWeight="1"
+        android:layout_margin="4dp"
+        android:background="@android:color/holo_blue_dark"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="New root"
+        android:textColor="@android:color/white"
+        android:textSize="28sp" />
+
+    <TextView
+        android:id="@+id/forward_delay_command"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_rowWeight="1"
+        android:layout_columnWeight="1"
+        android:layout_margin="4dp"
+        android:background="@android:color/holo_orange_dark"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="Forward 3s"
+        android:textColor="@android:color/white"
+        android:textSize="28sp" />
+
+    <TextView
+        android:id="@+id/back_to_command"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_rowWeight="1"
+        android:layout_columnWeight="1"
+        android:layout_margin="4dp"
+        android:background="@android:color/holo_red_dark"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="Back to '3'"
+        android:textColor="@android:color/white"
+        android:textSize="28sp" />
+
+    <TextView
+        android:id="@+id/exit_command"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_rowWeight="1"
+        android:layout_columnSpan="2"
+        android:layout_columnWeight="1"
+        android:layout_margin="4dp"
+        android:background="@android:color/holo_green_dark"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="Exit"
+        android:textColor="@android:color/white"
+        android:textSize="28sp" />
+
+</GridLayout>
