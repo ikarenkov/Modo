@@ -10,7 +10,7 @@ fun Modo.saveState(bundle: Bundle) {
 }
 
 fun Modo.restoreState(bundle: Bundle?) {
-    state = bundle?.getString(STATE_KEY).asNavigationState()
+    state = NavigationState.parse(bundle?.getString(STATE_KEY))
 }
 
 fun Modo.init(bundle: Bundle?, firstScreen: AppScreen) {
@@ -29,8 +29,8 @@ internal fun NavigationState.stringify(): String =
         it.stringify()
     }
 
-internal fun String?.asNavigationState(): NavigationState =
-    restoreStateFromScreenStrings(this?.split(STATE_SEPARATOR))
+internal fun NavigationState.Companion.parse(str: String?): NavigationState =
+    restoreStateFromScreenStrings(str?.split(STATE_SEPARATOR))
 
 internal fun restoreStateFromScreenStrings(ids: List<String>?): NavigationState {
     val chain = ids
