@@ -61,7 +61,7 @@
         android:textSize="28sp" />
 
     <TextView
-        android:id="@+id/new_chain_command"
+        android:id="@+id/multi_forward_command"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_rowWeight="1"
@@ -70,12 +70,12 @@
         android:background="@android:color/holo_red_dark"
         android:gravity="center"
         android:padding="16dp"
-        android:text="New chain"
+        android:text="Multi forward"
         android:textColor="@android:color/white"
         android:textSize="28sp" />
 
     <TextView
-        android:id="@+id/new_root_chain_command"
+        android:id="@+id/new_stack_command"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_rowWeight="1"
@@ -84,7 +84,7 @@
         android:background="@android:color/holo_green_dark"
         android:gravity="center"
         android:padding="16dp"
-        android:text="New root chain"
+        android:text="New stack"
         android:textColor="@android:color/white"
         android:textSize="28sp" />
 

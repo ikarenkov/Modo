@@ -22,22 +22,22 @@ class SampleFragment : Fragment(R.layout.fragment_sample) {
         view.findViewById<View>(R.id.replace_command).setOnClickListener {
             modo.replace(Screens.Sample(screenId + 1))
         }
-        view.findViewById<View>(R.id.new_chain_command).setOnClickListener {
+        view.findViewById<View>(R.id.multi_forward_command).setOnClickListener {
             modo.forward(
                 Screens.Sample(screenId + 1),
                 Screens.Sample(screenId + 2),
                 Screens.Sample(screenId + 3)
             )
         }
-        view.findViewById<View>(R.id.new_root_chain_command).setOnClickListener {
-            modo.newRoot(
+        view.findViewById<View>(R.id.new_stack_command).setOnClickListener {
+            modo.newStack(
                 Screens.Sample(screenId + 1),
                 Screens.Sample(screenId + 2),
                 Screens.Sample(screenId + 3)
             )
         }
         view.findViewById<View>(R.id.new_root_command).setOnClickListener {
-            modo.newRoot(Screens.Sample(screenId + 1))
+            modo.newStack(Screens.Sample(screenId + 1))
         }
         view.findViewById<View>(R.id.forward_delay_command).setOnClickListener {
             it.handler.postDelayed({

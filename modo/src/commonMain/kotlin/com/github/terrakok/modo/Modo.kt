@@ -34,7 +34,7 @@ class ModoReducer : NavigationReducer {
             is Replace -> NavigationState(
                 state.chain.dropLast(1).plus(action.screen)
             )
-            is NewRoot -> NavigationState(
+            is NewStack -> NavigationState(
                 action.screen.toList()
             )
             is BackTo -> {
