@@ -12,6 +12,9 @@ import com.github.terrakok.modo.saveState
 class MainActivity : AppCompatActivity() {
     private val modo = App.INSTANCE.modo
 
+    //must be lazy otherwise initialization fails with early access to fragment magaer
+    private val modoRender by lazy { ModoRender(this, R.id.container) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -20,11 +23,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
-        //render must be created in onResume for initialization with fragment manager
-        val render = ModoRender(supportFragmentManager, R.id.container) { finish() }
         modo.render = {
-            render(it)
+            modoRender(it)
+            //only for sample
             findViewById<Toolbar>(R.id.toolbar).title = it.chain.joinToString("-") { it.id }
         }
     }

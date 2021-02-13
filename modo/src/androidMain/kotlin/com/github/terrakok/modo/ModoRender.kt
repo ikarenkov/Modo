@@ -1,5 +1,6 @@
 package com.github.terrakok.modo
 
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 
@@ -19,6 +20,11 @@ open class ModoRender(
         }
         restoreStateFromScreenStrings(names)
     }
+
+    constructor(
+        activity: FragmentActivity,
+        containerId: Int
+    ) : this(activity.supportFragmentManager, containerId, { activity.finish() })
 
     override fun invoke(state: NavigationState) {
         val diff = diff(currentState, state)
