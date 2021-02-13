@@ -1,0 +1,32 @@
+package com.github.terrakok.modo
+
+import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+
+class NavigationStateSerializationTest {
+
+    @Test
+    fun `navigation state serialization case #1`() {
+        val state = NavigationState(listOf(A, B, C, D, E))
+        val restored = state.stringify().asNavigationState()
+        assertTrue(state.sameChain(restored))
+    }
+
+    @Test
+    fun `navigation state serialization case #2`() {
+        val state = NavigationState()
+        val restored = state.stringify().asNavigationState()
+        assertTrue(state.sameChain(restored))
+    }
+
+    @Test
+    fun `navigation state serialization case #3`() {
+        val state = NavigationState(listOf(A))
+        val restored = state.stringify().asNavigationState()
+        assertTrue(state.sameChain(restored))
+    }
+
+    private fun NavigationState.sameChain(other: NavigationState) =
+        chain.map { it.id } == other.chain.map { it.id }
+}
