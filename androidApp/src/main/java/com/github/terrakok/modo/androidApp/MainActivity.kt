@@ -12,7 +12,7 @@ import com.github.terrakok.modo.saveState
 class MainActivity : AppCompatActivity() {
     private val modo = App.INSTANCE.modo
 
-    //must be lazy otherwise initialization fails with early access to fragment magaer
+    //must be lazy otherwise initialization fails with early access to fragment manager
     private val modoRender by lazy { ModoRender(this, R.id.container) }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -8,6 +8,9 @@ interface StackAction
 data class Pop(val count: Int) : StackAction
 data class Push(val screens: List<Screen>) : StackAction
 
+/**
+ * Render navigation state based on FragmentManager
+ */
 open class ModoRender(
     protected val fragmentManager: FragmentManager,
     protected val containerId: Int,

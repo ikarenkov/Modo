@@ -45,7 +45,7 @@ class SampleFragment : Fragment(R.layout.fragment_sample) {
             }, 3000)
         }
         view.findViewById<View>(R.id.back_to_command).setOnClickListener {
-            modo.backTo(Screens.Sample(3))
+            modo.backTo(Screens.Sample(3).id)
         }
         view.findViewById<View>(R.id.exit_command).setOnClickListener {
             modo.exit()

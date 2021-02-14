@@ -2,6 +2,9 @@ package com.github.terrakok.modo
 
 import androidx.fragment.app.Fragment
 
+/**
+ * Fragment based Screen
+ */
 class AppScreen(
     override val id: String,
     val replacePreviousScreen: Boolean,
