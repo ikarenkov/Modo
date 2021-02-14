@@ -5,6 +5,7 @@ plugins {
 
 kotlin {
     android()
+    ios() //stub for fix MPP import
     sourceSets {
         val androidMain by getting {
             dependencies {
