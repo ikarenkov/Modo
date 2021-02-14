@@ -47,6 +47,9 @@ class SampleFragment : Fragment(R.layout.fragment_sample) {
         view.findViewById<View>(R.id.back_to_command).setOnClickListener {
             modo.backTo(Screens.Sample(3).id)
         }
+        view.findViewById<View>(R.id.external_command).setOnClickListener {
+            modo.launch(Screens.Browser("https://github.com/terrakok/Modo"))
+        }
         view.findViewById<View>(R.id.exit_command).setOnClickListener {
             modo.exit()
         }
