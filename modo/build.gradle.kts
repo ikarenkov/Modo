@@ -7,6 +7,12 @@ kotlin {
     android()
     ios() //stub for fix MPP import
     sourceSets {
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test-common"))
+                implementation(kotlin("test-annotations-common"))
+            }
+        }
         val androidMain by getting {
             dependencies {
                 implementation("androidx.appcompat:appcompat:1.2.0")

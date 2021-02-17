@@ -1,7 +1,6 @@
 package com.github.terrakok.modo
 
 import org.junit.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class NavigationStateSerializationTest {
@@ -26,7 +25,4 @@ class NavigationStateSerializationTest {
         val restored = NavigationState.parse(state.stringify())
         assertTrue(state.sameChain(restored))
     }
-
-    private fun NavigationState.sameChain(other: NavigationState) =
-        chain.map { it.id } == other.chain.map { it.id }
 }

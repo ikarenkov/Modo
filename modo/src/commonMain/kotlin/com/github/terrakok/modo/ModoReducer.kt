@@ -19,14 +19,11 @@ class ModoReducer : NavigationReducer {
                 action.screen.toList()
             )
             is BackTo -> {
-                if (action.screenId == null) {
-                    NavigationState()
-                } else {
-                    val i = state.chain.indexOfLast { it.id == action.screenId }
-                    if (i != -1) NavigationState(state.chain.take(i + 1))
-                    else state
-                }
+                val i = state.chain.indexOfLast { it.id == action.screenId }
+                if (i != -1) NavigationState(state.chain.take(i + 1))
+                else state
             }
+            is Exit -> NavigationState()
             else -> state
         }
 }
