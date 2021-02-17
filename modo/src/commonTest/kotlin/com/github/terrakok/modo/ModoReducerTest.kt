@@ -81,7 +81,7 @@ class ModoReducerTest {
     }
 
     @Test
-    fun `test new stack action`() {
+    fun `test newStack action`() {
         val reducer = ModoReducer()
 
         val prev1 = NavigationState(listOf(A, B))
@@ -100,7 +100,7 @@ class ModoReducerTest {
     }
 
     @Test
-    fun `test back to action`() {
+    fun `test backTo action`() {
         val reducer = ModoReducer()
 
         val prev1 = NavigationState(listOf(A, B))
