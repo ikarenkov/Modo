@@ -48,7 +48,7 @@ android {
 val localProps = gradleLocalProperties(rootDir)
 
 group = "com.github.terrakok"
-version = "0.1"
+version = "0.2"
 
 val javadocJar by tasks.registering(Jar::class) {
     archiveClassifier.set("javadoc")
