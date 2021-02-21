@@ -16,18 +16,21 @@ open class ModoRender(
     protected val containerId: Int,
     protected val exitAction: () -> Unit
 ) : NavigationRender {
-    protected var currentState = run {
-        val names = mutableListOf<String>()
-        for (i in 0 until fragmentManager.backStackEntryCount) {
-            fragmentManager.getBackStackEntryAt(i).name?.let { names.add(it) }
-        }
-        restoreStateFromScreenStrings(names)
-    }
+    internal var currentState: NavigationState
+        private set
 
     constructor(
         activity: FragmentActivity,
         containerId: Int
     ) : this(activity.supportFragmentManager, containerId, { activity.finish() })
+
+    init {
+        val restoredScreens = mutableListOf<Screen>()
+        for (i in 0 until fragmentManager.backStackEntryCount) {
+            fragmentManager.getBackStackEntryAt(i).name?.let { restoredScreens.add(RestoredScreen(it)) }
+        }
+        currentState = NavigationState(restoredScreens)
+    }
 
     override fun invoke(state: NavigationState) {
         val diff = diff(currentState, state)
@@ -58,18 +61,25 @@ open class ModoRender(
     }
 
     protected fun push(screens: List<Screen>) {
-        screens.map { screen ->
-            screen as? AppScreen ?: error("ModoRender works with AppScreens only!")
-            fragmentManager.beginTransaction().apply {
-                setReorderingAllowed(true)
-                if (screen.replacePreviousScreen) {
-                    replace(containerId, screen.create(), screen.id)
-                } else {
-                    add(containerId, screen.create(), screen.id)
-                }
-                addToBackStack(screen.stringify())
-            }.commit()
+        screens.forEach { screen ->
+            if (screen is AppScreen) {
+                fragmentManager.beginTransaction().apply {
+                    setReorderingAllowed(true)
+                    if (screen.replacePreviousScreen) {
+                        replace(containerId, screen.create(), screen.id)
+                    } else {
+                        add(containerId, screen.create(), screen.id)
+                    }
+                    addToBackStack(screen.id)
+                }.commit()
+            } else {
+                error("ModoRender works with AppScreens only! Received $screen")
+            }
         }
+    }
+
+    private class RestoredScreen(override val id: String) : Screen {
+        override fun toString() = "[$id]"
     }
 
     internal companion object {

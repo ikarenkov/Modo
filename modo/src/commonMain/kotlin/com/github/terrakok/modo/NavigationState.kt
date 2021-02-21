@@ -5,7 +5,4 @@ package com.github.terrakok.modo
  */
 data class NavigationState(
     val chain: List<Screen> = emptyList()
-) {
-    //for extensions
-    companion object
-}
+)
