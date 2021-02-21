@@ -43,12 +43,12 @@ android {
 }
 
 //PUBLISHING
-// ./gradlew clean modo:publishAndroidReleasePublicationToSonatypeRepository
+// ./gradlew clean modo:publishAllPublicationsToSonatypeRepository
 
 val localProps = gradleLocalProperties(rootDir)
 
 group = "com.github.terrakok"
-version = "0.2"
+version = "0.3"
 
 val javadocJar by tasks.registering(Jar::class) {
     archiveClassifier.set("javadoc")
