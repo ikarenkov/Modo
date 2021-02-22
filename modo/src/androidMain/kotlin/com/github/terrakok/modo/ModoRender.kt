@@ -1,8 +1,10 @@
 package com.github.terrakok.modo
 
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
+import androidx.fragment.app.FragmentTransaction
 
 interface StackAction
 data class Pop(val count: Int) : StackAction
@@ -49,7 +51,7 @@ open class ModoRender(
         }
     }
 
-    protected fun pop(count: Int) {
+    protected open fun pop(count: Int) {
         val entryIndex = fragmentManager.backStackEntryCount - count
         val entryName =
             if (entryIndex in 0 until fragmentManager.backStackEntryCount) {
@@ -60,17 +62,19 @@ open class ModoRender(
         fragmentManager.popBackStack(entryName, POP_BACK_STACK_INCLUSIVE)
     }
 
-    protected fun push(screens: List<Screen>) {
+    protected open fun push(screens: List<Screen>) {
         screens.forEach { screen ->
             if (screen is AppScreen) {
                 fragmentManager.beginTransaction().apply {
                     setReorderingAllowed(true)
+                    val fragment = screen.create()
                     if (screen.replacePreviousScreen) {
-                        replace(containerId, screen.create(), screen.id)
+                        replace(containerId, fragment, screen.id)
                     } else {
-                        add(containerId, screen.create(), screen.id)
+                        add(containerId, fragment, screen.id)
                     }
                     addToBackStack(screen.id)
+                    setupTransaction(fragmentManager, this, screen, fragment)
                 }.commit()
             } else {
                 error("ModoRender works with AppScreens only! Received $screen")
@@ -78,12 +82,19 @@ open class ModoRender(
         }
     }
 
+    protected open fun setupTransaction(
+        fragmentManager: FragmentManager,
+        transaction: FragmentTransaction,
+        screen: AppScreen,
+        newFragment: Fragment
+    ) {
+    }
+
     private class RestoredScreen(override val id: String) : Screen {
         override fun toString() = "[$id]"
     }
 
     internal companion object {
-
         fun diff(prev: NavigationState, next: NavigationState): List<StackAction> = when {
             prev.chain.isEmpty() && next.chain.isEmpty() -> emptyList()
             prev.chain.isEmpty() -> listOf(Push(next.chain))

@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.github.terrakok.modo.ModoRender
+import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.back
 import com.github.terrakok.modo.init
 
@@ -11,7 +12,15 @@ class MainActivity : AppCompatActivity() {
     private val modo = App.INSTANCE.modo
 
     //must be lazy otherwise initialization fails with early access to fragment manager
-    private val modoRender by lazy { ModoRender(this, R.id.container) }
+    private val modoRender by lazy {
+        object : ModoRender(this@MainActivity, R.id.container) {
+            //only for sample
+            override fun invoke(state: NavigationState) {
+                super.invoke(state)
+                findViewById<Toolbar>(R.id.toolbar).title = state.chain.joinToString("-") { it.id }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,11 +30,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        modo.render = {
-            modoRender(it)
-            //only for sample
-            findViewById<Toolbar>(R.id.toolbar).title = it.chain.joinToString("-") { it.id }
-        }
+        modo.render = modoRender
     }
 
     override fun onPause() {
