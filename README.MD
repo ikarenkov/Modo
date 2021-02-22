@@ -82,6 +82,54 @@ modo.back() //back to previous
 modo.exit() //exit from activity
 ```
 
+## Debug
+You can use `LogReducer` for logging navigation state changes
+```kotlin
+Modo(
+    if (BuildConfig.DEBUG) LogReducer(AppReducer(this@App))
+    else AppReducer(this@App)
+)
+```
+Logcat (from sample application):
+```
+D/Modo: Activity first launch
+D/Modo: New action=com.github.terrakok.modo.Forward@9d0f15d
+D/Modo: New state=NavigationState(chain=[[1]])
+```
+
+## Extending ModoRender
+```kotlin
+private val modoRender by lazy {
+    object : ModoRender(this@MainActivity, R.id.container) {
+        override fun pop(count: Int) {
+            hideKeyboard()
+            super.pop(count)
+        }
+
+        override fun push(screens: List<Screen>) {
+            hideKeyboard()
+            super.push(screens)
+        }
+
+        override fun setupTransaction(
+            fragmentManager: FragmentManager,
+            transaction: FragmentTransaction,
+            screen: AppScreen,
+            newFragment: Fragment
+        ) {
+            //e.g. setup your animation
+        }
+    }
+}
+
+fun Activity.hideKeyboard() {
+    currentFocus?.apply {
+        val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputManager.hideSoftInputFromWindow(windowToken, 0)
+    }
+}
+```
+
 ## License
 ```
 MIT License
