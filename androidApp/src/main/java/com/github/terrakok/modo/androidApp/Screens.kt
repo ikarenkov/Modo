@@ -2,8 +2,8 @@ package com.github.terrakok.modo.androidApp
 
 import android.content.Intent
 import android.net.Uri
-import com.github.terrakok.modo.AppScreen
-import com.github.terrakok.modo.ExternalScreen
+import com.github.terrakok.modo.android.AppScreen
+import com.github.terrakok.modo.android.ExternalScreen
 
 object Screens {
     fun Sample(id: Int) = AppScreen(id.toString()) {

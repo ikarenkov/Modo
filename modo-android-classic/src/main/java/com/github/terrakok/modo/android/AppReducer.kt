@@ -1,7 +1,8 @@
-package com.github.terrakok.modo
+package com.github.terrakok.modo.android
 
 import android.content.Context
 import android.content.Intent
+import com.github.terrakok.modo.*
 
 /**
  * Screen for opening external activity via Intent.

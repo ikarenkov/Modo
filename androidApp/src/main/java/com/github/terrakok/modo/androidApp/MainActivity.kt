@@ -3,10 +3,10 @@ package com.github.terrakok.modo.androidApp
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import com.github.terrakok.modo.ModoRender
 import com.github.terrakok.modo.NavigationState
+import com.github.terrakok.modo.android.ModoRender
+import com.github.terrakok.modo.android.init
 import com.github.terrakok.modo.back
-import com.github.terrakok.modo.init
 
 class MainActivity : AppCompatActivity() {
     private val modo = App.INSTANCE.modo

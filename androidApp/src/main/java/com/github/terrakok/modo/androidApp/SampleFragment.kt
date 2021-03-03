@@ -5,10 +5,11 @@ import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.github.terrakok.modo.*
+import com.github.terrakok.modo.android.launch
 
 class SampleFragment : Fragment(R.layout.fragment_sample) {
     private val modo = App.INSTANCE.modo
-    private val screenId: Int by lazy { arguments!!.getInt(ARG_ID) }
+    private val screenId: Int by lazy { requireArguments().getInt(ARG_ID) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

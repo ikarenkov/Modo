@@ -1,6 +1,9 @@
-package com.github.terrakok.modo
+package com.github.terrakok.modo.android
 
 import android.util.Log
+import com.github.terrakok.modo.NavigationAction
+import com.github.terrakok.modo.NavigationReducer
+import com.github.terrakok.modo.NavigationState
 
 /**
  * Additional reducer for logging changes of navigation state.

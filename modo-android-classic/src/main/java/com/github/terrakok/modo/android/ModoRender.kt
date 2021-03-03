@@ -1,10 +1,13 @@
-package com.github.terrakok.modo
+package com.github.terrakok.modo.android
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.fragment.app.FragmentTransaction
+import com.github.terrakok.modo.NavigationRender
+import com.github.terrakok.modo.NavigationState
+import com.github.terrakok.modo.Screen
 
 interface StackAction
 data class Pop(val count: Int) : StackAction

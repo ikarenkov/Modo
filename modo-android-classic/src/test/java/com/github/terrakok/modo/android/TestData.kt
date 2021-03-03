@@ -1,4 +1,4 @@
-package com.github.terrakok.modo
+package com.github.terrakok.modo.android
 
 val A = AppScreen("A") { error("stub") }
 val B = AppScreen("B") { error("stub") }

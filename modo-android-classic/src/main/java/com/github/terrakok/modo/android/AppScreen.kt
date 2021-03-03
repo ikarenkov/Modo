@@ -1,6 +1,7 @@
-package com.github.terrakok.modo
+package com.github.terrakok.modo.android
 
 import androidx.fragment.app.Fragment
+import com.github.terrakok.modo.Screen
 
 /**
  * Fragment based Screen

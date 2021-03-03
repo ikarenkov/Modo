@@ -1,7 +1,9 @@
-package com.github.terrakok.modo
+package com.github.terrakok.modo.android
 
 import android.os.Bundle
 import android.util.Log
+import com.github.terrakok.modo.Modo
+import com.github.terrakok.modo.forward
 
 private var modoInitialized: Boolean = false
 fun Modo.init(bundle: Bundle?, render: ModoRender, firstScreen: AppScreen) {

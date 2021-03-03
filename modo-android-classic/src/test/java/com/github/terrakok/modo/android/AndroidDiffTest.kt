@@ -1,7 +1,8 @@
-package com.github.terrakok.modo
+package com.github.terrakok.modo.android
 
+import com.github.terrakok.modo.NavigationState
+import org.junit.Assert.assertEquals
 import org.junit.Test
-import kotlin.test.assertEquals
 
 class AndroidDiffTest {
 
@@ -11,7 +12,7 @@ class AndroidDiffTest {
             NavigationState(),
             NavigationState()
         )
-        assertEquals(emptyList(), diff)
+        assertEquals(emptyList<StackAction>(), diff)
     }
 
     @Test
