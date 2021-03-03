@@ -19,13 +19,12 @@ class ComposeRender(
 ) : NavigationRender {
     constructor(activity: Activity) : this({ activity.finish() })
 
-    var state: NavigationState by mutableStateOf(NavigationState())
-        private set
+    private var state: NavigationState by mutableStateOf(NavigationState())
 
     override fun invoke(state: NavigationState) {
         this.state = state
         if (state.chain.isEmpty()) {
-            exitAction.invoke()
+            exitAction()
         }
     }
 
@@ -34,7 +33,7 @@ class ComposeRender(
         state.chain.lastOrNull()?.let { screen ->
             when (screen) {
                 is ComposeScreen -> screen.content()
-                else -> error("ComposeRender works with AppScreens only! Received $screen")
+                else -> error("ComposeRender works with ComposeScreen only! Received $screen")
             }
         }
     }
