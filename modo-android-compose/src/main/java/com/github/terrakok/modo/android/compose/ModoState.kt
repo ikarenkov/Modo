@@ -3,11 +3,12 @@ package com.github.terrakok.modo.android.compose
 import android.os.Bundle
 import android.util.Log
 import com.github.terrakok.modo.Modo
+import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.forward
 
 private var modoInitialized: Boolean = false
 
-fun Modo.init(bundle: Bundle?, render: ComposeRender, firstScreen: ComposeScreen) {
+fun Modo.init(bundle: Bundle?, firstScreen: ComposeScreen) {
     if (bundle == null) {
         if (!modoInitialized) {
             Log.d("Modo", "Activity first launch")
@@ -20,12 +21,28 @@ fun Modo.init(bundle: Bundle?, render: ComposeRender, firstScreen: ComposeScreen
         if (!modoInitialized) {
             Log.d("Modo", "Activity restored after process death")
             modoInitialized = true
-            // TODO think how to restore state after process death
-            forward(firstScreen)
-            // restore(render.currentState)
+            val restoredState = bundle.restoreNavigationState()
+            if (restoredState.chain.isNotEmpty()) {
+                restore(restoredState)
+            }
         } else {
             Log.d("Modo", "Activity restored after rotation")
             //do nothing
         }
     }
+}
+
+private const val KEY_NAVIGATION_STATE = "ket_nav_state"
+private fun Bundle.restoreNavigationState() = NavigationState(
+    getParcelableArray(KEY_NAVIGATION_STATE)
+        ?.toList()
+        .orEmpty()
+        .filterIsInstance<ComposeScreen>()
+)
+
+fun Modo.saveState(bundle: Bundle) {
+    bundle.putParcelableArray(
+        KEY_NAVIGATION_STATE,
+        state.chain.filterIsInstance<ComposeScreen>().toTypedArray()
+    )
 }
