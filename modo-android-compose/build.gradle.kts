@@ -33,4 +33,5 @@ android {
 dependencies {
     implementation(project(":modo"))
     implementation("androidx.compose.ui:ui:1.0.0-beta01")
+    implementation("androidx.compose.foundation:foundation:1.0.0-beta01")
 }
