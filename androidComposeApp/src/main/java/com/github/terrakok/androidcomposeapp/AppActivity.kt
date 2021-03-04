@@ -17,6 +17,7 @@ import com.github.terrakok.modo.android.compose.ComposeRender
 import com.github.terrakok.modo.android.compose.ComposeScreen
 import com.github.terrakok.modo.android.compose.init
 import com.github.terrakok.modo.back
+import com.github.terrakok.modo.backTo
 import com.github.terrakok.modo.exit
 import com.github.terrakok.modo.forward
 
@@ -91,6 +92,14 @@ fun ItemScreen(i: Int): ComposeScreen = ComposeScreen("ItemScreen") {
             }
         ) {
             Text(text = "Open [${i + 1} ${i + 2} ${i + 3}]")
+        }
+        Button(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth(),
+            onClick = { modo.backTo(ListScreen().id) }
+        ) {
+            Text(text = "Back to list")
         }
         Button(
             modifier = Modifier
