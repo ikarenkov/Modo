@@ -106,7 +106,8 @@ open class MultiStackFragmentImpl : MultiStackFragment() {
     }
 
     protected open fun createTabView(index: Int, parent: LinearLayout): View =
-        TextView(context).apply {
+        TextView(parent.context).apply {
+            layoutParams = parent.layoutParams
             gravity = Gravity.CENTER
             setPadding(40, 40, 40, 40)
             text = "Tab $index"
