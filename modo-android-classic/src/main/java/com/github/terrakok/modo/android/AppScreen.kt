@@ -1,6 +1,9 @@
 package com.github.terrakok.modo.android
 
+import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
+import com.github.terrakok.modo.MultiScreen
+import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.Screen
 
 /**
@@ -32,4 +35,22 @@ class AppScreen(
     override fun hashCode(): Int {
         return id.hashCode()
     }
+}
+
+fun MultiAppScreen(
+    id: String,
+    roots: List<AppScreen>,
+    selected: Int
+) = MultiScreen(
+    id,
+    List(roots.size) { i -> NavigationState(listOf(roots[i])) },
+    selected
+)
+
+abstract class MultiStackFragment : Fragment {
+    constructor() : super()
+    constructor(@LayoutRes contentLayoutId: Int) : super(contentLayoutId)
+
+    abstract fun applyMultiState(multiScreen: MultiScreen)
+    abstract fun getCurrentFragment(): Fragment?
 }
