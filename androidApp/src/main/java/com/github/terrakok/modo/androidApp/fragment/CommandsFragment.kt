@@ -1,13 +1,16 @@
-package com.github.terrakok.modo.androidApp
+package com.github.terrakok.modo.androidApp.fragment
 
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.github.terrakok.modo.*
+import com.github.terrakok.modo.androidApp.App
+import com.github.terrakok.modo.androidApp.R
+import com.github.terrakok.modo.androidApp.Screens
 
 class CommandsFragment : Fragment(R.layout.fragment_commands) {
-    private val modo get() = App.INSTANCE.modo
+    private val modo = App.modo
     private val screenId: Int by lazy { requireArguments().getInt(ARG_ID) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -8,11 +8,9 @@ data class MultiScreen(
 
 class ExternalForward(val screen: Screen, vararg val screens: Screen) : NavigationAction
 object BackToTabRoot : NavigationAction
-data class SelectStack(val stackIndex: Int) : NavigationAction
+class SelectStack(val stackIndex: Int) : NavigationAction
 
-fun Modo.externalForward(screen: Screen, vararg screens: Screen) =
-    dispatch(ExternalForward(screen, *screens))
-
+fun Modo.externalForward(screen: Screen, vararg screens: Screen) = dispatch(ExternalForward(screen, *screens))
 fun Modo.selectStack(stackIndex: Int) = dispatch(SelectStack(stackIndex))
 fun Modo.backToTabRoot() = dispatch(BackToTabRoot)
 

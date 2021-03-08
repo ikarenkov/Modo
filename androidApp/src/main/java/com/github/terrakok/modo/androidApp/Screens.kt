@@ -5,6 +5,9 @@ import android.net.Uri
 import com.github.terrakok.modo.android.AppScreen
 import com.github.terrakok.modo.android.ExternalScreen
 import com.github.terrakok.modo.android.MultiAppScreen
+import com.github.terrakok.modo.androidApp.fragment.CommandsFragment
+import com.github.terrakok.modo.androidApp.fragment.StartFragment
+import com.github.terrakok.modo.androidApp.fragment.TabFragment
 
 object Screens {
     val Start = AppScreen("Start") {

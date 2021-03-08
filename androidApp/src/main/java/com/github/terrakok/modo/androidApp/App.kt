@@ -7,15 +7,14 @@ import com.github.terrakok.modo.android.AppReducer
 import com.github.terrakok.modo.android.LogReducer
 
 class App : Application() {
-    val modo = Modo(LogReducer(AppReducer(this, MultiReducer())))
 
     override fun onCreate() {
-        INSTANCE = this
+        modo = Modo(LogReducer(AppReducer(this, MultiReducer())))
         super.onCreate()
     }
 
     companion object {
-        lateinit var INSTANCE: App
+        lateinit var modo: Modo
             private set
     }
 }
