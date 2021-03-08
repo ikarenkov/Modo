@@ -10,6 +10,7 @@ import com.github.terrakok.modo.*
 import com.github.terrakok.modo.android.ModoRender
 import com.github.terrakok.modo.android.init
 import com.github.terrakok.modo.android.multi.MultiStackFragmentImpl
+import com.github.terrakok.modo.android.saveState
 
 class AppActivity : AppCompatActivity() {
     private val modo = App.modo
@@ -39,7 +40,7 @@ class AppActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        modo.init(savedInstanceState, modoRender, Screens.Start)
+        modo.init(savedInstanceState, Screens.Start)
     }
 
     override fun onResume() {
@@ -52,24 +53,30 @@ class AppActivity : AppCompatActivity() {
         super.onPause()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        modo.saveState(outState)
+    }
+
     override fun onBackPressed() {
         modo.back()
     }
+}
 
-    private inner class MyMultiStackFragment : MultiStackFragmentImpl() {
-        override fun createTabView(index: Int, parent: LinearLayout): View =
-            LayoutInflater.from(context).inflate(R.layout.layout_tab, parent, false).apply {
-                findViewById<TextView>(R.id.title).text = "Tab ${index + 1}"
-                setOnClickListener {
-                    val currentScreen = modo.state.chain.lastOrNull()
-                    if (currentScreen is MultiScreen) {
-                        if (currentScreen.selectedStack != index) {
-                            modo.selectStack(index)
-                        } else {
-                            modo.backToTabRoot()
-                        }
+class MyMultiStackFragment : MultiStackFragmentImpl() {
+    private val modo = App.modo
+    override fun createTabView(index: Int, parent: LinearLayout): View =
+        LayoutInflater.from(context).inflate(R.layout.layout_tab, parent, false).apply {
+            findViewById<TextView>(R.id.title).text = "Tab ${index + 1}"
+            setOnClickListener {
+                val currentScreen = modo.state.chain.lastOrNull()
+                if (currentScreen is MultiScreen) {
+                    if (currentScreen.selectedStack != index) {
+                        modo.selectStack(index)
+                    } else {
+                        modo.backToTabRoot()
                     }
                 }
             }
-    }
+        }
 }
