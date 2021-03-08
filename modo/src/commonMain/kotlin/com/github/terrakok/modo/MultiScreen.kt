@@ -6,6 +6,10 @@ data class MultiScreen(
     val selectedStack: Int
 ) : Screen
 
+object BackToTabRoot : NavigationAction
+
+fun Modo.backToTabRoot() = dispatch(BackToTabRoot)
+
 data class SelectStack(val stackIndex: Int) : NavigationAction
 
 fun Modo.selectStack(stackIndex: Int) = dispatch(SelectStack(stackIndex))
@@ -15,7 +19,16 @@ class MultiReducer(
 ) : NavigationReducer {
     override fun invoke(action: NavigationAction, state: NavigationState): NavigationState {
         val currentScreen = state.chain.lastOrNull()
-        return if (currentScreen is MultiScreen && action is SelectStack) {
+        return if (currentScreen is MultiScreen && action is BackToTabRoot) {
+            val localState = currentScreen.stacks[currentScreen.selectedStack]
+            val newLocalState = NavigationState(listOfNotNull(localState.chain.firstOrNull()))
+
+            val newStacks = currentScreen.stacks.toMutableList()
+            newStacks[currentScreen.selectedStack] = newLocalState
+
+            val newScreen = currentScreen.copy(stacks = newStacks)
+            origin(Replace(newScreen), state)
+        } else if (currentScreen is MultiScreen && action is SelectStack) {
             val newScreen = currentScreen.copy(selectedStack = action.stackIndex)
             origin(Replace(newScreen), state)
         } else if (currentScreen is MultiScreen && standardActionIsApplicable(

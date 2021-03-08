@@ -7,13 +7,21 @@ import com.github.terrakok.modo.android.ExternalScreen
 import com.github.terrakok.modo.android.MultiAppScreen
 
 object Screens {
-    fun Sample(id: Int) = AppScreen(id.toString()) {
-        SampleFragment.create(id)
+    val Start = AppScreen("Start") {
+        StartFragment()
+    }
+
+    fun Commands(id: Int) = AppScreen(id.toString()) {
+        CommandsFragment.create(id)
+    }
+
+    fun Tab(tabId: Int, id: Int) = AppScreen("${tabId}:$id") {
+        TabFragment.create(tabId, id)
     }
 
     fun MultiStack() = MultiAppScreen(
         "MultiStack",
-        listOf(Sample(100), Sample(200), Sample(300)),
+        listOf(Tab(0, 1), Tab(1, 1), Tab(2, 1)),
         1
     )
 

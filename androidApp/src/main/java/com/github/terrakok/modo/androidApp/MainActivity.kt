@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import com.github.terrakok.modo.*
 import com.github.terrakok.modo.android.ModoRender
 import com.github.terrakok.modo.android.init
@@ -23,7 +22,16 @@ class MainActivity : AppCompatActivity() {
             //only for sample
             override fun invoke(state: NavigationState) {
                 super.invoke(state)
-                findViewById<Toolbar>(R.id.toolbar).title = state.chain.joinToString("-") { it.id }
+                findViewById<TextView>(R.id.title).text =
+                    state.chain.joinToString(" - ") { screen ->
+                        if (screen is MultiScreen) {
+                            val chain = screen.stacks[screen.selectedStack].chain
+                                .joinToString(" - ") { it.id }
+                            "${screen.id}[$chain]"
+                        } else {
+                            screen.id
+                        }
+                    }
             }
         }
     }
@@ -31,7 +39,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        modo.init(savedInstanceState, modoRender, Screens.MultiStack())
+        modo.init(savedInstanceState, modoRender, Screens.Start)
     }
 
     override fun onResume() {

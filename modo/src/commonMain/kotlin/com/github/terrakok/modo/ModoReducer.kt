@@ -20,6 +20,9 @@ class ModoReducer : NavigationReducer {
                 if (i != -1) NavigationState(state.chain.take(i + 1))
                 else state
             }
+            is BackToRoot -> NavigationState(
+                listOfNotNull(state.chain.firstOrNull())
+            )
             is Back -> NavigationState(
                 state.chain.dropLast(1)
             )
