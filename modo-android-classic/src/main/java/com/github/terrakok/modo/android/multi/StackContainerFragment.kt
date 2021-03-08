@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import com.github.terrakok.modo.android.ModoRender
 
 class StackContainerFragment : Fragment() {
-    val index by lazy { requireArguments().getInt(ARG_INDEX) }
+    internal val index by lazy { requireArguments().getInt(ARG_INDEX) }
 
     private val render by lazy {
         ModoRender(childFragmentManager, CONTAINER_ID) {

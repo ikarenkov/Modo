@@ -17,26 +17,23 @@ open class MultiStackFragmentImpl : MultiStackFragment() {
     private var multiScreen: MultiScreen? = null
         set(value) {
             if (value != null) {
-                field = value
-
-                createTabs(value.stacks.size)
-                updateRenders()
-            }
-        }
-    private val localRenders = mutableMapOf<Int, NavigationRender>()
-    private val tabContainer by lazy { requireView().findViewById<LinearLayout>(TAB_CONTAINER_ID) }
-
-    private fun updateRenders() {
-        multiScreen?.let { multiState ->
-            localRenders.forEach { (index, render) ->
-                multiState.stacks.getOrNull(index)?.let { state ->
-                    render(state)
+                if (field == null) {
+                    view?.findViewById<LinearLayout>(TAB_CONTAINER_ID)?.let {
+                        createTabs(value, it)
+                    }
                 }
-            }
-            selectTab(multiState.selectedStack)
-        }
-    }
 
+                field = value
+                localRenders.forEach { (index, render) ->
+                    value.stacks.getOrNull(index)?.let { state ->
+                        render(state)
+                    }
+                }
+                selectTab(value.selectedStack)
+            }
+        }
+
+    private val localRenders = mutableMapOf<Int, NavigationRender>()
     internal fun setRender(index: Int, render: NavigationRender?) {
         if (render != null) {
             localRenders[index] = render
@@ -88,20 +85,20 @@ open class MultiStackFragmentImpl : MultiStackFragment() {
             }
         }
         addView(tabContainer)
+        multiScreen?.let { createTabs(it, tabContainer) }
     }
 
-    private fun createTabs(count: Int) {
-        val newTabViewCount = count - tabContainer.childCount
-        if (newTabViewCount > 0) {
-            for (i in tabContainer.childCount until newTabViewCount) {
-                val view = createTabView(i, tabContainer).apply {
-                    layoutParams = LinearLayout.LayoutParams(layoutParams).apply {
-                        width = 0
-                        weight = 1F
-                    }
+    private fun createTabs(state: MultiScreen, container: LinearLayout) {
+        container.removeAllViews()
+        for (i in state.stacks.indices) {
+            val tabView = createTabView(i, container).apply {
+                layoutParams = LinearLayout.LayoutParams(layoutParams).apply {
+                    width = 0
+                    weight = 1F
                 }
-                tabContainer.addView(view)
+                isSelected = i == state.selectedStack
             }
+            container.addView(tabView)
         }
     }
 
@@ -114,14 +111,20 @@ open class MultiStackFragmentImpl : MultiStackFragment() {
         }
 
     private fun selectTab(index: Int) {
-        for (i in 0 until tabContainer.childCount) {
-            tabContainer.getChildAt(i).isSelected = i == index
+        view?.findViewById<LinearLayout>(TAB_CONTAINER_ID)?.let { tabContainer ->
+            for (i in 0 until tabContainer.childCount) {
+                tabContainer.getChildAt(i).isSelected = i == index
+            }
         }
 
-        val addedFragments = childFragmentManager.fragments
-            .filterIsInstance<StackContainerFragment>()
-        val tabExists = addedFragments.any { it.index == index }
+        val addedFragments =
+            childFragmentManager.fragments.filterIsInstance<StackContainerFragment>()
+
+        val currentContainerFragment = addedFragments.firstOrNull { it.isVisible }
+        if (currentContainerFragment?.index == index) return
+
         childFragmentManager.beginTransaction().also { transaction ->
+            val tabExists = addedFragments.any { it.index == index }
             if (!tabExists) {
                 transaction.add(
                     CONTAINER_ID,
