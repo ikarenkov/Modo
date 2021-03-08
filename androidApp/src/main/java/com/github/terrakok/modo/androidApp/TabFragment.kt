@@ -20,6 +20,9 @@ class TabFragment : Fragment(R.layout.fragment_tab) {
         view.findViewById<View>(R.id.replaceButton).setOnClickListener {
             modo.replace(Screens.Tab(tabId, screenId + 1))
         }
+        view.findViewById<View>(R.id.externalForwardButton).setOnClickListener {
+            modo.externalForward(Screens.Start)
+        }
         view.findViewById<View>(R.id.changeTabButton).setOnClickListener {
             modo.selectStack((tabId + 1) % 3)
         }

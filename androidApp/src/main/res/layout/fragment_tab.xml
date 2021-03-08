@@ -26,7 +26,7 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline3"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
-        app:layout_constraintTop_toBottomOf="@+id/replaceButton" />
+        app:layout_constraintTop_toBottomOf="@+id/externalForwardButton" />
 
     <Button
         android:id="@+id/replaceButton"
@@ -34,11 +34,23 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="Replace"
-        app:layout_constraintBottom_toTopOf="@+id/changeTabButton"
+        app:layout_constraintBottom_toTopOf="@+id/externalForwardButton"
         app:layout_constraintEnd_toStartOf="@+id/guideline3"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
         app:layout_constraintTop_toBottomOf="@+id/forwardButton" />
+
+    <Button
+        android:id="@+id/externalForwardButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="External forward"
+        app:layout_constraintBottom_toTopOf="@+id/changeTabButton"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/replaceButton" />
 
     <Button
         android:id="@+id/backToStartButton"

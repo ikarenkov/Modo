@@ -6,38 +6,50 @@ data class MultiScreen(
     val selectedStack: Int
 ) : Screen
 
+class ExternalForward(val screen: Screen, vararg val screens: Screen) : NavigationAction
 object BackToTabRoot : NavigationAction
-
-fun Modo.backToTabRoot() = dispatch(BackToTabRoot)
-
 data class SelectStack(val stackIndex: Int) : NavigationAction
 
+fun Modo.externalForward(screen: Screen, vararg screens: Screen) =
+    dispatch(ExternalForward(screen, *screens))
+
 fun Modo.selectStack(stackIndex: Int) = dispatch(SelectStack(stackIndex))
+fun Modo.backToTabRoot() = dispatch(BackToTabRoot)
 
 class MultiReducer(
     private val origin: ModoReducer = ModoReducer()
 ) : NavigationReducer {
     override fun invoke(action: NavigationAction, state: NavigationState): NavigationState {
         val currentScreen = state.chain.lastOrNull()
-        return if (currentScreen is MultiScreen && action is BackToTabRoot) {
-            val localState = currentScreen.stacks[currentScreen.selectedStack]
-            val newLocalState = NavigationState(listOfNotNull(localState.chain.firstOrNull()))
 
-            val newStacks = currentScreen.stacks.toMutableList()
-            newStacks[currentScreen.selectedStack] = newLocalState
+        return if (currentScreen is MultiScreen) {
+            when {
+                action is ExternalForward -> {
+                    origin(Forward(action.screen, *action.screens), state)
+                }
+                action is BackToTabRoot -> {
+                    val localState = currentScreen.stacks[currentScreen.selectedStack]
+                    val newLocalState =
+                        NavigationState(listOfNotNull(localState.chain.firstOrNull()))
 
-            val newScreen = currentScreen.copy(stacks = newStacks)
-            origin(Replace(newScreen), state)
-        } else if (currentScreen is MultiScreen && action is SelectStack) {
-            val newScreen = currentScreen.copy(selectedStack = action.stackIndex)
-            origin(Replace(newScreen), state)
-        } else if (currentScreen is MultiScreen && standardActionIsApplicable(
-                currentScreen,
-                action
-            )
-        ) {
-            val newScreen = applyOriginToMultiScreen(action, currentScreen)
-            origin(Replace(newScreen), state)
+                    val newStacks = currentScreen.stacks.toMutableList()
+                    newStacks[currentScreen.selectedStack] = newLocalState
+
+                    val newScreen = currentScreen.copy(stacks = newStacks)
+                    origin(Replace(newScreen), state)
+                }
+                action is SelectStack -> {
+                    val newScreen = currentScreen.copy(selectedStack = action.stackIndex)
+                    origin(Replace(newScreen), state)
+                }
+                standardActionIsApplicable(currentScreen, action) -> {
+                    val newScreen = applyOriginToMultiScreen(action, currentScreen)
+                    origin(Replace(newScreen), state)
+                }
+                else -> {
+                    origin(action, state)
+                }
+            }
         } else {
             origin(action, state)
         }

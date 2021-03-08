@@ -136,7 +136,7 @@ open class MultiStackFragmentImpl : MultiStackFragment() {
                     transaction.hide(f)
                 }
             }
-        }.commitNow()
+        }.commitNowAllowingStateLoss()
     }
 
     companion object {
