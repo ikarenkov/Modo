@@ -1,13 +1,11 @@
 package com.github.terrakok.modo.android.multi
 
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.github.terrakok.modo.MultiScreen
 import com.github.terrakok.modo.NavigationRender
@@ -91,24 +89,18 @@ open class MultiStackFragmentImpl : MultiStackFragment() {
     private fun createTabs(state: MultiScreen, container: LinearLayout) {
         container.removeAllViews()
         for (i in state.stacks.indices) {
-            val tabView = createTabView(i, container).apply {
+            createTabView(i, container)?.apply {
                 layoutParams = LinearLayout.LayoutParams(layoutParams).apply {
                     width = 0
                     weight = 1F
                 }
                 isSelected = i == state.selectedStack
+                container.addView(this)
             }
-            container.addView(tabView)
         }
     }
 
-    protected open fun createTabView(index: Int, parent: LinearLayout): View =
-        TextView(parent.context).apply {
-            layoutParams = parent.layoutParams
-            gravity = Gravity.CENTER
-            setPadding(40, 40, 40, 40)
-            text = "Tab $index"
-        }
+    protected open fun createTabView(index: Int, parent: LinearLayout): View? = null
 
     private fun selectTab(index: Int) {
         view?.findViewById<LinearLayout>(TAB_CONTAINER_ID)?.let { tabContainer ->
