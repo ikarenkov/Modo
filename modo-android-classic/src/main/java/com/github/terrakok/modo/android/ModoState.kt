@@ -20,7 +20,7 @@ fun Modo.init(bundle: Bundle?, firstScreen: Screen) {
         if (!modoInitialized) {
             Log.d("Modo", "Activity restored after process death")
             modoInitialized = true
-            restoreState(bundle)
+            restoreState(bundle, firstScreen)
         } else {
             Log.d("Modo", "Activity restored after rotation")
             //do nothing
@@ -35,7 +35,7 @@ fun Modo.saveState(bundle: Bundle) {
     bundle.putParcelableArray("key_modo_app_screens", appScreens.values.toTypedArray())
 }
 
-private fun Modo.restoreState(bundle: Bundle) {
+private fun Modo.restoreState(bundle: Bundle, firstScreen: Screen) {
     if (bundle.containsKey("key_modo_state")) {
         val navState = jsonToNavState(
             JSONObject(bundle.getString("key_modo_state")!!),
@@ -46,6 +46,8 @@ private fun Modo.restoreState(bundle: Bundle) {
                 .associateBy { it.id }
         )
         restore(navState)
+    } else {
+        forward(firstScreen)
     }
 }
 
