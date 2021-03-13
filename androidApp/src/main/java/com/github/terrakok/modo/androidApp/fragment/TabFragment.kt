@@ -24,7 +24,7 @@ class TabFragment : Fragment(R.layout.fragment_tab) {
             modo.replace(Screens.Tab(tabId, screenId + 1))
         }
         view.findViewById<View>(R.id.externalForwardButton).setOnClickListener {
-            modo.externalForward(Screens.Start)
+            modo.externalForward(Screens.Start())
         }
         view.findViewById<View>(R.id.changeTabButton).setOnClickListener {
             modo.selectStack((tabId + 1) % 3)
@@ -33,7 +33,7 @@ class TabFragment : Fragment(R.layout.fragment_tab) {
             modo.backToTabRoot()
         }
         view.findViewById<View>(R.id.backToStartButton).setOnClickListener {
-            modo.backTo(Screens.Start.id)
+            modo.backTo(Screens.Start().id)
         }
     }
 

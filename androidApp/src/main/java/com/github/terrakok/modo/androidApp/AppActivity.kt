@@ -40,7 +40,7 @@ class AppActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        modo.init(savedInstanceState, Screens.Start)
+        modo.init(savedInstanceState, Screens.Start())
     }
 
     override fun onResume() {

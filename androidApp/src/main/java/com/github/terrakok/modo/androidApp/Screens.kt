@@ -8,18 +8,22 @@ import com.github.terrakok.modo.android.MultiAppScreen
 import com.github.terrakok.modo.androidApp.fragment.CommandsFragment
 import com.github.terrakok.modo.androidApp.fragment.StartFragment
 import com.github.terrakok.modo.androidApp.fragment.TabFragment
+import kotlinx.parcelize.Parcelize
 
 object Screens {
-    val Start = AppScreen("Start") {
-        StartFragment()
+    @Parcelize
+    class Start : AppScreen("Start") {
+        override fun create() = StartFragment()
     }
 
-    fun Commands(id: Int) = AppScreen(id.toString()) {
-        CommandsFragment.create(id)
+    @Parcelize
+    class Commands(private val i: Int) : AppScreen(i.toString()) {
+        override fun create() = CommandsFragment.create(i)
     }
 
-    fun Tab(tabId: Int, id: Int) = AppScreen("${tabId}:$id") {
-        TabFragment.create(tabId, id)
+    @Parcelize
+    class Tab(private val tabId: Int, private val i: Int) : AppScreen("${tabId}:$i") {
+        override fun create() = TabFragment.create(tabId, i)
     }
 
     fun MultiStack() = MultiAppScreen(
