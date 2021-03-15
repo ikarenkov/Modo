@@ -1,16 +1,16 @@
 pluginManagement {
     repositories {
         google()
-        jcenter()
         gradlePluginPortal()
         mavenCentral()
     }
-    
+
 }
 rootProject.name = "Modo"
 
-include(":androidApp")
 include(":modo")
-include(":modo-android-classic")
-include(":modo-android-compose")
-include(":androidComposeApp")
+include(":modo-render-android-fm")
+include(":modo-render-android-compose")
+
+include(":sample-android-fm")
+include(":sample-android-compose")
