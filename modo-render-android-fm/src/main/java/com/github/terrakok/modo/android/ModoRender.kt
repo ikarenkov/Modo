@@ -78,13 +78,13 @@ open class ModoRender(
                 fragmentManager.beginTransaction().apply {
                     setReorderingAllowed(true)
                     val fragment = screen.create()
+                    setupTransaction(fragmentManager, this, screen, fragment)
                     if (screen.replacePreviousScreen) {
                         replace(containerId, fragment, screen.id)
                     } else {
                         add(containerId, fragment, screen.id)
                     }
                     addToBackStack(screen.id)
-                    setupTransaction(fragmentManager, this, screen, fragment)
                 }.commit()
             } else if (screen is MultiScreen) {
                 pushMultiStackFragment(screen)
