@@ -7,13 +7,13 @@ Modo is navigation library based on UDF principles for developing Single Activit
 <table>
     <tr>
         <td>
-            <img src="https://github.com/terrakok/Modo/raw/master/media/1.gif"/>
+            <img src="https://github.com/terrakok/Modo/raw/master/media/1.gif" width="256"/>
         </td>
         <td>
-            <img src="https://github.com/terrakok/Modo/raw/master/media/2.gif"/>
+            <img src="https://github.com/terrakok/Modo/raw/master/media/2.gif" width="256"/>
         </td>
         <td>
-            <img src="https://github.com/terrakok/Modo/raw/master/media/3.gif"/>
+            <img src="https://github.com/terrakok/Modo/raw/master/media/3.gif" width="256"/>
         </td>
     </tr>
     <tr>
@@ -135,7 +135,7 @@ Modo gives you multistack support out-of-the-box!
 
 1) Use `MultiReducer` for initialization
 ```kotlin
-modo = Modo(LogReducer(AppReducer(this, MultiReducer())))
+modo = Modo(AppReducer(this, MultiReducer()))
 ```
 
 2) Add multistack screen:
