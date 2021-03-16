@@ -8,20 +8,20 @@ buildscript {
     }
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.30")
-        classpath("com.android.tools.build:gradle:7.0.0-alpha09")
+        classpath("com.android.tools.build:gradle:7.0.0-alpha10")
     }
 }
 
 allprojects {
     group = "com.github.terrakok"
-    version = "0.6"
+    version = "0.6.1"
 
     repositories {
         google()
         mavenCentral()
     }
 
-    //PUBLISHING './gradlew bundleReleaseAar publishAllPublicationsToSonatypeRepository'
+    //PUBLISHING './gradlew clean bundleReleaseAar publishAllPublicationsToSonatypeRepository'
     val localProps = gradleLocalProperties(rootDir)
     val emptyJavadocJar by tasks.registering(Jar::class) {
         archiveClassifier.set("javadoc")
