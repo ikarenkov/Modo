@@ -86,11 +86,22 @@ class MultiReducer(
     }
 
     private fun applySelectStackAction(action: SelectStack, state: NavigationState): NavigationState {
-        val screen = state.chain.lastOrNull() ?: return NavigationState()
+        val screen = state.chain.lastOrNull()
         if (screen is MultiScreen) {
-            val newMultiScreen = screen.copy(selectedStack = action.stackIndex)
-            val newChain = state.chain.dropLast(1).plus(newMultiScreen)
-            return NavigationState(newChain)
+            val selectedStack = screen.stacks[screen.selectedStack]
+            if (selectedStack.chain.lastOrNull() is MultiScreen) {
+                val newStacks = screen.stacks.toMutableList()
+                val newLocalChain = applySelectStackAction(action, selectedStack)
+                newStacks[screen.selectedStack] = newLocalChain
+                val newMultiScreen = screen.copy(stacks = newStacks)
+
+                val newChain = state.chain.dropLast(1).plus(newMultiScreen)
+                return NavigationState(newChain)
+            } else {
+                val newMultiScreen = screen.copy(selectedStack = action.stackIndex)
+                val newChain = state.chain.dropLast(1).plus(newMultiScreen)
+                return NavigationState(newChain)
+            }
         } else {
             return state
         }
