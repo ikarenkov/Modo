@@ -11,6 +11,10 @@ import com.github.terrakok.modo.MultiScreen
 import com.github.terrakok.modo.NavigationRender
 import com.github.terrakok.modo.android.MultiStackFragment
 
+interface TabViewFactory {
+    fun createTabView(index: Int, parent: LinearLayout): View
+}
+
 open class MultiStackFragmentImpl : MultiStackFragment() {
     private var multiScreen: MultiScreen? = null
         set(value) {
@@ -102,7 +106,18 @@ open class MultiStackFragmentImpl : MultiStackFragment() {
         }
     }
 
-    protected open fun createTabView(index: Int, parent: LinearLayout): View? = null
+    protected open fun createTabView(index: Int, parent: LinearLayout): View? =
+        findTabViewFactory(this)?.createTabView(index, parent)
+
+    private fun findTabViewFactory(fragment: Fragment): TabViewFactory? {
+        val parent = fragment.parentFragment
+        if (parent != null) {
+            if (parent is TabViewFactory) return parent
+            else return findTabViewFactory(parent)
+        } else {
+            return activity as? TabViewFactory
+        }
+    }
 
     private fun selectTab(index: Int) {
         view?.findViewById<LinearLayout>(TAB_CONTAINER_ID)?.let { tabContainer ->

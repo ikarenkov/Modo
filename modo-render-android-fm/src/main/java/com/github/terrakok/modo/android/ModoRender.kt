@@ -56,6 +56,7 @@ open class ModoRender(
         }
         val currentScreen = currentState.chain.lastOrNull()
         if (currentScreen is MultiScreen) {
+            fragmentManager.executePendingTransactions()
             (fragmentManager.findFragmentById(containerId) as MultiStackFragment)
                 .applyMultiState(currentScreen)
         }
