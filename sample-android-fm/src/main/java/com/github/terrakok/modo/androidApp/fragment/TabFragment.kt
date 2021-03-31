@@ -30,7 +30,7 @@ class TabFragment : Fragment(R.layout.fragment_tab) {
             modo.selectStack((tabId + 1) % 3)
         }
         view.findViewById<View>(R.id.backToTabRootButton).setOnClickListener {
-            modo.backToTabRoot()
+            modo.backToLocalRoot()
         }
         view.findViewById<View>(R.id.backToStartButton).setOnClickListener {
             modo.backTo(Screens.Start().id)

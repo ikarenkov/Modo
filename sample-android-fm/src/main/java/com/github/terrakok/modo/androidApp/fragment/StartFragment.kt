@@ -20,6 +20,9 @@ class StartFragment : Fragment(R.layout.fragment_start) {
         view.findViewById<View>(R.id.multiButton).setOnClickListener {
             modo.forward(Screens.MultiStack())
         }
+        view.findViewById<View>(R.id.flowButton).setOnClickListener {
+            modo.forward(Screens.FlowScreen())
+        }
         view.findViewById<View>(R.id.githubButton).setOnClickListener {
             modo.launch(Screens.Browser("https://github.com/terrakok/Modo"))
         }

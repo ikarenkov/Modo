@@ -18,22 +18,24 @@ class AppActivity : AppCompatActivity() {
     //must be lazy otherwise initialization fails with early access to fragment manager
     private val modoRender by lazy {
         object : ModoRender(this@AppActivity, R.id.container) {
-            override fun createMultiStackFragment() = MyMultiStackFragment()
+            override fun createMultiStackFragment(multiScreen: MultiScreen) = MyMultiStackFragment()
 
             //only for sample
             override fun invoke(state: NavigationState) {
                 super.invoke(state)
-                findViewById<TextView>(R.id.title).text =
-                    state.chain.joinToString(" - ") { screen ->
-                        if (screen is MultiScreen) {
-                            val chain = screen.stacks[screen.selectedStack].chain
-                                .joinToString(" - ") { it.id }
-                            "${screen.id}[$chain]"
-                        } else {
-                            screen.id
-                        }
-                    }
+                findViewById<TextView>(R.id.title).text = chainToString(state.chain)
             }
+
+            private fun chainToString(chain: List<Screen>): String =
+                chain.joinToString(" - ") { screen ->
+                    if (screen is MultiScreen) {
+                        val localChain = screen.stacks[screen.selectedStack].chain
+                        val str = chainToString(localChain)
+                        "${screen.id}[$str]"
+                    } else {
+                        screen.id
+                    }
+                }
         }
     }
 
@@ -74,7 +76,7 @@ class MyMultiStackFragment : MultiStackFragmentImpl() {
                     if (currentScreen.selectedStack != index) {
                         modo.selectStack(index)
                     } else {
-                        modo.backToTabRoot()
+                        modo.backToLocalRoot()
                     }
                 }
             }

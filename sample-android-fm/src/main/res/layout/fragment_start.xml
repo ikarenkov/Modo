@@ -27,11 +27,25 @@
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="16dp"
         android:text="Multistack navigation"
-        app:layout_constraintBottom_toTopOf="@+id/githubButton"
+        app:layout_constraintBottom_toTopOf="@+id/flowButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/commandsButton" />
+
+    <Button
+        android:id="@+id/flowButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="16dp"
+        android:text="Flow navigation"
+        app:layout_constraintBottom_toTopOf="@+id/githubButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/multiButton" />
 
     <Button
         android:id="@+id/githubButton"
@@ -44,5 +58,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/multiButton" />
+        app:layout_constraintTop_toBottomOf="@+id/flowButton" />
 </androidx.constraintlayout.widget.ConstraintLayout>

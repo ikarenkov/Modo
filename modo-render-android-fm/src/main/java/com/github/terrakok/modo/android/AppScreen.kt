@@ -28,6 +28,15 @@ fun MultiAppScreen(
     selected
 )
 
+fun FlowAppScreen(
+    id: String,
+    root: AppScreen
+) = MultiScreen(
+    id,
+    listOf(NavigationState(listOf(root))),
+    0
+)
+
 abstract class MultiStackFragment : Fragment {
     constructor() : super()
     constructor(@LayoutRes contentLayoutId: Int) : super(contentLayoutId)

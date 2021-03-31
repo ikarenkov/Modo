@@ -7,77 +7,92 @@ data class MultiScreen(
 ) : Screen
 
 class ExternalForward(val screen: Screen, vararg val screens: Screen) : NavigationAction
-object BackToTabRoot : NavigationAction
+object BackToLocalRoot : NavigationAction
 class SelectStack(val stackIndex: Int) : NavigationAction
 
 fun Modo.externalForward(screen: Screen, vararg screens: Screen) = dispatch(ExternalForward(screen, *screens))
 fun Modo.selectStack(stackIndex: Int) = dispatch(SelectStack(stackIndex))
-fun Modo.backToTabRoot() = dispatch(BackToTabRoot)
+fun Modo.backToLocalRoot() = dispatch(BackToLocalRoot)
 
 class MultiReducer(
     private val origin: ModoReducer = ModoReducer()
 ) : NavigationReducer {
-    override fun invoke(action: NavigationAction, state: NavigationState): NavigationState {
-        val currentScreen = state.chain.lastOrNull()
+    override fun invoke(action: NavigationAction, state: NavigationState) = when (action) {
+        is Exit, is BackToRoot, is NewStack -> origin(action, state)
+        is ExternalForward -> origin(Forward(action.screen, *action.screens), state)
+        is Forward, is Replace, is Back -> applyLocalAction(action, state)
+        is BackToLocalRoot -> applyLocalAction(BackToRoot, state)
+        is BackTo -> applyBackToAction(action, state) ?: state
+        is SelectStack -> applySelectStackAction(action, state)
+        else -> state
+    }
 
-        return if (currentScreen is MultiScreen) {
-            when {
-                action is ExternalForward -> {
-                    origin(Forward(action.screen, *action.screens), state)
-                }
-                action is BackToTabRoot -> {
-                    val localState = currentScreen.stacks[currentScreen.selectedStack]
-                    val newLocalState =
-                        NavigationState(listOfNotNull(localState.chain.firstOrNull()))
+    private fun applyLocalAction(action: NavigationAction, state: NavigationState): NavigationState {
+        val localNavigationState = getLocalNavigationState(state)
+        val newLocalNavigationState = origin(action, localNavigationState)
+        return applyNewLocalNavigationState(state, newLocalNavigationState)
+    }
 
-                    val newStacks = currentScreen.stacks.toMutableList()
-                    newStacks[currentScreen.selectedStack] = newLocalState
+    private fun getLocalNavigationState(state: NavigationState): NavigationState {
+        val screen = state.chain.lastOrNull()
+        if (screen is MultiScreen) {
+            return getLocalNavigationState(screen.stacks[screen.selectedStack])
+        } else {
+            return state
+        }
+    }
 
-                    val newScreen = currentScreen.copy(stacks = newStacks)
-                    origin(Replace(newScreen), state)
-                }
-                action is SelectStack -> {
-                    val newScreen = currentScreen.copy(selectedStack = action.stackIndex)
-                    origin(Replace(newScreen), state)
-                }
-                standardActionIsApplicable(currentScreen, action) -> {
-                    val newScreen = applyOriginToMultiScreen(action, currentScreen)
-                    origin(Replace(newScreen), state)
-                }
-                else -> {
-                    origin(action, state)
-                }
+    private fun applyNewLocalNavigationState(state: NavigationState, local: NavigationState): NavigationState {
+        val screen = state.chain.lastOrNull()
+        if (screen is MultiScreen) {
+            val selectedStack = screen.stacks[screen.selectedStack]
+            val newLocalChain = applyNewLocalNavigationState(selectedStack, local)
+
+            if (newLocalChain.chain.isNotEmpty()) {
+                val newStacks = screen.stacks.toMutableList()
+                newStacks[screen.selectedStack] = newLocalChain
+                val newMultiScreen = screen.copy(stacks = newStacks)
+
+                val newChain = state.chain.dropLast(1).plus(newMultiScreen)
+                return NavigationState(newChain)
+            } else {
+                val newChain = state.chain.dropLast(1)
+                return NavigationState(newChain)
             }
         } else {
-            origin(action, state)
+            return local
         }
     }
 
-    private fun standardActionIsApplicable(
-        multiScreen: MultiScreen,
-        action: NavigationAction
-    ): Boolean {
-        if (action is Forward || action is Replace) return true
-        if (action is Back) {
-            return multiScreen.stacks[multiScreen.selectedStack].chain.size > 1
+    private fun applyBackToAction(action: BackTo, state: NavigationState): NavigationState? {
+        val screen = state.chain.lastOrNull() ?: return null
+        if (screen is MultiScreen) {
+            val newLocalChain = applyBackToAction(action, screen.stacks[screen.selectedStack])
+            if (newLocalChain == null) {
+                if (state.chain.none { it.id == action.screenId }) return null
+                return origin(action, state)
+            } else {
+                val newStacks = screen.stacks.toMutableList()
+                newStacks[screen.selectedStack] = newLocalChain
+                val newMultiScreen = screen.copy(stacks = newStacks)
+
+                val newChain = state.chain.dropLast(1).plus(newMultiScreen)
+                return NavigationState(newChain)
+            }
+        } else {
+            if (state.chain.none { it.id == action.screenId }) return null
+            return origin(action, state)
         }
-        if (action is BackTo) {
-            val localState = multiScreen.stacks[multiScreen.selectedStack]
-            return localState.chain.any { it.id == action.screenId }
-        }
-        return false
     }
 
-    private fun applyOriginToMultiScreen(
-        action: NavigationAction,
-        multiScreen: MultiScreen
-    ): MultiScreen {
-        val localState = multiScreen.stacks[multiScreen.selectedStack]
-        val newLocalState = origin(action, localState)
-
-        val newStacks = multiScreen.stacks.toMutableList()
-        newStacks[multiScreen.selectedStack] = newLocalState
-
-        return multiScreen.copy(stacks = newStacks)
+    private fun applySelectStackAction(action: SelectStack, state: NavigationState): NavigationState {
+        val screen = state.chain.lastOrNull() ?: return NavigationState()
+        if (screen is MultiScreen) {
+            val newMultiScreen = screen.copy(selectedStack = action.stackIndex)
+            val newChain = state.chain.dropLast(1).plus(newMultiScreen)
+            return NavigationState(newChain)
+        } else {
+            return state
+        }
     }
 }

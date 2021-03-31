@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import com.github.terrakok.modo.android.AppScreen
 import com.github.terrakok.modo.android.ExternalScreen
+import com.github.terrakok.modo.android.FlowAppScreen
 import com.github.terrakok.modo.android.MultiAppScreen
 import com.github.terrakok.modo.androidApp.fragment.CommandsFragment
 import com.github.terrakok.modo.androidApp.fragment.StartFragment
@@ -30,6 +31,11 @@ object Screens {
         "MultiStack",
         listOf(Tab(0, 1), Tab(1, 1), Tab(2, 1)),
         1
+    )
+
+    fun FlowScreen() = FlowAppScreen(
+        "FlowScreen",
+        Start()
     )
 
     fun Browser(url: String) = ExternalScreen {

@@ -88,14 +88,16 @@ open class MultiStackFragmentImpl : MultiStackFragment() {
 
     private fun createTabs(state: MultiScreen, container: LinearLayout) {
         container.removeAllViews()
-        for (i in state.stacks.indices) {
-            createTabView(i, container)?.apply {
-                layoutParams = LinearLayout.LayoutParams(layoutParams).apply {
-                    width = 0
-                    weight = 1F
+        if (state.stacks.size > 1) {
+            for (i in state.stacks.indices) {
+                createTabView(i, container)?.apply {
+                    layoutParams = LinearLayout.LayoutParams(layoutParams).apply {
+                        width = 0
+                        weight = 1F
+                    }
+                    isSelected = i == state.selectedStack
+                    container.addView(this)
                 }
-                isSelected = i == state.selectedStack
-                container.addView(this)
             }
         }
     }
