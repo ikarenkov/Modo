@@ -67,15 +67,6 @@ class AppActivity : AppCompatActivity(), TabViewFactory {
             .inflate(R.layout.layout_tab, parent, false)
             .apply {
                 findViewById<TextView>(R.id.title).text = "Tab ${index + 1}"
-                setOnClickListener {
-                    val currentScreen = modo.state.chain.lastOrNull()
-                    if (currentScreen is MultiScreen) {
-                        if (currentScreen.selectedStack != index) {
-                            modo.selectStack(index)
-                        } else {
-                            modo.backToLocalRoot()
-                        }
-                    }
-                }
+                setOnClickListener { modo.selectStack(index) }
             }
 }
