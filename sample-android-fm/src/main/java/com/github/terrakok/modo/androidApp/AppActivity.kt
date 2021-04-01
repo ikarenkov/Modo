@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.github.terrakok.modo.*
@@ -21,19 +22,32 @@ class AppActivity : AppCompatActivity(), TabViewFactory {
             //only for sample
             override fun invoke(state: NavigationState) {
                 super.invoke(state)
-                findViewById<TextView>(R.id.title).text = chainToString(state.chain)
+                val stateStr = "‣root\n${getNavigationStateString("⦙  ", state).trimEnd()}  ᐊ current screen"
+                findViewById<TextView>(R.id.log).text = stateStr
+                findViewById<ScrollView>(R.id.scroll).apply {
+                    post { fullScroll(View.FOCUS_DOWN) }
+                }
             }
 
-            private fun chainToString(chain: List<Screen>): String =
-                chain.joinToString(" - ") { screen ->
-                    if (screen is MultiScreen) {
-                        val localChain = screen.stacks[screen.selectedStack].chain
-                        val str = chainToString(localChain)
-                        "${screen.id}[$str]"
-                    } else {
-                        screen.id
+            //copy-paste from LogReducer
+            private fun getNavigationStateString(prefix: String, navigationState: NavigationState): String =
+                navigationState.chain.map { screen ->
+                    when (screen) {
+                        is MultiScreen -> buildString {
+                            append(prefix)
+                            append('‣')
+                            append(screen.id)
+                            if (screen.stacks.size > 1) {
+                                append(" [${screen.selectedStack + 1}/${screen.stacks.size}]")
+                            }
+                            append('\n')
+                            append(getNavigationStateString("$prefix⦙  ", screen.stacks[screen.selectedStack]))
+                        }
+                        else -> {
+                            "$prefix${screen.id}\n"
+                        }
                     }
-                }
+                }.joinToString(separator = "")
         }
     }
 
