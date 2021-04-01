@@ -10,12 +10,16 @@ import androidx.fragment.app.Fragment
 import com.github.terrakok.modo.MultiScreen
 import com.github.terrakok.modo.NavigationRender
 import com.github.terrakok.modo.android.MultiStackFragment
+import kotlin.random.Random
 
 interface TabViewFactory {
     fun createTabView(index: Int, parent: LinearLayout): View
 }
 
 open class MultiStackFragmentImpl : MultiStackFragment() {
+    private val CONTAINER_ID = Random.nextInt()
+    private val TAB_CONTAINER_ID = Random.nextInt()
+
     private var multiScreen: MultiScreen? = null
         set(value) {
             if (value != null) {
@@ -149,10 +153,5 @@ open class MultiStackFragmentImpl : MultiStackFragment() {
                 }
             }
         }.commitNowAllowingStateLoss()
-    }
-
-    companion object {
-        private const val CONTAINER_ID = 9283
-        private const val TAB_CONTAINER_ID = 9284
     }
 }
