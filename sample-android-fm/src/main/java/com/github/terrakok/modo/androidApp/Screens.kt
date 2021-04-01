@@ -18,12 +18,12 @@ object Screens {
     }
 
     @Parcelize
-    class Commands(private val i: Int) : AppScreen(i.toString()) {
+    class Commands(private val i: Int) : AppScreen("c_$i") {
         override fun create() = CommandsFragment.create(i)
     }
 
     @Parcelize
-    class Tab(private val tabId: Int, private val i: Int) : AppScreen("${tabId}:$i") {
+    class Tab(private val tabId: Int, private val i: Int) : AppScreen("t_$i") {
         override fun create() = TabFragment.create(tabId, i)
     }
 
@@ -34,7 +34,7 @@ object Screens {
     )
 
     fun FlowScreen() = FlowAppScreen(
-        "FlowScreen",
+        "Flow",
         Start()
     )
 

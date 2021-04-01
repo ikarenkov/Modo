@@ -17,8 +17,8 @@ interface TabViewFactory {
 }
 
 open class MultiStackFragmentImpl : MultiStackFragment() {
-    private val CONTAINER_ID = Random.nextInt()
-    private val TAB_CONTAINER_ID = Random.nextInt()
+    private var CONTAINER_ID: Int = -1
+    private var TAB_CONTAINER_ID: Int = -1
 
     private var multiScreen: MultiScreen? = null
         set(value) {
@@ -60,6 +60,18 @@ open class MultiStackFragmentImpl : MultiStackFragment() {
             .filterIsInstance<StackContainerFragment>()
             .firstOrNull { it.isVisible }
             ?.getCurrentFragment()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        CONTAINER_ID = savedInstanceState?.getInt("CONTAINER_ID") ?: Random.nextInt()
+        TAB_CONTAINER_ID = savedInstanceState?.getInt("TAB_CONTAINER_ID") ?: Random.nextInt()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("CONTAINER_ID", CONTAINER_ID)
+        outState.putInt("TAB_CONTAINER_ID", TAB_CONTAINER_ID)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
