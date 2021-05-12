@@ -26,12 +26,12 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.0.0-beta01"
+        kotlinCompilerExtensionVersion = "1.0.0-beta06"
     }
 }
 
 dependencies {
     implementation(project(":modo"))
-    implementation("androidx.compose.ui:ui:1.0.0-beta01")
-    implementation("androidx.compose.foundation:foundation:1.0.0-beta01")
+    implementation("androidx.compose.ui:ui:1.0.0-beta06")
+    implementation("androidx.compose.foundation:foundation:1.0.0-beta06")
 }
