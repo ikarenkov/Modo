@@ -13,11 +13,11 @@ dependencies {
 }
 
 android {
-    compileSdkVersion(30)
+    compileSdk = 30
     defaultConfig {
         applicationId = "com.github.terrakok.modo.androidApp"
-        minSdkVersion(24)
-        targetSdkVersion(30)
+        minSdk = 24
+        targetSdk = 30
         versionCode = 1
         versionName = "1.0"
     }

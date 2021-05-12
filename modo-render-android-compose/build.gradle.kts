@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    compileSdkVersion(30)
+    compileSdk = 30
 
     defaultConfig {
-        minSdkVersion(21)
-        targetSdkVersion(30)
+        minSdk = 21
+        targetSdk = 30
     }
 
     compileOptions {
@@ -26,12 +26,12 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.0.0-beta01"
+        kotlinCompilerExtensionVersion = "1.0.0-beta06"
     }
 }
 
 dependencies {
     implementation(project(":modo"))
-    implementation("androidx.compose.ui:ui:1.0.0-beta01")
-    implementation("androidx.compose.foundation:foundation:1.0.0-beta01")
+    implementation("androidx.compose.ui:ui:1.0.0-beta06")
+    implementation("androidx.compose.foundation:foundation:1.0.0-beta06")
 }
