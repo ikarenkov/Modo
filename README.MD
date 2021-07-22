@@ -166,6 +166,12 @@ class MyMultiStackFragment : MultiStackFragmentImpl() {
   override fun createTabView(index: Int, parent: LinearLayout): View =
     LayoutInflater.from(context)
       .inflate(R.layout.layout_tab, parent, false)
+
+  // optional
+  override fun decorTabContainer(view: LinearLayout) {
+    // customize tab container
+    // view.elevation = 8.dpToPx()
+  }
 }
 ```
 
