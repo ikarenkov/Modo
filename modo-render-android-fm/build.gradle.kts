@@ -25,7 +25,7 @@ android {
 
 dependencies {
     implementation(project(":modo"))
-    implementation("androidx.fragment:fragment:1.3.3")
+    implementation("androidx.fragment:fragment:1.3.6")
 
     testImplementation("junit:junit:4.13.2")
 }

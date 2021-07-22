@@ -26,6 +26,7 @@ open class MultiStackFragmentImpl : MultiStackFragment() {
                 if (field == null) {
                     view?.findViewById<LinearLayout>(TAB_CONTAINER_ID)?.let {
                         createTabs(value, it)
+                        decorTabContainer(it)
                     }
                 }
 
@@ -124,6 +125,11 @@ open class MultiStackFragmentImpl : MultiStackFragment() {
 
     protected open fun createTabView(index: Int, parent: LinearLayout): View? =
         findTabViewFactory(this)?.createTabView(index, parent)
+
+
+    protected open fun decorTabContainer(view: LinearLayout) {
+        // Do nothing by default
+    }
 
     private fun findTabViewFactory(fragment: Fragment): TabViewFactory? {
         val parent = fragment.parentFragment
