@@ -5,12 +5,12 @@ plugins {
 }
 
 android {
-    compileSdk = 30
+    compileSdk = (properties["android.compileSdk"] as String).toInt()
 
     defaultConfig {
         applicationId = "com.github.terrakok.androidcomposeapp"
-        minSdk = 21
-        targetSdk = 30
+        minSdk = (properties["android.minSdk"] as String).toInt()
+        targetSdk = (properties["android.targetSdk"] as String).toInt()
         versionCode = 1
         versionName = "1.0"
     }
@@ -22,7 +22,6 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
-        useIR = true
     }
 
     buildFeatures {
@@ -30,19 +29,19 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.0.0-beta06"
+        kotlinCompilerExtensionVersion = properties["version.kotlinCompilerExtension"] as String
     }
 }
 
 dependencies {
     implementation(project(":modo"))
     implementation(project(":modo-render-android-compose"))
-    implementation("androidx.core:core-ktx:1.3.2")
-    implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("com.google.android.material:material:1.3.0")
-    implementation("androidx.compose.ui:ui:1.0.0-beta06")
-    implementation("androidx.compose.material:material:1.0.0-beta06")
-    implementation("androidx.compose.ui:ui-tooling:1.0.0-beta06")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
-    implementation("androidx.activity:activity-compose:1.3.0-alpha07")
+    implementation("androidx.core:core-ktx:${properties["version.coreKtx"]}")
+    implementation("androidx.appcompat:appcompat:${properties["version.appcompat"]}")
+    implementation("com.google.android.material:material:${properties["version.material"]}")
+    implementation("androidx.compose.ui:ui:${properties["version.compose"]}")
+    implementation("androidx.compose.material:material:${properties["version.compose"]}")
+    implementation("androidx.compose.ui:ui-tooling:${properties["version.compose"]}")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:${properties["version.lifecycleRuntimeKtx"]}")
+    implementation("androidx.activity:activity-compose:${properties["version.composeActivity"]}")
 }

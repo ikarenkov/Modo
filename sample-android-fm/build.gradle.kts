@@ -7,17 +7,17 @@ plugins {
 dependencies {
     implementation(project(":modo"))
     implementation(project(":modo-render-android-fm"))
-    implementation("com.google.android.material:material:1.4.0")
-    implementation("androidx.appcompat:appcompat:1.3.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.4")
+    implementation("com.google.android.material:material:${properties["version.material"]}")
+    implementation("androidx.appcompat:appcompat:${properties["version.appcompat"]}")
+    implementation("androidx.constraintlayout:constraintlayout:${properties["version.constraint"]}")
 }
 
 android {
-    compileSdk = 30
+    compileSdk = (properties["android.compileSdk"] as String).toInt()
     defaultConfig {
         applicationId = "com.github.terrakok.modo.androidApp"
-        minSdk = 24
-        targetSdk = 30
+        minSdk = (properties["android.minSdk"] as String).toInt()
+        targetSdk = (properties["android.targetSdk"] as String).toInt()
         versionCode = 1
         versionName = "1.0"
     }
