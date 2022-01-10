@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    compileSdk = 30
+    compileSdk = (properties["android.compileSdk"] as String).toInt()
 
     defaultConfig {
-        minSdk = 21
-        targetSdk = 30
+        minSdk = (properties["android.minSdk"] as String).toInt()
+        targetSdk = (properties["android.targetSdk"] as String).toInt()
     }
 
     compileOptions {
@@ -25,9 +25,9 @@ android {
 
 dependencies {
     implementation(project(":modo"))
-    implementation("androidx.fragment:fragment:1.3.6")
+    implementation("androidx.fragment:fragment:${properties["version.fragment"]}")
 
-    testImplementation("junit:junit:4.13.2")
+    testImplementation("junit:junit:${properties["version.junit"]}")
 }
 
 val sourceJar by tasks.registering(Jar::class) {

@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    compileSdk = 30
+    compileSdk = (properties["android.compileSdk"] as String).toInt()
 
     defaultConfig {
-        minSdk = 21
-        targetSdk = 30
+        minSdk = (properties["android.minSdk"] as String).toInt()
+        targetSdk = (properties["android.targetSdk"] as String).toInt()
     }
 
     compileOptions {
@@ -18,7 +18,6 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
-        useIR = true
     }
 
     buildFeatures {
@@ -26,12 +25,12 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.0.0-beta06"
+        kotlinCompilerExtensionVersion = properties["version.kotlinCompilerExtension"] as String
     }
 }
 
 dependencies {
     implementation(project(":modo"))
-    implementation("androidx.compose.ui:ui:1.0.0-beta06")
-    implementation("androidx.compose.foundation:foundation:1.0.0-beta06")
+    implementation("androidx.compose.ui:ui:${properties["version.compose"]}")
+    implementation("androidx.compose.foundation:foundation:${properties["version.compose"]}")
 }
