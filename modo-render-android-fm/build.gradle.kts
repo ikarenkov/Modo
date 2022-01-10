@@ -31,7 +31,7 @@ dependencies {
 }
 
 val sourceJar by tasks.registering(Jar::class) {
-    from(android.sourceSets["main"].java.srcDirs())
+    from(android.sourceSets["main"].java.srcDirs().srcDirs)
     archiveClassifier.set("sources")
 }
 
