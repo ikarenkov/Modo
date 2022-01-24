@@ -16,7 +16,7 @@ class AppActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        modo.init(savedInstanceState, SampleScreen(1))
+        modo.init(savedInstanceState) { SampleScreen(1) }
         setContent {
             Surface(color = MaterialTheme.colors.background) {
                 render.Content()
