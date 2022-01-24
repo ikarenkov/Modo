@@ -8,7 +8,7 @@ import com.github.terrakok.modo.forward
 
 private var modoInitialized: Boolean = false
 
-fun Modo.init(bundle: Bundle?, firstScreen: ComposeScreen) {
+fun Modo.init(bundle: Bundle?, firstScreenFactory: () -> ComposeScreen) {
     if (bundle == null) {
         if (!modoInitialized) {
             Log.d("Modo", "Activity first launch")
@@ -16,7 +16,7 @@ fun Modo.init(bundle: Bundle?, firstScreen: ComposeScreen) {
         } else {
             Log.d("Modo", "Activity re-launch")
         }
-        forward(firstScreen)
+        forward(firstScreenFactory())
     } else {
         if (!modoInitialized) {
             Log.d("Modo", "Activity restored after process death")
