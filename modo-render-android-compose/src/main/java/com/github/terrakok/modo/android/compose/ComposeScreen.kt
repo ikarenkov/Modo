@@ -7,6 +7,9 @@ import com.github.terrakok.modo.Screen
 abstract class ComposeScreen(
     override val id: String
 ) : Screen, Parcelable {
+
+    abstract val screenKey: String
+
     @Composable
     abstract fun Content()
 
