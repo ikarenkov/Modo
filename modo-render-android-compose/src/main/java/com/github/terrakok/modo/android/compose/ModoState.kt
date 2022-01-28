@@ -21,6 +21,7 @@ fun Modo.init(bundle: Bundle?, firstScreenFactory: () -> ComposeScreen) {
         if (!modoInitialized) {
             Log.d("Modo", "Activity restored after process death")
             modoInitialized = true
+            restoreScreenCounter(bundle.getInt(KEY_NAVIGATION_SCREEN_COUNTER)!!)
             val restoredState = bundle.restoreNavigationState()
             if (restoredState.chain.isNotEmpty()) {
                 restore(restoredState)
@@ -32,7 +33,8 @@ fun Modo.init(bundle: Bundle?, firstScreenFactory: () -> ComposeScreen) {
     }
 }
 
-private const val KEY_NAVIGATION_STATE = "ket_nav_state"
+private const val KEY_NAVIGATION_STATE = "KEY_NAVIGATION_STATE"
+private const val KEY_NAVIGATION_SCREEN_COUNTER = "KEY_NAVIGATION_SCREEN_COUNTER"
 private fun Bundle.restoreNavigationState() = NavigationState(
     getParcelableArray(KEY_NAVIGATION_STATE)
         ?.toList()
@@ -45,4 +47,5 @@ fun Modo.saveState(bundle: Bundle) {
         KEY_NAVIGATION_STATE,
         state.chain.filterIsInstance<ComposeScreen>().toTypedArray()
     )
+    bundle.putInt(KEY_NAVIGATION_SCREEN_COUNTER, screenCounterKey.get())
 }
