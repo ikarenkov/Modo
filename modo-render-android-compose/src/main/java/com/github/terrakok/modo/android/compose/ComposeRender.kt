@@ -3,7 +3,6 @@ package com.github.terrakok.modo.android.compose
 import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.SaveableStateHolder
@@ -33,19 +32,14 @@ class ComposeRender(
     @Composable
     fun Content() {
         val stateHolder = rememberSaveableStateHolder()
-        SideEffect {
-            // Have to try to clear state holder, because changes inside chain might happens.
-            clearStateHolder(stateHolder)
+        DisposableEffect(key1 = state) {
+            onDispose {
+                clearStateHolder(stateHolder)
+            }
         }
         state.chain.lastOrNull()?.let { screen ->
             require(screen is ComposeScreen) {
                 "ComposeRender works with ComposeScreen only! Received $screen"
-            }
-            // It works, until our navigation is stack, but it stop works, when we remove screens inside.
-            DisposableEffect(key1 = screen) {
-                onDispose {
-                    clearStateHolder(stateHolder)
-                }
             }
             stateHolder.SaveableStateProvider(key = screen.screenKey) {
                 screen.Content()

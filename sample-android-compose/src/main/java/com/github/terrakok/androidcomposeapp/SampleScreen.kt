@@ -60,6 +60,7 @@ private fun SampleContent(i: Int, modo: Modo) {
             "Back" to { modo.back() },
             "Forward" to { modo.forward(SampleScreen(i + 1)) },
             "Replace" to { modo.replace(SampleScreen(i + 1)) },
+            "Delete prev" to { modo.dispatch(RemovePrev()) },
             "Multi forward" to {
                 modo.forward(
                     SampleScreen(i + 1),
