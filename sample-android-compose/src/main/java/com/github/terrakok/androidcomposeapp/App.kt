@@ -6,7 +6,7 @@ import com.github.terrakok.modo.android.compose.AppReducer
 import com.github.terrakok.modo.android.compose.LogReducer
 
 class App : Application() {
-    val modo = Modo(LogReducer(AppReducer(this)))
+    val modo = Modo(LogReducer(CustomModoReducer(AppReducer(this))))
 
     override fun onCreate() {
         INSTANCE = this
