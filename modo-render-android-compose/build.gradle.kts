@@ -1,6 +1,8 @@
 plugins {
     id("com.android.library")
     kotlin("android")
+    id("maven-publish")
+    id("signing")
 }
 
 android {
@@ -33,4 +35,18 @@ dependencies {
     implementation(project(":modo"))
     implementation("androidx.compose.ui:ui:${properties["version.compose"]}")
     implementation("androidx.compose.foundation:foundation:${properties["version.compose"]}")
+}
+
+val sourceJar by tasks.registering(Jar::class) {
+    from(android.sourceSets["main"].java.srcDirs().srcDirs)
+    archiveClassifier.set("sources")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("release") {
+            artifact(sourceJar.get())
+            artifact("$buildDir/outputs/aar/${artifactId}-${name}.aar")
+        }
+    }
 }

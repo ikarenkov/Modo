@@ -8,13 +8,13 @@ buildscript {
     }
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${properties["version.kotlin"]}")
-        classpath("com.android.tools.build:gradle:7.1.0-rc01")
+        classpath("com.android.tools.build:gradle:7.1.1")
     }
 }
 
 allprojects {
     group = "com.github.terrakok"
-    version = "0.6.2"
+    version = "0.6.3"
 
     repositories {
         google()
