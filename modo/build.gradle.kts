@@ -10,7 +10,8 @@ kotlin {
         publishAllLibraryVariants()
     }
     // for future experiments with compose multiplatform
-    macosX64()
+    linuxX64()
+    jvm()
     sourceSets {
         val commonTest by getting {
             dependencies {
@@ -20,6 +21,8 @@ kotlin {
         }
         val commonMain by sourceSets.getting
         val androidMain by sourceSets.getting
+        val linuxX64Main by sourceSets.getting
+        val jvmMain by sourceSets.getting
     }
 }
 
