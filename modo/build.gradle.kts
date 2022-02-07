@@ -9,6 +9,8 @@ kotlin {
     android {
         publishAllLibraryVariants()
     }
+    // for future experiments with compose multiplatform
+    macosX64()
     sourceSets {
         val commonTest by getting {
             dependencies {
