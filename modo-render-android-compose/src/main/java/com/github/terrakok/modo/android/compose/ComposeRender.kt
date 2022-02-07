@@ -17,7 +17,8 @@ class ComposeRender(
 ) : NavigationRender {
     constructor(activity: Activity) : this({ activity.finish() })
 
-    private var state: NavigationState by mutableStateOf(NavigationState())
+    var state: NavigationState by mutableStateOf(NavigationState())
+        private set
 
     private val removedScreens = mutableSetOf<Screen>()
 

@@ -46,15 +46,16 @@ private fun SampleContent(i: Int, modo: Modo) {
             .padding(8.dp)
             .fillMaxHeight()
     ) {
+        Spacer(modifier = Modifier.size(16.dp))
         Text(
             text = "Screen $i",
             fontSize = 28.sp,
             modifier = Modifier
-                .padding(16.dp)
                 .weight(1f)
                 .fillMaxSize(),
             textAlign = TextAlign.Center
         )
+        Spacer(modifier = Modifier.size(16.dp))
         Spacer(modifier = Modifier.size(8.dp))
         val buttons = listOf(
             "Back" to { modo.back() },

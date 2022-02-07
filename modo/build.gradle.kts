@@ -9,7 +9,9 @@ kotlin {
     android {
         publishAllLibraryVariants()
     }
-    jvm() //for future experiments
+    // for future experiments with compose multiplatform
+    linuxX64()
+    jvm()
     sourceSets {
         val commonTest by getting {
             dependencies {
@@ -17,6 +19,10 @@ kotlin {
                 implementation(kotlin("test-annotations-common"))
             }
         }
+        val commonMain by sourceSets.getting
+        val androidMain by sourceSets.getting
+        val linuxX64Main by sourceSets.getting
+        val jvmMain by sourceSets.getting
     }
 }
 
