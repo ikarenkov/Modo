@@ -3,12 +3,25 @@ package com.github.terrakok.androidcomposeapp
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.android.compose.ComposeRender
 import com.github.terrakok.modo.android.compose.init
 import com.github.terrakok.modo.android.compose.saveState
 import com.github.terrakok.modo.back
+import com.github.terrakok.modo.format
 
 class AppActivity : AppCompatActivity() {
     private val modo get() = App.INSTANCE.modo
@@ -19,7 +32,26 @@ class AppActivity : AppCompatActivity() {
         modo.init(savedInstanceState) { SampleScreen(1) }
         setContent {
             Surface(color = MaterialTheme.colors.background) {
-                render.Content()
+                Column {
+                    val scrollState = rememberScrollState()
+                    val text = render.state.format()
+                    LaunchedEffect(text) {
+                        scrollState.animateScrollTo(scrollState.maxValue)
+                    }
+                    Text(
+                        text = text,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .background(Color.Black)
+                            .padding(4.dp)
+                            .verticalScroll(scrollState),
+                        color = Color.White.copy(alpha = 0.5f)
+                    )
+                    Box(modifier = Modifier.weight(3f)) {
+                        render.Content()
+                    }
+                }
             }
         }
     }

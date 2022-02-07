@@ -1,9 +1,9 @@
 package com.github.terrakok.androidcomposeapp
 
 import android.app.Application
+import com.github.terrakok.modo.LogReducer
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.android.compose.AppReducer
-import com.github.terrakok.modo.android.compose.LogReducer
 
 class App : Application() {
     val modo = Modo(LogReducer(CustomModoReducer(AppReducer(this))))

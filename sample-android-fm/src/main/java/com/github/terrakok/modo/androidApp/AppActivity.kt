@@ -7,11 +7,14 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.github.terrakok.modo.*
+import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.android.ModoRender
 import com.github.terrakok.modo.android.init
 import com.github.terrakok.modo.android.multi.TabViewFactory
 import com.github.terrakok.modo.android.saveState
+import com.github.terrakok.modo.back
+import com.github.terrakok.modo.format
+import com.github.terrakok.modo.selectStack
 
 class AppActivity : AppCompatActivity(), TabViewFactory {
     private val modo = App.modo
@@ -22,32 +25,13 @@ class AppActivity : AppCompatActivity(), TabViewFactory {
             //only for sample
             override fun invoke(state: NavigationState) {
                 super.invoke(state)
-                val stateStr = "‣root\n${getNavigationStateString("⦙  ", state).trimEnd()}  ᐊ current screen"
+                val stateStr = state.format()
                 findViewById<TextView>(R.id.log).text = stateStr
                 findViewById<ScrollView>(R.id.scroll).apply {
                     post { fullScroll(View.FOCUS_DOWN) }
                 }
             }
 
-            //copy-paste from LogReducer
-            private fun getNavigationStateString(prefix: String, navigationState: NavigationState): String =
-                navigationState.chain.map { screen ->
-                    when (screen) {
-                        is MultiScreen -> buildString {
-                            append(prefix)
-                            append('‣')
-                            append(screen.id)
-                            if (screen.stacks.size > 1) {
-                                append(" [${screen.selectedStack + 1}/${screen.stacks.size}]")
-                            }
-                            append('\n')
-                            append(getNavigationStateString("$prefix⦙  ", screen.stacks[screen.selectedStack]))
-                        }
-                        else -> {
-                            "$prefix${screen.id}\n"
-                        }
-                    }
-                }.joinToString(separator = "")
         }
     }
 

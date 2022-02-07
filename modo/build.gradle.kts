@@ -9,7 +9,6 @@ kotlin {
     android {
         publishAllLibraryVariants()
     }
-    jvm() //for future experiments
     sourceSets {
         val commonTest by getting {
             dependencies {
@@ -17,6 +16,8 @@ kotlin {
                 implementation(kotlin("test-annotations-common"))
             }
         }
+        val commonMain by sourceSets.getting
+        val androidMain by sourceSets.getting
     }
 }
 
