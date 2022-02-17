@@ -47,6 +47,9 @@ Modo is navigation library based on UDF principles for developing Single Activit
                        +----------------+
 ```
 
+## Main idea
+There is `NavigationState` which can be used for busines logic. **You can read and write current navigation stack** and UI render has to apply your changes. But here can be some limitations e.g. render based on FragmentManager can hadle changes like this `A-B-C -> A-D-C` other way you expect. In this case B and C screens will be droped and Fragment manager will add new D and C screens.
+
 ## Download
 ```kotlin
 plugins {
