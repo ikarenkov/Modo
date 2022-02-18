@@ -2,20 +2,38 @@ package com.github.terrakok.androidcomposeapp
 
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.terrakok.androidcomposeapp.saveable.ListScreen
-import com.github.terrakok.modo.*
+import com.github.terrakok.modo.Modo
+import com.github.terrakok.modo.MultiScreenState
+import com.github.terrakok.modo.NavigationState
+import com.github.terrakok.modo.android.compose.AppReducer
 import com.github.terrakok.modo.android.compose.ComposeScreen
 import com.github.terrakok.modo.android.compose.ExternalScreen
 import com.github.terrakok.modo.android.compose.launch
 import com.github.terrakok.modo.android.compose.uniqueScreenKey
+import com.github.terrakok.modo.back
+import com.github.terrakok.modo.backTo
+import com.github.terrakok.modo.exit
+import com.github.terrakok.modo.forward
+import com.github.terrakok.modo.newStack
+import com.github.terrakok.modo.replace
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -60,6 +78,13 @@ private fun SampleContent(i: Int, modo: Modo) {
         val buttons = listOf(
             "Back" to { modo.back() },
             "Forward" to { modo.forward(SampleScreen(i + 1)) },
+            "Forward multiscreen" to {
+                modo.forward(
+                    SampleMultiScreen(
+                        MultiScreenState(List(3) { NavigationState(listOf(SampleScreen(0))) }),
+                    )
+                )
+            },
             "Replace" to { modo.replace(SampleScreen(i + 1)) },
             "Delete prev" to { modo.dispatch(RemovePrev()) },
             "Multi forward" to {
@@ -130,4 +155,10 @@ fun ModoButton(
     Button(onClick = action, modifier) {
         Text(text = text)
     }
+}
+
+@Preview
+@Composable
+fun PreviewSampleContent() {
+    SampleContent(0, Modo(AppReducer(LocalContext.current)))
 }

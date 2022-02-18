@@ -24,7 +24,7 @@ fun NavigationState.format(): String =
 fun getNavigationStateString(prefix: String, navigationState: NavigationState): String =
     navigationState.chain.map { screen ->
         when (screen) {
-            is MultiScreen -> buildString {
+            is AbstractMultiScreen -> buildString {
                 append(prefix)
                 append('‣')
                 append(screen.id)
