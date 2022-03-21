@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.github.terrakok.modo.MultiScreenState
 
-abstract class ComposeMultiScreen(multiScreenState: MultiScreenState, id: String) : ComposeScreen(id) {
+abstract class MultiComposeScreen(multiScreenState: MultiScreenState, id: String) : ComposeScreen(id) {
 
     /**
      * @param multiScreen - current multiscreen model, for access to state

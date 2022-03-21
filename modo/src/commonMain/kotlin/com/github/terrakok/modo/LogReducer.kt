@@ -19,12 +19,12 @@ class LogReducer(
 }
 
 fun NavigationState.format(): String =
-    "‣root\n${getNavigationStateString("⦙  ", this).trimEnd()}  ᐊ current screen"
+    "‣root\n${getNavigationStateString("|  ", this).trimEnd()}  <- current screen"
 
 fun getNavigationStateString(prefix: String, navigationState: NavigationState): String =
     navigationState.chain.map { screen ->
         when (screen) {
-            is AbstractMultiScreen -> buildString {
+            is MultiScreen -> buildString {
                 append(prefix)
                 append('‣')
                 append(screen.id)
@@ -32,7 +32,7 @@ fun getNavigationStateString(prefix: String, navigationState: NavigationState): 
                     append(" [${screen.selectedStack + 1}/${screen.stacks.size}]")
                 }
                 append('\n')
-                append(getNavigationStateString("$prefix⦙  ", screen.stacks[screen.selectedStack]))
+                append(getNavigationStateString("$prefix|  ", screen.stacks[screen.selectedStack]))
             }
             else -> {
                 "$prefix${screen.id}\n"
@@ -40,4 +40,4 @@ fun getNavigationStateString(prefix: String, navigationState: NavigationState): 
         }
     }.joinToString(separator = "")
 
-expect fun logd(tag: String, msg: String)
+internal expect fun logd(tag: String, msg: String)

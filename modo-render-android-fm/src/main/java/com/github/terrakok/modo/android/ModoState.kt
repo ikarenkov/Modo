@@ -3,7 +3,6 @@ package com.github.terrakok.modo.android
 import android.os.Bundle
 import android.util.Log
 import com.github.terrakok.modo.*
-import com.github.terrakok.modo.android.multi.FragmentMultiScreen
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -58,7 +57,7 @@ private fun navStateToJson(
 ): JSONObject {
     val chain = navigationState.chain
     val ids = chain.map { it.id }
-    val multiScreens = chain.filterIsInstance<FragmentMultiScreen>()
+    val multiScreens = chain.filterIsInstance<MultiAppScreen>()
     val appScreens = chain.filterIsInstance<AppScreen>()
 
     appScreens.forEach { appScreenAccumulator[it.id] = it }
@@ -86,7 +85,7 @@ private fun jsonToNavState(json: JSONObject, appScreens: Map<String, AppScreen>)
         rawChain.add(chainArr[it].toString())
     }
 
-    val multiMap = mutableMapOf<String, AbstractMultiScreen>()
+    val multiMap = mutableMapOf<String, MultiScreen>()
     val multiArr = json.getJSONArray("multi")
     (0 until multiArr.length()).forEach {
         val ms = jsonToMultiScreen(multiArr.getJSONObject(it), appScreens)
@@ -98,12 +97,12 @@ private fun jsonToNavState(json: JSONObject, appScreens: Map<String, AppScreen>)
     )
 }
 
-private fun jsonToMultiScreen(json: JSONObject, appScreens: Map<String, AppScreen>): FragmentMultiScreen {
+private fun jsonToMultiScreen(json: JSONObject, appScreens: Map<String, AppScreen>): MultiAppScreen {
     val id = json.getString("id")
     val selectedStack = json.getInt("selectedStack")
     val stacksArr = json.getJSONArray("stacks")
     val stacks: List<NavigationState> = (0 until stacksArr.length()).map { i ->
         jsonToNavState(stacksArr.getJSONObject(i), appScreens)
     }
-    return FragmentMultiScreen(id, MultiScreenState(stacks, selectedStack))
+    return MultiAppScreen(id, MultiScreenState(stacks, selectedStack))
 }

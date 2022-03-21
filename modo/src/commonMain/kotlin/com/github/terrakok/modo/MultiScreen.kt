@@ -1,23 +1,19 @@
 package com.github.terrakok.modo
 
-/**
- * Abstract class witch holds multiscreen state and allows to share state updating logic between compose and fragment
- */
-interface AbstractMultiScreen : Screen {
+interface MultiScreen : Screen {
     var multiScreenState: MultiScreenState
+    val stacks: List<NavigationState> get() = multiScreenState.stacks
+    val selectedStack: Int get() = multiScreenState.selectedStack
 }
-
-val AbstractMultiScreen.stacks: List<NavigationState> get() = multiScreenState.stacks
-val AbstractMultiScreen.selectedStack: Int get() = multiScreenState.selectedStack
 
 data class MultiScreenState(
     val stacks: List<NavigationState>,
-    val selectedStack: Int = 0
+    val selectedStack: Int
 )
 
 class ExternalForward(val screen: Screen, vararg val screens: Screen) : NavigationAction
 object BackToLocalRoot : NavigationAction
-class SelectStack(val stackIndex: Int, val screen: Screen? = null) : NavigationAction
+class SelectStack(val stackIndex: Int) : NavigationAction
 
 fun Modo.externalForward(screen: Screen, vararg screens: Screen) = dispatch(ExternalForward(screen, *screens))
 fun Modo.selectStack(stackIndex: Int) = dispatch(SelectStack(stackIndex))
@@ -48,7 +44,7 @@ class MultiReducer(
      */
     private fun getLocalNavigationState(state: NavigationState): NavigationState {
         val screen = state.chain.lastOrNull()
-        return if (screen is AbstractMultiScreen) {
+        return if (screen is MultiScreen) {
             getLocalNavigationState(screen.multiScreenState.stacks[screen.multiScreenState.selectedStack])
         } else {
             state
@@ -60,7 +56,7 @@ class MultiReducer(
      */
     private fun applyNewLocalNavigationState(state: NavigationState, newLocalNavigationState: NavigationState): NavigationState {
         val screen = state.chain.lastOrNull()
-        return if (screen is AbstractMultiScreen) {
+        return if (screen is MultiScreen) {
             val selectedStack = screen.multiScreenState.stacks[screen.multiScreenState.selectedStack]
             val newLocalChain = applyNewLocalNavigationState(selectedStack, newLocalNavigationState)
 
@@ -82,7 +78,7 @@ class MultiReducer(
 
     private fun applyBackToAction(action: BackTo, state: NavigationState): NavigationState? {
         val screen = state.chain.lastOrNull() ?: return null
-        if (screen is AbstractMultiScreen) {
+        if (screen is MultiScreen) {
             val newLocalChain = applyBackToAction(action, screen.stacks[screen.selectedStack])
             if (newLocalChain == null) {
                 if (state.chain.none { it.id == action.screenId }) return null
@@ -101,9 +97,9 @@ class MultiReducer(
 
     private fun applySelectStackAction(action: SelectStack, state: NavigationState): NavigationState {
         val screen = state.chain.lastOrNull()
-        if (screen is AbstractMultiScreen) {
+        if (screen is MultiScreen) {
             val selectedStack = screen.stacks[screen.selectedStack]
-            if (selectedStack.chain.lastOrNull() is AbstractMultiScreen) {
+            if (selectedStack.chain.lastOrNull() is MultiScreen) {
                 val newStacks = screen.stacks.toMutableList()
                 val newLocalChain = applySelectStackAction(action, selectedStack)
                 newStacks[screen.selectedStack] = newLocalChain

@@ -15,21 +15,19 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
-import com.github.terrakok.modo.AbstractMultiScreen
+import com.github.terrakok.modo.MultiScreen
 import com.github.terrakok.modo.MultiScreenState
 import com.github.terrakok.modo.NavigationState
-import com.github.terrakok.modo.android.compose.ComposeMultiScreen
 import com.github.terrakok.modo.android.compose.ComposeScreen
+import com.github.terrakok.modo.android.compose.MultiComposeScreen
 import com.github.terrakok.modo.android.compose.uniqueScreenKey
 import com.github.terrakok.modo.selectStack
-import com.github.terrakok.modo.selectedStack
-import com.github.terrakok.modo.stacks
 import kotlinx.parcelize.IgnoredOnParcel
 
-class SampleMultiScreen(
+class SampleMultiComposeScreen(
     multiScreenState: MultiScreenState,
     override val screenKey: String = uniqueScreenKey
-) : ComposeMultiScreen(multiScreenState, "SampleMultiScreen"), AbstractMultiScreen {
+) : MultiComposeScreen(multiScreenState, "SampleMultiComposeScreen"), MultiScreen {
 
     @IgnoredOnParcel
     val modo = App.INSTANCE.modo
@@ -66,12 +64,12 @@ class SampleMultiScreen(
     }
 
     // FIXME: replace it with general solution for saving ComposeMultiScreen
-    companion object CREATOR : Parcelable.Creator<SampleMultiScreen> {
-        override fun createFromParcel(parcel: Parcel): SampleMultiScreen {
-            return SampleMultiScreen(parcel)
+    companion object CREATOR : Parcelable.Creator<SampleMultiComposeScreen> {
+        override fun createFromParcel(parcel: Parcel): SampleMultiComposeScreen {
+            return SampleMultiComposeScreen(parcel)
         }
 
-        override fun newArray(size: Int): Array<SampleMultiScreen?> {
+        override fun newArray(size: Int): Array<SampleMultiComposeScreen?> {
             return arrayOfNulls(size)
         }
 
@@ -84,7 +82,7 @@ private fun readMultiscreenState(parcel: Parcel): MultiScreenState {
     val stackSize = parcel.readInt()
     val stacks = List(stackSize) {
         NavigationState(
-            parcel.readParcelableArray(SampleMultiScreen::class.java.classLoader).orEmpty().toList() as List<ComposeScreen>
+            parcel.readParcelableArray(SampleMultiComposeScreen::class.java.classLoader).orEmpty().toList() as List<ComposeScreen>
         )
     }
     return MultiScreenState(

@@ -157,11 +157,9 @@ open class MultiStackFragmentImpl : MultiStackFragment() {
         childFragmentManager.beginTransaction().also { transaction ->
             val tabExists = addedFragments.any { it.index == index }
             if (!tabExists) {
-                transaction.add(
-                    CONTAINER_ID,
-                    StackContainerFragment.create(index),
-                    index.toString()
-                )
+                val newFragment = StackContainerFragment.create(index)
+                transaction.add(CONTAINER_ID, newFragment, index.toString())
+                transaction.show(newFragment)
             }
             addedFragments.forEach { f ->
                 if (f.index == index && !f.isVisible) {

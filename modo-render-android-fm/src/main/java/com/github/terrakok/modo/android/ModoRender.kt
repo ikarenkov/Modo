@@ -6,7 +6,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.fragment.app.FragmentTransaction
 import com.github.terrakok.modo.*
-import com.github.terrakok.modo.android.multi.FragmentMultiScreen
 import com.github.terrakok.modo.android.multi.MultiStackFragmentImpl
 
 interface StackAction
@@ -53,7 +52,7 @@ open class ModoRender(
             }
         }
         val currentScreen = currentState.chain.lastOrNull()
-        if (currentScreen is AbstractMultiScreen) {
+        if (currentScreen is MultiScreen) {
             fragmentManager.executePendingTransactions()
             (fragmentManager.findFragmentById(containerId) as MultiStackFragment)
                 .applyMultiState(currentScreen.multiScreenState)
@@ -85,8 +84,8 @@ open class ModoRender(
                     }
                     addToBackStack(screen.id)
                 }.commit()
-            } else if (screen is AbstractMultiScreen) {
-                require(screen is FragmentMultiScreen) {"ModoRender for multiscreen works with FragmentMultiScreen only! Received $screen"}
+            } else if (screen is MultiScreen) {
+                require(screen is MultiAppScreen) {"ModoRender for multiscreen works with MultiAppScreen only! Received $screen"}
                 pushMultiStackFragment(screen)
             } else {
                 error("ModoRender works with AppScreens only! Received $screen")
@@ -102,7 +101,7 @@ open class ModoRender(
     ) {
     }
 
-    protected open fun pushMultiStackFragment(multiScreen: FragmentMultiScreen) {
+    protected open fun pushMultiStackFragment(multiScreen: MultiAppScreen) {
         val fragment = createMultiStackFragment(multiScreen.multiScreenState)
         fragmentManager.beginTransaction().apply {
             setReorderingAllowed(true)
