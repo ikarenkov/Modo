@@ -1,12 +1,14 @@
 package com.github.terrakok.modo.android.compose
 
+import android.os.Parcel
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import com.github.terrakok.modo.MultiScreen
 import com.github.terrakok.modo.MultiScreenState
+import com.github.terrakok.modo.NavigationState
+import kotlinx.parcelize.Parceler
 
-abstract class MultiComposeScreen(multiScreenState: MultiScreenState, id: String) : ComposeScreen(id) {
+abstract class MultiComposeScreen(initialMultiScreenState: MultiScreenState, id: String) : ComposeScreen(id), MultiScreen {
 
     /**
      * @param multiScreen - current multiscreen model, for access to state
@@ -14,7 +16,21 @@ abstract class MultiComposeScreen(multiScreenState: MultiScreenState, id: String
     @Composable
     abstract fun Content(innerContent: @Composable () -> Unit)
 
-    var multiScreenState by mutableStateOf(multiScreenState)
+    /**
+     * Override this field in constructor for simple state saving/restoration using Parcelize kotlin plugin
+     */
+    abstract var saveableMultiScreenState: MultiScreenState
+
+    // Field allows to work with snapshot compose system through multiScreenState
+    private val renderState = mutableStateOf(initialMultiScreenState)
+
+    override var multiScreenState = initialMultiScreenState
+        set(value) {
+            field = value
+            saveableMultiScreenState = value
+            renderState.value = value
+        }
+        get() = renderState.value
 
     @Composable
     final override fun Content() {
@@ -23,6 +39,34 @@ abstract class MultiComposeScreen(multiScreenState: MultiScreenState, id: String
             require(selectedScreen is ComposeScreen)
             selectedScreen.Content()
         }
+    }
+
+}
+
+/**
+ * Parceler implementation for [MultiScreenState]
+ */
+object MultiScreenStateParceler : Parceler<MultiScreenState> {
+
+    override fun MultiScreenState.write(parcel: Parcel, flags: Int) {
+        parcel.writeInt(stacks.size)
+        for (navigationState in stacks) {
+            parcel.writeParcelableArray(navigationState.chain.filterIsInstance<ComposeScreen>().toTypedArray(), 0)
+        }
+        parcel.writeInt(selectedStack)
+    }
+
+    override fun create(parcel: Parcel): MultiScreenState {
+        val stackSize = parcel.readInt()
+        val stacks = List(stackSize) {
+            NavigationState(
+                parcel.readParcelableArray(ComposeScreen::class.java.classLoader).orEmpty().toList() as List<ComposeScreen>
+            )
+        }
+        return MultiScreenState(
+            stacks,
+            parcel.readInt()
+        )
     }
 
 }

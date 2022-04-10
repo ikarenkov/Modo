@@ -35,6 +35,7 @@ dependencies {
     implementation(project(":modo"))
     implementation("androidx.compose.ui:ui:${properties["version.compose"]}")
     implementation("androidx.compose.foundation:foundation:${properties["version.compose"]}")
+    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:${properties["version.kotlin"]}")
 }
 
 val sourceJar by tasks.registering(Jar::class) {

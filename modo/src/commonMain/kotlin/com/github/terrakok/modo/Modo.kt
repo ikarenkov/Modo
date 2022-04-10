@@ -1,7 +1,12 @@
 package com.github.terrakok.modo
 
 typealias NavigationReducer = (action: NavigationAction, state: NavigationState) -> NavigationState
-typealias NavigationRender = (state: NavigationState) -> Unit
+
+fun interface NavigationRender {
+
+    operator fun invoke(state: NavigationState)
+
+}
 
 /**
  * Modo is navigation state holder and dispatcher actions to reducer

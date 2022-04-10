@@ -17,7 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.github.terrakok.modo.android.compose.ComposeRender
+import com.github.terrakok.modo.android.compose.ComposeRenderImpl
 import com.github.terrakok.modo.android.compose.init
 import com.github.terrakok.modo.android.compose.saveState
 import com.github.terrakok.modo.back
@@ -25,7 +25,7 @@ import com.github.terrakok.modo.format
 
 class AppActivity : AppCompatActivity() {
     private val modo get() = App.INSTANCE.modo
-    private val render = ComposeRender(this)
+    private val render = ComposeRenderImpl(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +34,7 @@ class AppActivity : AppCompatActivity() {
             Surface(color = MaterialTheme.colors.background) {
                 Column {
                     val scrollState = rememberScrollState()
-                    val text = render.state.format()
+                    val text = render.state.value.format()
                     LaunchedEffect(text) {
                         scrollState.animateScrollTo(scrollState.maxValue)
                     }
@@ -74,4 +74,5 @@ class AppActivity : AppCompatActivity() {
     override fun onBackPressed() {
         modo.back()
     }
+
 }
