@@ -7,11 +7,12 @@ import com.github.terrakok.modo.MultiScreen
 import com.github.terrakok.modo.MultiScreenState
 import com.github.terrakok.modo.NavigationState
 import kotlinx.parcelize.Parceler
+import java.util.*
 
 abstract class MultiComposeScreen(initialMultiScreenState: MultiScreenState, id: String) : ComposeScreen(id), MultiScreen {
 
     /**
-     * @param multiScreen - current multiscreen model, for access to state
+     * @param innerContent - content of currently displayed screen
      */
     @Composable
     abstract fun Content(innerContent: @Composable () -> Unit)
@@ -59,9 +60,8 @@ object MultiScreenStateParceler : Parceler<MultiScreenState> {
     override fun create(parcel: Parcel): MultiScreenState {
         val stackSize = parcel.readInt()
         val stacks = List(stackSize) {
-            NavigationState(
-                parcel.readParcelableArray(ComposeScreen::class.java.classLoader).orEmpty().toList() as List<ComposeScreen>
-            )
+            val parcelableArray = parcel.readParcelableArray(ComposeScreen::class.java.classLoader).orEmpty()
+            NavigationState(Arrays.copyOf(parcelableArray, parcelableArray.size, Array<ComposeScreen>::class.java).toList())
         }
         return MultiScreenState(
             stacks,
