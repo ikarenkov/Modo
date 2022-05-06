@@ -1,10 +1,15 @@
 package com.github.terrakok.modo
 
-data class MultiScreen(
-    override val id: String,
+interface MultiScreen : Screen {
+    var multiScreenState: MultiScreenState
+    val stacks: List<NavigationState> get() = multiScreenState.stacks
+    val selectedStack: Int get() = multiScreenState.selectedStack
+}
+
+data class MultiScreenState(
     val stacks: List<NavigationState>,
     val selectedStack: Int
-) : Screen
+)
 
 class ExternalForward(val screen: Screen, vararg val screens: Screen) : NavigationAction
 object BackToLocalRoot : NavigationAction
@@ -15,7 +20,7 @@ fun Modo.selectStack(stackIndex: Int) = dispatch(SelectStack(stackIndex))
 fun Modo.backToLocalRoot() = dispatch(BackToLocalRoot)
 
 class MultiReducer(
-    private val origin: ModoReducer = ModoReducer()
+    private val origin: NavigationReducer = ModoReducer()
 ) : NavigationReducer {
     override fun invoke(action: NavigationAction, state: NavigationState) = when (action) {
         is Exit, is BackToRoot, is NewStack -> origin(action, state)
@@ -24,7 +29,7 @@ class MultiReducer(
         is BackToLocalRoot -> applyLocalAction(BackToRoot, state)
         is BackTo -> applyBackToAction(action, state) ?: state
         is SelectStack -> applySelectStackAction(action, state)
-        else -> state
+        else -> applyLocalAction(action, state)
     }
 
     private fun applyLocalAction(action: NavigationAction, state: NavigationState): NavigationState {
@@ -33,34 +38,41 @@ class MultiReducer(
         return applyNewLocalNavigationState(state, newLocalNavigationState)
     }
 
+    /**
+     * Finds and returns top navigation state, which can be nested in AbstractMultiScreen.
+     * In this case it returns deepest NavigationState.
+     */
     private fun getLocalNavigationState(state: NavigationState): NavigationState {
         val screen = state.chain.lastOrNull()
-        if (screen is MultiScreen) {
-            return getLocalNavigationState(screen.stacks[screen.selectedStack])
+        return if (screen is MultiScreen) {
+            getLocalNavigationState(screen.multiScreenState.stacks[screen.multiScreenState.selectedStack])
         } else {
-            return state
+            state
         }
     }
 
-    private fun applyNewLocalNavigationState(state: NavigationState, local: NavigationState): NavigationState {
+    /**
+     * Applies new navigation state to the deepest selected multiscreen.
+     */
+    private fun applyNewLocalNavigationState(state: NavigationState, newLocalNavigationState: NavigationState): NavigationState {
         val screen = state.chain.lastOrNull()
-        if (screen is MultiScreen) {
-            val selectedStack = screen.stacks[screen.selectedStack]
-            val newLocalChain = applyNewLocalNavigationState(selectedStack, local)
+        return if (screen is MultiScreen) {
+            val selectedStack = screen.multiScreenState.stacks[screen.multiScreenState.selectedStack]
+            val newLocalChain = applyNewLocalNavigationState(selectedStack, newLocalNavigationState)
 
             if (newLocalChain.chain.isNotEmpty()) {
-                val newStacks = screen.stacks.toMutableList()
-                newStacks[screen.selectedStack] = newLocalChain
-                val newMultiScreen = screen.copy(stacks = newStacks)
+                val newStacks = screen.multiScreenState.stacks.toMutableList()
+                newStacks[screen.multiScreenState.selectedStack] = newLocalChain
+                val newMultiScreenState: MultiScreenState = screen.multiScreenState.copy(stacks = newStacks)
 
-                val newChain = state.chain.dropLast(1).plus(newMultiScreen)
-                return NavigationState(newChain)
+                screen.multiScreenState = newMultiScreenState
+                state
             } else {
                 val newChain = state.chain.dropLast(1)
-                return NavigationState(newChain)
+                NavigationState(newChain)
             }
         } else {
-            return local
+            newLocalNavigationState
         }
     }
 
@@ -74,10 +86,8 @@ class MultiReducer(
             } else {
                 val newStacks = screen.stacks.toMutableList()
                 newStacks[screen.selectedStack] = newLocalChain
-                val newMultiScreen = screen.copy(stacks = newStacks)
-
-                val newChain = state.chain.dropLast(1).plus(newMultiScreen)
-                return NavigationState(newChain)
+                screen.multiScreenState = screen.multiScreenState.copy(stacks = newStacks)
+                return state
             }
         } else {
             if (state.chain.none { it.id == action.screenId }) return null
@@ -93,17 +103,11 @@ class MultiReducer(
                 val newStacks = screen.stacks.toMutableList()
                 val newLocalChain = applySelectStackAction(action, selectedStack)
                 newStacks[screen.selectedStack] = newLocalChain
-                val newMultiScreen = screen.copy(stacks = newStacks)
-
-                val newChain = state.chain.dropLast(1).plus(newMultiScreen)
-                return NavigationState(newChain)
+                screen.multiScreenState = screen.multiScreenState.copy(stacks = newStacks)
             } else {
-                val newMultiScreen = screen.copy(selectedStack = action.stackIndex)
-                val newChain = state.chain.dropLast(1).plus(newMultiScreen)
-                return NavigationState(newChain)
+                screen.multiScreenState = screen.multiScreenState.copy(selectedStack = action.stackIndex)
             }
-        } else {
-            return state
         }
+        return state
     }
 }

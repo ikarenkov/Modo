@@ -7,15 +7,14 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.terrakok.androidcomposeapp.saveable.ListScreen
 import com.github.terrakok.modo.*
-import com.github.terrakok.modo.android.compose.ComposeScreen
-import com.github.terrakok.modo.android.compose.ExternalScreen
-import com.github.terrakok.modo.android.compose.launch
-import com.github.terrakok.modo.android.compose.uniqueScreenKey
+import com.github.terrakok.modo.android.compose.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -60,6 +59,13 @@ private fun SampleContent(i: Int, modo: Modo) {
         val buttons = listOf(
             "Back" to { modo.back() },
             "Forward" to { modo.forward(SampleScreen(i + 1)) },
+            "Forward multiscreen" to {
+                modo.forward(
+                    SampleMultiComposeScreen(
+                        MultiScreenState(List(3) { NavigationState(listOf(SampleScreen(0))) }, 0),
+                    )
+                )
+            },
             "Replace" to { modo.replace(SampleScreen(i + 1)) },
             "Delete prev" to { modo.dispatch(RemovePrev()) },
             "Multi forward" to {
@@ -130,4 +136,10 @@ fun ModoButton(
     Button(onClick = action, modifier) {
         Text(text = text)
     }
+}
+
+@Preview
+@Composable
+fun PreviewSampleContent() {
+    SampleContent(0, Modo(AppReducer(LocalContext.current)))
 }

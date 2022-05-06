@@ -57,7 +57,7 @@ private fun navStateToJson(
 ): JSONObject {
     val chain = navigationState.chain
     val ids = chain.map { it.id }
-    val multiScreens = chain.filterIsInstance<MultiScreen>()
+    val multiScreens = chain.filterIsInstance<MultiAppScreen>()
     val appScreens = chain.filterIsInstance<AppScreen>()
 
     appScreens.forEach { appScreenAccumulator[it.id] = it }
@@ -97,12 +97,12 @@ private fun jsonToNavState(json: JSONObject, appScreens: Map<String, AppScreen>)
     )
 }
 
-private fun jsonToMultiScreen(json: JSONObject, appScreens: Map<String, AppScreen>): MultiScreen {
+private fun jsonToMultiScreen(json: JSONObject, appScreens: Map<String, AppScreen>): MultiAppScreen {
     val id = json.getString("id")
     val selectedStack = json.getInt("selectedStack")
     val stacksArr = json.getJSONArray("stacks")
     val stacks: List<NavigationState> = (0 until stacksArr.length()).map { i ->
         jsonToNavState(stacksArr.getJSONObject(i), appScreens)
     }
-    return MultiScreen(id, stacks, selectedStack)
+    return MultiAppScreen(id, MultiScreenState(stacks, selectedStack))
 }

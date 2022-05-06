@@ -5,10 +5,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.fragment.app.FragmentTransaction
-import com.github.terrakok.modo.MultiScreen
-import com.github.terrakok.modo.NavigationRender
-import com.github.terrakok.modo.NavigationState
-import com.github.terrakok.modo.Screen
+import com.github.terrakok.modo.*
 import com.github.terrakok.modo.android.multi.MultiStackFragmentImpl
 
 interface StackAction
@@ -58,7 +55,7 @@ open class ModoRender(
         if (currentScreen is MultiScreen) {
             fragmentManager.executePendingTransactions()
             (fragmentManager.findFragmentById(containerId) as MultiStackFragment)
-                .applyMultiState(currentScreen)
+                .applyMultiState(currentScreen.multiScreenState)
         }
     }
 
@@ -88,6 +85,7 @@ open class ModoRender(
                     addToBackStack(screen.id)
                 }.commit()
             } else if (screen is MultiScreen) {
+                require(screen is MultiAppScreen) {"ModoRender for multiscreen works with MultiAppScreen only! Received $screen"}
                 pushMultiStackFragment(screen)
             } else {
                 error("ModoRender works with AppScreens only! Received $screen")
@@ -103,8 +101,8 @@ open class ModoRender(
     ) {
     }
 
-    protected open fun pushMultiStackFragment(multiScreen: MultiScreen) {
-        val fragment = createMultiStackFragment(multiScreen)
+    protected open fun pushMultiStackFragment(multiScreen: MultiAppScreen) {
+        val fragment = createMultiStackFragment(multiScreen.multiScreenState)
         fragmentManager.beginTransaction().apply {
             setReorderingAllowed(true)
             replace(containerId, fragment, multiScreen.id)
@@ -113,7 +111,7 @@ open class ModoRender(
         fragmentManager.executePendingTransactions()
     }
 
-    protected open fun createMultiStackFragment(multiScreen: MultiScreen): MultiStackFragment = MultiStackFragmentImpl()
+    protected open fun createMultiStackFragment(multiScreenState: MultiScreenState): MultiStackFragment = MultiStackFragmentImpl()
 
     private class RestoredScreen(override val id: String) : Screen {
         override fun toString() = "[$id]"

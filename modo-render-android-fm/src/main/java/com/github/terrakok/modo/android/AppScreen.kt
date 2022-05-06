@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import com.github.terrakok.modo.MultiScreen
+import com.github.terrakok.modo.MultiScreenState
 import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.Screen
 
@@ -18,29 +19,31 @@ abstract class AppScreen(
     override fun toString() = "[$id]"
 }
 
-fun MultiAppScreen(
-    id: String,
-    roots: List<AppScreen>,
-    selected: Int
-) = MultiScreen(
-    id,
-    List(roots.size) { i -> NavigationState(listOf(roots[i])) },
-    selected
-)
+data class MultiAppScreen(
+    override val id: String,
+    override var multiScreenState: MultiScreenState,
+) : MultiScreen {
+    constructor(id: String, roots: List<AppScreen>, selected: Int) : this(
+        id,
+        MultiScreenState(
+            List(roots.size) { i -> NavigationState(listOf(roots[i])) },
+            selected
+        )
+    )
+}
 
-fun FlowAppScreen(
-    id: String,
-    root: AppScreen
-) = MultiScreen(
+fun FlowAppScreen(id: String, root: AppScreen) = MultiAppScreen(
     id,
-    listOf(NavigationState(listOf(root))),
-    0
+    MultiScreenState(
+        listOf(NavigationState(listOf(root))),
+        0
+    )
 )
 
 abstract class MultiStackFragment : Fragment {
     constructor() : super()
     constructor(@LayoutRes contentLayoutId: Int) : super(contentLayoutId)
 
-    abstract fun applyMultiState(multiScreen: MultiScreen)
+    abstract fun applyMultiState(multiScreenState: MultiScreenState)
     abstract fun getCurrentFragment(): Fragment?
 }

@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
-import com.github.terrakok.modo.MultiScreen
+import com.github.terrakok.modo.MultiScreenState
 import com.github.terrakok.modo.NavigationRender
 import com.github.terrakok.modo.android.MultiStackFragment
 import kotlin.random.Random
@@ -20,7 +20,7 @@ open class MultiStackFragmentImpl : MultiStackFragment() {
     private var CONTAINER_ID: Int = -1
     private var TAB_CONTAINER_ID: Int = -1
 
-    private var multiScreen: MultiScreen? = null
+    private var multiScreenState: MultiScreenState? = null
         set(value) {
             if (value != null) {
                 if (field == null) {
@@ -44,7 +44,7 @@ open class MultiStackFragmentImpl : MultiStackFragment() {
     internal fun setRender(index: Int, render: NavigationRender?) {
         if (render != null) {
             localRenders[index] = render
-            multiScreen?.stacks?.getOrNull(index)?.let { state ->
+            multiScreenState?.stacks?.getOrNull(index)?.let { state ->
                 render(state)
             }
         } else {
@@ -52,8 +52,8 @@ open class MultiStackFragmentImpl : MultiStackFragment() {
         }
     }
 
-    override fun applyMultiState(multiScreen: MultiScreen) {
-        this.multiScreen = multiScreen
+    override fun applyMultiState(multiScreenState: MultiScreenState) {
+        this.multiScreenState = multiScreenState
     }
 
     override fun getCurrentFragment(): Fragment? =
@@ -104,10 +104,10 @@ open class MultiStackFragmentImpl : MultiStackFragment() {
             }
         }
         addView(tabContainer)
-        multiScreen?.let { createTabs(it, tabContainer) }
+        multiScreenState?.let { createTabs(it, tabContainer) }
     }
 
-    private fun createTabs(state: MultiScreen, container: LinearLayout) {
+    private fun createTabs(state: MultiScreenState, container: LinearLayout) {
         container.removeAllViews()
         if (state.stacks.size > 1) {
             for (i in state.stacks.indices) {
@@ -157,11 +157,9 @@ open class MultiStackFragmentImpl : MultiStackFragment() {
         childFragmentManager.beginTransaction().also { transaction ->
             val tabExists = addedFragments.any { it.index == index }
             if (!tabExists) {
-                transaction.add(
-                    CONTAINER_ID,
-                    StackContainerFragment.create(index),
-                    index.toString()
-                )
+                val newFragment = StackContainerFragment.create(index)
+                transaction.add(CONTAINER_ID, newFragment, index.toString())
+                transaction.show(newFragment)
             }
             addedFragments.forEach { f ->
                 if (f.index == index && !f.isVisible) {

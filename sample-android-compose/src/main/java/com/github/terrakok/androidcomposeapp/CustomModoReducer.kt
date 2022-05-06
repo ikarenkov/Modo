@@ -1,11 +1,12 @@
 package com.github.terrakok.androidcomposeapp
 
+import com.github.terrakok.modo.ModoReducer
 import com.github.terrakok.modo.NavigationAction
 import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.NavigationState
 
 class CustomModoReducer(
-    private val origin: NavigationReducer
+    private val origin: NavigationReducer = ModoReducer()
 ) : NavigationReducer {
 
     override fun invoke(action: NavigationAction, state: NavigationState): NavigationState = when (action) {

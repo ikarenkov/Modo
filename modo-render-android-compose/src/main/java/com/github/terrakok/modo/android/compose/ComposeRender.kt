@@ -1,24 +1,28 @@
 package com.github.terrakok.modo.android.compose
 
 import android.app.Activity
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
-import androidx.compose.runtime.setValue
 import com.github.terrakok.modo.NavigationRender
 import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.Screen
 
-class ComposeRender(
+interface ComposeRenderer : NavigationRender {
+
+    val state: State<NavigationState>
+
+    @Composable
+    fun Content()
+
+}
+
+open class ComposeRenderImpl(
     private val exitAction: () -> Unit
-) : NavigationRender {
+) : ComposeRenderer {
     constructor(activity: Activity) : this({ activity.finish() })
 
-    var state: NavigationState by mutableStateOf(NavigationState())
-        private set
+    override val state: MutableState<NavigationState> = mutableStateOf(NavigationState())
 
     private val removedScreens = mutableSetOf<Screen>()
 
@@ -26,19 +30,19 @@ class ComposeRender(
         if (state.chain.isEmpty()) {
             exitAction()
         }
-        removedScreens.addAll(calculateRemovedScreens(this.state.chain, state.chain))
-        this.state = state
+        removedScreens.addAll(calculateRemovedScreens(this.state.value.chain, state.chain))
+        this.state.value = state
     }
 
     @Composable
-    fun Content() {
+    override fun Content() {
         val stateHolder = rememberSaveableStateHolder()
         DisposableEffect(key1 = state) {
             onDispose {
                 clearStateHolder(stateHolder)
             }
         }
-        state.chain.lastOrNull()?.let { screen ->
+        state.value.chain.lastOrNull()?.let { screen ->
             require(screen is ComposeScreen) {
                 "ComposeRender works with ComposeScreen only! Received $screen"
             }

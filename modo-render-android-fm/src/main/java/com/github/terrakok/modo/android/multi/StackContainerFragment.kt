@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
-import com.github.terrakok.modo.MultiScreen
+import com.github.terrakok.modo.MultiScreenState
 import com.github.terrakok.modo.android.ModoRender
 
 class StackContainerFragment : Fragment() {
@@ -13,7 +13,7 @@ class StackContainerFragment : Fragment() {
 
     private val render by lazy {
         object : ModoRender(childFragmentManager, CONTAINER_ID, {}) {
-            override fun createMultiStackFragment(multiScreen: MultiScreen) = MultiStackFragmentImpl()
+            override fun createMultiStackFragment(multiScreenState: MultiScreenState) = MultiStackFragmentImpl()
         }
     }
 
