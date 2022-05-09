@@ -3,6 +3,7 @@ package com.github.terrakok.androidcomposeapp
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,15 +18,30 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.github.terrakok.modo.android.compose.ComposeRenderImpl
-import com.github.terrakok.modo.android.compose.init
-import com.github.terrakok.modo.android.compose.saveState
+import com.github.terrakok.modo.android.compose.*
 import com.github.terrakok.modo.back
 import com.github.terrakok.modo.format
 
 class AppActivity : AppCompatActivity() {
     private val modo get() = App.INSTANCE.modo
-    private val render = ComposeRenderImpl(this)
+
+    @OptIn(ExperimentalAnimationApi::class)
+    private val render = ComposeRenderImpl(this) {
+        ScreenTransition(
+            transitionSpec = {
+                if (transitionType == ScreenTransitionType.Replace) {
+                    scaleIn(initialScale = 2f) + fadeIn() with fadeOut()
+                } else {
+                    val (initialOffset, targetOffset) = when (transitionType) {
+                        ScreenTransitionType.Pop -> ({ size: Int -> -size }) to ({ size: Int -> size })
+                        else -> ({ size: Int -> size }) to ({ size: Int -> -size })
+                    }
+                    slideInHorizontally(initialOffsetX = initialOffset) with
+                            slideOutHorizontally(targetOffsetX = targetOffset)
+                }
+            }
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
