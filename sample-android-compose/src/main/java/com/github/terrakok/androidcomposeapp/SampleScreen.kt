@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.terrakok.androidcomposeapp.saveable.ListScreen
+import com.github.terrakok.androidcomposeapp.wrapper.SampleWrapperScreen
 import com.github.terrakok.modo.*
 import com.github.terrakok.modo.android.compose.*
 import kotlinx.coroutines.GlobalScope
@@ -29,11 +30,10 @@ class SampleScreen(
     val i: Int,
     override val screenKey: String = uniqueScreenKey
 ) : ComposeScreen("ItemScreen $i") {
-    private val modo get() = App.INSTANCE.modo
 
     @Composable
     override fun Content() {
-        SampleContent(i, modo)
+        SampleContent(i, LocalModo.current)
     }
 
 }
@@ -94,7 +94,8 @@ private fun SampleContent(i: Int, modo: Modo) {
                 modo.launch(Browser("https://github.com/terrakok/Modo"))
             },
             "Exit" to { modo.exit() },
-            "List sample" to { modo.forward(ListScreen()) }
+            "List sample" to { modo.forward(ListScreen()) },
+            "Wrapped Modo" to { modo.forward(SampleWrapperScreen(modo)) }
         )
         for (index in buttons.indices step 2) {
             Spacer(modifier = Modifier.size(8.dp))

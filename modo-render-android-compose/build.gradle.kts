@@ -35,6 +35,8 @@ dependencies {
     implementation(project(":modo"))
     implementation("androidx.compose.ui:ui:${properties["version.compose"]}")
     implementation("androidx.compose.foundation:foundation:${properties["version.compose"]}")
+    // For BackHandler
+    implementation("androidx.activity:activity-compose:${properties["version.composeActivity"]}")
     implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:${properties["version.kotlin"]}")
 }
 

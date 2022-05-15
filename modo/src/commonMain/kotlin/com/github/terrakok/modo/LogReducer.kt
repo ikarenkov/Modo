@@ -27,15 +27,21 @@ fun getNavigationStateString(prefix: String, navigationState: NavigationState): 
             is MultiScreen -> buildString {
                 append(prefix)
                 append('‣')
-                append(screen.id)
+                append(screen)
                 if (screen.stacks.size > 1) {
                     append(" [${screen.selectedStack + 1}/${screen.stacks.size}]")
                 }
-                append('\n')
+                appendLine()
                 append(getNavigationStateString("$prefix|  ", screen.stacks[screen.selectedStack]))
             }
+            is WrapperScreen -> buildString {
+                append(prefix)
+                append(screen)
+                appendLine()
+                append(getNavigationStateString("$prefix|  ", screen.modo.state))
+            }
             else -> {
-                "$prefix${screen.id}\n"
+                "$prefix$screen\n"
             }
         }
     }.joinToString(separator = "")

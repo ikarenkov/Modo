@@ -13,5 +13,5 @@ abstract class ComposeScreen(
     @Composable
     abstract fun Content()
 
-    override fun toString() = "[$id]"
+    override fun toString() = "[$id:$screenKey]"
 }

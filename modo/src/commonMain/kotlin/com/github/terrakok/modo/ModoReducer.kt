@@ -6,6 +6,7 @@ package com.github.terrakok.modo
 class ModoReducer : NavigationReducer {
     override fun invoke(action: NavigationAction, state: NavigationState): NavigationState =
         when (action) {
+            is SetState -> action.state
             is Forward -> NavigationState(
                 state.chain + listOf(action.screen, *action.screens)
             )

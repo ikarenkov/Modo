@@ -1,6 +1,7 @@
 package com.github.terrakok.androidcomposeapp
 
 import android.os.Bundle
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.*
@@ -14,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,25 +49,32 @@ class AppActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         modo.init(savedInstanceState) { SampleScreen(1) }
         setContent {
-            Surface(color = MaterialTheme.colors.background) {
-                Column {
-                    val scrollState = rememberScrollState()
-                    val text = render.state.value.format()
-                    LaunchedEffect(text) {
-                        scrollState.animateScrollTo(scrollState.maxValue)
-                    }
-                    Text(
-                        text = text,
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                            .background(Color.Black)
-                            .padding(4.dp)
-                            .verticalScroll(scrollState),
-                        color = Color.White.copy(alpha = 0.5f)
-                    )
-                    Box(modifier = Modifier.weight(3f)) {
-                        render.Content()
+            BackHandler {
+                modo.back()
+            }
+            CompositionLocalProvider(
+                LocalModo provides modo
+            ) {
+                Surface(color = MaterialTheme.colors.background) {
+                    Column {
+                        val scrollState = rememberScrollState()
+                        val text = render.state.value.format()
+                        LaunchedEffect(text) {
+                            scrollState.animateScrollTo(scrollState.maxValue)
+                        }
+                        Text(
+                            text = text,
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth()
+                                .background(Color.Black)
+                                .padding(4.dp)
+                                .verticalScroll(scrollState),
+                            color = Color.White.copy(alpha = 0.5f)
+                        )
+                        Box(modifier = Modifier.weight(3f)) {
+                            render.Content()
+                        }
                     }
                 }
             }
@@ -85,10 +94,6 @@ class AppActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         modo.saveState(outState)
-    }
-
-    override fun onBackPressed() {
-        modo.back()
     }
 
 }

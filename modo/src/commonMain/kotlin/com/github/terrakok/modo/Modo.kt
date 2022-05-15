@@ -11,7 +11,7 @@ fun interface NavigationRender {
 /**
  * Modo is navigation state holder and dispatcher actions to reducer
  */
-class Modo(
+open class Modo(
     private val reducer: NavigationReducer
 ) {
     var state = NavigationState()
@@ -25,7 +25,7 @@ class Modo(
             field?.invoke(state)
         }
 
-    fun dispatch(action: NavigationAction) {
+    open fun dispatch(action: NavigationAction) {
         state = reducer(action, state)
     }
 }

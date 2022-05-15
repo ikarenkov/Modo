@@ -5,6 +5,7 @@ package com.github.terrakok.modo
  */
 interface NavigationAction
 
+class SetState(val state: NavigationState) : NavigationAction
 class Forward(val screen: Screen, vararg val screens: Screen) : NavigationAction
 class Replace(val screen: Screen, vararg val screens: Screen) : NavigationAction
 class NewStack(val screen: Screen, vararg val screens: Screen) : NavigationAction

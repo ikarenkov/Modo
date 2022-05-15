@@ -33,6 +33,8 @@ interface ComposeRenderer : NavigationRender {
     @Composable
     fun Content()
 
+    fun clearStateHolder(stateHolder: SaveableStateHolder, clearAll: Boolean = false)
+
 }
 
 open class ComposeRenderImpl(
@@ -49,6 +51,7 @@ open class ComposeRenderImpl(
     override val state: MutableState<NavigationState> = mutableStateOf(NavigationState())
 
     private val lastStackEvent: MutableState<ScreenTransitionType> = mutableStateOf(ScreenTransitionType.Idle)
+    // TODO: share removed screen for whole structure
     private val removedScreens = mutableSetOf<Screen>()
 
     override fun invoke(state: NavigationState) {
@@ -62,14 +65,14 @@ open class ComposeRenderImpl(
 
     @Composable
     override fun Content() {
-        val stateHolder: SaveableStateHolder = rememberSaveableStateHolder()
+        val stateHolder: SaveableStateHolder = LocalSaveableStateHolder.current ?: rememberSaveableStateHolder()
         DisposableEffect(key1 = state.value) {
             onDispose {
                 clearStateHolder(stateHolder)
             }
         }
         CompositionLocalProvider(
-            LocalSaveableStateHolder provides stateHolder
+            LocalSaveableStateHolder providesDefault stateHolder
         ) {
             state.value.chain.lastOrNull()?.let { screen ->
                 require(screen is ComposeScreen) {
@@ -80,13 +83,20 @@ open class ComposeRenderImpl(
         }
     }
 
-    private fun clearStateHolder(stateHolder: SaveableStateHolder) {
-        removedScreens.forEach {
-            stateHolder.removeState(it)
+    override fun clearStateHolder(stateHolder: SaveableStateHolder, clearAll: Boolean) {
+        if (clearAll) {
+            state.value.chain.clearStates(stateHolder)
         }
+        removedScreens.clearStates(stateHolder)
         if (removedScreens.isNotEmpty()) {
             removedScreens.clear()
         }
+    }
+
+    private fun Iterable<Screen>.clearStates(stateHolder: SaveableStateHolder) = forEach { screen ->
+        require(screen is ComposeScreen)
+        stateHolder.removeState(screen.screenKey)
+        (screen as? WrapperComposeScreen)?.onRemoveScreen(stateHolder)
     }
 
     private fun calculateRemovedScreens(currentChain: List<Screen>, newChain: List<Screen>): List<Screen> {
