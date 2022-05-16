@@ -8,12 +8,18 @@ fun interface NavigationRender {
 
 }
 
+fun interface ModoDispatcher {
+
+    fun dispatch(action: NavigationAction)
+
+}
+
 /**
  * Modo is navigation state holder and dispatcher actions to reducer
  */
 open class Modo(
     private val reducer: NavigationReducer
-) {
+): ModoDispatcher {
     var state = NavigationState()
         internal set(value) {
             field = value
@@ -25,7 +31,7 @@ open class Modo(
             field?.invoke(state)
         }
 
-    open fun dispatch(action: NavigationAction) {
+    override fun dispatch(action: NavigationAction) {
         state = reducer(action, state)
     }
 }

@@ -34,11 +34,11 @@ fun getNavigationStateString(prefix: String, navigationState: NavigationState): 
                 appendLine()
                 append(getNavigationStateString("$prefix|  ", screen.stacks[screen.selectedStack]))
             }
-            is WrapperScreen -> buildString {
+            is NestedNavigationScreen -> buildString {
                 append(prefix)
                 append(screen)
                 appendLine()
-                append(getNavigationStateString("$prefix|  ", screen.modo.state))
+                append(getNavigationStateString("$prefix|  ", screen.navigationState))
             }
             else -> {
                 "$prefix$screen\n"

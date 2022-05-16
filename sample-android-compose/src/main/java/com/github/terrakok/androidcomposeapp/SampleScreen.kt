@@ -13,7 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.terrakok.androidcomposeapp.saveable.ListScreen
-import com.github.terrakok.androidcomposeapp.wrapper.SampleWrapperScreen
+import com.github.terrakok.androidcomposeapp.nestedNavigation.SampleNestedNavigationScreen
 import com.github.terrakok.modo.*
 import com.github.terrakok.modo.android.compose.*
 import kotlinx.coroutines.GlobalScope
@@ -33,13 +33,13 @@ class SampleScreen(
 
     @Composable
     override fun Content() {
-        SampleContent(i, LocalModo.current)
+        SampleContent(i, LocalModoDispatcher.current)
     }
 
 }
 
 @Composable
-private fun SampleContent(i: Int, modo: Modo) {
+private fun SampleContent(i: Int, modo: ModoDispatcher) {
     Column(
         modifier = Modifier
             .padding(8.dp)
@@ -95,7 +95,7 @@ private fun SampleContent(i: Int, modo: Modo) {
             },
             "Exit" to { modo.exit() },
             "List sample" to { modo.forward(ListScreen()) },
-            "Wrapped Modo" to { modo.forward(SampleWrapperScreen(modo)) }
+            "Wrapped Modo" to { modo.forward(SampleNestedNavigationScreen()) }
         )
         for (index in buttons.indices step 2) {
             Spacer(modifier = Modifier.size(8.dp))

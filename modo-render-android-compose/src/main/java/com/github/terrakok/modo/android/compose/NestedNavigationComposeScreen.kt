@@ -9,25 +9,27 @@ import com.github.terrakok.modo.*
 import kotlinx.parcelize.Parceler
 import java.util.*
 
-val LocalModo = staticCompositionLocalOf<Modo> { TODO("error") }
+val LocalModoDispatcher = staticCompositionLocalOf<ModoDispatcher> { error("Local ModoDispatcher wasn't provided!") }
 
-abstract class WrapperComposeScreen(
+abstract class NestedNavigationComposeScreen(
     id: String,
     initWreppeeState: NavigationState,
-    reducer: NavigationReducer,
-) : ComposeScreen(id), WrapperScreen {
+) : ComposeScreen(id), NestedNavigationScreen {
 
     abstract var saveableWreppeeState: NavigationState
-
-    abstract fun onNewState(state: NavigationState)
 
     @Composable
     abstract fun Content(innerContent: @Composable () -> Unit)
 
-    override val modo: Modo = ModoWrapper(reducer) {
-        saveableWreppeeState = it
-        onNewState(it)
-    }.apply { dispatch(SetState(initWreppeeState)) }
+    protected open val renderer = createRenderer().apply { invoke(initWreppeeState) }
+
+    override var navigationState: NavigationState = initWreppeeState
+        set(value) {
+            field = value
+            saveableWreppeeState = value
+            renderer.invoke(value)
+        }
+        get() = renderer.state.value
 
     @OptIn(ExperimentalAnimationApi::class)
     protected open fun createRenderer() = ComposeRenderImpl(
@@ -50,39 +52,25 @@ abstract class WrapperComposeScreen(
     }
 
     fun onRemoveScreen(stateHolder: SaveableStateHolder) {
-        (modo.render as? ComposeRenderer)?.clearStateHolder(stateHolder, true)
+        renderer.clearStateHolder(stateHolder, true)
     }
 
     @Composable
     final override fun Content() {
-        val outerModo = LocalModo.current
-        remember {
-            if (modo.render == null) {
-                modo.render = createRenderer()
-            }
+        val outerModoDispatcher = LocalModoDispatcher.current
+        val localModoDispatcher = remember {
+            ModoDispatcher { outerModoDispatcher.dispatch(NestedAction(it)) }
         }
         BackHandler {
-            (if (modo.state.chain.size == 1) outerModo else modo).back()
+            (if (navigationState.chain.isEmpty()) outerModoDispatcher else localModoDispatcher).back()
         }
         CompositionLocalProvider(
-            LocalModo provides modo
+            LocalModoDispatcher provides localModoDispatcher
         ) {
             Content {
-                (modo.render as? ComposeRenderer)?.Content()
+                renderer.Content()
             }
         }
-    }
-
-}
-
-private class ModoWrapper(
-    reducer: NavigationReducer,
-    private val onNewState: (NavigationState) -> Unit
-) : Modo(reducer) {
-
-    override fun dispatch(action: NavigationAction) {
-        super.dispatch(action)
-        onNewState(state)
     }
 
 }

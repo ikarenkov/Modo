@@ -14,10 +14,10 @@ object BackToRoot : NavigationAction
 object Back : NavigationAction
 object Exit : NavigationAction
 
-fun Modo.forward(screen: Screen, vararg screens: Screen) = dispatch(Forward(screen, *screens))
-fun Modo.replace(screen: Screen, vararg screens: Screen) = dispatch(Replace(screen, *screens))
-fun Modo.newStack(screen: Screen, vararg screens: Screen) = dispatch(NewStack(screen, *screens))
-fun Modo.backTo(screenId: String) = dispatch(BackTo(screenId))
-fun Modo.backToRoot() = dispatch(BackToRoot)
-fun Modo.back() = dispatch(Back)
-fun Modo.exit() = dispatch(Exit)
+fun ModoDispatcher.forward(screen: Screen, vararg screens: Screen) = dispatch(Forward(screen, *screens))
+fun ModoDispatcher.replace(screen: Screen, vararg screens: Screen) = dispatch(Replace(screen, *screens))
+fun ModoDispatcher.newStack(screen: Screen, vararg screens: Screen) = dispatch(NewStack(screen, *screens))
+fun ModoDispatcher.backTo(screenId: String) = dispatch(BackTo(screenId))
+fun ModoDispatcher.backToRoot() = dispatch(BackToRoot)
+fun ModoDispatcher.back() = dispatch(Back)
+fun ModoDispatcher.exit() = dispatch(Exit)

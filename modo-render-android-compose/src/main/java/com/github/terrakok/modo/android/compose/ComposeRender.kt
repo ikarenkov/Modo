@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import com.github.terrakok.modo.ModoDispatcher
 import com.github.terrakok.modo.NavigationRender
 import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.Screen
@@ -37,20 +38,16 @@ interface ComposeRenderer : NavigationRender {
 
 }
 
-open class ComposeRenderImpl(
+class ComposeRenderImpl(
     private val exitAction: () -> Unit,
     private val getTransitionType: (oldScreensStack: List<Screen>, newScreensStack: List<Screen>) -> ScreenTransitionType = ::defaultCalculateTransitionType,
     private val content: RendererContent = defaultRendererContent
 ) : ComposeRenderer {
-    constructor(
-        activity: Activity,
-        getTransitionType: (oldScreensStack: List<Screen>, newScreensStack: List<Screen>) -> ScreenTransitionType = ::defaultCalculateTransitionType,
-        content: RendererContent = defaultRendererContent
-    ) : this({ activity.finish() }, getTransitionType, content)
 
     override val state: MutableState<NavigationState> = mutableStateOf(NavigationState())
 
     private val lastStackEvent: MutableState<ScreenTransitionType> = mutableStateOf(ScreenTransitionType.Idle)
+
     // TODO: share removed screen for whole structure
     private val removedScreens = mutableSetOf<Screen>()
 
@@ -83,6 +80,11 @@ open class ComposeRenderImpl(
         }
     }
 
+    /**
+     * Clear states of removed screens from given [stateHolder].
+     * @param stateHolder - SaveableStateHolder that contains screen states
+     * @param clearAll - forces to remove all screen states that renderer holds (removed and "displayed")
+     */
     override fun clearStateHolder(stateHolder: SaveableStateHolder, clearAll: Boolean) {
         if (clearAll) {
             state.value.chain.clearStates(stateHolder)
@@ -96,12 +98,37 @@ open class ComposeRenderImpl(
     private fun Iterable<Screen>.clearStates(stateHolder: SaveableStateHolder) = forEach { screen ->
         require(screen is ComposeScreen)
         stateHolder.removeState(screen.screenKey)
-        (screen as? WrapperComposeScreen)?.onRemoveScreen(stateHolder)
+        (screen as? NestedNavigationComposeScreen)?.onRemoveScreen(stateHolder)
     }
 
     private fun calculateRemovedScreens(currentChain: List<Screen>, newChain: List<Screen>): List<Screen> {
         val newChainSet = newChain.toSet()
         return currentChain.filter { it !in newChainSet }
+    }
+
+}
+
+/**
+ * Renderer that must be used as root renderer for [Modo] to provide root [LocalModoDispatcher] for composable tree.
+ */
+class RootRenderer(
+    private val rootModoDispatcher: ModoDispatcher,
+    private val original: ComposeRenderer
+) : ComposeRenderer by original {
+
+    constructor(
+        activity: Activity,
+        rootModoDispatcher: ModoDispatcher,
+    ) : this(
+        rootModoDispatcher,
+        ComposeRenderImpl({ activity.finish() })
+    )
+
+    @Composable
+    override fun Content() {
+        CompositionLocalProvider(LocalModoDispatcher provides rootModoDispatcher) {
+            original.Content()
+        }
     }
 
 }
