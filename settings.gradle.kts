@@ -12,5 +12,6 @@ include(":modo")
 include(":modo-render-android-fm")
 include(":modo-render-android-compose")
 
-include(":sample-android-fm")
-include(":sample-android-compose")
+include(":sample:android-fm")
+include(":sample:compose:app")
+include(":sample:compose:feature-impl")
