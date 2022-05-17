@@ -3,7 +3,7 @@ package com.github.terrakok.androidcomposeapp
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -11,15 +11,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.github.terrakok.androidcomposeapp.saveable.ListScreen
-import com.github.terrakok.androidcomposeapp.nestedNavigation.SampleNestedNavigationScreen
 import com.github.terrakok.modo.*
 import com.github.terrakok.modo.android.compose.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
+import modo.sample.compose.feature.nestedNavigation.SampleNestedNavigationScreen
+import modo.sample.compose.navigation.core.ButtonsList
+import modo.sample.compose.navigation.core.RemovePrev
 
 fun Browser(url: String) = ExternalScreen {
     Intent(Intent.ACTION_VIEW, Uri.parse(url))
@@ -43,19 +44,16 @@ private fun SampleContent(i: Int, modo: ModoDispatcher) {
     Column(
         modifier = Modifier
             .padding(8.dp)
-            .fillMaxHeight()
+            .fillMaxHeight(),
     ) {
         Spacer(modifier = Modifier.size(16.dp))
         Text(
             text = "Screen $i",
-            fontSize = 28.sp,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxSize(),
+            style = MaterialTheme.typography.h3,
+            modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.size(16.dp))
-        Spacer(modifier = Modifier.size(8.dp))
         val buttons = listOf(
             "Back" to { modo.back() },
             "Forward" to { modo.forward(SampleScreen(i + 1)) },
@@ -95,47 +93,12 @@ private fun SampleContent(i: Int, modo: ModoDispatcher) {
             },
             "Exit" to { modo.exit() },
             "List sample" to { modo.forward(ListScreen()) },
-            "Wrapped Modo" to { modo.forward(SampleNestedNavigationScreen()) }
+            "Wrapped Modo" to { modo.forward(SampleNestedNavigationScreen(i + 1, NavigationState(listOf(SampleScreen(1))))) }
         )
-        for (index in buttons.indices step 2) {
-            Spacer(modifier = Modifier.size(8.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) {
-                ModoButton(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxSize(),
-                    text = buttons[index].first
-                ) {
-                    buttons[index].second()
-                }
-                if (index + 1 in buttons.indices) {
-                    Spacer(modifier = Modifier.size(8.dp))
-                    ModoButton(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxSize(),
-                        text = buttons[index + 1].first
-                    ) {
-                        buttons[index + 1].second()
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ModoButton(
-    modifier: Modifier,
-    text: String,
-    action: () -> Unit
-) {
-    Button(onClick = action, modifier) {
-        Text(text = text)
+        ButtonsList(
+            buttons,
+            Modifier.weight(1f)
+        )
     }
 }
 

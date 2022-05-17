@@ -1,4 +1,4 @@
-package com.github.terrakok.androidcomposeapp
+package modo.sample.compose.navigation.core
 
 import com.github.terrakok.modo.ModoReducer
 import com.github.terrakok.modo.NavigationAction

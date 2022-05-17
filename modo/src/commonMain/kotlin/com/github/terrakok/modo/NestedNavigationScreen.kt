@@ -21,13 +21,17 @@ class NestedNavigationReducer(
 
     override fun invoke(action: NavigationAction, state: NavigationState): NavigationState = when (action) {
         is NestedAction -> {
-            val wrapperScreen = (state.chain.last() as NestedNavigationScreen)
-            val newInnerState = wrapperScreen.reducer(action.navigationAction, wrapperScreen.navigationState)
-            if (backOnEmptyInnerState && newInnerState.chain.isEmpty()) {
-                origin.invoke(Back, state)
+            val wrapperScreen = state.chain.last()
+            if (wrapperScreen is NestedNavigationScreen) {
+                val newInnerState = wrapperScreen.reducer(action.navigationAction, wrapperScreen.navigationState)
+                if (backOnEmptyInnerState && newInnerState.chain.isEmpty()) {
+                    origin.invoke(Back, state)
+                } else {
+                    wrapperScreen.navigationState = newInnerState
+                    state
+                }
             } else {
-                wrapperScreen.navigationState = newInnerState
-                state
+                origin(action.navigationAction, state)
             }
         }
         else -> origin(action, state)

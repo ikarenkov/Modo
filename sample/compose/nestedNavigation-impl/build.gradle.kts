@@ -1,5 +1,5 @@
 plugins {
-    id("com.android.application")
+    id("com.android.library")
     kotlin("android")
     id("kotlin-parcelize")
 }
@@ -8,11 +8,8 @@ android {
     compileSdk = (properties["android.compileSdk"] as String).toInt()
 
     defaultConfig {
-        applicationId = "com.github.terrakok.androidcomposeapp"
         minSdk = (properties["android.minSdk"] as String).toInt()
         targetSdk = (properties["android.targetSdk"] as String).toInt()
-        versionCode = 1
-        versionName = "1.0"
     }
 
     compileOptions {
@@ -36,9 +33,7 @@ android {
 dependencies {
     implementation(project(":modo"))
     implementation(project(":modo-render-android-compose"))
-    implementation(project(":sample:compose:nestedNavigation-impl"))
     implementation(project(":sample:compose:core"))
-
     implementation("androidx.core:core-ktx:${properties["version.coreKtx"]}")
     implementation("androidx.appcompat:appcompat:${properties["version.appcompat"]}")
     implementation("com.google.android.material:material:${properties["version.material"]}")

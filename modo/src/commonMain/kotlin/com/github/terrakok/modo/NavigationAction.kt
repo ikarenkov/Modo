@@ -14,6 +14,7 @@ object BackToRoot : NavigationAction
 object Back : NavigationAction
 object Exit : NavigationAction
 
+fun ModoDispatcher.setState(state: NavigationState) = dispatch(SetState(state))
 fun ModoDispatcher.forward(screen: Screen, vararg screens: Screen) = dispatch(Forward(screen, *screens))
 fun ModoDispatcher.replace(screen: Screen, vararg screens: Screen) = dispatch(Replace(screen, *screens))
 fun ModoDispatcher.newStack(screen: Screen, vararg screens: Screen) = dispatch(NewStack(screen, *screens))

@@ -5,6 +5,7 @@ import android.util.Log
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.forward
+import com.github.terrakok.modo.setState
 
 private var modoInitialized: Boolean = false
 
@@ -24,7 +25,7 @@ fun Modo.init(bundle: Bundle?, firstScreenFactory: () -> ComposeScreen) {
             restoreScreenCounter(bundle.getInt(KEY_NAVIGATION_SCREEN_COUNTER)!!)
             val restoredState = bundle.restoreNavigationState()
             if (restoredState.chain.isNotEmpty()) {
-                restore(restoredState)
+                setState(restoredState)
             }
         } else {
             Log.d("Modo", "Activity restored after rotation")

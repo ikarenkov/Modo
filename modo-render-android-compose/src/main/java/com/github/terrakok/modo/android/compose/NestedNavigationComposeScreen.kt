@@ -61,6 +61,7 @@ abstract class NestedNavigationComposeScreen(
         val localModoDispatcher = remember {
             ModoDispatcher { outerModoDispatcher.dispatch(NestedAction(it)) }
         }
+        // TODO: disable back handler during transition
         BackHandler {
             (if (navigationState.chain.isEmpty()) outerModoDispatcher else localModoDispatcher).back()
         }
