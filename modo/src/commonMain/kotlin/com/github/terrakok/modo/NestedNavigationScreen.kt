@@ -2,7 +2,6 @@ package com.github.terrakok.modo
 
 interface NestedNavigationScreen : Screen {
     var navigationState: NavigationState
-
     val reducer: NavigationReducer
 }
 

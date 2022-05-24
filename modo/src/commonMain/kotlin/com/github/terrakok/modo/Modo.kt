@@ -1,25 +1,37 @@
 package com.github.terrakok.modo
 
-typealias NavigationReducer = (action: NavigationAction, state: NavigationState) -> NavigationState
-
-fun interface NavigationRender {
-
-    operator fun invoke(state: NavigationState)
-
+interface Screen {
+    val id: String
 }
 
-fun interface ModoDispatcher {
+/**
+ * Marker for actions which will be applied to state via reducer
+ */
+interface NavigationAction
 
+/**
+ * Holder of current navigation state
+ */
+data class NavigationState(
+    val chain: List<Screen> = emptyList()
+)
+
+typealias NavigationReducer = (action: NavigationAction, state: NavigationState) -> NavigationState
+
+interface NavigationRender {
+    operator fun invoke(state: NavigationState)
+}
+
+fun interface NavigationDispatcher {
     fun dispatch(action: NavigationAction)
-
 }
 
 /**
  * Modo is navigation state holder and dispatcher actions to reducer
  */
-open class Modo(
+class Modo(
     private val reducer: NavigationReducer
-): ModoDispatcher {
+): NavigationDispatcher {
     var state = NavigationState()
         internal set(value) {
             field = value

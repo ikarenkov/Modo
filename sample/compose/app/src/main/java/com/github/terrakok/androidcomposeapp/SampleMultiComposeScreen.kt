@@ -15,12 +15,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import com.github.terrakok.modo.MultiScreenState
-import com.github.terrakok.modo.android.compose.LocalModoDispatcher
+import com.github.terrakok.modo.android.compose.LocalNavigationDispatcher
 import com.github.terrakok.modo.android.compose.MultiComposeScreen
 import com.github.terrakok.modo.android.compose.MultiScreenStateParceler
 import com.github.terrakok.modo.android.compose.uniqueScreenKey
 import com.github.terrakok.modo.selectStack
-import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 
@@ -33,7 +32,7 @@ class SampleMultiComposeScreen(
 
     @Composable
     override fun Content(innerContent: @Composable () -> Unit) {
-        val modo = LocalModoDispatcher.current
+        val modo = LocalNavigationDispatcher.current
         Column {
             Box(Modifier.weight(1f)) {
                 innerContent()

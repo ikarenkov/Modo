@@ -1,10 +1,5 @@
 package com.github.terrakok.modo
 
-/**
- * Marker for actions which will be applied to state via reducer
- */
-interface NavigationAction
-
 class SetState(val state: NavigationState) : NavigationAction
 class Forward(val screen: Screen, vararg val screens: Screen) : NavigationAction
 class Replace(val screen: Screen, vararg val screens: Screen) : NavigationAction
@@ -14,11 +9,11 @@ object BackToRoot : NavigationAction
 object Back : NavigationAction
 object Exit : NavigationAction
 
-fun ModoDispatcher.setState(state: NavigationState) = dispatch(SetState(state))
-fun ModoDispatcher.forward(screen: Screen, vararg screens: Screen) = dispatch(Forward(screen, *screens))
-fun ModoDispatcher.replace(screen: Screen, vararg screens: Screen) = dispatch(Replace(screen, *screens))
-fun ModoDispatcher.newStack(screen: Screen, vararg screens: Screen) = dispatch(NewStack(screen, *screens))
-fun ModoDispatcher.backTo(screenId: String) = dispatch(BackTo(screenId))
-fun ModoDispatcher.backToRoot() = dispatch(BackToRoot)
-fun ModoDispatcher.back() = dispatch(Back)
-fun ModoDispatcher.exit() = dispatch(Exit)
+fun NavigationDispatcher.setState(state: NavigationState) = dispatch(SetState(state))
+fun NavigationDispatcher.forward(screen: Screen, vararg screens: Screen) = dispatch(Forward(screen, *screens))
+fun NavigationDispatcher.replace(screen: Screen, vararg screens: Screen) = dispatch(Replace(screen, *screens))
+fun NavigationDispatcher.newStack(screen: Screen, vararg screens: Screen) = dispatch(NewStack(screen, *screens))
+fun NavigationDispatcher.backTo(screenId: String) = dispatch(BackTo(screenId))
+fun NavigationDispatcher.backToRoot() = dispatch(BackToRoot)
+fun NavigationDispatcher.back() = dispatch(Back)
+fun NavigationDispatcher.exit() = dispatch(Exit)

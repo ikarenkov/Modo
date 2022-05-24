@@ -15,9 +15,9 @@ class ExternalForward(val screen: Screen, vararg val screens: Screen) : Navigati
 object BackToLocalRoot : NavigationAction
 class SelectStack(val stackIndex: Int) : NavigationAction
 
-fun ModoDispatcher.externalForward(screen: Screen, vararg screens: Screen) = dispatch(ExternalForward(screen, *screens))
-fun ModoDispatcher.selectStack(stackIndex: Int) = dispatch(SelectStack(stackIndex))
-fun ModoDispatcher.backToLocalRoot() = dispatch(BackToLocalRoot)
+fun NavigationDispatcher.externalForward(screen: Screen, vararg screens: Screen) = dispatch(ExternalForward(screen, *screens))
+fun NavigationDispatcher.selectStack(stackIndex: Int) = dispatch(SelectStack(stackIndex))
+fun NavigationDispatcher.backToLocalRoot() = dispatch(BackToLocalRoot)
 
 class MultiReducer(
     private val origin: NavigationReducer = ModoReducer()

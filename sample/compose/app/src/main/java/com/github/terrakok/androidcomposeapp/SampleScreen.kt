@@ -34,13 +34,13 @@ class SampleScreen(
 
     @Composable
     override fun Content() {
-        SampleContent(i, LocalModoDispatcher.current)
+        SampleContent(i, LocalNavigationDispatcher.current)
     }
 
 }
 
 @Composable
-private fun SampleContent(i: Int, modo: ModoDispatcher) {
+private fun SampleContent(i: Int, modo: NavigationDispatcher) {
     Column(
         modifier = Modifier
             .padding(8.dp)

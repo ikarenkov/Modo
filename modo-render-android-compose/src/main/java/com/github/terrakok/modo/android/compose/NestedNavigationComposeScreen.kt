@@ -9,7 +9,7 @@ import com.github.terrakok.modo.*
 import kotlinx.parcelize.Parceler
 import java.util.*
 
-val LocalModoDispatcher = staticCompositionLocalOf<ModoDispatcher> { error("Local ModoDispatcher wasn't provided!") }
+val LocalNavigationDispatcher = staticCompositionLocalOf<NavigationDispatcher> { error("Local ModoDispatcher wasn't provided!") }
 
 abstract class NestedNavigationComposeScreen(
     id: String,
@@ -57,16 +57,16 @@ abstract class NestedNavigationComposeScreen(
 
     @Composable
     final override fun Content() {
-        val outerModoDispatcher = LocalModoDispatcher.current
-        val localModoDispatcher = remember {
-            ModoDispatcher { outerModoDispatcher.dispatch(NestedAction(it)) }
+        val outerModoDispatcher = LocalNavigationDispatcher.current
+        val localNavigationDispatcher = remember {
+            NavigationDispatcher { outerModoDispatcher.dispatch(NestedAction(it)) }
         }
         // TODO: disable back handler during transition
         BackHandler {
-            (if (navigationState.chain.isEmpty()) outerModoDispatcher else localModoDispatcher).back()
+            (if (navigationState.chain.isEmpty()) outerModoDispatcher else localNavigationDispatcher).back()
         }
         CompositionLocalProvider(
-            LocalModoDispatcher provides localModoDispatcher
+            LocalNavigationDispatcher provides localNavigationDispatcher
         ) {
             Content {
                 renderer.Content()

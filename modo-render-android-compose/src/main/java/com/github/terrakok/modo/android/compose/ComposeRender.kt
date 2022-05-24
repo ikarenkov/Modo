@@ -4,7 +4,7 @@ import android.app.Activity
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
-import com.github.terrakok.modo.ModoDispatcher
+import com.github.terrakok.modo.NavigationDispatcher
 import com.github.terrakok.modo.NavigationRender
 import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.Screen
@@ -109,24 +109,24 @@ class ComposeRenderImpl(
 }
 
 /**
- * Renderer that must be used as root renderer for [Modo] to provide root [LocalModoDispatcher] for composable tree.
+ * Renderer that must be used as root renderer for [Modo] to provide root [LocalNavigationDispatcher] for composable tree.
  */
 class RootRenderer(
-    private val rootModoDispatcher: ModoDispatcher,
+    private val rootNavigationDispatcher: NavigationDispatcher,
     private val original: ComposeRenderer
 ) : ComposeRenderer by original {
 
     constructor(
         activity: Activity,
-        rootModoDispatcher: ModoDispatcher,
+        rootNavigationDispatcher: NavigationDispatcher,
     ) : this(
-        rootModoDispatcher,
+        rootNavigationDispatcher,
         ComposeRenderImpl({ activity.finish() })
     )
 
     @Composable
     override fun Content() {
-        CompositionLocalProvider(LocalModoDispatcher provides rootModoDispatcher) {
+        CompositionLocalProvider(LocalNavigationDispatcher provides rootNavigationDispatcher) {
             original.Content()
         }
     }

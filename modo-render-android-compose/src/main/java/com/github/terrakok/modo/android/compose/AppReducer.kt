@@ -17,7 +17,7 @@ class ExternalScreen(
  */
 class Launch(val screen: ExternalScreen) : NavigationAction
 
-fun ModoDispatcher.launch(screen: ExternalScreen) = dispatch(Launch(screen))
+fun NavigationDispatcher.launch(screen: ExternalScreen) = dispatch(Launch(screen))
 
 /**
  * Navigation reducer for building single activity application.
