@@ -23,8 +23,6 @@ open class Screen(
         container?.dispatch(action)
             ?: throw IllegalStateException("Screen `$id` should have container!")
     }
-
-    fun foo() {}
 }
 
 open class ContainerScreen(
@@ -44,8 +42,10 @@ open class ContainerScreen(
         val newState = reducer.reduce(action, navigationState)
         if (newState != null) {
             navigationState = newState
+        } else if (container != null) {
+            container.dispatch(action)
         } else {
-            super.dispatch(action)
+            throw IllegalStateException("Unknown action $action in root screen `$id`!")
         }
     }
 
