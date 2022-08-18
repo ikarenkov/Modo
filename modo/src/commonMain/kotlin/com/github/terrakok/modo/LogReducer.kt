@@ -8,42 +8,48 @@ class LogReducer(
     private val onNewAction: (NavigationAction) -> Unit = { action ->
         logd("Modo", "New action=$action")
     },
-    private val onNewState: (NavigationState) -> Unit = { navigationState ->
+    private val onNewState: (NavigationState?) -> Unit = { navigationState ->
         logd("Modo", "New state=${navigationState.hashCode()}\n${navigationState.format()}")
     }
 ) : NavigationReducer {
-    override fun invoke(action: NavigationAction, state: NavigationState): NavigationState {
+    override fun reduce(action: NavigationAction, state: NavigationState): NavigationState? {
         onNewAction(action)
-        return origin.invoke(action, state).also(onNewState)
+        return origin.reduce(action, state).also(onNewState)
     }
 }
 
-fun NavigationState.format(): String =
-    "‣root\n${getNavigationStateString("|  ", this).trimEnd()}  <- current screen"
+fun NavigationState?.format(): String =
+    if (this == null) {
+        "null"
+    } else {
+        getNavigationStateString("", this).trimEnd() + "  <- current screen"
+    }
 
-fun getNavigationStateString(prefix: String, navigationState: NavigationState): String =
-    navigationState.chain.map { screen ->
-        when (screen) {
-            is MultiScreen -> buildString {
-                append(prefix)
-                append('‣')
-                append(screen)
-                if (screen.stacks.size > 1) {
-                    append(" [${screen.selectedStack + 1}/${screen.stacks.size}]")
+private fun getNavigationStateString(prefix: String, navigationState: NavigationState): String =
+    when (navigationState) {
+        is StackNavigation -> {
+            navigationState.stack.map { screen ->
+                when (screen) {
+                    is ContainerScreen -> buildString {
+                        append(prefix)
+                        append(screen.id)
+                        appendLine()
+                        append(getNavigationStateString("$prefix|  ", screen.navigationState))
+                    }
+                    else -> {
+                        "$prefix${screen.id}\n"
+                    }
                 }
-                appendLine()
-                append(getNavigationStateString("$prefix|  ", screen.stacks[screen.selectedStack]))
-            }
-            is NestedNavigationScreen -> buildString {
-                append(prefix)
-                append(screen)
-                appendLine()
-                append(getNavigationStateString("$prefix|  ", screen.navigationState))
-            }
-            else -> {
-                "$prefix$screen\n"
-            }
+            }.joinToString(separator = "")
         }
-    }.joinToString(separator = "")
+        is MultiNavigation -> buildString {
+            val screen = navigationState.containers[navigationState.activeContainerIndex]
+            append(prefix)
+            append(screen.id)
+            appendLine()
+            append(getNavigationStateString("$prefix|  ", screen.navigationState))
+        }
+        else -> "unknown state type: ${navigationState::class.simpleName}"
+    }
 
 internal expect fun logd(tag: String, msg: String)

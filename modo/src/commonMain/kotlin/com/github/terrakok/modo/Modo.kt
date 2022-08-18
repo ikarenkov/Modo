@@ -1,49 +1,53 @@
 package com.github.terrakok.modo
 
-interface Screen {
+interface ScreenId {
     val id: String
 }
 
-/**
- * Marker for actions which will be applied to state via reducer
- */
 interface NavigationAction
+interface NavigationState
 
-/**
- * Holder of current navigation state
- */
-data class NavigationState(
-    val chain: List<Screen> = emptyList()
-)
-
-typealias NavigationReducer = (action: NavigationAction, state: NavigationState) -> NavigationState
-
-interface NavigationRender {
-    operator fun invoke(state: NavigationState)
+interface NavigationReducer {
+    fun reduce(action: NavigationAction, state: NavigationState): NavigationState?
 }
 
-fun interface NavigationDispatcher {
+interface NavigationDispatcher {
     fun dispatch(action: NavigationAction)
 }
 
-/**
- * Modo is navigation state holder and dispatcher actions to reducer
- */
-class Modo(
-    private val reducer: NavigationReducer
-): NavigationDispatcher {
-    var state = NavigationState()
-        internal set(value) {
+open class Screen(
+    override val id: String,
+    val container: NavigationDispatcher?
+) : ScreenId, NavigationDispatcher {
+    override fun dispatch(action: NavigationAction) {
+        container?.dispatch(action)
+            ?: throw IllegalStateException("Screen `$id` should have container!")
+    }
+
+    fun foo() {}
+}
+
+open class ContainerScreen(
+    id: String,
+    initialState: NavigationState,
+    private val reducer: NavigationReducer,
+    outerContainer: NavigationDispatcher? = null
+) : Screen(id, outerContainer) {
+
+    var navigationState: NavigationState = initialState
+        private set(value) {
             field = value
-            render?.invoke(field)
-        }
-    var render: NavigationRender? = null
-        set(value) {
-            field = value
-            field?.invoke(state)
+            onStateUpdate(value)
         }
 
     override fun dispatch(action: NavigationAction) {
-        state = reducer(action, state)
+        val newState = reducer.reduce(action, navigationState)
+        if (newState != null) {
+            navigationState = newState
+        } else {
+            super.dispatch(action)
+        }
     }
+
+    open fun onStateUpdate(state: NavigationState) {}
 }
