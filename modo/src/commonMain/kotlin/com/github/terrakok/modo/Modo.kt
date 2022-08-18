@@ -22,10 +22,10 @@ interface NavigationRenderer {
 open class Screen(
     override val id: String
 ) : ScreenId, NavigationDispatcher {
-    val container: NavigationDispatcher get() = getContainer()
+    val container: NavigationDispatcher? get() = getContainer()
 
     override fun dispatch(action: NavigationAction) {
-        container.dispatch(action)
+        container?.dispatch(action)
     }
 }
 
@@ -52,7 +52,7 @@ open class ContainerScreen(
         if (newState != null) {
             navigationState = newState
         } else {
-            container.dispatch(action)
+            container?.dispatch(action)
         }
     }
 }
@@ -71,17 +71,18 @@ object Modo : NavigationDispatcher {
     }
 
     override fun dispatch(action: NavigationAction) {
+        root.getLeafScreen().dispatch(action)
+    }
+
+    fun dispatchToRoot(action: NavigationAction) {
         root.dispatch(action)
     }
 
-    internal fun findScreenContainer(screen: Screen): ContainerScreen =
-        root.findScreenContainer(screen)
-                ?: throw IllegalStateException("Screen $this is not found!")
+    internal fun findScreenContainer(screen: Screen) = root.findScreenContainer(screen)
 }
 
-private fun Screen.getContainer(): NavigationDispatcher = Modo.findScreenContainer(this)
+private fun Screen.getContainer() = Modo.findScreenContainer(this)
 private fun ContainerScreen.findScreenContainer(screen: Screen): ContainerScreen? {
-    if (screen === this) return this
     when (val state = navigationState) {
         is StackNavigation -> {
             state.stack.forEach { screenId ->
@@ -101,4 +102,18 @@ private fun ContainerScreen.findScreenContainer(screen: Screen): ContainerScreen
         }
     }
     return null
+}
+
+private fun ContainerScreen.getLeafScreen(): Screen = when (val state = navigationState) {
+    is StackNavigation -> {
+        when (val last = state.stack.lastOrNull()) {
+            is ContainerScreen -> last.getLeafScreen()
+            is Screen -> last
+            else -> this
+        }
+    }
+    is MultiNavigation -> {
+        state.containers[state.activeContainerIndex].getLeafScreen()
+    }
+    else -> throw IllegalStateException("Unknown navigation state $state!")
 }

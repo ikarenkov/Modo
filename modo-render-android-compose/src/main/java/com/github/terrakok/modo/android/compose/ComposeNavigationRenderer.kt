@@ -14,23 +14,22 @@ class ComposeNavigationRenderer(
     internal val mutableState: MutableState<NavigationState?> = mutableStateOf(null)
 
     override fun render(state: NavigationState) {
-        mutableState.value = state
+        if (state is StackNavigation && state.stack.isEmpty()) {
+            onExit()
+        } else {
+            mutableState.value = state
+        }
     }
 
     @Composable
     fun Content() {
         val state = mutableState.value
-        if (state != null) {
-            val screen = getComposeContent(state)
-            if (screen == null) onExit()
-            else screen.Content()
-        }
+        if (state != null) getComposeContent(state).Content()
     }
 
-    private fun getComposeContent(state: NavigationState): ComposeContent? = when (state) {
-        is StackNavigation -> state.stack.lastOrNull()?.let { it as ComposeContent }
+    private fun getComposeContent(state: NavigationState): ComposeContent = when (state) {
+        is StackNavigation -> state.stack.last() as ComposeContent
         is MultiNavigation -> state.containers[state.activeContainerIndex] as ComposeContent
         else -> throw IllegalStateException("Unknown navigation state: $state")
     }
-
 }

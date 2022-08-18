@@ -22,13 +22,14 @@ open class ComposeContainerScreen(
     initState: StackNavigation,
     reducer: NavigationReducer = StackReducer()
 ) : ContainerScreen(id, initState, reducer), ComposeContent {
-    constructor(id: String, rootScreen: ComposeScreen) : this(
-        id,
-        StackNavigation(listOf(rootScreen))
-    )
+    constructor(
+        id: String,
+        rootScreen: ComposeScreen,
+        reducer: NavigationReducer = StackReducer()
+    ) : this(id, StackNavigation(listOf(rootScreen)), reducer)
 
     private val composeRenderer = ComposeNavigationRenderer {
-        container.back()
+        container?.back()
     }
 
     init {
@@ -53,17 +54,22 @@ abstract class ComposeMultiScreen(
     initState: MultiNavigation,
     reducer: NavigationReducer = MultiReducer()
 ) : ContainerScreen(id, initState, reducer), ComposeContent {
-    constructor(id: String, selectedStack: Int, vararg rootScreens: ComposeScreen) : this(
+    constructor(
+        id: String,
+        selectedStack: Int,
+        vararg rootScreens: ComposeScreen,
+        reducer: NavigationReducer = MultiReducer()
+    ) : this(
         id,
         MultiNavigation(
             rootScreens.mapIndexed { i, s -> ComposeContainerScreen("$i", s) },
             selectedStack
-        )
+        ),
+        reducer
     )
 
-
     private val composeRenderer = ComposeNavigationRenderer {
-        container.back()
+        container?.back()
     }
 
     init {
@@ -72,12 +78,12 @@ abstract class ComposeMultiScreen(
 
     @Composable
     final override fun Content() {
-        val selectedIndex = (composeRenderer.mutableState.value as? MultiNavigation)?.activeContainerIndex ?: return
-        Content(selectedIndex) {
+        val state = (composeRenderer.mutableState.value as? MultiNavigation) ?: return
+        Content(state.containers.size, state.activeContainerIndex) {
             composeRenderer.Content()
         }
     }
 
     @Composable
-    abstract fun Content(stackIndex: Int, screenContent: @Composable () -> Unit)
+    abstract fun Content(stackCount: Int, selectedStack: Int, screenContent: @Composable () -> Unit)
 }

@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.github.terrakok.modo.androidApp">
+    package="com.github.terrakok.androidcomposeapp">
 
     <application
-        android:name=".App"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity
             android:name=".AppActivity"
@@ -14,4 +13,5 @@
             </intent-filter>
         </activity>
     </application>
+
 </manifest>
