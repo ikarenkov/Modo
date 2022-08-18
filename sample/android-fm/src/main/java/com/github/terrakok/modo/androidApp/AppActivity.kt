@@ -13,7 +13,7 @@ import com.github.terrakok.modo.android.init
 import com.github.terrakok.modo.android.multi.TabViewFactory
 import com.github.terrakok.modo.android.saveState
 import com.github.terrakok.modo.back
-import com.github.terrakok.modo.format
+import com.github.terrakok.modo.print
 import com.github.terrakok.modo.selectStack
 
 class AppActivity : AppCompatActivity(), TabViewFactory {
@@ -25,7 +25,7 @@ class AppActivity : AppCompatActivity(), TabViewFactory {
             //only for sample
             override fun invoke(state: NavigationState) {
                 super.invoke(state)
-                val stateStr = state.format()
+                val stateStr = state.print()
                 findViewById<TextView>(R.id.log).text = stateStr
                 findViewById<ScrollView>(R.id.scroll).apply {
                     post { fullScroll(View.FOCUS_DOWN) }

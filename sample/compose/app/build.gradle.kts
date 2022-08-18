@@ -36,8 +36,6 @@ android {
 dependencies {
     implementation(project(":modo"))
     implementation(project(":modo-render-android-compose"))
-    implementation(project(":sample:compose:nestedNavigation-impl"))
-    implementation(project(":sample:compose:core"))
 
     implementation("androidx.core:core-ktx:${properties["version.coreKtx"]}")
     implementation("androidx.appcompat:appcompat:${properties["version.appcompat"]}")

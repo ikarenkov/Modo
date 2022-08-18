@@ -1,4 +1,4 @@
-package modo.sample.compose.navigation.core
+package com.github.terrakok.androidcomposeapp
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button

@@ -1,23 +1,31 @@
 package com.github.terrakok.androidcomposeapp
 
 import android.app.Application
-import com.github.terrakok.modo.LogReducer
+import android.os.Bundle
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import com.github.terrakok.modo.Modo
-import com.github.terrakok.modo.MultiReducer
-import com.github.terrakok.modo.NestedNavigationReducer
-import com.github.terrakok.modo.android.compose.AppReducer
-import modo.sample.compose.navigation.core.CustomModoReducer
+import com.github.terrakok.modo.android.compose.ComposeNavigationRenderer
+import com.github.terrakok.modo.back
 
 class App : Application() {
-    val modo = Modo(LogReducer(AppReducer(this, MultiReducer(NestedNavigationReducer(CustomModoReducer())))))
-
     override fun onCreate() {
-        INSTANCE = this
         super.onCreate()
+        Modo.init(SampleScreen(1))
     }
+}
 
-    companion object {
-        lateinit var INSTANCE: App
-            private set
+class AppActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val render = ComposeNavigationRenderer { finish() }
+        Modo.setRenderer(render)
+        setContent {
+            BackHandler { Modo.back() }
+            Surface(color = MaterialTheme.colors.background) { render.Content() }
+        }
     }
 }

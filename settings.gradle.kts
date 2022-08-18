@@ -14,5 +14,3 @@ include(":modo-render-android-compose")
 
 include(":sample:android-fm")
 include(":sample:compose:app")
-include(":sample:compose:nestedNavigation-impl")
-include(":sample:compose:core")
