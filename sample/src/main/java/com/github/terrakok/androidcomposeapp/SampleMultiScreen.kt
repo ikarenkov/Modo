@@ -28,7 +28,7 @@ class SampleMultiScreen(i: Int) : ComposeMultiScreen(
     @Composable
     private fun Tab(modifier: Modifier, stackIndex: Int, i: Int) = Text(
         modifier = modifier
-            .clickable { selectContainer(i) }
+            .clickable { navigator.selectContainer(i) }
             .background(if (stackIndex == i) Color.LightGray else Color.White)
             .padding(16.dp),
         textAlign = TextAlign.Center,

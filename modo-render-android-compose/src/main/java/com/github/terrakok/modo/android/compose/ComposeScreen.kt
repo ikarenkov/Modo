@@ -29,7 +29,7 @@ open class ComposeContainerScreen(
     ) : this(id, StackNavigation(listOf(rootScreen)), reducer)
 
     private val composeRenderer = ComposeNavigationRenderer {
-        container?.back()
+        container?.dispatch(Back)
     }
 
     init {
@@ -69,7 +69,7 @@ abstract class ComposeMultiScreen(
     )
 
     private val composeRenderer = ComposeNavigationRenderer {
-        container?.back()
+        container?.dispatch(Back)
     }
 
     init {

@@ -21,7 +21,7 @@ class SampleContainerScreen(i: Int) : ComposeContainerScreen(
             Row(modifier = Modifier.padding(2.dp)) {
                 Text("Container")
                 Spacer(modifier = Modifier.weight(1f))
-                Text(modifier = Modifier.clickable { exit() }, text = "CLOSE")
+                Text(modifier = Modifier.clickable { navigator.exit() }, text = "[X]")
             }
             Box(
                 modifier = Modifier

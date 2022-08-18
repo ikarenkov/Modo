@@ -20,12 +20,12 @@ class SampleScreen(
 
     @Composable
     override fun Content() {
-        SampleContent(i, this)
+        SampleContent(i, navigator)
     }
 }
 
 @Composable
-private fun SampleContent(i: Int, navigator: NavigationDispatcher) {
+private fun SampleContent(i: Int, navigator: Navigator) {
     Column(
         modifier = Modifier
             .padding(8.dp)
@@ -69,9 +69,6 @@ private fun SampleContent(i: Int, navigator: NavigationDispatcher) {
             "Multiscreen" to { navigator.forward(SampleMultiScreen(i + 1)) },
             "Exit" to { navigator.exit() },
             "Exit App" to { Modo.dispatchToRoot(Exit) },
-//            "GitHub" to {
-//                modo.launch(Browser("https://github.com/terrakok/Modo"))
-//            },
             "List/Details" to { navigator.forward(ListScreen()) },
         )
         ButtonsList(
@@ -84,5 +81,5 @@ private fun SampleContent(i: Int, navigator: NavigationDispatcher) {
 @Preview
 @Composable
 fun PreviewSampleContent() {
-    SampleContent(0, Modo)
+    SampleContent(0, Navigator {})
 }

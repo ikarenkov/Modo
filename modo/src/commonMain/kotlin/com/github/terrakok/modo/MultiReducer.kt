@@ -8,8 +8,8 @@ data class MultiNavigation(
 class SetContainers(val state: MultiNavigation) : NavigationAction
 class SelectContainer(val index: Int) : NavigationAction
 
-fun NavigationDispatcher.setContainers(state: MultiNavigation) = dispatch(SetContainers(state))
-fun NavigationDispatcher.selectContainer(index: Int) = dispatch(SelectContainer(index))
+fun Navigator.setContainers(state: MultiNavigation) = dispatch(SetContainers(state))
+fun Navigator.selectContainer(index: Int) = dispatch(SelectContainer(index))
 
 class MultiReducer : NavigationReducer {
     override fun reduce(action: NavigationAction, state: NavigationState): NavigationState? {

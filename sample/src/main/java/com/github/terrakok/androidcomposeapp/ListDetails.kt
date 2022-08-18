@@ -32,7 +32,7 @@ class ListScreen: ComposeScreen("ListScreen") {
                     Text(text = "Item $it",
                         Modifier
                             .fillMaxWidth()
-                            .clickable { forward(DetailsScreen(it.toString())) }
+                            .clickable { navigator.forward(DetailsScreen(it.toString())) }
                             .padding(16.dp))
                 }
             }

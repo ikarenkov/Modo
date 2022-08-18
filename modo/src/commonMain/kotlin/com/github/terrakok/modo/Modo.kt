@@ -19,10 +19,13 @@ interface NavigationRenderer {
     fun render(state: NavigationState)
 }
 
+class Navigator(val dispatch: (action: NavigationAction) -> Unit)
+
 open class Screen(
     override val id: String
 ) : ScreenId, NavigationDispatcher {
     val container: NavigationDispatcher? get() = getContainer()
+    val navigator = Navigator(::dispatch)
 
     override fun dispatch(action: NavigationAction) {
         container?.dispatch(action)
@@ -61,6 +64,7 @@ object Modo : NavigationDispatcher {
     private lateinit var root: ContainerScreen
 
     val navigationState: NavigationState get() = root.navigationState
+    val navigator = Navigator(::dispatch)
 
     fun init(startScreen: Screen, reducer: NavigationReducer = StackReducer()) {
         root = ContainerScreen("root", StackNavigation(listOf(startScreen)), reducer)

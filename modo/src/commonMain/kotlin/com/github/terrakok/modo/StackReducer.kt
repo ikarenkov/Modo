@@ -13,14 +13,14 @@ object BackToRoot : NavigationAction
 object Back : NavigationAction
 object Exit : NavigationAction
 
-fun NavigationDispatcher.setStack(state: StackNavigation) = dispatch(SetStack(state))
-fun NavigationDispatcher.forward(screen: Screen, vararg screens: Screen) = dispatch(Forward(screen, *screens))
-fun NavigationDispatcher.replace(screen: Screen, vararg screens: Screen) = dispatch(Replace(screen, *screens))
-fun NavigationDispatcher.newStack(screen: Screen, vararg screens: Screen) = dispatch(NewStack(screen, *screens))
-fun NavigationDispatcher.backTo(screenId: String) = dispatch(BackTo(screenId))
-fun NavigationDispatcher.backToRoot() = dispatch(BackToRoot)
-fun NavigationDispatcher.back() = dispatch(Back)
-fun NavigationDispatcher.exit() = dispatch(Exit)
+fun Navigator.setStack(state: StackNavigation) = dispatch(SetStack(state))
+fun Navigator.forward(screen: Screen, vararg screens: Screen) = dispatch(Forward(screen, *screens))
+fun Navigator.replace(screen: Screen, vararg screens: Screen) = dispatch(Replace(screen, *screens))
+fun Navigator.newStack(screen: Screen, vararg screens: Screen) = dispatch(NewStack(screen, *screens))
+fun Navigator.backTo(screenId: String) = dispatch(BackTo(screenId))
+fun Navigator.backToRoot() = dispatch(BackToRoot)
+fun Navigator.back() = dispatch(Back)
+fun Navigator.exit() = dispatch(Exit)
 
 class StackReducer : NavigationReducer {
     override fun reduce(action: NavigationAction, state: NavigationState): NavigationState? {

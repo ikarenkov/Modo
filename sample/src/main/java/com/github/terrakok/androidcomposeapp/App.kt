@@ -17,7 +17,7 @@ class AppActivity : AppCompatActivity() {
         Modo.init(SampleScreen(1))
         Modo.setRenderer(render)
         setContent {
-            BackHandler { Modo.back() }
+            BackHandler { Modo.navigator.back() }
             Surface(color = MaterialTheme.colors.background) { render.Content() }
         }
     }
