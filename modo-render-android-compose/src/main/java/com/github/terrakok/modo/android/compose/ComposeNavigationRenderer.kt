@@ -11,7 +11,8 @@ import com.github.terrakok.modo.StackNavigation
 class ComposeNavigationRenderer(
     private val onExit: () -> Unit
 ) : NavigationRenderer {
-    internal val mutableState: MutableState<NavigationState?> = mutableStateOf(null)
+    private val mutableState: MutableState<NavigationState?> = mutableStateOf(null)
+    val currentState get() = mutableState.value
 
     override fun render(state: NavigationState) {
         if (state is StackNavigation && state.stack.isEmpty()) {
@@ -23,13 +24,12 @@ class ComposeNavigationRenderer(
 
     @Composable
     fun Content() {
-        val state = mutableState.value
-        if (state != null) getComposeContent(state).Content()
+        currentState?.getScreen()?.Content()
     }
 
-    private fun getComposeContent(state: NavigationState): ComposeContent = when (state) {
-        is StackNavigation -> state.stack.last() as ComposeContent
-        is MultiNavigation -> state.containers[state.activeContainerIndex] as ComposeContent
-        else -> throw IllegalStateException("Unknown navigation state: $state")
+    private fun NavigationState.getScreen(): ComposeContent = when (this) {
+        is StackNavigation -> stack.last() as ComposeContent
+        is MultiNavigation -> containers[selected] as ComposeContent
+        else -> throw IllegalStateException("Unknown navigation state: $this")
     }
 }

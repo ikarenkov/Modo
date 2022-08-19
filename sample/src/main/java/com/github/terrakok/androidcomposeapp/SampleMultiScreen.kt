@@ -13,39 +13,35 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.github.terrakok.modo.android.compose.ComposeMultiScreen
+import com.github.terrakok.modo.MultiNavigation
+import com.github.terrakok.modo.NavigationState
+import com.github.terrakok.modo.android.compose.ComposeContainerScreen
+import com.github.terrakok.modo.android.compose.Stack
+import com.github.terrakok.modo.navigator
 import com.github.terrakok.modo.selectContainer
 
-class SampleMultiScreen(i: Int) : ComposeMultiScreen(
+class SampleMultiScreen(i: Int) : ComposeContainerScreen(
     "m_$i",
-    1,
-    SampleScreen(1),
-    SampleScreen(1),
-    SampleScreen(1),
-    reducer = CustomReducer()
+    MultiNavigation(
+        listOf(
+            Stack("s_1", SampleScreen(1)),
+            Stack("s_2", SampleScreen(1)),
+            Stack("s_3", SampleScreen(1)),
+        ), 1
+    ),
+    CustomReducer()
 ) {
-
     @Composable
-    private fun Tab(modifier: Modifier, stackIndex: Int, i: Int) = Text(
-        modifier = modifier
-            .clickable { navigator.selectContainer(i) }
-            .background(if (stackIndex == i) Color.LightGray else Color.White)
-            .padding(16.dp),
-        textAlign = TextAlign.Center,
-        fontStyle = if (stackIndex == i) FontStyle.Italic else FontStyle.Normal,
-        color = if (stackIndex == i) Color.Red else Color.Black,
-        text = "Tab $i"
-    )
-
-    @Composable
-    override fun Content(stackCount: Int, selectedStack: Int, screenContent: @Composable () -> Unit) {
+    override fun Content(state: NavigationState, screenContent: @Composable () -> Unit) {
+        state as MultiNavigation
+        val stackCount = state.containers.size
         Column {
             Box(modifier = Modifier.weight(1f)) {
                 screenContent()
             }
             Row {
                 repeat(stackCount) {
-                    Tab(modifier = Modifier.weight(1f), selectedStack, it)
+                    Tab(modifier = Modifier.weight(1f), state.selected, it)
                 }
                 Text(
                     modifier = Modifier
@@ -57,4 +53,16 @@ class SampleMultiScreen(i: Int) : ComposeMultiScreen(
             }
         }
     }
+
+    @Composable
+    private fun Tab(modifier: Modifier, selected: Int, i: Int) = Text(
+        modifier = modifier
+            .clickable { navigator.selectContainer(i) }
+            .background(if (selected == i) Color.LightGray else Color.White)
+            .padding(16.dp),
+        textAlign = TextAlign.Center,
+        fontStyle = if (selected == i) FontStyle.Italic else FontStyle.Normal,
+        color = if (selected == i) Color.Red else Color.Black,
+        text = "Tab $i"
+    )
 }

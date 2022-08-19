@@ -2,7 +2,7 @@ package com.github.terrakok.modo
 
 data class MultiNavigation(
     val containers: List<ContainerScreen>,
-    val activeContainerIndex: Int
+    val selected: Int
 ) : NavigationState
 
 class SetContainers(val state: MultiNavigation) : NavigationAction
@@ -13,10 +13,10 @@ fun Navigator.selectContainer(index: Int) = dispatch(SelectContainer(index))
 
 class MultiReducer : NavigationReducer {
     override fun reduce(action: NavigationAction, state: NavigationState): NavigationState? {
-        if (state !is MultiNavigation) return null
+        require(state is MultiNavigation)
         return when (action) {
             is SetContainers -> action.state
-            is SelectContainer -> state.copy(activeContainerIndex = action.index)
+            is SelectContainer -> state.copy(selected = action.index)
             else -> null
         }
     }

@@ -8,15 +8,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.github.terrakok.modo.android.compose.ComposeContainerScreen
+import com.github.terrakok.modo.NavigationState
+import com.github.terrakok.modo.StackNavigation
+import com.github.terrakok.modo.android.compose.Stack
 import com.github.terrakok.modo.exit
+import com.github.terrakok.modo.navigator
 
-class SampleContainerScreen(i: Int) : ComposeContainerScreen(
-    "c_$i",
-    SampleScreen(1)
-) {
+class SampleContainerScreen(i: Int) : Stack("c_$i", SampleScreen(1)) {
     @Composable
-    override fun Content(screenContent: @Composable () -> Unit) {
+    override fun Content(state: NavigationState, screenContent: @Composable () -> Unit) {
+        state as StackNavigation
         Column(modifier = Modifier.fillMaxSize()) {
             Row(modifier = Modifier.padding(2.dp)) {
                 Text("Container")

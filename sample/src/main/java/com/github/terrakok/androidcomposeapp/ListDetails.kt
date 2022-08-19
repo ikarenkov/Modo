@@ -13,8 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.android.compose.ComposeScreen
 import com.github.terrakok.modo.forward
+import com.github.terrakok.modo.navigator
 
-class ListScreen: ComposeScreen("ListScreen") {
+class ListScreen: ComposeScreen {
+    override val id = "ListScreen"
+
     @Composable
     override fun Content() {
         Box(Modifier.fillMaxSize()) {
@@ -40,9 +43,9 @@ class ListScreen: ComposeScreen("ListScreen") {
     }
 }
 
-class DetailsScreen(
-    private val userId: String
-) : ComposeScreen("DetailsScreen") {
+class DetailsScreen(private val userId: String) : ComposeScreen {
+    override val id = "DetailsScreen($userId)"
+
     @Composable
     override fun Content() {
         Box {

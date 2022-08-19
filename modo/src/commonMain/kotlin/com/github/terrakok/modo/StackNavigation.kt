@@ -1,7 +1,7 @@
 package com.github.terrakok.modo
 
 data class StackNavigation(
-    val stack: List<ScreenId> = emptyList()
+    val stack: List<Screen> = emptyList()
 ): NavigationState
 
 class SetStack(val state: StackNavigation) : NavigationAction
@@ -24,7 +24,7 @@ fun Navigator.exit() = dispatch(Exit)
 
 class StackReducer : NavigationReducer {
     override fun reduce(action: NavigationAction, state: NavigationState): NavigationState? {
-        if (state !is StackNavigation) return null
+        require(state is StackNavigation)
         return when (action) {
             is SetStack -> action.state
             is Forward -> StackNavigation(

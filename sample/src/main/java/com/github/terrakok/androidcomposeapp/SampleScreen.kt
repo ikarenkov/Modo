@@ -16,7 +16,8 @@ import kotlinx.coroutines.launch
 
 class SampleScreen(
     val i: Int
-) : ComposeScreen("SampleScreen $i") {
+) : ComposeScreen {
+    override val id = i.toString()
 
     @Composable
     override fun Content() {
