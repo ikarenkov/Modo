@@ -1,10 +1,12 @@
 package com.github.terrakok.modo
 
-interface NavigationState
+interface NavigationState {
+    fun getChildScreens(): List<Screen>
+}
 interface NavigationAction
 
-interface NavigationReducer {
-    fun reduce(action: NavigationAction, state: NavigationState): NavigationState?
+interface NavigationReducer<State: NavigationState> {
+    fun reduce(action: NavigationAction, state: State): State?
 }
 
 interface NavigationDispatcher {
@@ -17,12 +19,12 @@ interface NavigationRenderer {
 
 object Modo : NavigationDispatcher {
     @Suppress("VARIABLE_IN_SINGLETON_WITHOUT_THREAD_LOCAL")
-    private lateinit var root: ContainerScreen
+    private lateinit var root: ContainerScreen<*>
 
     val navigationState: NavigationState get() = root.navigationState
     val navigator = Navigator(::dispatch)
 
-    fun init(startScreen: Screen, reducer: NavigationReducer = StackReducer()) {
+    fun init(startScreen: Screen, reducer: NavigationReducer<StackNavigation> = StackReducer()) {
         root = ContainerScreen("root", StackNavigation(listOf(startScreen)), reducer)
     }
 
@@ -40,12 +42,12 @@ object Modo : NavigationDispatcher {
 
     internal fun findScreenContainer(screen: Screen) = root.findScreenContainer(screen)
 
-    private fun ContainerScreen.findScreenContainer(screen: Screen): ContainerScreen? {
+    private fun ContainerScreen<*>.findScreenContainer(screen: Screen): ContainerScreen<*>? {
         when (val state = navigationState) {
             is StackNavigation -> {
                 state.stack.forEach { item ->
                     if (item === screen) return this
-                    if (item is ContainerScreen) {
+                    if (item is ContainerScreen<*>) {
                         val inner = item.findScreenContainer(screen)
                         if (inner != null) return inner
                     }
@@ -62,10 +64,10 @@ object Modo : NavigationDispatcher {
         return null
     }
 
-    private fun ContainerScreen.getActiveScreen(): Screen = when (val state = navigationState) {
+    private fun ContainerScreen<*>.getActiveScreen(): Screen = when (val state = navigationState) {
         is StackNavigation -> {
             when (val last = state.stack.lastOrNull()) {
-                is ContainerScreen -> last.getActiveScreen()
+                is ContainerScreen<*> -> last.getActiveScreen()
                 is Screen -> last
                 else -> this
             }
@@ -89,7 +91,7 @@ private fun getNavigationStateString(prefix: String, navigationState: Navigation
         is StackNavigation -> {
             navigationState.stack.map { screen ->
                 when (screen) {
-                    is ContainerScreen -> buildString {
+                    is ContainerScreen<*> -> buildString {
                         append(prefix)
                         append(screen.id)
                         appendLine()

@@ -1,0 +1,60 @@
+package com.github.terrakok.modo.android.compose
+
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.with
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import com.github.terrakok.modo.NavigationState
+import com.github.terrakok.modo.StackNavigation
+
+enum class ScreenTransitionType {
+    Push,
+    Replace,
+    Pop,
+    Idle
+}
+
+typealias ScreenTransitionContent = @Composable AnimatedVisibilityScope.(ComposeScreen) -> Unit
+
+@ExperimentalAnimationApi
+@Composable
+fun ComposeRendererScope.ScreenTransition(
+    modifier: Modifier = Modifier,
+    transitionSpec: AnimatedContentScope<ComposeScreen>.() -> ContentTransform = {
+        fadeIn(animationSpec = tween(220, delayMillis = 90)) +
+            scaleIn(initialScale = 0.92f, animationSpec = tween(220, delayMillis = 90)) with
+            fadeOut(animationSpec = tween(90))
+    },
+    content: ScreenTransitionContent = { it.SaveableContent() }
+) {
+    AnimatedContent(
+        targetState = screen,
+        transitionSpec = transitionSpec,
+        modifier = modifier
+    ) {
+        content(it)
+    }
+}
+
+fun defaultCalculateTransitionType(oldScreensState: NavigationState?, newScreensState: NavigationState?): ScreenTransitionType =
+    if (oldScreensState is StackNavigation && newScreensState is StackNavigation) {
+        val oldStack = oldScreensState.stack
+        val newStack = newScreensState.stack
+        when {
+            oldStack.lastOrNull() == newStack.lastOrNull() || oldStack.isEmpty() -> ScreenTransitionType.Idle
+            newStack.lastOrNull() in oldStack -> ScreenTransitionType.Pop
+            oldStack.lastOrNull() in newStack -> ScreenTransitionType.Push
+            else -> ScreenTransitionType.Replace
+        }
+    } else {
+        // TODO: support animation for different type of navigation states
+        ScreenTransitionType.Idle
+    }

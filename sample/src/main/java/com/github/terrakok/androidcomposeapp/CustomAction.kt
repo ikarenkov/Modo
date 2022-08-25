@@ -9,11 +9,11 @@ class AddTab(
     val rootScreen: ComposeScreen
 ) : NavigationAction
 
-class CustomReducer : NavigationReducer {
+class CustomReducer : NavigationReducer<MultiNavigation> {
     private val multiReducer = MultiReducer()
 
-    override fun reduce(action: NavigationAction, state: NavigationState): NavigationState? {
-        if (state is MultiNavigation && action is AddTab) {
+    override fun reduce(action: NavigationAction, state: MultiNavigation): MultiNavigation? {
+        if (action is AddTab) {
             return MultiNavigation(
                 state.containers + Stack(action.id, action.rootScreen),
                 state.selected

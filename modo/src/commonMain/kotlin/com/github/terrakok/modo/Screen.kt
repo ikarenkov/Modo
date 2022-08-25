@@ -4,20 +4,21 @@ interface Screen {
     val id: String
 }
 
+// FIXME: why do we need some more abstractions?
 class Navigator(val dispatch: (action: NavigationAction) -> Unit)
 
 val Screen.container get() = Modo.findScreenContainer(this)
 val Screen.navigator get() = Navigator {
-    if (this is ContainerScreen) dispatch(it) else container?.dispatch(it)
+    if (this is ContainerScreen<*>) dispatch(it) else container?.dispatch(it)
 }
 
-open class ContainerScreen(
+open class ContainerScreen<State: NavigationState>(
     override val id: String,
-    initialState: NavigationState,
-    private val reducer: NavigationReducer
+    initialState: State,
+    private val reducer: NavigationReducer<State>
 ) : Screen, NavigationDispatcher {
 
-    var navigationState: NavigationState = initialState
+    var navigationState: State = initialState
         private set(value) {
             field = value
             renderer?.render(value)

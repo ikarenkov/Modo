@@ -12,15 +12,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.MultiNavigation
-import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.android.compose.ComposeContainerScreen
 import com.github.terrakok.modo.android.compose.Stack
 import com.github.terrakok.modo.navigator
 import com.github.terrakok.modo.selectContainer
 
-class SampleMultiScreen(i: Int) : ComposeContainerScreen(
+class SampleMultiScreen(i: Int) : ComposeContainerScreen<MultiNavigation>(
     "m_$i",
     MultiNavigation(
         listOf(
@@ -32,8 +32,7 @@ class SampleMultiScreen(i: Int) : ComposeContainerScreen(
     CustomReducer()
 ) {
     @Composable
-    override fun Content(state: NavigationState, screenContent: @Composable () -> Unit) {
-        state as MultiNavigation
+    override fun Content(state: MultiNavigation, screenContent: @Composable () -> Unit) {
         val stackCount = state.containers.size
         Column {
             Box(modifier = Modifier.weight(1f)) {
@@ -65,4 +64,10 @@ class SampleMultiScreen(i: Int) : ComposeContainerScreen(
         color = if (selected == i) Color.Red else Color.Black,
         text = "Tab $i"
     )
+}
+
+@Preview
+@Composable
+fun PreviewSampleMultiScreen() {
+    SampleMultiScreen(1).Content()
 }
