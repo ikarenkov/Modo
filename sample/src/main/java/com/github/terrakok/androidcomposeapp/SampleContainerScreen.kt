@@ -18,8 +18,12 @@ import com.github.terrakok.modo.StackNavigation
 import com.github.terrakok.modo.android.compose.Stack
 import com.github.terrakok.modo.exit
 import com.github.terrakok.modo.navigator
+import java.util.concurrent.atomic.AtomicInteger
 
-class SampleContainerScreen(i: Int) : Stack("c_$i", SampleScreen(1)) {
+class SampleContainerScreen : Stack("c_${index.getAndIncrement()}", SampleScreen(1)) {
+    companion object {
+        private val index = AtomicInteger(0)
+    }
     @Composable
     override fun Content(state: StackNavigation, screenContent: @Composable () -> Unit) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -44,5 +48,5 @@ class SampleContainerScreen(i: Int) : Stack("c_$i", SampleScreen(1)) {
 @Preview
 @Composable
 private fun PreviewContainerScreen() {
-    SampleMultiScreen(1).Content()
+    SampleMultiScreen().Content()
 }

@@ -1,14 +1,7 @@
 package com.github.terrakok.modo.android.compose
 
 import androidx.compose.runtime.Composable
-import com.github.terrakok.modo.Back
-import com.github.terrakok.modo.ContainerScreen
-import com.github.terrakok.modo.NavigationReducer
-import com.github.terrakok.modo.NavigationState
-import com.github.terrakok.modo.Screen
-import com.github.terrakok.modo.StackNavigation
-import com.github.terrakok.modo.StackReducer
-import com.github.terrakok.modo.container
+import com.github.terrakok.modo.*
 
 interface ComposeContent {
     @Composable
@@ -21,8 +14,7 @@ abstract class ComposeContainerScreen<State : NavigationState>(
     id: String,
     initState: State,
     reducer: NavigationReducer<State>
-) : ContainerScreen<State>(id, initState, reducer), ComposeContent {
-    //    private val composeRenderer = ComposeNavigationRenderer { container?.dispatch(Back) }
+) : ContainerScreen<State>(id, initState, reducer), ComposeScreen {
     private val composeRenderer = ComposeRenderer(exitAction = { container?.dispatch(Back) })
 
     init {
@@ -44,9 +36,9 @@ abstract class ComposeContainerScreen<State : NavigationState>(
 open class Stack(id: String, rootScreen: ComposeScreen) :
     ComposeContainerScreen<StackNavigation>(id, StackNavigation(listOf(rootScreen)), StackReducer())
 
-//open class MultiStack(id: String, vararg rootScreen: ComposeScreen, selected: Int) :
-//    ComposeContainerScreen(
-//        id,
-//        MultiNavigation(rootScreen.mapIndexed { i, s -> Stack(i.toString(), s) }, selected),
-//        MultiReducer()
-//    )
+open class MultiStack(id: String, vararg rootScreen: ComposeScreen, selected: Int) :
+    ComposeContainerScreen<MultiNavigation>(
+        id,
+        MultiNavigation(rootScreen.mapIndexed { i, s -> Stack(i.toString(), s) }, selected),
+        MultiReducer()
+    )

@@ -1,25 +1,28 @@
 package com.github.terrakok.modo.android.compose
 
 import android.app.Activity
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
-import androidx.compose.runtime.staticCompositionLocalOf
 import com.github.terrakok.modo.MultiNavigation
 import com.github.terrakok.modo.NavigationRenderer
 import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.StackNavigation
 
-typealias RendererContent = @Composable ComposeRendererScope.() -> Unit
+class ComposeRendererScope(
+    val screen: ComposeScreen,
+    val transitionType: ScreenTransitionType
+)
 
+typealias RendererContent = @Composable ComposeRendererScope.() -> Unit
 val defaultRendererContent: RendererContent = { screen.SaveableContent() }
 
-internal val LocalSaveableStateHolder = staticCompositionLocalOf<SaveableStateHolder?> { null }
+private val LocalSaveableStateHolder = staticCompositionLocalOf<SaveableStateHolder?> { null }
+
+private val <T> ProvidableCompositionLocal<T?>.currentOrThrow: T
+    @Composable
+    get() = current ?: error("CompositionLocal is null")
 
 @Composable
 fun ComposeScreen.SaveableContent() {
@@ -28,14 +31,8 @@ fun ComposeScreen.SaveableContent() {
     }
 }
 
-class ComposeRendererScope(
-    val screen: ComposeScreen,
-    val transitionType: ScreenTransitionType
-)
-
 fun Activity.ComposeRenderer(
-    getTransitionType: (oldState: NavigationState?, newState: NavigationState?) -> ScreenTransitionType =
-        ::defaultCalculateTransitionType,
+    getTransitionType: (oldState: NavigationState?, newState: NavigationState?) -> ScreenTransitionType = ::defaultCalculateTransitionType,
     content: RendererContent = defaultRendererContent
 ) = ComposeRenderer(
     exitAction = { finish() },
@@ -51,18 +48,11 @@ fun Activity.ComposeRenderer(
  */
 class ComposeRenderer(
     private val exitAction: () -> Unit = {},
-    private val getTransitionType: (oldState: NavigationState?, newState: NavigationState?) -> ScreenTransitionType =
-        ::defaultCalculateTransitionType,
+    private val getTransitionType: (oldState: NavigationState?, newState: NavigationState?) -> ScreenTransitionType = ::defaultCalculateTransitionType,
     private val content: RendererContent = defaultRendererContent
 ) : NavigationRenderer {
 
-    private val mutableState: MutableState<NavigationState?> = mutableStateOf(null)
-    private var state
-        get() = mutableState.value
-        set(value) {
-            mutableState.value = value
-        }
-
+    private val renderState: MutableState<NavigationState?> = mutableStateOf(null)
     private val lastStackEvent: MutableState<ScreenTransitionType> = mutableStateOf(ScreenTransitionType.Idle)
 
     // TODO: share removed screen for whole structure
@@ -72,11 +62,11 @@ class ComposeRenderer(
         if (state is StackNavigation && state.stack.isEmpty()) {
             exitAction()
         } else {
-            lastStackEvent.value = getTransitionType(this.state, state)
-            this.state?.let { currentState ->
+            lastStackEvent.value = getTransitionType(renderState.value, state)
+            renderState.value?.let { currentState ->
                 removedScreens.addAll(calculateRemovedScreens(currentState, state))
             }
-            this.state = state
+            renderState.value = state
         }
     }
 
@@ -84,28 +74,19 @@ class ComposeRenderer(
     fun Content() {
         // use single state holder for whole hierarchy, store it on top of it
         val stateHolder: SaveableStateHolder = LocalSaveableStateHolder.current ?: rememberSaveableStateHolder()
-        DisposableEffect(key1 = state) {
-            onDispose {
-                clearStateHolder(stateHolder)
-            }
+        DisposableEffect(key1 = renderState) {
+            onDispose { clearStateHolder(stateHolder) }
         }
         CompositionLocalProvider(
             LocalSaveableStateHolder providesDefault stateHolder
         ) {
-            state?.getScreen()?.let { screen ->
+            renderState.value?.getActiveScreen()?.let { screen ->
                 require(screen is ComposeScreen) {
                     "ComposeRender works with ComposeScreen only! Received $screen"
                 }
                 ComposeRendererScope(screen, lastStackEvent.value).content()
             }
         }
-    }
-
-    // TODO: move it to screen to bring flexibility to our library and remove else branch with exception
-    private fun NavigationState.getScreen(): ComposeContent = when (this) {
-        is StackNavigation -> stack.last() as ComposeContent
-        is MultiNavigation -> containers[selected] as ComposeContent
-        else -> throw IllegalStateException("Unknown navigation state: $this")
     }
 
     /**
@@ -115,7 +96,7 @@ class ComposeRenderer(
      */
     private fun clearStateHolder(stateHolder: SaveableStateHolder, clearAll: Boolean = false) {
         if (clearAll) {
-            state?.getChildScreens()?.clearStates(stateHolder)
+            renderState.value?.getAllScreens()?.clearStates(stateHolder)
         }
         removedScreens.clearStates(stateHolder)
         if (removedScreens.isNotEmpty()) {
@@ -131,8 +112,7 @@ class ComposeRenderer(
     }
 
     private fun calculateRemovedScreens(oldState: NavigationState, newState: NavigationState): List<Screen> {
-        val newChainSet = newState.getChildScreens()
-        return oldState.getChildScreens().filter { it !in newChainSet }
+        val newChainSet = newState.getAllScreens()
+        return oldState.getAllScreens().filter { it !in newChainSet }
     }
-
 }

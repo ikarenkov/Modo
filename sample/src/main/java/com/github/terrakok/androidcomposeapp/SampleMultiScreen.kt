@@ -19,18 +19,22 @@ import com.github.terrakok.modo.android.compose.ComposeContainerScreen
 import com.github.terrakok.modo.android.compose.Stack
 import com.github.terrakok.modo.navigator
 import com.github.terrakok.modo.selectContainer
+import java.util.concurrent.atomic.AtomicInteger
 
-class SampleMultiScreen(i: Int) : ComposeContainerScreen<MultiNavigation>(
-    "m_$i",
+class SampleMultiScreen : ComposeContainerScreen<MultiNavigation>(
+    "m_${index.getAndIncrement()}",
     MultiNavigation(
         listOf(
-            Stack("s_1", SampleScreen(1)),
-            Stack("s_2", SampleScreen(1)),
-            Stack("s_3", SampleScreen(1)),
+            Stack("s_1_${index.getAndIncrement()}", SampleScreen(1)),
+            Stack("s_2_${index.getAndIncrement()}", SampleScreen(1)),
+            Stack("s_3_${index.getAndIncrement()}", SampleScreen(1)),
         ), 1
     ),
     CustomReducer()
 ) {
+    companion object {
+        private val index = AtomicInteger(0)
+    }
     @Composable
     override fun Content(state: MultiNavigation, screenContent: @Composable () -> Unit) {
         val stackCount = state.containers.size
@@ -69,5 +73,5 @@ class SampleMultiScreen(i: Int) : ComposeContainerScreen<MultiNavigation>(
 @Preview
 @Composable
 fun PreviewSampleMultiScreen() {
-    SampleMultiScreen(1).Content()
+    SampleMultiScreen().Content()
 }

@@ -3,7 +3,8 @@ package com.github.terrakok.modo
 data class StackNavigation(
     val stack: List<Screen> = emptyList()
 ): NavigationState {
-    override fun getChildScreens(): List<Screen> = stack
+    override fun getAllScreens(): List<Screen> = stack
+    override fun getActiveScreen(): Screen? = stack.lastOrNull()
 }
 
 class SetStack(val state: StackNavigation) : NavigationAction

@@ -4,7 +4,9 @@ interface Screen {
     val id: String
 }
 
-// FIXME: why do we need some more abstractions?
+/**
+ * Delegate for dispatching navigation calls from Compose Screens
+ */
 class Navigator(val dispatch: (action: NavigationAction) -> Unit)
 
 val Screen.container get() = Modo.findScreenContainer(this)

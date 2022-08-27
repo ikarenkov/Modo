@@ -13,11 +13,15 @@ import com.github.terrakok.modo.android.compose.ComposeScreen
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicInteger
 
 class SampleScreen(
     val i: Int
 ) : ComposeScreen {
-    override val id = i.toString()
+    companion object {
+        private val index = AtomicInteger(0)
+    }
+    override val id = index.getAndIncrement().toString()
 
     @Composable
     override fun Content() {
@@ -66,8 +70,8 @@ private fun SampleContent(i: Int, navigator: Navigator) {
                 }
             },
             "Back to '3'" to { navigator.backTo(SampleScreen(3).id) },
-            "Container" to { navigator.forward(SampleContainerScreen(i + 1)) },
-            "Multiscreen" to { navigator.forward(SampleMultiScreen(i + 1)) },
+            "Container" to { navigator.forward(SampleContainerScreen()) },
+            "Multiscreen" to { navigator.forward(SampleMultiScreen()) },
             "Exit" to { navigator.exit() },
             "Exit App" to { Modo.dispatchToRoot(Exit) },
             "List/Details" to { navigator.forward(ListScreen()) },

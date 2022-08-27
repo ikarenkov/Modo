@@ -4,7 +4,8 @@ data class MultiNavigation(
     val containers: List<ContainerScreen<*>>,
     val selected: Int
 ) : NavigationState {
-    override fun getChildScreens(): List<Screen> = containers
+    override fun getAllScreens(): List<Screen> = containers
+    override fun getActiveScreen(): Screen? = containers.getOrNull(selected)
 }
 
 class SetContainers(val state: MultiNavigation) : NavigationAction

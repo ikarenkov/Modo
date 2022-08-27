@@ -1,8 +1,10 @@
 package com.github.terrakok.modo
 
 interface NavigationState {
-    fun getChildScreens(): List<Screen>
+    fun getAllScreens(): List<Screen>
+    fun getActiveScreen(): Screen?
 }
+
 interface NavigationAction
 
 interface NavigationReducer<State: NavigationState> {
