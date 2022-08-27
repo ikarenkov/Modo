@@ -9,7 +9,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.*
-import com.github.terrakok.modo.android.compose.ComposeScreen
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -17,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class SampleScreen(
     val i: Int
-) : ComposeScreen {
+) : Screen {
     companion object {
         private val index = AtomicInteger(0)
     }

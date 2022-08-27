@@ -1,9 +1,9 @@
 package com.github.terrakok.androidcomposeapp
 
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -14,12 +14,12 @@ import androidx.compose.animation.with
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import com.github.terrakok.modo.Modo
-import com.github.terrakok.modo.android.compose.ComposeRenderer
-import com.github.terrakok.modo.android.compose.ScreenTransition
-import com.github.terrakok.modo.android.compose.ScreenTransitionType
+import com.github.terrakok.modo.ComposeRenderer
+import com.github.terrakok.modo.ScreenTransition
+import com.github.terrakok.modo.ScreenTransitionType
 import com.github.terrakok.modo.back
 
-class AppActivity : AppCompatActivity() {
+class AppActivity : ComponentActivity() {
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

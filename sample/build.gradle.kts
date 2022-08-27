@@ -35,14 +35,9 @@ android {
 
 dependencies {
     implementation(project(":modo"))
-    implementation(project(":modo-render-android-compose"))
-
-    implementation("androidx.core:core-ktx:${properties["version.coreKtx"]}")
-    implementation("androidx.appcompat:appcompat:${properties["version.appcompat"]}")
-    implementation("com.google.android.material:material:${properties["version.material"]}")
+    implementation("androidx.compose.foundation:foundation:${properties["version.compose"]}")
     implementation("androidx.compose.ui:ui:${properties["version.compose"]}")
-    implementation("androidx.compose.material:material:${properties["version.compose"]}")
     implementation("androidx.compose.ui:ui-tooling:${properties["version.compose"]}")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:${properties["version.lifecycleRuntimeKtx"]}")
+    implementation("androidx.compose.material:material:${properties["version.compose"]}")
     implementation("androidx.activity:activity-compose:${properties["version.composeActivity"]}")
 }

@@ -1,23 +1,6 @@
 package com.github.terrakok.modo
 
-interface NavigationState {
-    fun getAllScreens(): List<Screen>
-    fun getActiveScreen(): Screen?
-}
-
-interface NavigationAction
-
-interface NavigationReducer<State: NavigationState> {
-    fun reduce(action: NavigationAction, state: State): State?
-}
-
-interface NavigationDispatcher {
-    fun dispatch(action: NavigationAction)
-}
-
-interface NavigationRenderer {
-    fun render(state: NavigationState)
-}
+import androidx.compose.runtime.Composable
 
 object Modo : NavigationDispatcher {
     @Suppress("VARIABLE_IN_SINGLETON_WITHOUT_THREAD_LOCAL")
@@ -41,6 +24,9 @@ object Modo : NavigationDispatcher {
     fun dispatchToRoot(action: NavigationAction) {
         root.dispatch(action)
     }
+
+    @Composable
+    fun Content() = root.Content()
 
     internal fun findScreenContainer(screen: Screen) = root.findScreenContainer(screen)
 
@@ -79,31 +65,27 @@ object Modo : NavigationDispatcher {
         }
         else -> throw IllegalStateException("Unknown navigation state $state!")
     }
+
+    override fun toString() = root.navigationState.print()
 }
 
-fun NavigationState?.print(): String =
-    if (this == null) {
-        "null"
-    } else {
-        getNavigationStateString("", this).trimEnd() + "  <- current screen"
-    }
+fun NavigationState.print(): String =
+    getNavigationStateString("", this).trimEnd() + "  <- current screen"
 
 private fun getNavigationStateString(prefix: String, navigationState: NavigationState): String =
     when (navigationState) {
-        is StackNavigation -> {
-            navigationState.stack.map { screen ->
-                when (screen) {
-                    is ContainerScreen<*> -> buildString {
-                        append(prefix)
-                        append(screen.id)
-                        appendLine()
-                        append(getNavigationStateString("$prefix|  ", screen.navigationState))
-                    }
-                    else -> {
-                        "$prefix${screen.id}\n"
-                    }
+        is StackNavigation -> navigationState.stack.joinToString(separator = "") { screen ->
+            when (screen) {
+                is ContainerScreen<*> -> buildString {
+                    append(prefix)
+                    append(screen.id)
+                    appendLine()
+                    append(getNavigationStateString("$prefix|  ", screen.navigationState))
                 }
-            }.joinToString(separator = "")
+                else -> {
+                    "$prefix${screen.id}\n"
+                }
+            }
         }
         is MultiNavigation -> buildString {
             val screen = navigationState.containers[navigationState.selected]
@@ -114,5 +96,3 @@ private fun getNavigationStateString(prefix: String, navigationState: Navigation
         }
         else -> "unknown state type: ${navigationState::class.simpleName}"
     }
-
-internal expect fun logd(tag: String, msg: String)

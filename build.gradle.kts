@@ -5,20 +5,23 @@ buildscript {
         gradlePluginPortal()
         google()
         mavenCentral()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${properties["version.kotlin"]}")
-        classpath("com.android.tools.build:gradle:7.1.1")
+        classpath("org.jetbrains.compose:compose-gradle-plugin:${properties["version.composeGradle"]}")
+        classpath("com.android.tools.build:gradle:${properties["version.agp"]}")
     }
 }
 
 allprojects {
     group = "com.github.terrakok"
-    version = "0.6.4"
+    version = "1.0.0"
 
     repositories {
         google()
         mavenCentral()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 
     //PUBLISHING './gradlew clean bundleReleaseAar publishAllPublicationsToSonatypeRepository'

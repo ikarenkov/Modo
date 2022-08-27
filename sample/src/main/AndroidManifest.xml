@@ -3,7 +3,7 @@
     package="com.github.terrakok.androidcomposeapp">
 
     <application
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        android:theme="@android:style/Theme.Material.Light.NoActionBar">
         <activity
             android:name=".AppActivity"
             android:exported="true">

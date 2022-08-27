@@ -14,14 +14,10 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.github.terrakok.modo.MultiNavigation
-import com.github.terrakok.modo.android.compose.ComposeContainerScreen
-import com.github.terrakok.modo.android.compose.Stack
-import com.github.terrakok.modo.navigator
-import com.github.terrakok.modo.selectContainer
+import com.github.terrakok.modo.*
 import java.util.concurrent.atomic.AtomicInteger
 
-class SampleMultiScreen : ComposeContainerScreen<MultiNavigation>(
+class SampleMultiScreen : ContainerScreen<MultiNavigation>(
     "m_${index.getAndIncrement()}",
     MultiNavigation(
         listOf(

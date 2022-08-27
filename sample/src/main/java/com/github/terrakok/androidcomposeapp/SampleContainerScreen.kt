@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.StackNavigation
-import com.github.terrakok.modo.android.compose.Stack
+import com.github.terrakok.modo.Stack
 import com.github.terrakok.modo.exit
 import com.github.terrakok.modo.navigator
 import java.util.concurrent.atomic.AtomicInteger

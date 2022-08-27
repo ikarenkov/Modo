@@ -11,11 +11,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.github.terrakok.modo.android.compose.ComposeScreen
+import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.forward
 import com.github.terrakok.modo.navigator
 
-class ListScreen: ComposeScreen {
+class ListScreen: Screen {
     override val id = "ListScreen"
 
     @Composable
@@ -43,7 +43,7 @@ class ListScreen: ComposeScreen {
     }
 }
 
-class DetailsScreen(private val userId: String) : ComposeScreen {
+class DetailsScreen(private val userId: String) : Screen {
     override val id = "DetailsScreen($userId)"
 
     @Composable
