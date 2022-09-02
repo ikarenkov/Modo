@@ -4,9 +4,11 @@ import android.app.Activity
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.lifecycle.ViewModelStoreOwner
 import com.github.terrakok.modo.NavigationRender
 import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.Screen
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 
 typealias RendererContent = @Composable ComposeRendererScope.() -> Unit
 
@@ -51,17 +53,37 @@ open class ComposeRenderImpl(
     private val lastStackEvent: MutableState<ScreenTransitionType> = mutableStateOf(ScreenTransitionType.Idle)
     private val removedScreens = mutableSetOf<Screen>()
 
+    private var viewModel: ModoViewModel? = null
+
     override fun invoke(state: NavigationState) {
         if (state.chain.isEmpty()) {
             exitAction()
         }
         lastStackEvent.value = getTransitionType(this.state.value.chain, state.chain)
         removedScreens.addAll(calculateRemovedScreens(this.state.value.chain, state.chain))
+
+        val oldState = this.state.value.chain
+        val newState = state.chain
+        if (oldState.size > newState.size) {
+            oldState.lastOrNull()?.let {
+                viewModel?.clear(it.id)
+            }
+        }
+
         this.state.value = state
     }
 
     @Composable
     override fun Content() {
+        val screen = state.value.chain.lastOrNull() ?: return
+        if (viewModel == null) {
+            val owner = checkNotNull(LocalViewModelStoreOwner.current) {
+                "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
+            }
+            viewModel = ModoViewModel.getInstance(owner.viewModelStore)
+        }
+        val owner = ViewModelStoreOwner { viewModel!!.getViewModelStore(screen.id) }
+
         val stateHolder: SaveableStateHolder = rememberSaveableStateHolder()
         DisposableEffect(key1 = state.value) {
             onDispose {
@@ -69,14 +91,13 @@ open class ComposeRenderImpl(
             }
         }
         CompositionLocalProvider(
-            LocalSaveableStateHolder provides stateHolder
+            LocalSaveableStateHolder provides stateHolder,
+            LocalViewModelStoreOwner provides owner
         ) {
-            state.value.chain.lastOrNull()?.let { screen ->
-                require(screen is ComposeScreen) {
-                    "ComposeRender works with ComposeScreen only! Received $screen"
-                }
-                ComposeRendererScope(screen, lastStackEvent.value).content()
+            require(screen is ComposeScreen) {
+                "ComposeRender works with ComposeScreen only! Received $screen"
             }
+            ComposeRendererScope(screen, lastStackEvent.value).content()
         }
     }
 

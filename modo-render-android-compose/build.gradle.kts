@@ -20,6 +20,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs += "-Xjvm-default=all"
     }
 
     buildFeatures {
@@ -36,6 +37,8 @@ dependencies {
     implementation("androidx.compose.ui:ui:${properties["version.compose"]}")
     implementation("androidx.compose.foundation:foundation:${properties["version.compose"]}")
     implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:${properties["version.kotlin"]}")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${properties["version.viewModelKtx"]}")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:${properties["version.composeViewModel"]}")
 }
 
 val sourceJar by tasks.registering(Jar::class) {
