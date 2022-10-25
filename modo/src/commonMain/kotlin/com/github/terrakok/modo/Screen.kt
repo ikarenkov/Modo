@@ -1,25 +1,16 @@
 package com.github.terrakok.modo
 
 interface Screen {
-    val id: String
+    val screenName: String get() = "Screen"
 }
 
-// FIXME: why do we need some more abstractions?
-class Navigator(val dispatch: (action: NavigationAction) -> Unit)
-
-val Screen.container get() = Modo.findScreenContainer(this)
-val Screen.navigator get() = Navigator {
-    if (this is ContainerScreen<*>) dispatch(it) else container?.dispatch(it)
-}
-
-open class ContainerScreen<State: NavigationState>(
-    override val id: String,
+open class ContainerScreen<State : NavigationState>(
     initialState: State,
     private val reducer: NavigationReducer<State>
 ) : Screen, NavigationDispatcher {
 
-    var navigationState: State = initialState
-        private set(value) {
+    open var navigationState: State = initialState
+        set(value) {
             field = value
             renderer?.render(value)
         }
@@ -35,7 +26,8 @@ open class ContainerScreen<State: NavigationState>(
         if (newState != null) {
             navigationState = newState
         } else {
-            container?.dispatch(action)
+//            container?.dispatch(action)
         }
     }
+
 }

@@ -14,13 +14,13 @@ class StackReducerTest {
     fun `test back action`() {
         val reducer = StackReducer()
 
-        val prev1 = StackNavigation(listOf(A, B))
+        val prev1 = StackNavigationState(listOf(A, B))
         val next1 = reducer.reduce(Back, prev1)
-        assertTrue(next1.sameStack(StackNavigation(listOf(A))))
+        assertTrue(next1.sameStack(StackNavigationState(listOf(A))))
 
-        val prev2 = StackNavigation(listOf(A))
+        val prev2 = StackNavigationState(listOf(A))
         val next2 = reducer.reduce(Back, prev2)
-        assertTrue(next2.sameStack(StackNavigation()))
+        assertTrue(next2.sameStack(StackNavigationState()))
 
         assertFalse(prev1.sameStack(prev2))
     }
@@ -29,13 +29,13 @@ class StackReducerTest {
     fun `test exit action`() {
         val reducer = StackReducer()
 
-        val prev1 = StackNavigation(listOf(A, B))
+        val prev1 = StackNavigationState(listOf(A, B))
         val next1 = reducer.reduce(Exit, prev1)
-        assertTrue(next1.sameStack(StackNavigation()))
+        assertTrue(next1.sameStack(StackNavigationState()))
 
-        val prev2 = StackNavigation()
+        val prev2 = StackNavigationState()
         val next2 = reducer.reduce(Exit, prev2)
-        assertTrue(next2.sameStack(StackNavigation()))
+        assertTrue(next2.sameStack(StackNavigationState()))
 
         assertFalse(prev1.sameStack(prev2))
     }
@@ -44,17 +44,17 @@ class StackReducerTest {
     fun `test forward action`() {
         val reducer = StackReducer()
 
-        val prev1 = StackNavigation(listOf(A, B))
+        val prev1 = StackNavigationState(listOf(A, B))
         val next1 = reducer.reduce(Forward(C), prev1)
-        assertTrue(next1.sameStack(StackNavigation(listOf(A, B, C))))
+        assertTrue(next1.sameStack(StackNavigationState(listOf(A, B, C))))
 
-        val prev2 = StackNavigation()
+        val prev2 = StackNavigationState()
         val next2 = reducer.reduce(Forward(A, B, C), prev2)
-        assertTrue(next2.sameStack(StackNavigation(listOf(A, B, C))))
+        assertTrue(next2.sameStack(StackNavigationState(listOf(A, B, C))))
 
-        val prev3 = StackNavigation(listOf(A, B, C))
+        val prev3 = StackNavigationState(listOf(A, B, C))
         val next3 = reducer.reduce(Forward(A, B, C), prev3)
-        assertTrue(next3.sameStack(StackNavigation(listOf(A, B, C, A, B, C))))
+        assertTrue(next3.sameStack(StackNavigationState(listOf(A, B, C, A, B, C))))
 
         assertFalse(prev1.sameStack(prev3))
     }
@@ -63,17 +63,17 @@ class StackReducerTest {
     fun `test replace action`() {
         val reducer = StackReducer()
 
-        val prev1 = StackNavigation(listOf(A, B))
+        val prev1 = StackNavigationState(listOf(A, B))
         val next1 = reducer.reduce(Replace(C), prev1)
-        assertTrue(next1.sameStack(StackNavigation(listOf(A, C))))
+        assertTrue(next1.sameStack(StackNavigationState(listOf(A, C))))
 
-        val prev2 = StackNavigation()
+        val prev2 = StackNavigationState()
         val next2 = reducer.reduce(Replace(A, B, C), prev2)
-        assertTrue(next2.sameStack(StackNavigation(listOf(A, B, C))))
+        assertTrue(next2.sameStack(StackNavigationState(listOf(A, B, C))))
 
-        val prev3 = StackNavigation(listOf(A, B, C))
+        val prev3 = StackNavigationState(listOf(A, B, C))
         val next3 = reducer.reduce(Replace(A, B, C), prev3)
-        assertTrue(next3.sameStack(StackNavigation(listOf(A, B, A, B, C))))
+        assertTrue(next3.sameStack(StackNavigationState(listOf(A, B, A, B, C))))
 
         assertFalse(prev1.sameStack(prev3))
     }
@@ -82,17 +82,17 @@ class StackReducerTest {
     fun `test newStack action`() {
         val reducer = StackReducer()
 
-        val prev1 = StackNavigation(listOf(A, B))
+        val prev1 = StackNavigationState(listOf(A, B))
         val next1 = reducer.reduce(NewStack(C), prev1)
-        assertTrue(next1.sameStack(StackNavigation(listOf(C))))
+        assertTrue(next1.sameStack(StackNavigationState(listOf(C))))
 
-        val prev2 = StackNavigation()
+        val prev2 = StackNavigationState()
         val next2 = reducer.reduce(NewStack(A, B, C), prev2)
-        assertTrue(next2.sameStack(StackNavigation(listOf(A, B, C))))
+        assertTrue(next2.sameStack(StackNavigationState(listOf(A, B, C))))
 
-        val prev3 = StackNavigation(listOf(A, B, C))
+        val prev3 = StackNavigationState(listOf(A, B, C))
         val next3 = reducer.reduce(NewStack(D, B, A), prev3)
-        assertTrue(next3.sameStack(StackNavigation(listOf(D, B, A))))
+        assertTrue(next3.sameStack(StackNavigationState(listOf(D, B, A))))
 
         assertFalse(prev1.sameStack(prev3))
     }
@@ -101,24 +101,24 @@ class StackReducerTest {
     fun `test backTo action`() {
         val reducer = StackReducer()
 
-        val prev1 = StackNavigation(listOf(A, B))
+        val prev1 = StackNavigationState(listOf(A, B))
         val next1 = reducer.reduce(BackTo(C.id), prev1)
-        assertTrue(next1.sameStack(StackNavigation(listOf(A, B))))
+        assertTrue(next1.sameStack(StackNavigationState(listOf(A, B))))
 
-        val prev2 = StackNavigation(listOf(A, B, C))
+        val prev2 = StackNavigationState(listOf(A, B, C))
         val next2 = reducer.reduce(BackTo(A.id), prev2)
-        assertTrue(next2.sameStack(StackNavigation(listOf(A))))
+        assertTrue(next2.sameStack(StackNavigationState(listOf(A))))
 
-        val prev3 = StackNavigation(listOf(A, B, C, B, D))
+        val prev3 = StackNavigationState(listOf(A, B, C, B, D))
         val next3 = reducer.reduce(BackTo(B.id), prev3)
-        assertTrue(next3.sameStack(StackNavigation(listOf(A, B, C, B))))
+        assertTrue(next3.sameStack(StackNavigationState(listOf(A, B, C, B))))
 
         assertFalse(prev1.sameStack(prev3))
     }
 }
 
-internal fun NavigationState?.sameStack(other: StackNavigation): Boolean {
+internal fun NavigationState?.sameStack(other: StackNavigationState): Boolean {
     if (this == null) return false
-    if (this !is StackNavigation) return false
+    if (this !is StackNavigationState) return false
     return stack.map { it.id } == other.stack.map { it.id }
 }

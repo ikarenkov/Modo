@@ -12,14 +12,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.android.compose.ComposeScreen
+import com.github.terrakok.modo.android.compose.LocalContainerScreen
+import com.github.terrakok.modo.android.compose.generateScreenKey
 import com.github.terrakok.modo.forward
-import com.github.terrakok.modo.navigator
 
-class ListScreen: ComposeScreen {
-    override val id = "ListScreen"
+class ListScreen(
+    override val screenKey: String = generateScreenKey()
+) : ComposeScreen {
 
     @Composable
     override fun Content() {
+        val conScreen = LocalContainerScreen.current
         Box(Modifier.fillMaxSize()) {
             val lazyColumnState = rememberSaveable(saver = LazyListState.Saver) {
                 LazyListState(
@@ -35,7 +38,7 @@ class ListScreen: ComposeScreen {
                     Text(text = "Item $it",
                         Modifier
                             .fillMaxWidth()
-                            .clickable { navigator.forward(DetailsScreen(it.toString())) }
+                            .clickable { conScreen.forward(DetailsScreen(it.toString())) }
                             .padding(16.dp))
                 }
             }
@@ -43,12 +46,14 @@ class ListScreen: ComposeScreen {
     }
 }
 
-class DetailsScreen(private val userId: String) : ComposeScreen {
-    override val id = "DetailsScreen($userId)"
+class DetailsScreen(
+    private val userId: String,
+    override val screenKey: String = generateScreenKey()
+) : ComposeScreen {
 
     @Composable
     override fun Content() {
-        Box {
+        Box(Modifier.fillMaxSize()) {
             Column(Modifier.align(Alignment.Center)) {
                 Text(text = "Profile details $userId")
             }

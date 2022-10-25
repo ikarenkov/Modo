@@ -13,37 +13,50 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.with
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import com.github.terrakok.modo.Modo
-import com.github.terrakok.modo.android.compose.ComposeRenderer
+import com.github.terrakok.modo.android.compose.ComposeScreen
+import com.github.terrakok.modo.android.compose.Modo
 import com.github.terrakok.modo.android.compose.ScreenTransition
 import com.github.terrakok.modo.android.compose.ScreenTransitionType
+import com.github.terrakok.modo.android.compose.Stack
 import com.github.terrakok.modo.back
 
 class AppActivity : AppCompatActivity() {
-    @OptIn(ExperimentalAnimationApi::class)
+
+    private lateinit var rootScreen: Stack
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val render = ComposeRenderer {
-            ScreenTransition(
-                transitionSpec = {
-                    if (transitionType == ScreenTransitionType.Replace) {
-                        scaleIn(initialScale = 2f) + fadeIn() with fadeOut()
-                    } else {
-                        val (initialOffset, targetOffset) = when (transitionType) {
-                            ScreenTransitionType.Pop -> ({ size: Int -> -size }) to ({ size: Int -> size })
-                            else -> ({ size: Int -> size }) to ({ size: Int -> -size })
-                        }
-                        slideInHorizontally(initialOffsetX = initialOffset) with
-                            slideOutHorizontally(targetOffsetX = targetOffset)
-                    }
-                }
-            )
-        }
-        Modo.init(SampleScreen(1))
-        Modo.setRenderer(render)
+        rootScreen = Modo.restoreInstanceIfCan<Stack>(savedInstanceState, ::provideRootScreen)
         setContent {
-            BackHandler { Modo.navigator.back() }
-            Surface(color = MaterialTheme.colors.background) { render.Content() }
+            BackHandler { rootScreen.back() }
+            Surface(color = MaterialTheme.colors.background) {
+                rootScreen.Content()
+            }
         }
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        Modo.saveInstanceState(outState, rootScreen)
+        super.onSaveInstanceState(outState)
+    }
+
+    @OptIn(ExperimentalAnimationApi::class)
+    fun provideRootScreen(): Stack = Stack(SampleScreen(1))
+//    {
+//        ScreenTransition(
+//            transitionSpec = {
+//                if (transitionType == ScreenTransitionType.Replace) {
+//                    scaleIn(initialScale = 2f) + fadeIn() with fadeOut()
+//                } else {
+//                    val (initialOffset, targetOffset) = when (transitionType) {
+//                        ScreenTransitionType.Pop -> ({ size: Int -> -size }) to ({ size: Int -> size })
+//                        else -> ({ size: Int -> size }) to ({ size: Int -> -size })
+//                    }
+//                    slideInHorizontally(initialOffsetX = initialOffset) with
+//                        slideOutHorizontally(targetOffsetX = targetOffset)
+//                }
+//            }
+//        )
+//    }
+
 }

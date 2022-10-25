@@ -10,13 +10,13 @@ data class MultiNavigation(
 class SetContainers(val state: MultiNavigation) : NavigationAction
 class SelectContainer(val index: Int) : NavigationAction
 
-fun Navigator.setContainers(state: MultiNavigation) = dispatch(SetContainers(state))
-fun Navigator.selectContainer(index: Int) = dispatch(SelectContainer(index))
+fun NavigationDispatcher.setContainers(state: MultiNavigation) = dispatch(SetContainers(state))
+fun NavigationDispatcher.selectContainer(index: Int) = dispatch(SelectContainer(index))
 
 class MultiReducer : NavigationReducer<MultiNavigation> {
-    override fun reduce(action: NavigationAction, state: MultiNavigation): MultiNavigation? = when (action) {
+    override fun reduce(action: NavigationAction, state: MultiNavigation): MultiNavigation = when (action) {
         is SetContainers -> action.state
         is SelectContainer -> state.copy(selected = action.index)
-        else -> null
+        else -> state
     }
 }

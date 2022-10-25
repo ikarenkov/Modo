@@ -1,52 +1,122 @@
 package com.github.terrakok.modo.android.compose
 
+import android.os.Parcelable
 import androidx.compose.runtime.Composable
-import com.github.terrakok.modo.Back
+import androidx.compose.runtime.staticCompositionLocalOf
 import com.github.terrakok.modo.ContainerScreen
+import com.github.terrakok.modo.MultiNavigation
+import com.github.terrakok.modo.MultiReducer
 import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.Screen
-import com.github.terrakok.modo.StackNavigation
+import com.github.terrakok.modo.StackNavigationState
 import com.github.terrakok.modo.StackReducer
-import com.github.terrakok.modo.container
+import kotlinx.parcelize.Parcelize
 
 interface ComposeContent {
     @Composable
     fun Content()
+
+    val screenKey: String
 }
 
 interface ComposeScreen : Screen, ComposeContent
 
+val LocalContainerScreen = staticCompositionLocalOf<ComposeContainerScreen<*>> { error("no screen provided") }
+
 abstract class ComposeContainerScreen<State : NavigationState>(
-    id: String,
     initState: State,
     reducer: NavigationReducer<State>
-) : ContainerScreen<State>(id, initState, reducer), ComposeContent {
-    //    private val composeRenderer = ComposeNavigationRenderer { container?.dispatch(Back) }
-    private val composeRenderer = ComposeRenderer(exitAction = { container?.dispatch(Back) })
+) : ContainerScreen<State>(initState, reducer), ComposeScreen {
+    override var navigationState: State
+        get() = ((renderer as ComposeRenderer).state ?: (super.navigationState)) as State
+        set(value) {
+            super.navigationState = value
+        }
 
     init {
-        // TODO: maybe we can replace NavigationRenderer to ComposeRenderer? We are not going to support fragments anymore.
-        renderer = composeRenderer
+        renderer = ComposeRenderer(containerScreen = this, exitAction = { })
     }
 
     @Composable
-    final override fun Content() {
-        Content(navigationState) { composeRenderer.Content() }
+    protected fun InternalContent(
+        screen: Screen,
+        content: RendererContent = defaultRendererContent
+    ) {
+        val composeRenderer = renderer as ComposeRenderer
+        composeRenderer.Content(screen as ComposeScreen, content)
     }
 
-    @Composable
-    open fun Content(state: State, screenContent: @Composable () -> Unit) {
-        screenContent()
-    }
+    override fun toString(): String = screenKey
+
 }
 
-open class Stack(id: String, rootScreen: ComposeScreen) :
-    ComposeContainerScreen<StackNavigation>(id, StackNavigation(listOf(rootScreen)), StackReducer())
+open class Stack(
+    rootScreen: ComposeScreen,
+    reducer: NavigationReducer<StackNavigationState> = StackReducer(),
+    override val screenKey: String = generateScreenKey(),
+    val defaultRendererContent: RendererContent = com.github.terrakok.modo.android.compose.defaultRendererContent
+) : ComposeContainerScreen<StackNavigationState>(
+    StackNavigationState(listOf(rootScreen)),
+    reducer,
+) {
 
-//open class MultiStack(id: String, vararg rootScreen: ComposeScreen, selected: Int) :
-//    ComposeContainerScreen(
-//        id,
-//        MultiNavigation(rootScreen.mapIndexed { i, s -> Stack(i.toString(), s) }, selected),
-//        MultiReducer()
-//    )
+    /**
+     * Default implementation last screen from stack.
+     */
+    @Composable
+    override fun Content() {
+        TopScreenContent()
+    }
+
+    /**
+     * Renders last screen from stack.
+     */
+    @Composable
+    protected fun TopScreenContent(
+        content: RendererContent = defaultRendererContent
+    ) {
+        Content(navigationState.stack.last(), content)
+    }
+
+    @Composable
+    protected fun Content(
+        screen: Screen,
+        content: RendererContent = defaultRendererContent
+    ) {
+        super.InternalContent(screen, content)
+    }
+
+}
+
+open class MultiScreen(
+    initState: MultiNavigation,
+    reducer: NavigationReducer<MultiNavigation> = MultiReducer(),
+    override val screenKey: String = generateScreenKey(),
+) : ComposeContainerScreen<MultiNavigation>(
+    initState,
+    reducer,
+) {
+
+    @Composable
+    override fun Content() {
+        SelectedScreen()
+    }
+
+    @Composable
+    fun SelectedScreen(
+        content: RendererContent = defaultRendererContent
+    ) {
+        Content(navigationState.containers[navigationState.selected], content)
+    }
+
+    @Composable
+    fun Content(
+        screen: Screen,
+        content: RendererContent = defaultRendererContent
+    ) {
+        // Завезти баг на IssueTracker гугла
+        super.InternalContent(screen, content)
+    }
+
+}

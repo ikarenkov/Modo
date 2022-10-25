@@ -39,9 +39,9 @@ dependencies {
 
     implementation("androidx.core:core-ktx:${properties["version.coreKtx"]}")
     implementation("androidx.appcompat:appcompat:${properties["version.appcompat"]}")
-    implementation("com.google.android.material:material:${properties["version.material"]}")
+//    implementation("com.google.android.material:material:${properties["version.material"]}")
     implementation("androidx.compose.ui:ui:${properties["version.compose"]}")
-    implementation("androidx.compose.material:material:${properties["version.compose"]}")
+    implementation("androidx.compose.material:material:${properties["version.material"]}")
     implementation("androidx.compose.ui:ui-tooling:${properties["version.compose"]}")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:${properties["version.lifecycleRuntimeKtx"]}")
     implementation("androidx.activity:activity-compose:${properties["version.composeActivity"]}")

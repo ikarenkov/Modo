@@ -13,7 +13,7 @@ import androidx.compose.animation.with
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.github.terrakok.modo.NavigationState
-import com.github.terrakok.modo.StackNavigation
+import com.github.terrakok.modo.StackNavigationState
 
 enum class ScreenTransitionType {
     Push,
@@ -45,7 +45,7 @@ fun ComposeRendererScope.ScreenTransition(
 }
 
 fun defaultCalculateTransitionType(oldScreensState: NavigationState?, newScreensState: NavigationState?): ScreenTransitionType =
-    if (oldScreensState is StackNavigation && newScreensState is StackNavigation) {
+    if (oldScreensState is StackNavigationState && newScreensState is StackNavigationState) {
         val oldStack = oldScreensState.stack
         val newStack = newScreensState.stack
         when {
