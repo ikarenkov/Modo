@@ -1,9 +1,13 @@
 package com.github.terrakok.modo
 
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
+
+@Parcelize
 data class MultiNavigation(
     val containers: List<ContainerScreen<*>>,
     val selected: Int
-) : NavigationState {
+) : NavigationState, Parcelable {
     override fun getChildScreens(): List<Screen> = containers
 }
 

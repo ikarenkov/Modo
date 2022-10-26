@@ -28,8 +28,10 @@ import com.github.terrakok.modo.android.compose.ComposeScreen
 import com.github.terrakok.modo.android.compose.generateScreenKey
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import kotlinx.parcelize.Parcelize
 import kotlin.random.Random
 
+@Parcelize
 class SaveableStateHolderDemoScreen(
     override val screenKey: String = generateScreenKey()
 ) : ComposeScreen {

@@ -1,8 +1,12 @@
 package com.github.terrakok.modo
 
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
+
+@Parcelize
 data class StackNavigationState(
     val stack: List<Screen> = emptyList()
-) : NavigationState {
+) : NavigationState, Parcelable {
 
     constructor(vararg screensStack: Screen) : this(screensStack.toList())
 

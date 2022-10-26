@@ -1,13 +1,16 @@
 package com.github.terrakok.modo
 
-interface Screen {
+import dev.icerock.moko.parcelize.Parcelable
+
+interface Screen : Parcelable {
     val screenName: String get() = "Screen"
 }
 
-open class ContainerScreen<State : NavigationState>(
+abstract class ContainerScreen<State : NavigationState>(
     initialState: State,
-    private val reducer: NavigationReducer<State>
 ) : Screen, NavigationDispatcher {
+
+    abstract val reducer: NavigationReducer<State>
 
     open var navigationState: State = initialState
         set(value) {
@@ -22,12 +25,7 @@ open class ContainerScreen<State : NavigationState>(
         }
 
     override fun dispatch(action: NavigationAction) {
-        val newState = reducer.reduce(action, navigationState)
-        if (newState != null) {
-            navigationState = newState
-        } else {
-//            container?.dispatch(action)
-        }
+        navigationState = reducer.reduce(action, navigationState)
     }
 
 }

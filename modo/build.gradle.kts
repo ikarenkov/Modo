@@ -3,6 +3,7 @@ plugins {
     id("com.android.library")
     id("maven-publish")
     id("signing")
+    id("kotlin-parcelize")
 }
 
 kotlin {
@@ -28,4 +29,8 @@ android {
         minSdk = (properties["android.minSdk"] as String).toInt()
         targetSdk = (properties["android.targetSdk"] as String).toInt()
     }
+}
+
+dependencies {
+    commonMainApi("dev.icerock.moko:parcelize:0.8.0")
 }

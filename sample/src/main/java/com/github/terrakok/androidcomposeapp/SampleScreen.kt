@@ -33,7 +33,9 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 class SampleScreen(
     private val i: Int,
     override val screenKey: String = generateScreenKey()
@@ -100,7 +102,7 @@ private fun SampleContent(screenKey: String, i: Int, navigator: NavigationDispat
                 },
                 "Back to '3'" to { navigator.backTo(SampleScreen(3)) },
                 "Container" to { navigator.forward(SampleStackScreen(i + 1)) },
-                "Multiscreen" to { navigator.forward(SampleMultiScreen(i + 1)) },
+                "Multiscreen" to { navigator.forward(SampleMultiScreen()) },
                 "Exit" to { navigator.exit() },
                 "Exit App" to { },
                 "List/Details" to { navigator.forward(ListScreen()) },

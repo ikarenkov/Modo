@@ -1,5 +1,7 @@
 package com.github.terrakok.androidcomposeapp
 
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -21,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.terrakok.modo.StackNavigationState
 import com.github.terrakok.modo.android.compose.LocalContainerScreen
 import com.github.terrakok.modo.android.compose.ScreenTransition
 import com.github.terrakok.modo.android.compose.ScreenTransitionType
@@ -28,10 +31,21 @@ import com.github.terrakok.modo.android.compose.Stack
 import com.github.terrakok.modo.android.compose.generateScreenKey
 import com.github.terrakok.modo.back
 
-class SampleStackScreen(
-    private val i: Int,
-    override val screenKey: String = generateScreenKey()
-) : Stack(SampleScreen(1)) {
+class SampleStackScreen : Stack {
+
+    constructor(
+        i: Int,
+        sampleNavigationState: StackNavigationState = StackNavigationState(SampleScreen(1))
+    ) : super(sampleNavigationState, generateScreenKey()) {
+        this.i = i
+    }
+
+    private constructor(parcel: Parcel) : super(parcel) {
+        i = parcel.readInt()
+    }
+
+    private val i: Int
+
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     override fun Content() {
@@ -73,6 +87,20 @@ class SampleStackScreen(
             }
         }
     }
+
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        super.writeToParcel(parcel, flags)
+        parcel.writeInt(i)
+    }
+
+    companion object CREATOR : Parcelable.Creator<SampleStackScreen> {
+
+        override fun createFromParcel(parcel: Parcel): SampleStackScreen = SampleStackScreen(parcel)
+
+        override fun newArray(size: Int): Array<SampleStackScreen?> = arrayOfNulls(size)
+    }
+
 }
 
 @Preview

@@ -1,5 +1,7 @@
 package com.github.terrakok.androidcomposeapp
 
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -19,26 +21,26 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.MultiNavigation
-import com.github.terrakok.modo.MultiReducer
 import com.github.terrakok.modo.android.compose.MultiScreen
 import com.github.terrakok.modo.android.compose.Stack
 import com.github.terrakok.modo.android.compose.generateScreenKey
 import com.github.terrakok.modo.selectContainer
 
-class SampleMultiScreen(
-    i: Int,
-    override val screenKey: String = generateScreenKey()
-) : MultiScreen(
-    initState = MultiNavigation(
-        containers = listOf(
-            Stack(SampleScreen(1)),
-            Stack(SampleScreen(2)),
-            Stack(SampleScreen(3)),
-        ),
-        selected = 1
-    ),
-    reducer = MultiReducer()
-) {
+class SampleMultiScreen : MultiScreen {
+
+    constructor(
+        initialState: MultiNavigation = MultiNavigation(
+            containers = listOf(
+                Stack(SampleScreen(1)),
+                Stack(SampleScreen(2)),
+                Stack(SampleScreen(3)),
+            ),
+            selected = 1
+        )
+    ) : super(initialState, generateScreenKey())
+
+    constructor(parcel: Parcel) : super(parcel)
+
     @Composable
     override fun Content() {
         var showAllStacks by rememberSaveable {
@@ -105,10 +107,16 @@ class SampleMultiScreen(
         color = if (isSelected) Color.Red else Color.Black,
         text = "Tab $tabPos"
     )
+
+    companion object CREATOR : Parcelable.Creator<SampleMultiScreen> {
+        override fun createFromParcel(parcel: Parcel): SampleMultiScreen = SampleMultiScreen(parcel)
+
+        override fun newArray(size: Int): Array<SampleMultiScreen?> = arrayOfNulls(size)
+    }
 }
 
 @Preview
 @Composable
 fun PreviewSampleMultiScreen() {
-    SampleMultiScreen(1).Content()
+    SampleMultiScreen().Content()
 }

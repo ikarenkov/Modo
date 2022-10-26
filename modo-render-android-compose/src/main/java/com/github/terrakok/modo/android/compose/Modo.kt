@@ -5,9 +5,11 @@ import android.os.Bundle
 object Modo {
 
     private const val MODO_SCREEN_COUNTER_KEY = "MODO_SCREEN_COUNTER_KEY"
+    private const val MODO_GRAPH = "MODO_GRAPH"
 
     fun saveInstanceState(outState: Bundle, rootScreen: ComposeScreen) {
         outState.putInt(MODO_SCREEN_COUNTER_KEY, screenCounterKey.get())
+        outState.putParcelable(MODO_GRAPH, rootScreen)
     }
 
     /**
@@ -17,7 +19,7 @@ object Modo {
     fun <T: ComposeScreen> restoreInstanceIfCan(savedState: Bundle?, rootScreenProvider: () -> T): T =
         if (savedState != null) {
             restoreScreenCounter(savedState.getInt(MODO_SCREEN_COUNTER_KEY))
-            rootScreenProvider()
+            savedState.getParcelable<ComposeScreen>(MODO_GRAPH) as T
         } else {
             rootScreenProvider()
         }
