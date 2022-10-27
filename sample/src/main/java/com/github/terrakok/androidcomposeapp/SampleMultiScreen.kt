@@ -22,7 +22,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.MultiNavigation
 import com.github.terrakok.modo.android.compose.MultiScreen
-import com.github.terrakok.modo.android.compose.Stack
 import com.github.terrakok.modo.android.compose.generateScreenKey
 import com.github.terrakok.modo.selectContainer
 
@@ -31,9 +30,9 @@ class SampleMultiScreen : MultiScreen {
     constructor(
         initialState: MultiNavigation = MultiNavigation(
             containers = listOf(
-                Stack(SampleScreen(1)),
-                Stack(SampleScreen(2)),
-                Stack(SampleScreen(3)),
+                SampleStack(SampleScreen(1)),
+                SampleStack(SampleScreen(2)),
+                SampleStack(SampleScreen(3)),
             ),
             selected = 1
         )

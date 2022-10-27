@@ -15,7 +15,7 @@ class CustomReducer : NavigationReducer<MultiNavigation> {
     override fun reduce(action: NavigationAction, state: MultiNavigation): MultiNavigation {
         if (action is AddTab) {
             return MultiNavigation(
-                state.containers + Stack(action.rootScreen),
+                state.containers + SampleStack(action.rootScreen),
                 state.selected
             )
         }

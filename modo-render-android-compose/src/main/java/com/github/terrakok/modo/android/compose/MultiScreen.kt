@@ -1,14 +1,13 @@
 package com.github.terrakok.modo.android.compose
 
 import android.os.Parcel
-import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import com.github.terrakok.modo.MultiNavigation
 import com.github.terrakok.modo.MultiReducer
 import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.Screen
 
-open class MultiScreen(
+abstract class MultiScreen(
     initState: MultiNavigation,
     override val screenKey: String,
 ) : ComposeContainerScreen<MultiNavigation>(
@@ -39,7 +38,7 @@ open class MultiScreen(
         screen: Screen,
         content: RendererContent = defaultRendererContent
     ) {
-        // Завезти баг на IssueTracker гугла
+        // create issue at google issue tracker
         super.InternalContent(screen, content)
     }
 
@@ -49,11 +48,5 @@ open class MultiScreen(
     }
 
     override fun describeContents(): Int = 0
-
-    companion object CREATOR : Parcelable.Creator<MultiScreen> {
-        override fun createFromParcel(parcel: Parcel): MultiScreen = MultiScreen(parcel)
-
-        override fun newArray(size: Int): Array<MultiScreen?> = arrayOfNulls(size)
-    }
 
 }

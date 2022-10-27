@@ -9,13 +9,18 @@ import com.github.terrakok.modo.StackNavigationState
 import com.github.terrakok.modo.StackReducer
 import kotlinx.parcelize.Parcelize
 
-open class Stack(
+abstract class Stack(
     navigationState: StackNavigationState,
     override val screenKey: String,
 ) : ComposeContainerScreen<StackNavigationState>(navigationState), Parcelable {
 
     constructor(rootScreen: ComposeScreen) : this(
         StackNavigationState(listOf(rootScreen)),
+        generateScreenKey()
+    )
+
+    constructor(navigationState: StackNavigationState) : this(
+        navigationState,
         generateScreenKey()
     )
 
@@ -63,14 +68,11 @@ open class Stack(
         val screenKey: String
     ) : Parcelable
 
-    companion object CREATOR : Parcelable.Creator<Stack> {
+    companion object {
 
         @JvmStatic
         protected fun readSavedState(parcel: Parcel): SaveState = parcel.readParcelable(SaveState::class.java.classLoader)!!
 
-        override fun createFromParcel(parcel: Parcel): Stack = Stack(parcel)
-
-        override fun newArray(size: Int): Array<Stack?> = arrayOfNulls(size)
     }
 
 }

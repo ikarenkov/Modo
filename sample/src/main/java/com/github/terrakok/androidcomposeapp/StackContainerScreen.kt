@@ -23,7 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.StackNavigationState
+import com.github.terrakok.modo.android.compose.ComposeRendererScope
 import com.github.terrakok.modo.android.compose.LocalContainerScreen
 import com.github.terrakok.modo.android.compose.ScreenTransition
 import com.github.terrakok.modo.android.compose.ScreenTransitionType
@@ -45,6 +47,9 @@ class SampleStackScreen : Stack {
     }
 
     private val i: Int
+
+    override val reducer: NavigationReducer<StackNavigationState>
+        get() = super.reducer
 
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
@@ -69,25 +74,11 @@ class SampleStackScreen : Stack {
                     .background(Color.White)
             ) {
                 TopScreenContent {
-                    ScreenTransition(
-                        transitionSpec = {
-                            if (transitionType == ScreenTransitionType.Replace) {
-                                scaleIn(initialScale = 2f) + fadeIn() with fadeOut()
-                            } else {
-                                val (initialOffset, targetOffset) = when (transitionType) {
-                                    ScreenTransitionType.Pop -> ({ size: Int -> -size }) to ({ size: Int -> size })
-                                    else -> ({ size: Int -> size }) to ({ size: Int -> -size })
-                                }
-                                slideInHorizontally(initialOffsetX = initialOffset) with
-                                    slideOutHorizontally(targetOffsetX = targetOffset)
-                            }
-                        }
-                    )
+                    SlideTransition()
                 }
             }
         }
     }
-
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         super.writeToParcel(parcel, flags)
