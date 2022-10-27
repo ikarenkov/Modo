@@ -1,7 +1,6 @@
 package com.github.terrakok.androidcomposeapp
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
@@ -19,9 +18,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import com.github.terrakok.modo.android.compose.ComposeScreen
-import com.github.terrakok.modo.android.compose.Stack
-import com.github.terrakok.modo.android.compose.defaultRendererContent
+import com.github.terrakok.modo.containers.Stack
 import com.github.terrakok.modo.back
 
 // Doesn't work correctly because of bug

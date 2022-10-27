@@ -1,22 +1,11 @@
-package com.github.terrakok.modo
+package com.github.terrakok.modo.util
 
-interface NavigationState {
-    fun getChildScreens(): List<Screen>
-}
+import android.util.Log
+import com.github.terrakok.modo.MultiNavigation
+import com.github.terrakok.modo.NavigationState
+import com.github.terrakok.modo.StackNavigationState
+import com.github.terrakok.modo.containers.ContainerScreen
 
-interface NavigationAction
-
-interface NavigationReducer<State : NavigationState> {
-    fun reduce(action: NavigationAction, state: State): State
-}
-
-fun interface NavigationDispatcher {
-    fun dispatch(action: NavigationAction)
-}
-
-interface NavigationRenderer {
-    fun render(state: NavigationState)
-}
 
 fun NavigationState?.print(): String =
     if (this == null) {
@@ -52,4 +41,6 @@ private fun getNavigationStateString(prefix: String, navigationState: Navigation
         else -> "unknown state type: ${navigationState::class.simpleName}"
     }
 
-internal expect fun logd(tag: String, msg: String)
+internal fun logd(tag: String, msg: String) {
+    Log.d(tag, msg)
+}

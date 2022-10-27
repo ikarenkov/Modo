@@ -33,7 +33,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":modo"))
     implementation("androidx.compose.ui:ui:${properties["version.compose"]}")
     implementation("androidx.compose.foundation:foundation:${properties["version.compose"]}")
     // For BackHandler

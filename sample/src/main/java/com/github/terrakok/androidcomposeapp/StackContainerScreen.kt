@@ -3,12 +3,6 @@ package com.github.terrakok.androidcomposeapp
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.with
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -25,13 +19,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.StackNavigationState
-import com.github.terrakok.modo.android.compose.ComposeRendererScope
-import com.github.terrakok.modo.android.compose.LocalContainerScreen
-import com.github.terrakok.modo.android.compose.ScreenTransition
-import com.github.terrakok.modo.android.compose.ScreenTransitionType
-import com.github.terrakok.modo.android.compose.Stack
-import com.github.terrakok.modo.android.compose.generateScreenKey
+import com.github.terrakok.modo.containers.Stack
+import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.back
+import com.github.terrakok.modo.containers.LocalContainerScreen
 
 class SampleStackScreen : Stack {
 

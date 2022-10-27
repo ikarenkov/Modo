@@ -21,8 +21,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.MultiNavigation
-import com.github.terrakok.modo.android.compose.MultiScreen
-import com.github.terrakok.modo.android.compose.generateScreenKey
+import com.github.terrakok.modo.containers.MultiScreen
+import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.selectContainer
 
 class SampleMultiScreen : MultiScreen {

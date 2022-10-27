@@ -1,7 +1,8 @@
 package com.github.terrakok.modo
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import android.os.Parcelable
+import com.github.terrakok.modo.containers.ContainerScreen
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class MultiNavigation(

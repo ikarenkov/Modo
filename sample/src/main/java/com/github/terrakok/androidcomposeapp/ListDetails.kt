@@ -15,16 +15,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.github.terrakok.modo.android.compose.ComposeScreen
-import com.github.terrakok.modo.android.compose.LocalContainerScreen
-import com.github.terrakok.modo.android.compose.generateScreenKey
+import com.github.terrakok.modo.Screen
+import com.github.terrakok.modo.containers.LocalContainerScreen
+import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.forward
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class ListScreen(
     override val screenKey: String = generateScreenKey()
-) : ComposeScreen {
+) : Screen {
 
     @Composable
     override fun Content() {
@@ -56,7 +56,7 @@ class ListScreen(
 class DetailsScreen(
     private val userId: String,
     override val screenKey: String = generateScreenKey()
-) : ComposeScreen {
+) : Screen {
 
     @Composable
     override fun Content() {

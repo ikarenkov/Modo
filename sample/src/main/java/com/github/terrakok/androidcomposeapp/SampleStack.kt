@@ -4,8 +4,8 @@ import android.os.Parcel
 import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import com.github.terrakok.modo.StackNavigationState
-import com.github.terrakok.modo.android.compose.ComposeScreen
-import com.github.terrakok.modo.android.compose.Stack
+import com.github.terrakok.modo.Screen
+import com.github.terrakok.modo.containers.Stack
 
 class SampleStack : Stack {
 
@@ -13,7 +13,7 @@ class SampleStack : Stack {
 
     constructor(initialState: StackNavigationState) : super(navigationState = initialState)
 
-    constructor(rootScreen: ComposeScreen) : this(initialState = StackNavigationState(rootScreen))
+    constructor(rootScreen: Screen) : this(initialState = StackNavigationState(rootScreen))
 
     @Composable
     override fun Content() {

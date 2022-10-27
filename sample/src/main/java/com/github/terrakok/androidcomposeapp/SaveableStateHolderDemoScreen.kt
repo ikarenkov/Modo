@@ -24,8 +24,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.github.terrakok.modo.android.compose.ComposeScreen
-import com.github.terrakok.modo.android.compose.generateScreenKey
+import com.github.terrakok.modo.Screen
+import com.github.terrakok.modo.generateScreenKey
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.parcelize.Parcelize
@@ -34,7 +34,7 @@ import kotlin.random.Random
 @Parcelize
 class SaveableStateHolderDemoScreen(
     override val screenKey: String = generateScreenKey()
-) : ComposeScreen {
+) : Screen {
 
     @Composable
     override fun Content() {

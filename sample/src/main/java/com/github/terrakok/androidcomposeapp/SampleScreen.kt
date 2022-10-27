@@ -20,11 +20,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.NavigationDispatcher
-import com.github.terrakok.modo.android.compose.ComposeScreen
-import com.github.terrakok.modo.android.compose.LocalContainerScreen
-import com.github.terrakok.modo.android.compose.generateScreenKey
+import com.github.terrakok.modo.Screen
+import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.back
 import com.github.terrakok.modo.backTo
+import com.github.terrakok.modo.containers.LocalContainerScreen
 import com.github.terrakok.modo.exit
 import com.github.terrakok.modo.forward
 import com.github.terrakok.modo.newStack
@@ -39,7 +39,7 @@ import kotlinx.parcelize.Parcelize
 class SampleScreen(
     private val i: Int,
     override val screenKey: String = generateScreenKey()
-) : ComposeScreen {
+) : Screen {
 
     @Composable
     override fun Content() {

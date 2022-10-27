@@ -1,20 +1,23 @@
-package com.github.terrakok.modo.android.compose
+package com.github.terrakok.modo.containers
 
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import com.github.terrakok.modo.NavigationReducer
+import com.github.terrakok.modo.RendererContent
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.StackNavigationState
 import com.github.terrakok.modo.StackReducer
+import com.github.terrakok.modo.defaultRendererContent
+import com.github.terrakok.modo.generateScreenKey
 import kotlinx.parcelize.Parcelize
 
 abstract class Stack(
     navigationState: StackNavigationState,
     override val screenKey: String,
-) : ComposeContainerScreen<StackNavigationState>(navigationState), Parcelable {
+) : ContainerScreen<StackNavigationState>(navigationState), Parcelable {
 
-    constructor(rootScreen: ComposeScreen) : this(
+    constructor(rootScreen: Screen) : this(
         StackNavigationState(listOf(rootScreen)),
         generateScreenKey()
     )

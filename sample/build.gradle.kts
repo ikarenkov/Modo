@@ -34,7 +34,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":modo"))
     implementation(project(":modo-render-android-compose"))
 
     implementation("androidx.core:core-ktx:${properties["version.coreKtx"]}")

@@ -8,9 +8,9 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.with
 import androidx.compose.runtime.Composable
-import com.github.terrakok.modo.android.compose.ComposeRendererScope
-import com.github.terrakok.modo.android.compose.ScreenTransition
-import com.github.terrakok.modo.android.compose.ScreenTransitionType
+import com.github.terrakok.modo.ComposeRendererScope
+import com.github.terrakok.modo.animation.ScreenTransition
+import com.github.terrakok.modo.animation.ScreenTransitionType
 
 @Composable
 @OptIn(ExperimentalAnimationApi::class)

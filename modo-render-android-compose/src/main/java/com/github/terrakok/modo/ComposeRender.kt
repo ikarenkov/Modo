@@ -1,9 +1,8 @@
-package com.github.terrakok.modo.android.compose
+package com.github.terrakok.modo
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -12,10 +11,10 @@ import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
-import com.github.terrakok.modo.NavigationRenderer
-import com.github.terrakok.modo.NavigationState
-import com.github.terrakok.modo.Screen
-import com.github.terrakok.modo.StackNavigationState
+import com.github.terrakok.modo.animation.ScreenTransitionType
+import com.github.terrakok.modo.animation.defaultCalculateTransitionType
+import com.github.terrakok.modo.containers.ContainerScreen
+import com.github.terrakok.modo.containers.LocalContainerScreen
 
 typealias RendererContent = @Composable ComposeRendererScope.() -> Unit
 
@@ -24,14 +23,14 @@ val defaultRendererContent: (@Composable ComposeRendererScope.() -> Unit) = { sc
 internal val LocalSaveableStateHolder = staticCompositionLocalOf<SaveableStateHolder?> { null }
 
 @Composable
-fun ComposeScreen.SaveableContent() {
+fun Screen.SaveableContent() {
     LocalSaveableStateHolder.currentOrThrow.SaveableStateProvider(key = screenKey) {
         Content()
     }
 }
 
 class ComposeRendererScope(
-    val screen: ComposeScreen,
+    val screen: Screen,
     val transitionType: ScreenTransitionType
 )
 
@@ -41,7 +40,7 @@ class ComposeRendererScope(
  *  2. Storing and clearing composable states inside [SaveableStateHolder]
  */
 internal class ComposeRenderer(
-    private val containerScreen: ComposeContainerScreen<*>,
+    private val containerScreen: ContainerScreen<*>,
     private val exitAction: () -> Unit = {},
     private val getTransitionType: (oldState: NavigationState?, newState: NavigationState?) -> ScreenTransitionType =
         ::defaultCalculateTransitionType
@@ -69,7 +68,7 @@ internal class ComposeRenderer(
 
     @Composable
     fun Content(
-        screen: ComposeScreen,
+        screen: Screen,
         content: RendererContent = defaultRendererContent
     ) {
         // use single state holder for whole hierarchy, store it on top of it
@@ -103,10 +102,10 @@ internal class ComposeRenderer(
     }
 
     private fun Iterable<Screen>.clearStates(stateHolder: SaveableStateHolder) = forEach { screen ->
-        require(screen is ComposeScreen)
+        require(screen is Screen)
         stateHolder.removeState(screen.screenKey)
         // clear nested screens using recursion
-        ((screen as? ComposeContainerScreen<*>)?.renderer as? ComposeRenderer)?.clearStateHolder(stateHolder, clearAll = true)
+        ((screen as? ContainerScreen<*>)?.renderer as? ComposeRenderer)?.clearStateHolder(stateHolder, clearAll = true)
     }
 
     private fun calculateRemovedScreens(oldState: NavigationState, newState: NavigationState): List<Screen> {

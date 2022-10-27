@@ -1,7 +1,7 @@
 package com.github.terrakok.modo
 
-import dev.icerock.moko.parcelize.Parcelable
-import dev.icerock.moko.parcelize.Parcelize
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class StackNavigationState(

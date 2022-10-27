@@ -1,16 +1,18 @@
-package com.github.terrakok.modo.android.compose
+package com.github.terrakok.modo.containers
 
 import android.os.Parcel
 import androidx.compose.runtime.Composable
 import com.github.terrakok.modo.MultiNavigation
 import com.github.terrakok.modo.MultiReducer
 import com.github.terrakok.modo.NavigationReducer
+import com.github.terrakok.modo.RendererContent
 import com.github.terrakok.modo.Screen
+import com.github.terrakok.modo.defaultRendererContent
 
 abstract class MultiScreen(
     initState: MultiNavigation,
     override val screenKey: String,
-) : ComposeContainerScreen<MultiNavigation>(
+) : ContainerScreen<MultiNavigation>(
     initState,
 ) {
 

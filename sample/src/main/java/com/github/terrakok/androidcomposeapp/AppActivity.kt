@@ -7,8 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import com.github.terrakok.modo.StackNavigationState
-import com.github.terrakok.modo.android.compose.Modo
-import com.github.terrakok.modo.android.compose.Stack
+import com.github.terrakok.modo.Modo
+import com.github.terrakok.modo.containers.Stack
 import com.github.terrakok.modo.back
 
 class AppActivity : AppCompatActivity() {

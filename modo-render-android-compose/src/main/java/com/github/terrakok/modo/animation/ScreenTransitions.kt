@@ -1,4 +1,4 @@
-package com.github.terrakok.modo.android.compose
+package com.github.terrakok.modo.animation
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentScope
@@ -12,7 +12,10 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.with
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.github.terrakok.modo.ComposeRendererScope
 import com.github.terrakok.modo.NavigationState
+import com.github.terrakok.modo.SaveableContent
+import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.StackNavigationState
 
 enum class ScreenTransitionType {
@@ -22,13 +25,13 @@ enum class ScreenTransitionType {
     Idle
 }
 
-typealias ScreenTransitionContent = @Composable AnimatedVisibilityScope.(ComposeScreen) -> Unit
+typealias ScreenTransitionContent = @Composable AnimatedVisibilityScope.(Screen) -> Unit
 
 @ExperimentalAnimationApi
 @Composable
 fun ComposeRendererScope.ScreenTransition(
     modifier: Modifier = Modifier,
-    transitionSpec: AnimatedContentScope<ComposeScreen>.() -> ContentTransform = {
+    transitionSpec: AnimatedContentScope<Screen>.() -> ContentTransform = {
         fadeIn(animationSpec = tween(220, delayMillis = 90)) +
             scaleIn(initialScale = 0.92f, animationSpec = tween(220, delayMillis = 90)) with
             fadeOut(animationSpec = tween(90))
