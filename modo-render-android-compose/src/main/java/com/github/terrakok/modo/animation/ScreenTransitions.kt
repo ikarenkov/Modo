@@ -6,6 +6,7 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -38,13 +39,13 @@ fun ComposeRendererScope.ScreenTransition(
     },
     content: ScreenTransitionContent = { it.SaveableContent() }
 ) {
-    AnimatedContent(
-        targetState = screen,
+    val transition = updateTransition(targetState = screen, label = "ScreenTransition")
+    transition.AnimatedContent(
         transitionSpec = transitionSpec,
-        modifier = modifier
-    ) {
-        content(it)
-    }
+        modifier = modifier,
+        contentKey = { it.screenKey },
+        content = content
+    )
 }
 
 fun defaultCalculateTransitionType(oldScreensState: NavigationState?, newScreensState: NavigationState?): ScreenTransitionType =
