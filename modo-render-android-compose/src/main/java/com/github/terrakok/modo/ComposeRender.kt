@@ -15,6 +15,7 @@ import com.github.terrakok.modo.animation.ScreenTransitionType
 import com.github.terrakok.modo.animation.defaultCalculateTransitionType
 import com.github.terrakok.modo.containers.ContainerScreen
 import com.github.terrakok.modo.containers.LocalContainerScreen
+import com.github.terrakok.modo.model.ScreenModelStore
 
 typealias RendererContent = @Composable ComposeRendererScope.() -> Unit
 
@@ -75,13 +76,14 @@ internal class ComposeRenderer(
         val stateHolder: SaveableStateHolder = LocalSaveableStateHolder.current ?: rememberSaveableStateHolder()
         DisposableEffect(key1 = state) {
             onDispose {
-                clearStateHolder(stateHolder)
+                clearScreens(stateHolder)
             }
         }
         CompositionLocalProvider(
             LocalSaveableStateHolder providesDefault stateHolder,
             LocalContainerScreen provides containerScreen
         ) {
+            LocalContainerScreen.current
             ComposeRendererScope(screen, lastStackEvent.value).content()
         }
     }
@@ -91,7 +93,7 @@ internal class ComposeRenderer(
      * @param stateHolder - SaveableStateHolder that contains screen states
      * @param clearAll - forces to remove all screen states that renderer holds (removed and "displayed")
      */
-    private fun clearStateHolder(stateHolder: SaveableStateHolder, clearAll: Boolean = false) {
+    private fun clearScreens(stateHolder: SaveableStateHolder, clearAll: Boolean = false) {
         if (clearAll) {
             state?.getChildScreens()?.clearStates(stateHolder)
         }
@@ -102,10 +104,10 @@ internal class ComposeRenderer(
     }
 
     private fun Iterable<Screen>.clearStates(stateHolder: SaveableStateHolder) = forEach { screen ->
-        require(screen is Screen)
+        ScreenModelStore.remove(screen)
         stateHolder.removeState(screen.screenKey)
         // clear nested screens using recursion
-        ((screen as? ContainerScreen<*>)?.renderer as? ComposeRenderer)?.clearStateHolder(stateHolder, clearAll = true)
+        ((screen as? ContainerScreen<*>)?.renderer as? ComposeRenderer)?.clearScreens(stateHolder, clearAll = true)
     }
 
     private fun calculateRemovedScreens(oldState: NavigationState, newState: NavigationState): List<Screen> {

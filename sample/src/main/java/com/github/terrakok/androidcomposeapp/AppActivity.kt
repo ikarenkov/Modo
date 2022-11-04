@@ -17,7 +17,9 @@ class AppActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        rootScreen = Modo.restoreInstanceIfCan<Stack>(savedInstanceState, ::provideRootScreen)
+        rootScreen = Modo.restoreInstanceIfCan<Stack>(savedInstanceState) {
+            SampleStack(StackNavigationState(SampleScreen(1)))
+        }
         setContent {
             BackHandler { rootScreen.back() }
             Surface(color = MaterialTheme.colors.background) {
@@ -30,7 +32,5 @@ class AppActivity : AppCompatActivity() {
         Modo.saveInstanceState(outState, rootScreen)
         super.onSaveInstanceState(outState)
     }
-
-    private fun provideRootScreen(): Stack = SampleStack(StackNavigationState(SampleScreen(1)))
 
 }

@@ -44,13 +44,13 @@ class SampleScreen(
     @Composable
     override fun Content() {
         val parent = LocalContainerScreen.current
-        SampleContent(screenKey, i, parent)
+        SampleContent(i, parent)
     }
 }
 
 @Composable
-private fun SampleContent(screenKey: String, i: Int, navigator: NavigationDispatcher) {
-    var counter by rememberSaveable(screenKey) {
+private fun SampleContent(i: Int, navigator: NavigationDispatcher) {
+    var counter by rememberSaveable {
         mutableStateOf(0)
     }
     LaunchedEffect(key1 = Unit) {
@@ -108,6 +108,7 @@ private fun SampleContent(screenKey: String, i: Int, navigator: NavigationDispat
                 "List/Details" to { navigator.forward(ListScreen()) },
                 "2 items screen" to { navigator.forward(TwoTopItemsStackScreen(i + 1)) },
                 "Demo" to { navigator.forward(SaveableStateHolderDemoScreen()) },
+                "Model" to { navigator.forward(ModelSampleScreen()) },
             )
         }
         ButtonsList(
@@ -120,5 +121,5 @@ private fun SampleContent(screenKey: String, i: Int, navigator: NavigationDispat
 @Preview
 @Composable
 fun PreviewSampleContent() {
-    SampleContent("", 0) {}
+    SampleContent(0) {}
 }
