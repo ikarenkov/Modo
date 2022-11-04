@@ -3,11 +3,17 @@ package com.github.terrakok.modo.containers
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.window.Dialog
+import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.RendererContent
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.StackNavigationState
 import com.github.terrakok.modo.StackReducer
+import com.github.terrakok.modo.back
 import com.github.terrakok.modo.defaultRendererContent
 import com.github.terrakok.modo.generateScreenKey
 import kotlinx.parcelize.Parcelize
@@ -48,7 +54,30 @@ abstract class Stack(
     protected fun TopScreenContent(
         content: RendererContent = defaultRendererContent
     ) {
-        Content(navigationState.stack.last(), content)
+        val screensToRender: List<Screen> by remember {
+            derivedStateOf {
+                val stack = navigationState.stack
+                val topScreen = stack.last()
+                if (topScreen is DialogScreen) {
+                    val screen = stack.findLast { it !is DialogScreen }
+                    listOfNotNull(screen, topScreen)
+                } else {
+                    listOf(stack.last())
+                }
+            }
+        }
+        for (screen in screensToRender) {
+            if (screen is DialogScreen) {
+                Dialog(
+                    onDismissRequest = { back() },
+                    properties = remember { screen.provideDialogProperties() }
+                ) {
+                    Content(screen = screen, content)
+                }
+            } else {
+                Content(screen, content)
+            }
+        }
     }
 
     @Composable

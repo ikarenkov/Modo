@@ -15,16 +15,13 @@ fun ButtonsList(
 ) {
     Column(modifier) {
         for (index in buttons.indices step 2) {
-            Spacer(modifier = Modifier.size(8.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1f, fill = false)
             ) {
                 ModoButton(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxSize(),
+                    modifier = Modifier.weight(1f),
                     text = buttons[index].first
                 ) {
                     buttons[index].second()
@@ -32,9 +29,7 @@ fun ButtonsList(
                 if (index + 1 in buttons.indices) {
                     Spacer(modifier = Modifier.size(8.dp))
                     ModoButton(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxSize(),
+                        modifier = Modifier.weight(1f),
                         text = buttons[index + 1].first
                     ) {
                         buttons[index + 1].second()

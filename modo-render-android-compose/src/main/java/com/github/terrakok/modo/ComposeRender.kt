@@ -42,7 +42,6 @@ class ComposeRendererScope(
  */
 internal class ComposeRenderer(
     private val containerScreen: ContainerScreen<*>,
-    private val exitAction: () -> Unit = {},
     private val getTransitionType: (oldState: NavigationState?, newState: NavigationState?) -> ScreenTransitionType =
         ::defaultCalculateTransitionType
 ) : NavigationRenderer {
@@ -56,15 +55,11 @@ internal class ComposeRenderer(
     private val removedScreens = mutableSetOf<Screen>()
 
     override fun render(state: NavigationState) {
-        if (state is StackNavigationState && state.stack.isEmpty()) {
-            exitAction()
-        } else {
-            lastStackEvent.value = getTransitionType(this.state, state)
-            this.state?.let { currentState ->
-                removedScreens.addAll(calculateRemovedScreens(currentState, state))
-            }
-            this.state = state
+        lastStackEvent.value = getTransitionType(this.state, state)
+        this.state?.let { currentState ->
+            removedScreens.addAll(calculateRemovedScreens(currentState, state))
         }
+        this.state = state
     }
 
     @Composable

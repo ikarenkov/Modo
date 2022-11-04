@@ -33,7 +33,7 @@ abstract class ContainerScreen<State : NavigationState>(
         }
 
     init {
-        renderer = ComposeRenderer(containerScreen = this, exitAction = { })
+        renderer = ComposeRenderer(containerScreen = this)
     }
 
     override fun dispatch(action: NavigationAction) {
