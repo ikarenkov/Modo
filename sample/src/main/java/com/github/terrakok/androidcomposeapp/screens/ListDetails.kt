@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.containers.LocalContainerScreen
 import com.github.terrakok.modo.generateScreenKey
-import com.github.terrakok.modo.forward
+import com.github.terrakok.modo.containers.forward
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

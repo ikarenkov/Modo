@@ -1,4 +1,4 @@
-package com.github.terrakok.androidcomposeapp
+package com.github.terrakok.androidcomposeapp.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -18,16 +18,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.terrakok.androidcomposeapp.ButtonsList
+import com.github.terrakok.androidcomposeapp.ListScreen
+import com.github.terrakok.androidcomposeapp.ModelSampleScreen
+import com.github.terrakok.androidcomposeapp.screens.containers.MultiScreen
+import com.github.terrakok.androidcomposeapp.screens.containers.SampleStackScreen
 import com.github.terrakok.modo.NavigationDispatcher
 import com.github.terrakok.modo.Screen
-import com.github.terrakok.modo.back
-import com.github.terrakok.modo.backTo
 import com.github.terrakok.modo.containers.LocalContainerScreen
-import com.github.terrakok.modo.exit
-import com.github.terrakok.modo.forward
+import com.github.terrakok.modo.containers.back
+import com.github.terrakok.modo.containers.backTo
+import com.github.terrakok.modo.containers.exit
+import com.github.terrakok.modo.containers.forward
+import com.github.terrakok.modo.containers.newStack
+import com.github.terrakok.modo.containers.replace
 import com.github.terrakok.modo.generateScreenKey
-import com.github.terrakok.modo.newStack
-import com.github.terrakok.modo.replace
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -108,11 +113,12 @@ private fun rememberButtons(
         },
         "Back to '3'" to { navigator.backTo(SampleScreen(3)) },
         "Container" to { navigator.forward(SampleStackScreen(i + 1)) },
-        "Multiscreen" to { navigator.forward(SampleMultiScreen()) },
+        "Multiscreen" to { navigator.forward(MultiScreen()) },
         "Exit" to { navigator.exit() },
         "Exit App" to { },
         "List/Details" to { navigator.forward(ListScreen()) },
-        "2 items screen" to { navigator.forward(TwoTopItemsStackScreen(i + 1)) },
+        // Just experiments
+//        "2 items screen" to { navigator.forward(TwoTopItemsStackScreen(i + 1)) },
 //                "Demo" to { navigator.forward(SaveableStateHolderDemoScreen()) },
         "Dialog" to { navigator.forward(SampleDialog(i + 1)) },
         "Model" to { navigator.forward(ModelSampleScreen()) },

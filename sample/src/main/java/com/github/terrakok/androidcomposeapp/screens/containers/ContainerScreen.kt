@@ -1,8 +1,5 @@
-package com.github.terrakok.androidcomposeapp
+package com.github.terrakok.androidcomposeapp.screens.containers
 
-import android.os.Parcel
-import android.os.Parcelable
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -17,32 +14,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.terrakok.androidcomposeapp.SlideTransition
+import com.github.terrakok.androidcomposeapp.screens.SampleScreen
 import com.github.terrakok.modo.NavigationReducer
-import com.github.terrakok.modo.StackNavigationState
-import com.github.terrakok.modo.containers.Stack
-import com.github.terrakok.modo.generateScreenKey
-import com.github.terrakok.modo.back
 import com.github.terrakok.modo.containers.LocalContainerScreen
+import com.github.terrakok.modo.containers.NavigationModel
+import com.github.terrakok.modo.containers.StackNavigationState
+import com.github.terrakok.modo.containers.StackScreen
+import com.github.terrakok.modo.containers.back
+import kotlinx.parcelize.Parcelize
 
-class SampleStackScreen : Stack {
+@Parcelize
+class SampleStackScreen(
+    private val i: Int,
+    private val navigationModel: NavigationModel<StackNavigationState>
+) : StackScreen(navigationModel) {
 
     constructor(
         i: Int,
         sampleNavigationState: StackNavigationState = StackNavigationState(SampleScreen(1))
-    ) : super(sampleNavigationState, generateScreenKey()) {
-        this.i = i
-    }
+    ) : this(i, NavigationModel(sampleNavigationState))
 
-    private constructor(parcel: Parcel) : super(parcel) {
-        i = parcel.readInt()
-    }
-
-    private val i: Int
-
-    override val reducer: NavigationReducer<StackNavigationState>
-        get() = super.reducer
-
-    @OptIn(ExperimentalAnimationApi::class)
     @Composable
     override fun Content() {
         val parent = LocalContainerScreen.current
@@ -69,18 +61,6 @@ class SampleStackScreen : Stack {
                 }
             }
         }
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        super.writeToParcel(parcel, flags)
-        parcel.writeInt(i)
-    }
-
-    companion object CREATOR : Parcelable.Creator<SampleStackScreen> {
-
-        override fun createFromParcel(parcel: Parcel): SampleStackScreen = SampleStackScreen(parcel)
-
-        override fun newArray(size: Int): Array<SampleStackScreen?> = arrayOfNulls(size)
     }
 
 }

@@ -1,6 +1,8 @@
 package com.github.terrakok.modo
 
-interface NavigationState {
+import android.os.Parcelable
+
+interface NavigationState : Parcelable {
     fun getChildScreens(): List<Screen>
 }
 

@@ -6,19 +6,20 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import com.github.terrakok.modo.StackNavigationState
+import com.github.terrakok.androidcomposeapp.screens.SampleScreen
+import com.github.terrakok.androidcomposeapp.screens.containers.SampleStack
 import com.github.terrakok.modo.Modo
-import com.github.terrakok.modo.containers.Stack
-import com.github.terrakok.modo.back
+import com.github.terrakok.modo.containers.StackScreen
+import com.github.terrakok.modo.containers.back
 
 class AppActivity : AppCompatActivity() {
 
-    private lateinit var rootScreen: Stack
+    private lateinit var rootScreen: StackScreen
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        rootScreen = Modo.restoreInstanceIfCan<Stack>(savedInstanceState) {
-            SampleStack(StackNavigationState(SampleScreen(1)))
+        rootScreen = Modo.restoreInstanceIfCan<StackScreen>(savedInstanceState) {
+            SampleStack(SampleScreen(1))
         }
         setContent {
             BackHandler { rootScreen.back() }

@@ -3,7 +3,7 @@ package com.github.terrakok.modo.util
 import android.util.Log
 import com.github.terrakok.modo.MultiNavigation
 import com.github.terrakok.modo.NavigationState
-import com.github.terrakok.modo.StackNavigationState
+import com.github.terrakok.modo.containers.StackNavigationState
 import com.github.terrakok.modo.containers.ContainerScreen
 
 

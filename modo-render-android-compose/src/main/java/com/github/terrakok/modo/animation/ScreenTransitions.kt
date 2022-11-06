@@ -17,7 +17,7 @@ import com.github.terrakok.modo.ComposeRendererScope
 import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.SaveableContent
 import com.github.terrakok.modo.Screen
-import com.github.terrakok.modo.StackNavigationState
+import com.github.terrakok.modo.containers.StackNavigationState
 
 enum class ScreenTransitionType {
     Push,

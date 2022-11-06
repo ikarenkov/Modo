@@ -78,7 +78,6 @@ internal class ComposeRenderer(
             LocalSaveableStateHolder providesDefault stateHolder,
             LocalContainerScreen provides containerScreen
         ) {
-            LocalContainerScreen.current
             ComposeRendererScope(screen, lastStackEvent.value).content()
         }
     }

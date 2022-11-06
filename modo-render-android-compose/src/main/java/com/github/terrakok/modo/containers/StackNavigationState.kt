@@ -1,11 +1,16 @@
-package com.github.terrakok.modo
+package com.github.terrakok.modo.containers
 
 import android.os.Parcelable
+import com.github.terrakok.modo.NavigationAction
+import com.github.terrakok.modo.NavigationDispatcher
+import com.github.terrakok.modo.NavigationReducer
+import com.github.terrakok.modo.NavigationState
+import com.github.terrakok.modo.Screen
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class StackNavigationState(
-    val stack: List<Screen> = emptyList()
+    val stack: List<Screen> = emptyList(),
 ) : NavigationState, Parcelable {
 
     constructor(vararg screensStack: Screen) : this(screensStack.toList())

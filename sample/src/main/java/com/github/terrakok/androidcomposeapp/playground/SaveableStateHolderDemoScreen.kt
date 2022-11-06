@@ -1,4 +1,4 @@
-package com.github.terrakok.androidcomposeapp
+package com.github.terrakok.androidcomposeapp.playground
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

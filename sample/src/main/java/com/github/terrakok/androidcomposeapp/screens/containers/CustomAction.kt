@@ -1,4 +1,4 @@
-package com.github.terrakok.androidcomposeapp
+package com.github.terrakok.androidcomposeapp.screens.containers
 
 import com.github.terrakok.modo.*
 import com.github.terrakok.modo.Screen

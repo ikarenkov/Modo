@@ -1,7 +1,5 @@
-package com.github.terrakok.androidcomposeapp
+package com.github.terrakok.androidcomposeapp.screens.containers
 
-import android.os.Parcel
-import android.os.Parcelable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -20,12 +18,19 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.terrakok.androidcomposeapp.screens.SampleScreen
 import com.github.terrakok.modo.MultiNavigation
+import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.containers.MultiScreen
-import com.github.terrakok.modo.generateScreenKey
+import com.github.terrakok.modo.containers.NavigationModel
 import com.github.terrakok.modo.selectContainer
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
-class SampleMultiScreen : MultiScreen {
+@Parcelize
+class MultiScreen(
+    private val navigationModel: NavigationModel<MultiNavigation>
+) : MultiScreen(navigationModel) {
 
     constructor(
         initialState: MultiNavigation = MultiNavigation(
@@ -36,9 +41,10 @@ class SampleMultiScreen : MultiScreen {
             ),
             selected = 1
         )
-    ) : super(initialState, generateScreenKey())
+    ) : this(NavigationModel(initialState))
 
-    constructor(parcel: Parcel) : super(parcel)
+    @IgnoredOnParcel
+    override val reducer: NavigationReducer<MultiNavigation> = CustomReducer()
 
     @Composable
     override fun Content() {
@@ -107,15 +113,10 @@ class SampleMultiScreen : MultiScreen {
         text = "Tab $tabPos"
     )
 
-    companion object CREATOR : Parcelable.Creator<SampleMultiScreen> {
-        override fun createFromParcel(parcel: Parcel): SampleMultiScreen = SampleMultiScreen(parcel)
-
-        override fun newArray(size: Int): Array<SampleMultiScreen?> = arrayOfNulls(size)
-    }
 }
 
 @Preview
 @Composable
 fun PreviewSampleMultiScreen() {
-    SampleMultiScreen().Content()
+    MultiScreen().Content()
 }
