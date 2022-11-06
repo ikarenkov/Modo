@@ -34,8 +34,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":modo-render-android-compose"))
 
+    implementation(project(":modo-compose"))
     implementation("androidx.core:core-ktx:${properties["version.coreKtx"]}")
     implementation("androidx.appcompat:appcompat:${properties["version.appcompat"]}")
 //    implementation("com.google.android.material:material:${properties["version.material"]}")

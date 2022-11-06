@@ -21,7 +21,7 @@ private fun getNavigationStateString(prefix: String, navigationState: Navigation
                 when (screen) {
                     is ContainerScreen<*> -> buildString {
                         append(prefix)
-//                        append(screen.id)
+                        append(screen.screenKey)
                         appendLine()
                         append(getNavigationStateString("$prefix|  ", screen.navigationState))
                     }
@@ -34,7 +34,7 @@ private fun getNavigationStateString(prefix: String, navigationState: Navigation
         is MultiNavigation -> buildString {
             val screen = navigationState.containers[navigationState.selected]
             append(prefix)
-//            append(screen.id)
+            append(screen.screenKey)
             appendLine()
             append(getNavigationStateString("$prefix|  ", screen.navigationState))
         }

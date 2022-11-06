@@ -9,5 +9,5 @@ pluginManagement {
 rootProject.name = "Modo"
 
 //include(":modo")
-include(":modo-render-android-compose")
+include(":modo-compose")
 include(":sample")
