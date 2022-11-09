@@ -1,5 +1,6 @@
 # Modo
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.terrakok/modo)](https://repo1.maven.org/maven2/com/github/terrakok)
+
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.terrakok/modo-compose)](https://repo1.maven.org/maven2/com/github/terrakok)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Modo is navigation library for Jetpack Compose based on UDF principles for developing Single Activity applications.
@@ -7,247 +8,150 @@ Modo is navigation library for Jetpack Compose based on UDF principles for devel
 <table>
     <tr>
         <td>
-            <img src="https://github.com/terrakok/Modo/raw/master/media/1.gif" width="256"/>
+            <img src="media/modo_base_navigation.gif" width="256"/>
         </td>
         <td>
-            <img src="https://github.com/terrakok/Modo/raw/master/media/2.gif" width="256"/>
+            <img src="media/modo_multiscreen.gif" width="256"/>
         </td>
         <td>
-            <img src="https://github.com/terrakok/Modo/raw/master/media/3.gif" width="256"/>
+            <img src="media/modo_nested_navigation.gif" width="256"/>
         </td>
     </tr>
     <tr>
         <td>
-            Power navigation
+            Basic navigation
         </td>
         <td>
-            Multibackstack
+            MultiScreen navigation
         </td>
         <td>
-            Launch external activities
+            Nested navigation
         </td>
     </tr>
 </table>
 
-```
- Modo                                                  Activity
- +---------------------------------------------+       +----------------------+
- |                                             |       |                      |
- |         +---------------------------------+ |       |                      |
- |         |                                 | |       |                      |
- |         \/          +-----------------+   | |       |                      |
- |  NavigationState--->|                 |   | |       |  +----------------+  |
- |                     |NavigationReducer|---+-|-------|->|NavigationRender|  |
- |             +------>|                 |     |       |  +----------------+  |
- |             |       +-----------------+     |       |                      |
- +---------------------------------------------+       +----------------------+
-               |                                                   |
-               |       +----------------+                          |
-               +-------|NavigationAction|<-------------------------+
-                       +----------------+
-```
+## The Main idea
 
-## Main idea
-There is `NavigationState` which can be used for busines logic. **You can read and write current navigation stack** and UI render has to apply your changes. But here can be some limitations e.g. render based on FragmentManager can hadle changes like this `A-B-C -> A-D-C` other way you expect. In this case B and C screens will be droped and Fragment manager will add new D and C screens.
+* `NavigationState` defines UI
+* UDF Navigation
+* There are Screen and ContainerScreen
+    * ContainerScreen can contains nad render child screens
+    * There are several build in implementation of ContainerScreen like StackScreen and MultiScreen
+* Whole navigation is Graph
+* `NavigationState` can be changed by only by `dispatch(action)`
+* You can easily extent existed commands by creating custom Actions and Reducers 
 
-## Download
-```kotlin
-plugins {
-  //...
-  //for serialization screens
-  id("kotlin-parcelize")
-}
+![](media/modo_udf.png)
 
-dependencies {
-  //...
-  //modo core
-  implementation("com.github.terrakok:modo:${latest_version}")
-  //for navigation based on FragmentManager
-  implementation("com.github.terrakok:modo-render-android-fm:${latest_version}")
-}
-```
+# Quick start
 
-## Usage
-1) Init Modo instance:
-```kotlin
-class App : Application() {
-    val modo = Modo(AppReducer(this))
-}
-```
+The best way to lear the library is discovering sample application. You can add Modo into your project doing folowing steps
 
-2) Describe your screens:
-```kotlin
-object Screens {
-  @Parcelize
-  class Start : AppScreen("Start") {
-    override fun create() = StartFragment()
-  }
-
-  fun Browser(url: String) = ExternalScreen {
-    Intent(Intent.ACTION_VIEW, Uri.parse(url))
-  }
-}
-```
-
-3) Setup your application activity:
-```kotlin
-class MainActivity : AppCompatActivity() {
-  private val modo = App.INSTANCE.modo
-
-  //must be lazy otherwise initialization fails with early access to fragment manager
-  private val modoRender by lazy { ModoRender(this, R.id.container) }
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
-    modo.init(savedInstanceState, Screens.Start())
-  }
-
-  override fun onResume() {
-    super.onResume()
-    modo.render = modoRender
-  }
-
-  override fun onPause() {
-    modo.render = null
-    super.onPause()
-  }
-
-  override fun onSaveInstanceState(outState: Bundle) {
-    super.onSaveInstanceState(outState)
-    //add this if you want to restore app after process death
-    modo.saveState(outState)
-  }
-}
-```
-
-4) Use Modo for navigation:
-See [CommandsFragment.kt](https://github.com/terrakok/Modo/blob/master/sample-android-fm/src/main/java/com/github/terrakok/modo/androidApp/fragment/CommandsFragment.kt)
-for additional examples.
-```kotlin
-modo.forward(screen) //navigate to next screen
-modo.replace(screen) //replace current screen
-modo.newStack(screen) //replace current screen stack
-modo.backTo(screenId) //back to screen in current stack if exist
-modo.back() //back to previous
-modo.exit() //exit from activity
-```
-
-## Multistack navigation
-Modo gives you multistack support out-of-the-box!
-
-1) Use `MultiReducer` for initialization
-```kotlin
-modo = Modo(AppReducer(this, MultiReducer()))
-```
-
-2) Add multistack screen:
-```kotlin
-object Screens {
-  @Parcelize
-  class Start : AppScreen("Start") {
-    override fun create() = StartFragment()
-  }
-
-  @Parcelize
-  class MyScreen : AppScreen("MyScreen") {
-    override fun create() = MyFragment()
-  }
-  //other screens...
-
-  fun MultiStack() = MultiAppScreen(
-    "MultiStack", //some id
-    listOf(Start(), MyScreen()), //root screens in tabs
-    1 //selected tab by default
-  )
-}
-```
-
-3) Describe how tab view will be look:
-```kotlin
-class MyMultiStackFragment : MultiStackFragmentImpl() {
-  override fun createTabView(index: Int, parent: LinearLayout): View =
-    LayoutInflater.from(context)
-      .inflate(R.layout.layout_tab, parent, false)
-
-  // optional
-  override fun decorTabContainer(view: LinearLayout) {
-    // customize tab container
-    // view.elevation = 8.dpToPx()
-  }
-}
-```
-
-4) Put it in your render:
-```kotlin
-private val modoRender by lazy {
-  object : ModoRender(this@AppActivity, R.id.container) {
-    override fun createMultiStackFragment() = MyMultiStackFragment()
-  }
-}
-```
-
-5) Just use new available commands!
-See [TabFragment.kt](https://github.com/terrakok/Modo/blob/master/sample-android-fm/src/main/java/com/github/terrakok/modo/androidApp/fragment/TabFragment.kt)
-for additional examples.
-```kotlin
-modo.externalForward(Screens.Start()) //open new screen above tabs
-modo.selectStack(1) //change tab
-modo.backToTabRoot() //return on tab root
-```
-
-## Debug
-You can use `LogReducer` for logging navigation state changes
-```kotlin
-Modo(
-  if (BuildConfig.DEBUG) LogReducer(AppReducer(this@App))
-  else AppReducer(this@App)
-)
-```
-Logcat (from sample application):
-```
-D/Modo: Activity first launch
-D/Modo: New action=com.github.terrakok.modo.Forward@9d0f15d
-D/Modo: New state=NavigationState(chain=[[1]])
-```
-
-## Samples
-Base features are showed in sample app: [sample-android-fm](https://github.com/terrakok/Modo/tree/master/sample-android-fm)
-
-## Extending ModoRender
-```kotlin
-private val modoRender by lazy {
-  object : ModoRender(this@MainActivity, R.id.container) {
-    override fun pop(count: Int) {
-      hideKeyboard()
-      super.pop(count)
+1. Add gradle dependency. In your `build.gradle.kts`
+    ```kotlin
+    plugins {
+        //...
+        //for serialization screens
+        id("kotlin-parcelize")
     }
-
-    override fun push(screens: List<Screen>) {
-      hideKeyboard()
-      super.push(screens)
+    
+    dependencies {
+        implementation("com.github.terrakok:modo-compose:${latest_version}")
     }
-
-    override fun setupTransaction(
-      fragmentManager: FragmentManager,
-      transaction: FragmentTransaction,
-      screen: AppScreen,
-      newFragment: Fragment
-    ) {
-      //e.g. setup your animation
+    ```
+2. Create your own stack screen
+    ```kotlin
+    @Parcelize
+    class SampleStack(
+        private val stackNavModel: StackNavModel
+    ) : StackScreen(stackNavModel) {
+    
+        constructor(rootScreen: Screen) : this(StackNavModel(rootScreen))
+    
+        @Composable
+        override fun Content() {
+            TopScreenContent {
+                SlideTransition()
+            }
+        }
     }
-  }
-}
+    ```
+3. Create simple screen
+    ```kotlin
+    @Parcelize
+    class SampleScreen(
+        override val screenKey: ScreenKey = generateScreenKey()
+    ) : Screen {
+    
+        @Composable
+        override fun Content() {
+            Text(text = "Hello world", modifier = Modifier.fillMaxSize())
+        }
+    }
+    ```
+4. Integrate screen with your
+   1. For Activity
+      ```kotlin
+      class AppActivity : AppCompatActivity() {
 
-fun Activity.hideKeyboard() {
-  currentFocus?.apply {
-    val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    inputManager.hideSoftInputFromWindow(windowToken, 0)
-  }
-}
-```
+        private var rootScreen: StackScreen? = null
 
-## License
+        override fun onCreate(savedInstanceState: Bundle?) {
+             super.onCreate(savedInstanceState)
+            rootScreen = Modo.init(savedInstanceState, rootScreen) {
+                  SampleStack(SampleScreen(1))
+            }
+            setContent {
+                  Surface(color = MaterialTheme.colors.background) {
+                      rootScreen?.Content()
+                  }
+              }
+          }
+
+          override fun onSaveInstanceState(outState: Bundle) {
+              Modo.save(outState, rootScreen)
+            super.onSaveInstanceState(outState)
+          }
+
+      }
+      ```
+   2. For Fragment
+      ```kotlin
+      internal class ModoRootFragment : Fragment() {
+
+          private var rootScreen: ModoStackScreen? = null
+
+          override fun onCreate(savedInstanceState: Bundle?) {
+              super.onCreate(savedInstanceState)
+              rootScreen = Modo.init(savedInstanceState, rootScreen) { ModoStackScreen() }
+          }
+
+          override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+              ComposeView(requireContext()).apply {
+                  setContent {
+                      rootScreen?.Content()
+                  }
+              }
+
+          override fun onSaveInstanceState(outState: Bundle) {
+              super.onSaveInstanceState(outState)
+              Modo.save(outState, rootScreen)
+          }
+
+      }
+      ```
+
+    
+
+# BuildIn Container Screens
+You can implement container screen by your own, but Modo provides several default containers
+1. [StackScreen](modo-compose/src/main/java/com/github/terrakok/modo/stack) - stack navigation implementation ![](media/modo_base_navigation.gif)
+2. [Multiscreen](modo-compose/src/main/java/com/github/terrakok/modo/multiscreen) - multiscreen navigation ![](media/modo_multiscreen.gif)
+
+Check out sample for more.
+
+# License
+
 ```
 MIT License
 

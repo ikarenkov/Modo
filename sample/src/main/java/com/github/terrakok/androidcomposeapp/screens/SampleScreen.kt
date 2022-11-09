@@ -95,7 +95,7 @@ internal fun SampleContent(
 private fun rememberButtons(
     navigator: NavigationContainer<StackState>,
     i: Int
-) = remember {
+): List<Pair<String, () -> Unit>> = remember {
     listOf(
         "Forward" to { navigator.forward(SampleScreen(i + 1)) },
         "Back" to { navigator.back() },
@@ -121,7 +121,11 @@ private fun rememberButtons(
                 navigator.forward(SampleScreen(i + 1))
             }
         },
-        "Back to '3'" to { navigator.backTo(SampleScreen(3)) },
+        "Back to '3'" to {
+            navigator.navigationState.stack.getOrNull(2)?.let {
+                navigator.backTo(it)
+            }
+        },
         "Container" to { navigator.forward(SampleStackScreen(i + 1)) },
         "Multiscreen" to { navigator.forward(SampleMultiScreen()) },
         "List/Details" to { navigator.forward(ListScreen()) },
