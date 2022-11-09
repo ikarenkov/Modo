@@ -76,7 +76,7 @@ public object ScreenModelStore {
 
     private fun Map<String, *>.onEach(screen: Screen, block: (String) -> Unit) =
         asSequence()
-            .filter { it.key.startsWith(screen.screenKey) }
+            .filter { it.key.startsWith(screen.screenKey.value) }
             .map { it.key }
             .forEach(block)
 }

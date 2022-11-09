@@ -1,4 +1,4 @@
-package com.github.terrakok.modo
+package com.github.terrakok.modo.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal

@@ -21,18 +21,21 @@ import androidx.compose.ui.unit.dp
 import com.github.terrakok.androidcomposeapp.ButtonsList
 import com.github.terrakok.androidcomposeapp.ListScreen
 import com.github.terrakok.androidcomposeapp.ModelSampleScreen
-import com.github.terrakok.androidcomposeapp.screens.containers.MultiScreen
+import com.github.terrakok.androidcomposeapp.screens.containers.SampleMultiScreen
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleStackScreen
-import com.github.terrakok.modo.NavigationDispatcher
+import com.github.terrakok.modo.LocalContainerScreen
+import com.github.terrakok.modo.NavigationContainer
 import com.github.terrakok.modo.Screen
-import com.github.terrakok.modo.containers.LocalContainerScreen
-import com.github.terrakok.modo.containers.back
-import com.github.terrakok.modo.containers.backTo
-import com.github.terrakok.modo.containers.exit
-import com.github.terrakok.modo.containers.forward
-import com.github.terrakok.modo.containers.newStack
-import com.github.terrakok.modo.containers.replace
+import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
+import com.github.terrakok.modo.stack.StackScreen
+import com.github.terrakok.modo.stack.StackState
+import com.github.terrakok.modo.stack.back
+import com.github.terrakok.modo.stack.backTo
+import com.github.terrakok.modo.stack.exit
+import com.github.terrakok.modo.stack.forward
+import com.github.terrakok.modo.stack.newStack
+import com.github.terrakok.modo.stack.replace
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -42,18 +45,18 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 class SampleScreen(
     private val i: Int,
-    override val screenKey: String = generateScreenKey()
+    override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
 
     @Composable
     override fun Content() {
         val parent = LocalContainerScreen.current
-        SampleContent(i, parent)
+        SampleContent(i, parent as StackScreen)
     }
 }
 
 @Composable
-internal fun SampleContent(i: Int, navigator: NavigationDispatcher) {
+internal fun SampleContent(i: Int, navigator: NavigationContainer<StackState>) {
     var counter by rememberSaveable { mutableStateOf(0) }
     LaunchedEffect(key1 = Unit) {
         while (isActive) {
@@ -83,7 +86,7 @@ internal fun SampleContent(i: Int, navigator: NavigationDispatcher) {
 
 @Composable
 private fun rememberButtons(
-    navigator: NavigationDispatcher,
+    navigator: NavigationContainer<StackState>,
     i: Int
 ) = remember {
     listOf(
@@ -113,7 +116,7 @@ private fun rememberButtons(
         },
         "Back to '3'" to { navigator.backTo(SampleScreen(3)) },
         "Container" to { navigator.forward(SampleStackScreen(i + 1)) },
-        "Multiscreen" to { navigator.forward(MultiScreen()) },
+        "Multiscreen" to { navigator.forward(SampleMultiScreen()) },
         "Exit" to { navigator.exit() },
         "Exit App" to { },
         "List/Details" to { navigator.forward(ListScreen()) },
@@ -123,10 +126,4 @@ private fun rememberButtons(
         "Dialog" to { navigator.forward(SampleDialog(i + 1)) },
         "Model" to { navigator.forward(ModelSampleScreen()) },
     )
-}
-
-@Preview
-@Composable
-fun PreviewSampleContent() {
-    SampleContent(0) {}
 }

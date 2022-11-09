@@ -14,23 +14,14 @@ import androidx.compose.animation.with
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.github.terrakok.modo.ComposeRendererScope
-import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.SaveableContent
 import com.github.terrakok.modo.Screen
-import com.github.terrakok.modo.containers.StackNavigationState
-
-enum class ScreenTransitionType {
-    Push,
-    Replace,
-    Pop,
-    Idle
-}
 
 typealias ScreenTransitionContent = @Composable AnimatedVisibilityScope.(Screen) -> Unit
 
 @ExperimentalAnimationApi
 @Composable
-fun ComposeRendererScope.ScreenTransition(
+fun ComposeRendererScope<*>.ScreenTransition(
     modifier: Modifier = Modifier,
     transitionSpec: AnimatedContentScope<Screen>.() -> ContentTransform = {
         fadeIn(animationSpec = tween(220, delayMillis = 90)) +
@@ -47,18 +38,3 @@ fun ComposeRendererScope.ScreenTransition(
         content = content
     )
 }
-
-fun defaultCalculateTransitionType(oldScreensState: NavigationState?, newScreensState: NavigationState?): ScreenTransitionType =
-    if (oldScreensState is StackNavigationState && newScreensState is StackNavigationState) {
-        val oldStack = oldScreensState.stack
-        val newStack = newScreensState.stack
-        when {
-            oldStack.lastOrNull() == newStack.lastOrNull() || oldStack.isEmpty() -> ScreenTransitionType.Idle
-            newStack.lastOrNull() in oldStack -> ScreenTransitionType.Pop
-            oldStack.lastOrNull() in newStack -> ScreenTransitionType.Push
-            else -> ScreenTransitionType.Replace
-        }
-    } else {
-        // TODO: support animation for different type of navigation states
-        ScreenTransitionType.Idle
-    }

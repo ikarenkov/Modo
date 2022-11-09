@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import com.github.terrakok.modo.Screen
+import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.model.ScreenModel
 import com.github.terrakok.modo.model.coroutineScope
@@ -18,7 +19,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class ModelSampleScreen(
-    override val screenKey: String = generateScreenKey()
+    override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
 
     @Composable

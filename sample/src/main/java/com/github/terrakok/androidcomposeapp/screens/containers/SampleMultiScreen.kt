@@ -19,32 +19,28 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.androidcomposeapp.screens.SampleScreen
-import com.github.terrakok.modo.MultiNavigation
 import com.github.terrakok.modo.NavigationReducer
-import com.github.terrakok.modo.containers.MultiScreen
-import com.github.terrakok.modo.containers.NavigationModel
-import com.github.terrakok.modo.selectContainer
+import com.github.terrakok.modo.multiscreen.MultiScreen
+import com.github.terrakok.modo.multiscreen.MultiScreenNavModel
+import com.github.terrakok.modo.multiscreen.MultiScreenState
+import com.github.terrakok.modo.multiscreen.selectContainer
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class MultiScreen(
-    private val navigationModel: NavigationModel<MultiNavigation>
-) : MultiScreen(navigationModel) {
-
-    constructor(
-        initialState: MultiNavigation = MultiNavigation(
-            containers = listOf(
-                SampleStack(SampleScreen(1)),
-                SampleStack(SampleScreen(2)),
-                SampleStack(SampleScreen(3)),
-            ),
-            selected = 1
-        )
-    ) : this(NavigationModel(initialState))
+class SampleMultiScreen(
+    private val navModel: MultiScreenNavModel = MultiScreenNavModel(
+        containers = listOf(
+            SampleStack(SampleScreen(1)),
+            SampleStack(SampleScreen(2)),
+            SampleStack(SampleScreen(3)),
+        ),
+        selected = 1
+    )
+) : MultiScreen(navModel) {
 
     @IgnoredOnParcel
-    override val reducer: NavigationReducer<MultiNavigation> = CustomReducer()
+    override val reducer: NavigationReducer<MultiScreenState> = CustomReducer()
 
     @Composable
     override fun Content() {
@@ -118,5 +114,5 @@ class MultiScreen(
 @Preview
 @Composable
 fun PreviewSampleMultiScreen() {
-    MultiScreen().Content()
+    SampleMultiScreen().Content()
 }

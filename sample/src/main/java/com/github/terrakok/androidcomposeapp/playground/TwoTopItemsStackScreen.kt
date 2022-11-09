@@ -19,19 +19,19 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.androidcomposeapp.screens.SampleScreen
-import com.github.terrakok.modo.containers.NavigationModel
-import com.github.terrakok.modo.containers.StackNavigationState
-import com.github.terrakok.modo.containers.StackScreen
-import com.github.terrakok.modo.containers.back
+import com.github.terrakok.modo.NavModel
+import com.github.terrakok.modo.stack.StackNavModel
+import com.github.terrakok.modo.stack.StackScreen
+import com.github.terrakok.modo.stack.StackState
+import com.github.terrakok.modo.stack.back
 import kotlinx.parcelize.Parcelize
 
 // Doesn't work correctly because of bug
 @Parcelize
 class TwoTopItemsStackScreen(
     private val i: Int,
-    private val navigationModel: NavigationModel<StackNavigationState> =
-        NavigationModel(StackNavigationState(SampleScreen(i + 1)))
-) : StackScreen(navigationModel) {
+    private val navModel: StackNavModel = StackNavModel(SampleScreen(i + 1))
+) : StackScreen(navModel) {
 
     @Composable
     override fun Content() {

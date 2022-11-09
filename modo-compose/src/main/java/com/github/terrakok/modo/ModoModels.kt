@@ -12,10 +12,12 @@ interface NavigationReducer<State : NavigationState> {
     fun reduce(action: NavigationAction, state: State): State
 }
 
-fun interface NavigationDispatcher {
+interface NavigationContainer<State : NavigationState> {
+    val navigationState: State
+
     fun dispatch(action: NavigationAction)
 }
 
-interface NavigationRenderer {
-    fun render(state: NavigationState)
+interface NavigationRenderer<State : NavigationState> {
+    fun render(state: State)
 }

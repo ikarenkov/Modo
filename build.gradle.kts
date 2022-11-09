@@ -14,7 +14,7 @@ buildscript {
 
 allprojects {
     group = "com.github.terrakok"
-    version = "0.6.4"
+    version = "0.7.0"
 
     repositories {
         google()
@@ -34,7 +34,7 @@ allprojects {
 
                 pom {
                     name.set("Modo")
-                    description.set("Navigation library based on UDF principles")
+                    description.set("Navigation library for Jetpack Compose based on UDF principles")
                     url.set("https://github.com/terrakok/Modo")
 
                     licenses {
@@ -44,6 +44,11 @@ allprojects {
                         }
                     }
                     developers {
+                        developer {
+                            id.set("ikarenkov")
+                            name.set("Igor Karenkov")
+                            email.set("karenkovigor@gmail.com")
+                        }
                         developer {
                             id.set("terrakok")
                             name.set("Konstantin Tskhovrebov")

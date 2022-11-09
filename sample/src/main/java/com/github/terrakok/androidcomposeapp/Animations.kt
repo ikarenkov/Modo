@@ -10,18 +10,21 @@ import androidx.compose.animation.with
 import androidx.compose.runtime.Composable
 import com.github.terrakok.modo.ComposeRendererScope
 import com.github.terrakok.modo.animation.ScreenTransition
-import com.github.terrakok.modo.animation.ScreenTransitionType
+import com.github.terrakok.modo.animation.StackTransitionType
+import com.github.terrakok.modo.animation.calculateStackTransitionType
+import com.github.terrakok.modo.stack.StackState
 
 @Composable
 @OptIn(ExperimentalAnimationApi::class)
-fun ComposeRendererScope.SlideTransition() {
+fun ComposeRendererScope<StackState>.SlideTransition() {
     ScreenTransition(
         transitionSpec = {
-            if (transitionType == ScreenTransitionType.Replace) {
+            val transitionType = calculateStackTransitionType(oldState, newState)
+            if (transitionType == StackTransitionType.Replace) {
                 scaleIn(initialScale = 2f) + fadeIn() with fadeOut()
             } else {
                 val (initialOffset, targetOffset) = when (transitionType) {
-                    ScreenTransitionType.Pop -> ({ size: Int -> -size }) to ({ size: Int -> size })
+                    StackTransitionType.Pop -> ({ size: Int -> -size }) to ({ size: Int -> size })
                     else -> ({ size: Int -> size }) to ({ size: Int -> -size })
                 }
                 slideInHorizontally(initialOffsetX = initialOffset) with

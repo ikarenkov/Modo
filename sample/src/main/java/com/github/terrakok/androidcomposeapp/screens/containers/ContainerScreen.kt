@@ -16,28 +16,28 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.androidcomposeapp.SlideTransition
 import com.github.terrakok.androidcomposeapp.screens.SampleScreen
-import com.github.terrakok.modo.NavigationReducer
-import com.github.terrakok.modo.containers.LocalContainerScreen
-import com.github.terrakok.modo.containers.NavigationModel
-import com.github.terrakok.modo.containers.StackNavigationState
-import com.github.terrakok.modo.containers.StackScreen
-import com.github.terrakok.modo.containers.back
+import com.github.terrakok.modo.LocalContainerScreen
+import com.github.terrakok.modo.NavModel
+import com.github.terrakok.modo.stack.StackNavModel
+import com.github.terrakok.modo.stack.StackScreen
+import com.github.terrakok.modo.stack.StackState
+import com.github.terrakok.modo.stack.back
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class SampleStackScreen(
     private val i: Int,
-    private val navigationModel: NavigationModel<StackNavigationState>
-) : StackScreen(navigationModel) {
+    private val navModel: StackNavModel
+) : StackScreen(navModel) {
 
     constructor(
         i: Int,
-        sampleNavigationState: StackNavigationState = StackNavigationState(SampleScreen(1))
-    ) : this(i, NavigationModel(sampleNavigationState))
+        sampleNavigationState: StackState = StackState(SampleScreen(1))
+    ) : this(i, NavModel(sampleNavigationState))
 
     @Composable
     override fun Content() {
-        val parent = LocalContainerScreen.current
+        val parent = LocalContainerScreen.current as StackScreen
         Column(modifier = Modifier.fillMaxSize()) {
             Row(modifier = Modifier.padding(2.dp)) {
                 Text("Container $i")

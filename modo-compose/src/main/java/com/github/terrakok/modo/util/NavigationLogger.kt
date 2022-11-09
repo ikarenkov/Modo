@@ -1,10 +1,10 @@
 package com.github.terrakok.modo.util
 
 import android.util.Log
-import com.github.terrakok.modo.MultiNavigation
+import com.github.terrakok.modo.multiscreen.MultiScreenState
 import com.github.terrakok.modo.NavigationState
-import com.github.terrakok.modo.containers.StackNavigationState
-import com.github.terrakok.modo.containers.ContainerScreen
+import com.github.terrakok.modo.stack.StackState
+import com.github.terrakok.modo.ContainerScreen
 
 
 fun NavigationState?.print(): String =
@@ -16,7 +16,7 @@ fun NavigationState?.print(): String =
 
 private fun getNavigationStateString(prefix: String, navigationState: NavigationState): String =
     when (navigationState) {
-        is StackNavigationState -> {
+        is StackState -> {
             navigationState.stack.map { screen ->
                 when (screen) {
                     is ContainerScreen<*> -> buildString {
@@ -31,7 +31,7 @@ private fun getNavigationStateString(prefix: String, navigationState: Navigation
                 }
             }.joinToString(separator = "")
         }
-        is MultiNavigation -> buildString {
+        is MultiScreenState -> buildString {
             val screen = navigationState.containers[navigationState.selected]
             append(prefix)
             append(screen.screenKey)

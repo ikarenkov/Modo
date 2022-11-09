@@ -16,19 +16,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.Screen
-import com.github.terrakok.modo.containers.LocalContainerScreen
+import com.github.terrakok.modo.ScreenKey
+import com.github.terrakok.modo.LocalContainerScreen
+import com.github.terrakok.modo.stack.forward
 import com.github.terrakok.modo.generateScreenKey
-import com.github.terrakok.modo.containers.forward
+import com.github.terrakok.modo.stack.StackScreen
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class ListScreen(
-    override val screenKey: String = generateScreenKey()
+    override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
 
     @Composable
     override fun Content() {
-        val conScreen = LocalContainerScreen.current
+        val conScreen = LocalContainerScreen.current as StackScreen
         Box(Modifier.fillMaxSize()) {
             val lazyColumnState = rememberSaveable(saver = LazyListState.Saver) {
                 LazyListState(
@@ -55,7 +57,7 @@ class ListScreen(
 @Parcelize
 class DetailsScreen(
     private val userId: String,
-    override val screenKey: String = generateScreenKey()
+    override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
 
     @Composable
