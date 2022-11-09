@@ -145,8 +145,11 @@ The best way to lear the library is discovering sample application. You can add 
 
 # BuildIn Container Screens
 You can implement container screen by your own, but Modo provides several default containers
-1. [StackScreen](modo-compose/src/main/java/com/github/terrakok/modo/stack) - stack navigation implementation ![](media/modo_base_navigation.gif)
-2. [Multiscreen](modo-compose/src/main/java/com/github/terrakok/modo/multiscreen) - multiscreen navigation ![](media/modo_multiscreen.gif)
+1. [StackScreen](modo-compose/src/main/java/com/github/terrakok/modo/stack) - stack navigation implementation 
+ <img src="media/modo_base_navigation.gif" width=200 />
+
+2. [Multiscreen](modo-compose/src/main/java/com/github/terrakok/modo/multiscreen) - multiscreen navigation
+ <img src="media/modo_multiscreen.gif" width=200 />
 
 Check out sample for more.
 
