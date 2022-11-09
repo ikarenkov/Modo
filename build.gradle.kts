@@ -8,13 +8,13 @@ buildscript {
     }
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${properties["version.kotlin"]}")
-        classpath("com.android.tools.build:gradle:7.1.1")
+        classpath("com.android.tools.build:gradle:7.1.3")
     }
 }
 
 allprojects {
     group = "com.github.terrakok"
-    version = "0.6.4"
+    version = "0.7.0"
 
     repositories {
         google()
@@ -34,7 +34,7 @@ allprojects {
 
                 pom {
                     name.set("Modo")
-                    description.set("Navigation library based on UDF principles")
+                    description.set("Navigation library for Jetpack Compose based on UDF principles")
                     url.set("https://github.com/terrakok/Modo")
 
                     licenses {
@@ -44,6 +44,11 @@ allprojects {
                         }
                     }
                     developers {
+                        developer {
+                            id.set("ikarenkov")
+                            name.set("Igor Karenkov")
+                            email.set("karenkovigor@gmail.com")
+                        }
                         developer {
                             id.set("terrakok")
                             name.set("Konstantin Tskhovrebov")
