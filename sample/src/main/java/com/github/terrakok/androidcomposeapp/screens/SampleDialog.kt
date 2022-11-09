@@ -10,8 +10,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
-import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.LocalContainerScreen
+import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.stack.StackScreen
 import kotlinx.parcelize.Parcelize
@@ -28,9 +28,9 @@ class SampleDialog(
         Box(
             Modifier
                 .clip(RoundedCornerShape(16.dp))
-                .background(Color.Cyan)
+                .background(Color.White)
         ) {
-            SampleContent(i, LocalContainerScreen.current as StackScreen)
+            SampleContent(i, LocalContainerScreen.current as StackScreen, isDialog = true)
         }
     }
 }

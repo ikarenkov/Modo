@@ -2,7 +2,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.terrakok/modo)](https://repo1.maven.org/maven2/com/github/terrakok)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Modo is navigation library based on UDF principles for developing Single Activity applications.
+Modo is navigation library for Jetpack Compose based on UDF principles for developing Single Activity applications.
 
 <table>
     <tr>

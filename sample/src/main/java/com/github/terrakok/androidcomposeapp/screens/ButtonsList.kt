@@ -1,6 +1,11 @@
 package com.github.terrakok.androidcomposeapp
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -26,14 +31,16 @@ fun ButtonsList(
                 ) {
                     buttons[index].second()
                 }
+                Spacer(modifier = Modifier.size(8.dp))
                 if (index + 1 in buttons.indices) {
-                    Spacer(modifier = Modifier.size(8.dp))
                     ModoButton(
                         modifier = Modifier.weight(1f),
                         text = buttons[index + 1].first
                     ) {
                         buttons[index + 1].second()
                     }
+                } else {
+                    Box(modifier = Modifier.weight(1f))
                 }
             }
         }

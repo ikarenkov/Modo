@@ -39,20 +39,22 @@ abstract class StackScreen(
     protected fun TopScreenContent(
         content: RendererContent<StackState> = defaultRendererContent
     ) {
-        val screensToRender: Pair<Screen, DialogScreen?> by remember {
+        val screensToRender: Pair<Screen?, DialogScreen?> by remember {
             derivedStateOf {
                 val stack = navigationState.stack
-                val topScreen = stack.last()
+                val topScreen = stack.lastOrNull()
                 if (topScreen is DialogScreen) {
                     val screen = stack.findLast { it !is DialogScreen }!!
                     screen to topScreen
                 } else {
-                    stack.last() to null
+                    topScreen to null
                 }
             }
         }
         val (screen, dialog) = screensToRender
-        Content(screen, content)
+        if (screen != null) {
+            Content(screen, content)
+        }
         if (dialog != null) {
             Dialog(
                 onDismissRequest = { back() },
