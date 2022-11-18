@@ -39,6 +39,12 @@ dependencies {
     // For BackHandler
     implementation("androidx.activity:activity-compose:${properties["version.composeActivity"]}")
     implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:${properties["version.kotlin"]}")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
+}
+
+tasks.withType(Test::class) {
+    useJUnitPlatform()
 }
 
 val sourceJar by tasks.registering(Jar::class) {

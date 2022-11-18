@@ -25,7 +25,7 @@ public object ScreenModelStore {
 
     @PublishedApi
     internal inline fun <reified T : ScreenModel> getKey(screen: Screen, tag: String?): ScreenModelKey =
-        "${screen.screenKey}:${T::class.qualifiedName}:${tag ?: "default"}"
+        "${screen.screenKey.value}:${T::class.qualifiedName}:${tag ?: "default"}"
 
     @PublishedApi
     internal fun getDependencyKey(screenModel: ScreenModel, name: String): DependencyKey =
