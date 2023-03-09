@@ -10,7 +10,6 @@ import androidx.compose.ui.window.Dialog
 import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
-import com.github.terrakok.modo.NavModel
 import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.RendererContent
 import com.github.terrakok.modo.Screen

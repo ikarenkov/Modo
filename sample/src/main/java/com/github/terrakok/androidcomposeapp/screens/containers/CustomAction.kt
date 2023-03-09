@@ -1,6 +1,7 @@
 package com.github.terrakok.androidcomposeapp.screens.containers
 
-import com.github.terrakok.modo.*
+import com.github.terrakok.modo.NavigationAction
+import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.multiscreen.MultiReducer
 import com.github.terrakok.modo.multiscreen.MultiScreenState

@@ -1,11 +1,10 @@
 package com.github.terrakok.modo.util
 
 import android.util.Log
-import com.github.terrakok.modo.multiscreen.MultiScreenState
-import com.github.terrakok.modo.NavigationState
-import com.github.terrakok.modo.stack.StackState
 import com.github.terrakok.modo.ContainerScreen
-
+import com.github.terrakok.modo.NavigationState
+import com.github.terrakok.modo.multiscreen.MultiScreenState
+import com.github.terrakok.modo.stack.StackState
 
 fun NavigationState?.print(): String =
     if (this == null) {

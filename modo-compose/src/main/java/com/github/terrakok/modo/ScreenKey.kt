@@ -19,7 +19,7 @@ internal fun restoreScreenCounter(value: Int) {
     } else {
         Log.w(
             "Modo", "Trying to restore screen count, when screen count is $screenCounterKey != 0. " +
-                "You must only call restoreScreenKey when screenCount == 0."
+            "You must only call restoreScreenKey when screenCount == 0."
         )
     }
 }

@@ -19,10 +19,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.androidcomposeapp.screens.SampleScreen
-import com.github.terrakok.modo.NavModel
 import com.github.terrakok.modo.stack.StackNavModel
 import com.github.terrakok.modo.stack.StackScreen
-import com.github.terrakok.modo.stack.StackState
 import com.github.terrakok.modo.stack.back
 import kotlinx.parcelize.Parcelize
 
