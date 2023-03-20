@@ -2,7 +2,6 @@ package com.github.terrakok.modo.multiscreen
 
 import androidx.compose.runtime.Composable
 import com.github.terrakok.modo.ContainerScreen
-import com.github.terrakok.modo.NavModel
 import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.RendererContent
 import com.github.terrakok.modo.Screen

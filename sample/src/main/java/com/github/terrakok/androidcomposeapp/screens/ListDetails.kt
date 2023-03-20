@@ -15,12 +15,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
-import com.github.terrakok.modo.LocalContainerScreen
-import com.github.terrakok.modo.stack.forward
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.stack.StackScreen
+import com.github.terrakok.modo.stack.forward
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

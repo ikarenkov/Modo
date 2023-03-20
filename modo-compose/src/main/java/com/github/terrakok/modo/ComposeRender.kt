@@ -26,7 +26,7 @@ fun Screen.SaveableContent() {
     }
 }
 
-class ComposeRendererScope<State: NavigationState>(
+class ComposeRendererScope<State : NavigationState>(
     val oldState: State?,
     val newState: State?,
     val screen: Screen,
@@ -37,7 +37,7 @@ class ComposeRendererScope<State: NavigationState>(
  *  1. Rendering - wrapping state to composable state and delegating rendering to screens
  *  2. Storing and clearing composable states inside [SaveableStateHolder]
  */
-internal class ComposeRenderer<State: NavigationState>(
+internal class ComposeRenderer<State : NavigationState>(
     private val containerScreen: ContainerScreen<*>,
 ) : NavigationRenderer<State> {
 
