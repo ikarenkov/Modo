@@ -62,6 +62,23 @@ public object ScreenModelStore {
             .first as T
     }
 
+    public inline fun <reified T : Any> getOrPutDependency(
+        screen: Screen,
+        name: String,
+        tag: String? = null,
+        noinline onDispose: @DisallowComposableCalls (T) -> Unit = {},
+        noinline factory: @DisallowComposableCalls (DependencyKey) -> T
+    ): T {
+        val key = getDependencyKey(screen, name, tag)
+
+        return dependencies
+            .getOrPut(key) { (factory(key) to onDispose) as Dependency }
+            .first as T
+    }
+
+    fun getDependencyKey(screen: Screen, name: String, tag: String? = null) =
+        "${screen.screenKey.value}:$name${if (tag != null) ":$tag" else ""}"
+
     public fun remove(screen: Screen) {
         screenModels.onEach(screen) { key ->
             screenModels[key]?.onDispose()
