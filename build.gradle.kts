@@ -14,7 +14,7 @@ buildscript {
 
 allprojects {
     group = "com.github.terrakok"
-    version = "0.7.2"
+    version = "0.7.2-dev1"
 
     repositories {
         google()
