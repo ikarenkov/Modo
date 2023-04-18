@@ -14,7 +14,7 @@ buildscript {
 
 allprojects {
     group = "com.github.terrakok"
-    version = "0.7.2-dev1"
+    version = "0.7.2-dev2"
 
     repositories {
         google()
@@ -27,6 +27,10 @@ allprojects {
         archiveClassifier.set("javadoc")
     }
 
+    configurations.all {
+        // fix for new compose with old kotlin version
+        resolutionStrategy.force("org.jetbrains.kotlin:kotlin-stdlib:${properties["version.kotlin"]}")
+    }
     afterEvaluate {
         extensions.findByType<PublishingExtension>()?.apply {
             publications.withType<MavenPublication>().configureEach {

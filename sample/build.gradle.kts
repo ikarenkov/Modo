@@ -34,14 +34,17 @@ android {
 }
 
 dependencies {
+    val composeBom = platform("androidx.compose:compose-bom:${properties["version.composeBom"]}")
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
 
     implementation(project(":modo-compose"))
     implementation("androidx.core:core-ktx:${properties["version.coreKtx"]}")
     implementation("androidx.appcompat:appcompat:${properties["version.appcompat"]}")
-//    implementation("com.google.android.material:material:${properties["version.material"]}")
-    implementation("androidx.compose.ui:ui:${properties["version.compose"]}")
-    implementation("androidx.compose.material:material:${properties["version.material"]}")
-    implementation("androidx.compose.ui:ui-tooling:${properties["version.compose"]}")
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.material:material")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:${properties["version.lifecycleRuntimeKtx"]}")
     implementation("androidx.activity:activity-compose:${properties["version.composeActivity"]}")
     implementation("com.squareup.logcat:logcat:0.1")
