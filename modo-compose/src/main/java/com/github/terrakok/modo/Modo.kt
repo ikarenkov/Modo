@@ -20,12 +20,13 @@ object Modo {
      * @param savedState - container with modo state and graph
      * @param rootScreenProvider invokes when [savedState] is null and [inMemoryScreen] is null and we need to provide root screen.
      */
-    fun <T : Screen> init(savedState: Bundle?, inMemoryScreen: T?, rootScreenProvider: () -> T): T =
-        if (savedState != null) {
+    fun <T : Screen> init(savedState: Bundle?, inMemoryScreen: T?, rootScreenProvider: () -> T): T {
+        val modoGraph = savedState?.getParcelable<T>(MODO_GRAPH)
+        return if (modoGraph != null) {
             restoreScreenCounter(savedState.getInt(MODO_SCREEN_COUNTER_KEY))
-            savedState.getParcelable<T>(MODO_GRAPH) as T
+            modoGraph
         } else {
             inMemoryScreen ?: rootScreenProvider()
         }
-
+    }
 }
