@@ -77,13 +77,6 @@
       </option>
       <option name="JD_P_AT_EMPTY_LINES" value="false" />
     </JavaCodeStyleSettings>
-    <JetCodeStyleSettings>
-      <option name="PACKAGES_TO_USE_STAR_IMPORTS">
-        <value />
-      </option>
-      <option name="NAME_COUNT_TO_USE_STAR_IMPORT" value="2147483647" />
-      <option name="NAME_COUNT_TO_USE_STAR_IMPORT_FOR_MEMBERS" value="2147483647" />
-    </JetCodeStyleSettings>
     <XML>
       <option name="XML_KEEP_BLANK_LINES" value="1" />
       <option name="XML_SPACE_INSIDE_EMPTY_TAG" value="false" />

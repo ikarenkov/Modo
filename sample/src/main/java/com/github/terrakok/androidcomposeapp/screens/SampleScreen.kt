@@ -29,6 +29,7 @@ import com.github.terrakok.modo.NavigationContainer
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
+import com.github.terrakok.modo.model.OnScreenRemoved
 import com.github.terrakok.modo.stack.StackScreen
 import com.github.terrakok.modo.stack.StackState
 import com.github.terrakok.modo.stack.back
@@ -41,6 +42,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
+import logcat.logcat
 
 @Parcelize
 class SampleScreen(
@@ -50,6 +52,9 @@ class SampleScreen(
 
     @Composable
     override fun Content() {
+        OnScreenRemoved {
+            logcat { "Screen $screenKey was removed" }
+        }
         val parent = LocalContainerScreen.current
         SampleContent(i, parent as StackScreen)
     }

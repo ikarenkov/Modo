@@ -1,6 +1,7 @@
 package com.github.terrakok.modo
 
 import android.os.Bundle
+import com.github.terrakok.modo.model.ScreenModelStore
 
 object Modo {
 
@@ -29,4 +30,17 @@ object Modo {
             inMemoryScreen ?: rootScreenProvider()
         }
     }
+
+    /**
+     * Must be called to clear all data from [ScreenModelStore], related with removed screens.
+     */
+    fun onRootScreenFinished(rootScreen: ContainerScreen<*>?) {
+        rootScreen?.let(::clearScreenModel)
+    }
+
+    private fun clearScreenModel(screen: Screen) {
+        ScreenModelStore.remove(screen)
+        (screen as? ContainerScreen<*>)?.navigationState?.getChildScreens()?.forEach(::clearScreenModel)
+    }
+
 }

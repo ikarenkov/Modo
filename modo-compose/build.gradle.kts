@@ -33,9 +33,13 @@ android {
 }
 
 dependencies {
-    implementation("androidx.compose.ui:ui:${properties["version.compose"]}")
-    implementation("androidx.compose.foundation:foundation:${properties["version.compose"]}")
-    implementation("androidx.compose.animation:animation:${properties["version.compose"]}")
+    val composeBom = platform("androidx.compose:compose-bom:${properties["version.composeBom"]}")
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.foundation:foundation")
+    implementation("androidx.compose.animation:animation")
     // For BackHandler
     implementation("androidx.activity:activity-compose:${properties["version.composeActivity"]}")
     implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:${properties["version.kotlin"]}")

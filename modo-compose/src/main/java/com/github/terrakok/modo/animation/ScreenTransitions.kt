@@ -1,7 +1,7 @@
 package com.github.terrakok.modo.animation
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -23,7 +23,7 @@ typealias ScreenTransitionContent = @Composable AnimatedVisibilityScope.(Screen)
 @Composable
 fun ComposeRendererScope<*>.ScreenTransition(
     modifier: Modifier = Modifier,
-    transitionSpec: AnimatedContentScope<Screen>.() -> ContentTransform = {
+    transitionSpec: AnimatedContentTransitionScope<Screen>.() -> ContentTransform = {
         fadeIn(animationSpec = tween(220, delayMillis = 90)) +
             scaleIn(initialScale = 0.92f, animationSpec = tween(220, delayMillis = 90)) with
             fadeOut(animationSpec = tween(90))

@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.github.terrakok.modo.stack.CompositeAction
 
-val LocalContainerScreen = staticCompositionLocalOf<ContainerScreen<*>> { error("no screen provided") }
+val LocalContainerScreen = staticCompositionLocalOf<ContainerScreen<*>?> { null }
 
 abstract class ContainerScreen<State : NavigationState>(
     private val navModel: NavModel<State>
@@ -50,7 +50,7 @@ class NavModel<State : NavigationState>(
 ) : NavigationContainer<State>, Parcelable {
 
     override var navigationState: State = initialState
-        get() = (renderer as ComposeRenderer<State>).state ?: field
+        get() = renderer?.state ?: field
         set(value) {
             field = value
             renderer?.render(value)
@@ -68,7 +68,7 @@ class NavModel<State : NavigationState>(
             "Trying to initialize navigation model again"
         }
         this.reducerProvider = reducerProvider
-        this.renderer = renderer
+        this.renderer = renderer.also { it.render(navigationState) }
     }
 
     override fun dispatch(action: NavigationAction) {

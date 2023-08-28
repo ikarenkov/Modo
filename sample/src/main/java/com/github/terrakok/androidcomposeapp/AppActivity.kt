@@ -31,4 +31,11 @@ class AppActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        if (isFinishing) {
+            Modo.onRootScreenFinished(rootScreen)
+        }
+    }
+
 }
