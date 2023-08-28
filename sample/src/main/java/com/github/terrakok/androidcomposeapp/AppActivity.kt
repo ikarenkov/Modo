@@ -8,11 +8,12 @@ import androidx.compose.material.Surface
 import com.github.terrakok.androidcomposeapp.screens.SampleScreen
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleStack
 import com.github.terrakok.modo.Modo
+import com.github.terrakok.modo.RootScreen
 import com.github.terrakok.modo.stack.StackScreen
 
 class AppActivity : AppCompatActivity() {
 
-    private var rootScreen: StackScreen? = null
+    private var rootScreen: RootScreen<StackScreen>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
