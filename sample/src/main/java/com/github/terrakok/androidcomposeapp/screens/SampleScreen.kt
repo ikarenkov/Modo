@@ -22,8 +22,8 @@ import com.github.terrakok.androidcomposeapp.ButtonsList
 import com.github.terrakok.androidcomposeapp.ListScreen
 import com.github.terrakok.androidcomposeapp.ModelSampleScreen
 import com.github.terrakok.androidcomposeapp.randomBackground
-import com.github.terrakok.androidcomposeapp.screens.containers.SampleMultiScreen
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleContainerScreen
+import com.github.terrakok.androidcomposeapp.screens.containers.SampleMultiScreen
 import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.NavigationContainer
 import com.github.terrakok.modo.Screen
@@ -139,5 +139,6 @@ private fun rememberButtons(
 //                "Demo" to { navigator.forward(SaveableStateHolderDemoScreen()) },
         "Dialog" to { navigator.forward(SampleDialog(i + 1)) },
         "Model" to { navigator.forward(ModelSampleScreen()) },
+        "Bottom Sheet" to { navigator.forward(SampleBottomSheet(i + 1)) },
     )
 }

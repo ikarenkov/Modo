@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
@@ -22,6 +23,14 @@ class SampleDialog(
     private val i: Int,
     override val screenKey: ScreenKey = generateScreenKey()
 ) : DialogScreen {
+
+    override fun provideDialogConfig(): DialogScreen.DialogConfig = DialogScreen.DialogConfig(
+        useSystemDim = true,
+        dialogProperties = DialogProperties(
+            usePlatformDefaultWidth = true,
+            decorFitsSystemWindows = true
+        )
+    )
 
     @Composable
     override fun Content() {

@@ -47,5 +47,8 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:${properties["version.lifecycleRuntimeKtx"]}")
     implementation("androidx.activity:activity-compose:${properties["version.composeActivity"]}")
+
+    implementation("androidx.compose.material:material")
+
     implementation("com.squareup.logcat:logcat:0.1")
 }

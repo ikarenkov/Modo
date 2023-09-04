@@ -5,6 +5,7 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.core.view.WindowCompat
 import com.github.terrakok.androidcomposeapp.screens.SampleScreen
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleStack
 import com.github.terrakok.modo.Modo
@@ -17,6 +18,7 @@ class AppActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         rootScreen = Modo.init(savedInstanceState, rootScreen) {
             SampleStack(SampleScreen(1))
         }
