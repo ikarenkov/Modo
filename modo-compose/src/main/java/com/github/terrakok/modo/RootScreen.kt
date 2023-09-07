@@ -6,6 +6,9 @@ import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import kotlinx.parcelize.Parcelize
 
+/**
+ * Screen for single source of providing [LocalSaveableStateHolder]. Should be used with [Modo.init].
+ */
 @Parcelize
 class RootScreen<T : Screen>(
     val screen: T,
