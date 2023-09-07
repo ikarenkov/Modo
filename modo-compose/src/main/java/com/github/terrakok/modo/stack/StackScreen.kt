@@ -59,7 +59,7 @@ abstract class StackScreen(
                 onDismissRequest = { back() },
                 properties = remember { dialog.provideDialogProperties() }
             ) {
-                Content(screen = dialog)
+                Content(dialog, content)
             }
         }
     }

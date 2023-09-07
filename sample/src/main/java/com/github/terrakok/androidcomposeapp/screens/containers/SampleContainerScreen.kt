@@ -25,7 +25,7 @@ import com.github.terrakok.modo.stack.back
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class SampleStackScreen(
+class SampleContainerScreen(
     private val i: Int,
     private val navModel: StackNavModel
 ) : StackScreen(navModel) {
@@ -68,5 +68,5 @@ class SampleStackScreen(
 @Preview
 @Composable
 private fun PreviewContainerScreen() {
-    SampleStackScreen(1).Content()
+    SampleContainerScreen(1).Content()
 }

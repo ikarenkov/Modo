@@ -7,7 +7,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.saveable.SaveableStateHolder
-import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.github.terrakok.modo.model.ScreenModelStore
@@ -61,15 +60,13 @@ internal class ComposeRenderer<State : NavigationState>(
         screen: Screen,
         content: RendererContent<State> = defaultRendererContent
     ) {
-        // use single state holder for whole hierarchy, store it on top of it
-        val stateHolder: SaveableStateHolder = LocalSaveableStateHolder.current ?: rememberSaveableStateHolder()
+        val stateHolder: SaveableStateHolder = LocalSaveableStateHolder.currentOrThrow
         DisposableEffect(key1 = state) {
             onDispose {
                 clearScreens(stateHolder)
             }
         }
         CompositionLocalProvider(
-            LocalSaveableStateHolder providesDefault stateHolder,
             LocalContainerScreen provides containerScreen
         ) {
             ComposeRendererScope(lastState, state, screen).content()
