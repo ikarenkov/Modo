@@ -1,6 +1,11 @@
 package com.github.terrakok.androidcomposeapp.screens.containers
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import com.github.terrakok.androidcomposeapp.SlideTransition
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.stack.StackNavModel
@@ -16,8 +21,10 @@ class SampleStack(
 
     @Composable
     override fun Content() {
-        TopScreenContent {
-            SlideTransition()
+        Box(Modifier.windowInsetsPadding(WindowInsets.systemBars)) {
+            TopScreenContent {
+                SlideTransition()
+            }
         }
     }
 }

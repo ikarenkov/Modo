@@ -5,7 +5,7 @@
 
     <application
         android:name=".ModoSampleApplication"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        android:theme="@style/Theme.Modo">
         <activity
             android:name=".AppActivity"
             android:exported="true">

@@ -3,10 +3,13 @@ package com.github.terrakok.modo.stack
 import android.os.Parcelable
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogWindowProvider
 import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
@@ -55,10 +58,19 @@ abstract class StackScreen(
             Content(screen, content)
         }
         if (dialog != null) {
+            val dialogConfig = remember(dialog) {
+                dialog.provideDialogConfig()
+            }
             Dialog(
                 onDismissRequest = { back() },
-                properties = remember { dialog.provideDialogProperties() }
+                properties = dialogConfig.dialogProperties
             ) {
+                val parent = LocalView.current.parent
+                LaunchedEffect(key1 = parent) {
+                    if (!dialogConfig.useSystemDim) {
+                        (parent as? DialogWindowProvider)?.window?.setDimAmount(0f)
+                    }
+                }
                 Content(dialog, content)
             }
         }
