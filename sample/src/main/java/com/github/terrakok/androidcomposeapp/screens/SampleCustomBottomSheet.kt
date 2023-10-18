@@ -6,7 +6,6 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.window.DialogProperties
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
@@ -19,18 +18,12 @@ import kotlinx.parcelize.Parcelize
 
 @OptIn(ExperimentalModoApi::class)
 @Parcelize
-class SampleBottomSheet(
+class SampleCustomBottomSheet(
     private val i: Int,
     override val screenKey: ScreenKey = generateScreenKey()
 ) : DialogScreen {
 
-    override fun provideDialogConfig(): DialogScreen.DialogConfig = DialogScreen.DialogConfig.System(
-        useSystemDim = false,
-        dialogProperties = DialogProperties(
-            usePlatformDefaultWidth = false,
-            decorFitsSystemWindows = false
-        )
-    )
+    override fun provideDialogConfig() = DialogScreen.DialogConfig.Custom()
 
     @OptIn(ExperimentalMaterialApi::class)
     @Composable

@@ -18,7 +18,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.github.terrakok.androidcomposeapp.ButtonsList
 import com.github.terrakok.androidcomposeapp.ListScreen
 import com.github.terrakok.androidcomposeapp.ModelSampleScreen
 import com.github.terrakok.androidcomposeapp.randomBackground
@@ -140,5 +139,6 @@ private fun rememberButtons(
         "Dialog" to { navigator.forward(SampleDialog(i + 1)) },
         "Model" to { navigator.forward(ModelSampleScreen()) },
         "Bottom Sheet" to { navigator.forward(SampleBottomSheet(i + 1)) },
+        "Custom Bottom Sheet" to { navigator.forward(SampleCustomBottomSheet(i + 1)) },
     )
 }

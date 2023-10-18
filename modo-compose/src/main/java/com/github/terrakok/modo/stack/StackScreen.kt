@@ -61,17 +61,24 @@ abstract class StackScreen(
             val dialogConfig = remember(dialog) {
                 dialog.provideDialogConfig()
             }
-            Dialog(
-                onDismissRequest = { back() },
-                properties = dialogConfig.dialogProperties
-            ) {
-                val parent = LocalView.current.parent
-                LaunchedEffect(key1 = parent) {
-                    if (!dialogConfig.useSystemDim) {
-                        (parent as? DialogWindowProvider)?.window?.setDimAmount(0f)
+            when (dialogConfig) {
+                is DialogScreen.DialogConfig.System -> {
+                    Dialog(
+                        onDismissRequest = { back() },
+                        properties = dialogConfig.dialogProperties
+                    ) {
+                        val parent = LocalView.current.parent
+                        LaunchedEffect(key1 = parent) {
+                            if (!dialogConfig.useSystemDim) {
+                                (parent as? DialogWindowProvider)?.window?.setDimAmount(0f)
+                            }
+                        }
+                        Content(dialog, content)
                     }
                 }
-                Content(dialog, content)
+                is DialogScreen.DialogConfig.Custom -> {
+                    Content(dialog, content)
+                }
             }
         }
     }
