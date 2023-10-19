@@ -9,10 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
@@ -43,16 +40,13 @@ class SampleBottomSheet(
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
-        val lifecycleOwner = LocalLifecycleOwner.current
         val coroutineScope = rememberCoroutineScope()
         val navigation = LocalContainerScreen.currentOrThrow as StackScreen
         val state = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
-        LaunchedEffect(key1 = lifecycleOwner) {
+        LaunchedEffect(key1 = Unit) {
             coroutineScope.launch {
-                lifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                    state.show()
-                }
+                state.show()
             }
         }
 
@@ -66,7 +60,9 @@ class SampleBottomSheet(
 
         BackHandler {
             coroutineScope.launch {
-                lifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                if (state.currentValue == ModalBottomSheetValue.Hidden) {
+                    navigation.back()
+                } else {
                     state.hide()
                 }
             }
