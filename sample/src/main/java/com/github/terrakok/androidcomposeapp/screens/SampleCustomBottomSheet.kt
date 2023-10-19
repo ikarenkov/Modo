@@ -23,7 +23,7 @@ class SampleCustomBottomSheet(
     override val screenKey: ScreenKey = generateScreenKey()
 ) : DialogScreen {
 
-    override fun provideDialogConfig() = DialogScreen.DialogConfig.Custom()
+    override fun provideDialogConfig() = DialogScreen.DialogConfig.Custom
 
     @OptIn(ExperimentalMaterialApi::class)
     @Composable

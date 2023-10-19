@@ -14,9 +14,7 @@ interface DialogScreen : Screen {
             val dialogProperties: DialogProperties = DialogProperties()
         ) : DialogConfig
 
-        data class Custom(
-            val stackMode: Boolean = true,
-        ) : DialogConfig
+        data object Custom : DialogConfig
 
     }
 
