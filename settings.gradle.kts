@@ -7,6 +7,7 @@ pluginManagement {
 
 }
 rootProject.name = "Modo"
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 //include(":modo")
 include(":modo-compose")

@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
+    namespace = "com.github.terrakok.modo.android.compose"
     compileSdk = (properties["android.compileSdk"] as String).toInt()
 
     defaultConfig {
         minSdk = (properties["android.minSdk"] as String).toInt()
-        targetSdk = (properties["android.targetSdk"] as String).toInt()
     }
 
     compileOptions {
@@ -60,7 +60,7 @@ publishing {
     publications {
         create<MavenPublication>("release") {
             artifact(sourceJar.get())
-            artifact("$buildDir/outputs/aar/${artifactId}-${name}.aar")
+            artifact("${layout.buildDirectory}/outputs/aar/${artifactId}-${name}.aar")
         }
     }
 }

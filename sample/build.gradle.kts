@@ -5,6 +5,7 @@ plugins {
 }
 
 android {
+    namespace = "com.github.terrakok.androidcomposeapp"
     compileSdk = (properties["android.compileSdk"] as String).toInt()
 
     defaultConfig {
