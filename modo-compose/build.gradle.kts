@@ -8,10 +8,10 @@ plugins {
 
 android {
     namespace = "com.github.terrakok.modo.android.compose"
-    compileSdk = (properties["android.compileSdk"] as String).toInt()
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = (properties["android.minSdk"] as String).toInt()
+        minSdk = libs.versions.minSdk.get().toInt()
     }
 
     compileOptions {
@@ -28,23 +28,22 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = properties["version.kotlinCompilerExtension"] as String
+        kotlinCompilerExtensionVersion = libs.versions.kotlinCompilerExtension.get()
     }
 }
 
 dependencies {
-    val composeBom = platform("androidx.compose:compose-bom:${properties["version.composeBom"]}")
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
+    implementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(platform(libs.androidx.compose.bom))
 
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.foundation:foundation")
-    implementation("androidx.compose.animation:animation")
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.animation)
     // For BackHandler
-    implementation("androidx.activity:activity-compose:${properties["version.composeActivity"]}")
-    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:${properties["version.kotlin"]}")
+    implementation(libs.androidx.activity.compose)
+//    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:${properties["version.kotlin"]}")
 
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
+    testImplementation(libs.test.junit.jupiter)
 }
 
 tasks.withType(Test::class) {
