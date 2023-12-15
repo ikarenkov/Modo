@@ -16,21 +16,12 @@ allprojects {
     group = "com.github.terrakok"
     version = "0.7.2-dev2"
 
-    repositories {
-        google()
-        mavenCentral()
-    }
-
     //PUBLISHING './gradlew clean bundleReleaseAar publishAllPublicationsToSonatypeRepository'
     val localProps = gradleLocalProperties(rootDir)
     val emptyJavadocJar by tasks.registering(Jar::class) {
         archiveClassifier.set("javadoc")
     }
 
-    configurations.all {
-        // fix for new compose with old kotlin version
-        resolutionStrategy.force("org.jetbrains.kotlin:kotlin-stdlib:${properties["version.kotlin"]}")
-    }
     afterEvaluate {
         extensions.findByType<PublishingExtension>()?.apply {
             publications.withType<MavenPublication>().configureEach {

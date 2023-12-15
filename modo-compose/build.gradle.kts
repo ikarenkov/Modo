@@ -1,35 +1,20 @@
+import com.github.terrakok.configureKotlinAndroid
+import com.github.terrakok.configureJetpackCompose
+
 plugins {
     id("com.android.library")
     kotlin("android")
     id("kotlin-parcelize")
     id("maven-publish")
     id("signing")
+    id("build-logic")
 }
 
 android {
     namespace = "com.github.terrakok.modo.android.compose"
-    compileSdk = libs.versions.compileSdk.get().toInt()
 
-    defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-
-    buildFeatures {
-        compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.kotlinCompilerExtension.get()
-    }
+    configureKotlinAndroid(this)
+    configureJetpackCompose(this)
 }
 
 dependencies {
