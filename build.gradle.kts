@@ -28,30 +28,30 @@ allprojects {
                 artifact(emptyJavadocJar.get())
 
                 pom {
-                    name.set("Modo")
-                    description.set("Navigation library for Jetpack Compose based on UDF principles")
-                    url.set("https://github.com/terrakok/Modo")
+                    name = "Modo"
+                    description = "Navigation library for Jetpack Compose based on UDF principles"
+                    url = "https://github.com/terrakok/Modo"
 
                     licenses {
                         license {
-                            name.set("MIT")
-                            url.set("https://opensource.org/licenses/MIT")
+                            name = "MIT"
+                            url = "https://opensource.org/licenses/MIT"
                         }
                     }
                     developers {
                         developer {
-                            id.set("ikarenkov")
-                            name.set("Igor Karenkov")
-                            email.set("karenkovigor@gmail.com")
+                            id = "ikarenkov"
+                            name = "Igor Karenkov"
+                            email = "karenkovigor@gmail.com"
                         }
                         developer {
-                            id.set("terrakok")
-                            name.set("Konstantin Tskhovrebov")
-                            email.set("terrakok@gmail.com")
+                            id = "terrakok"
+                            name = "Konstantin Tskhovrebov"
+                            email = "terrakok@gmail.com"
                         }
                     }
                     scm {
-                        url.set("https://github.com/terrakok/Modo")
+                        url = "https://github.com/terrakok/Modo"
                     }
                 }
             }

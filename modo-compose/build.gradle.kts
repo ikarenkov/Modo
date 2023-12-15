@@ -44,7 +44,7 @@ publishing {
     publications {
         create<MavenPublication>("release") {
             artifact(sourceJar.get())
-            artifact("${layout.buildDirectory}/outputs/aar/${artifactId}-${name}.aar")
+            artifact("${layout.buildDirectory.get()}/outputs/aar/${artifactId}-${name}.aar")
         }
     }
 }
