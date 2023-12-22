@@ -16,7 +16,7 @@ typealias RendererContent<State> = @Composable ComposeRendererScope<State>.() ->
 
 val defaultRendererContent: (@Composable ComposeRendererScope<*>.() -> Unit) = { screen.SaveableContent() }
 
-internal val LocalSaveableStateHolder = staticCompositionLocalOf<SaveableStateHolder?> { null }
+val LocalSaveableStateHolder = staticCompositionLocalOf<SaveableStateHolder?> { null }
 
 @Composable
 fun Screen.SaveableContent() {
