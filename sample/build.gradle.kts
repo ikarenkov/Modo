@@ -1,54 +1,41 @@
+import com.github.terrakok.configureJetpackCompose
+import com.github.terrakok.configureKotlinAndroid
+
 plugins {
     id("com.android.application")
     kotlin("android")
     id("kotlin-parcelize")
+    id("build-logic")
 }
 
 android {
-    compileSdk = (properties["android.compileSdk"] as String).toInt()
+    namespace = "com.github.terrakok.androidcomposeapp"
+
+    configureKotlinAndroid(this)
+    configureJetpackCompose(this)
 
     defaultConfig {
         applicationId = "com.github.terrakok.androidcomposeapp"
-        minSdk = (properties["android.minSdk"] as String).toInt()
-        targetSdk = (properties["android.targetSdk"] as String).toInt()
+        targetSdk = libs.versions.compileSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-
-    buildFeatures {
-        compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = properties["version.kotlinCompilerExtension"] as String
     }
 }
 
 dependencies {
-    val composeBom = platform("androidx.compose:compose-bom:${properties["version.composeBom"]}")
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
+    implementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(platform(libs.androidx.compose.bom))
 
-    implementation(project(":modo-compose"))
-    implementation("androidx.core:core-ktx:${properties["version.coreKtx"]}")
-    implementation("androidx.appcompat:appcompat:${properties["version.appcompat"]}")
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.material:material")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:${properties["version.lifecycleRuntimeKtx"]}")
-    implementation("androidx.activity:activity-compose:${properties["version.composeActivity"]}")
+    implementation(projects.modoCompose)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.compose.ui)
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
 
-    implementation("androidx.compose.material:material")
+    implementation(libs.androidx.compose.material)
 
-    implementation("com.squareup.logcat:logcat:0.1")
+    implementation(libs.debug.logcat)
 }
