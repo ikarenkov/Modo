@@ -3,7 +3,7 @@ androidGradlePlugin = "8.2.0"
 junit = "4.13.2"
 androidxComposeBom = "2023.08.00"
 androidxActivityCompose = "1.7.2"
-androidxLifecycle = "2.6.1"
+androidxLifecycle = "2.7.0"
 androidxCore = "1.10.1"
 androidxFragment = "1.5.7"
 androidxAppCompat = "1.6.1"
@@ -25,7 +25,8 @@ androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "u
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivityCompose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
-androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
+androidx-lifecycle-runtimeKtx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
+androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
 
 test-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version = "5.8.2" }
 

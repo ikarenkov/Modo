@@ -24,6 +24,7 @@ import com.github.terrakok.androidcomposeapp.ModelSampleScreen
 import com.github.terrakok.androidcomposeapp.randomBackground
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleContainerScreen
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleMultiScreen
+import com.github.terrakok.androidcomposeapp.screens.viewmodel.AndroidViewModelSampleScreen
 import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.NavigationContainer
 import com.github.terrakok.modo.Screen
@@ -62,8 +63,8 @@ class SampleScreen(
 
 @Composable
 internal fun SampleContent(
-    i: Int, navigator:
-    NavigationContainer<StackState>,
+    screenIndex: Int,
+    navigator: NavigationContainer<StackState>,
     isDialog: Boolean = false
 ) {
     var counter by rememberSaveable { mutableStateOf(0) }
@@ -73,6 +74,16 @@ internal fun SampleContent(
             counter++
         }
     }
+    SampleContent(screenIndex, counter, navigator, isDialog)
+}
+
+@Composable
+internal fun SampleContent(
+    screenIndex: Int,
+    counter: Int,
+    navigator: NavigationContainer<StackState>,
+    isDialog: Boolean = false
+) {
     Column(
         modifier = Modifier
             .randomBackground()
@@ -83,14 +94,14 @@ internal fun SampleContent(
             text = counter.toString()
         )
         Text(
-            text = "Screen $i",
+            text = "Screen $screenIndex",
             style = MaterialTheme.typography.h6,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.size(16.dp))
         ButtonsList(
-            rememberButtons(navigator, i),
+            rememberButtons(navigator, screenIndex),
             Modifier.weight(1f, fill = false)
         )
     }
@@ -140,5 +151,6 @@ private fun rememberButtons(
         "Dialog" to { navigator.forward(SampleDialog(i + 1)) },
         "Model" to { navigator.forward(ModelSampleScreen()) },
         "Bottom Sheet" to { navigator.forward(SampleBottomSheet(i + 1)) },
+        "Android ViewModel" to { navigator.forward(AndroidViewModelSampleScreen(i + 1)) },
     )
 }

@@ -30,6 +30,7 @@ dependencies {
     implementation(libs.androidx.compose.animation)
     // For BackHandler
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 //    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:${properties["version.kotlin"]}")
 
     testImplementation(libs.test.junit.jupiter)

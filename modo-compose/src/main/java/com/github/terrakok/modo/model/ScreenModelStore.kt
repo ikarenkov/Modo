@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 private typealias ScreenModelKey = String
 
-private typealias DependencyKey = String
+internal typealias DependencyKey = String
 private typealias DependencyInstance = Any
 private typealias DependencyOnDispose = (Any) -> Unit
 private typealias Dependency = Pair<DependencyInstance, DependencyOnDispose>

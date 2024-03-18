@@ -12,8 +12,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.with
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import com.github.terrakok.modo.ComposeRendererScope
+import com.github.terrakok.modo.LocalTransitionCompleteChannel
 import com.github.terrakok.modo.SaveableContent
 import com.github.terrakok.modo.Screen
 
@@ -37,4 +39,10 @@ fun ComposeRendererScope<*>.ScreenTransition(
         contentKey = { it.screenKey },
         content = content
     )
+    if (transition.currentState == transition.targetState) {
+        val channel = LocalTransitionCompleteChannel.current
+        LaunchedEffect(Unit) {
+            channel.trySend(Unit)
+        }
+    }
 }
