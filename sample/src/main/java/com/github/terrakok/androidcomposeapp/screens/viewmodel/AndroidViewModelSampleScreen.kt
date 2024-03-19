@@ -3,6 +3,9 @@ package com.github.terrakok.androidcomposeapp.screens.viewmodel
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.eventFlow
 import androidx.lifecycle.viewModelScope
@@ -12,6 +15,7 @@ import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
+import com.github.terrakok.modo.lifecycle.DisposableScreenEffect
 import com.github.terrakok.modo.lifecycle.OnScreenCreated
 import com.github.terrakok.modo.stack.StackScreen
 import kotlinx.coroutines.delay
@@ -40,9 +44,25 @@ class AndroidViewModelSampleScreen(
 //                lifecycleOwner.lifecycle.removeObserver(observer)
 //            }
 //        }
+
+        // Coroutines way
         OnScreenCreated {
             lifecycleOwner.lifecycle.eventFlow.collect { lifecycleState ->
                 logcat { "AndroidViewModelSampleScreen $screenPos: LifecycleState $lifecycleState" }
+            }
+        }
+
+        // Observer way
+        DisposableScreenEffect {
+            val observer = object : LifecycleEventObserver {
+                override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+                    logcat { "AndroidViewModelSampleScreen observer $screenPos: Lifecycle.Event $event" }
+                }
+
+            }
+            lifecycleOwner.lifecycle.addObserver(observer)
+            onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
             }
         }
 

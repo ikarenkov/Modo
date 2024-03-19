@@ -9,3 +9,8 @@ buildscript {
         classpath("com.android.tools.build:gradle:${libs.versions.androidGradlePlugin.get()}")
     }
 }
+
+tasks.named<Wrapper>("wrapper") {
+    distributionType = Wrapper.DistributionType.ALL
+    gradleVersion = "8.6"
+}

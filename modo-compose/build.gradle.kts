@@ -1,6 +1,7 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.github.terrakok.configureJetpackCompose
 import com.github.terrakok.configureKotlinAndroid
+import java.util.Properties
 
 plugins {
     id("com.android.library")
@@ -12,7 +13,7 @@ plugins {
 }
 
 group = "com.github.terrakok"
-version = "0.7.2-dev2"
+version = "0.8.0-dev2"
 
 android {
     namespace = "com.github.terrakok.modo.android.compose"
@@ -101,6 +102,8 @@ publishing {
     }
 }
 
+readEnvironmentVariables()
+
 signing {
     sign(publishing.publications)
 }
@@ -108,4 +111,29 @@ signing {
 val isReleaseBuild = localProps.containsKey("signing.keyId")
 tasks.withType<Sign>().configureEach {
     onlyIf { isReleaseBuild }
+}
+
+private fun Project.readEnvironmentVariables() {
+    extra["signing.keyId"] = null
+    extra["signing.password"] = null
+    extra["signing.secretKeyRingFile"] = null
+    extra["sonatypeUsername"] = null
+    extra["sonatypePassword"] = null
+
+// Grabbing secrets from local.properties file or from environment variables, which could be used on CI
+    val secretPropsFile = project.rootProject.file("local.properties")
+    if (secretPropsFile.exists()) {
+        secretPropsFile.reader().use {
+            Properties().apply { load(it) }
+        }.onEach { (name, value) ->
+            extra[name.toString()] = value
+        }
+        extra["signing.secretKeyRingFile"] = project.rootProject.layout.projectDirectory.file(extra["signing.secretKeyRingFile"].toString())
+    } else {
+        extra["signing.keyId"] = System.getenv("SIGNING_KEY_ID")
+        extra["signing.password"] = System.getenv("SIGNING_PASSWORD")
+        extra["signing.secretKeyRingFile"] = System.getenv("SIGNING_SECRET_KEY_RING_FILE")
+        extra["sonatypeUsername"] = System.getenv("SONATYPE_USERNAME")
+        extra["sonatypePassword"] = System.getenv("SONATYPE_PASSWORD")
+    }
 }

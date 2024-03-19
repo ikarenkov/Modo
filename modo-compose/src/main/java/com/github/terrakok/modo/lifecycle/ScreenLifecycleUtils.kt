@@ -1,6 +1,9 @@
 package com.github.terrakok.modo.lifecycle
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.DisposableEffectResult
+import androidx.compose.runtime.DisposableEffectScope
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -16,16 +19,16 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 /**
- * Function that invokes block on the screen creation, and disposed when screen is gone.
- * @param block - suspend lambda that will be invoked once at the firs composition of screen.
- * This will be canceled when screen is removed from hierarchy.
+ * A side effect of screen creation that must be reversed or cleaned up if the Screen leaves the hierarchy.
+ * You can make any suspend invocation inside [block],
+ * but the [CoroutineScope] in witch this block is running will be canceled as soon as screen leaves hierarchy.
  */
 @Composable
 @NonRestartableComposable
 fun Screen.OnScreenCreated(
     tag: String = rememberSaveable { UUID.randomUUID().toString() },
     block: suspend CoroutineScope.() -> Unit
-): Unit {
+) {
     LaunchedEffect(this) {
         ScreenModelStore.getOrPutDependency<CoroutineScope>(
             screen = this@OnScreenCreated,
@@ -40,6 +43,48 @@ fun Screen.OnScreenCreated(
                 }
             }
         )
+    }
+}
+
+/**
+ * A side effect of screen creation that must be reversed or cleaned up if the Screen leaves the hierarchy.
+ * Similar to the [DisposableEffect], but
+ * 1. [effect] lambda called once per screen
+ * 2. `onDispose` is called when the screen lives hierarchy
+ */
+@Composable
+@NonRestartableComposable
+fun Screen.DisposableScreenEffect(
+    tag: String = rememberSaveable { UUID.randomUUID().toString() },
+    effect: DisposableEffectScope.() -> DisposableEffectResult
+) {
+    LaunchedEffect(this) {
+        ScreenModelStore.getOrPutDependency<DisposableScreenEffectImpl>(
+            screen = this@DisposableScreenEffect,
+            name = "OnScreenCreated",
+            tag = tag,
+            onDispose = { disposableScreenEffect -> disposableScreenEffect.onDisposed() },
+            factory = { _ ->
+                DisposableScreenEffectImpl(effect)
+            }
+        )
+    }
+}
+
+private val InternalDisposableScreenEffectScope = DisposableEffectScope()
+
+private class DisposableScreenEffectImpl(
+    effect: DisposableEffectScope.() -> DisposableEffectResult
+) {
+    private var onDispose: DisposableEffectResult? = null
+
+    init {
+        onDispose = InternalDisposableScreenEffectScope.effect()
+    }
+
+    fun onDisposed() {
+        onDispose?.dispose()
+        onDispose = null
     }
 }
 
