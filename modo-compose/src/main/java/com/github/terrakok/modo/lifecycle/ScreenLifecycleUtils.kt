@@ -5,8 +5,8 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.DisposableEffectResult
 import androidx.compose.runtime.DisposableEffectScope
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.saveable.rememberSaveable
+import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.model.DependencyKey
 import com.github.terrakok.modo.model.ScreenModelStore
@@ -23,8 +23,8 @@ import java.util.UUID
  * You can make any suspend invocation inside [block],
  * but the [CoroutineScope] in witch this block is running will be canceled as soon as screen leaves hierarchy.
  */
+@ExperimentalModoApi
 @Composable
-@NonRestartableComposable
 fun Screen.OnScreenCreated(
     tag: String = rememberSaveable { UUID.randomUUID().toString() },
     block: suspend CoroutineScope.() -> Unit
@@ -52,8 +52,8 @@ fun Screen.OnScreenCreated(
  * 1. [effect] lambda called once per screen
  * 2. `onDispose` is called when the screen lives hierarchy
  */
+@ExperimentalModoApi
 @Composable
-@NonRestartableComposable
 fun Screen.DisposableScreenEffect(
     tag: String = rememberSaveable { UUID.randomUUID().toString() },
     effect: DisposableEffectScope.() -> DisposableEffectResult

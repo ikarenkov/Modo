@@ -5,6 +5,7 @@ import androidx.compose.runtime.DisallowComposableCalls
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.Screen
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -16,7 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.plus
 import java.util.UUID
 
-public val ScreenModel.coroutineScope: CoroutineScope
+val ScreenModel.coroutineScope: CoroutineScope
     get() = ScreenModelStore.getOrPutDependency(
         screenModel = this,
         name = "ScreenModelCoroutineScope",
@@ -25,7 +26,7 @@ public val ScreenModel.coroutineScope: CoroutineScope
     )
 
 @Composable
-public inline fun <reified T : ScreenModel> Screen.rememberScreenModel(
+inline fun <reified T : ScreenModel> Screen.rememberScreenModel(
     tag: String? = null,
     crossinline factory: @DisallowComposableCalls () -> T
 ): T =
@@ -36,11 +37,12 @@ public inline fun <reified T : ScreenModel> Screen.rememberScreenModel(
 @PublishedApi
 internal const val ON_SCREEN_REMOVED_CALLBACK_NAME = "OnScreenRemovedCallBack"
 
+@ExperimentalModoApi
 @Composable
-public inline fun Screen.OnScreenRemoved(
+inline fun Screen.OnScreenRemoved(
     tag: String = rememberSaveable { UUID.randomUUID().toString() },
     crossinline onScreenRemoved: @DisallowComposableCalls () -> Unit
-): Unit {
+) {
     LaunchedEffect(tag) {
         ScreenModelStore.getOrPutDependency(
             screen = this@OnScreenRemoved,
