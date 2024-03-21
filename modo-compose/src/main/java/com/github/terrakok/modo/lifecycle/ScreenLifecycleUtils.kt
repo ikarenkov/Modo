@@ -25,16 +25,18 @@ import java.util.UUID
  */
 @ExperimentalModoApi
 @Composable
-fun Screen.OnScreenCreated(
+fun Screen.LaunchedScreenEffect(
     tag: String = rememberSaveable { UUID.randomUUID().toString() },
     block: suspend CoroutineScope.() -> Unit
 ) {
     LaunchedEffect(this) {
         ScreenModelStore.getOrPutDependency<CoroutineScope>(
-            screen = this@OnScreenCreated,
+            screen = this@LaunchedScreenEffect,
             name = "OnScreenCreated",
             tag = tag,
-            onDispose = { scope -> scope.cancel() },
+            onDispose = { scope ->
+                scope.cancel()
+            },
             factory = { key ->
                 screenCoroutineMainScope(key).also { scope ->
                     scope.launch {

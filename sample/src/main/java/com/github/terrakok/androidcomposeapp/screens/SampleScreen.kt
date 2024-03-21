@@ -25,6 +25,7 @@ import com.github.terrakok.androidcomposeapp.randomBackground
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleContainerScreen
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleMultiScreen
 import com.github.terrakok.androidcomposeapp.screens.viewmodel.AndroidViewModelSampleScreen
+import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.NavigationContainer
 import com.github.terrakok.modo.Screen
@@ -51,6 +52,7 @@ class SampleScreen(
     override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
 
+    @OptIn(ExperimentalModoApi::class)
     @Composable
     override fun Content() {
         OnScreenRemoved {
