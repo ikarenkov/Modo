@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "com.github.terrakok"
-version = "0.8.0-dev2"
+version = "0.8.0-dev3"
 
 android {
     namespace = "com.github.terrakok.modo.android.compose"

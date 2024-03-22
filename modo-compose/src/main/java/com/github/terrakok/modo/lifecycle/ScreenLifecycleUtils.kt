@@ -6,6 +6,8 @@ import androidx.compose.runtime.DisposableEffectResult
 import androidx.compose.runtime.DisposableEffectScope
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.LifecycleObserver
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.model.DependencyKey
@@ -32,7 +34,7 @@ fun Screen.LaunchedScreenEffect(
     LaunchedEffect(this) {
         ScreenModelStore.getOrPutDependency<CoroutineScope>(
             screen = this@LaunchedScreenEffect,
-            name = "OnScreenCreated",
+            name = "LaunchedScreenEffect",
             tag = tag,
             onDispose = { scope ->
                 scope.cancel()
@@ -63,13 +65,34 @@ fun Screen.DisposableScreenEffect(
     LaunchedEffect(this) {
         ScreenModelStore.getOrPutDependency<DisposableScreenEffectImpl>(
             screen = this@DisposableScreenEffect,
-            name = "OnScreenCreated",
+            name = "DisposableScreenEffect",
             tag = tag,
             onDispose = { disposableScreenEffect -> disposableScreenEffect.onDisposed() },
             factory = { _ ->
                 DisposableScreenEffectImpl(effect)
             }
         )
+    }
+}
+
+/**
+ * A shortcut to subscribe to screen lifecycle. Uses [DisposableScreenEffect] under the hood.
+ * Automatically creates observer, adds it to screen lifecycle and removes it, when screen disposed.
+ */
+@ExperimentalModoApi
+@Composable
+fun Screen.LifecycleScreenEffect(
+    lifecycleObserverFactory: () -> LifecycleObserver
+) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableScreenEffect(
+        tag = rememberSaveable { "LifecycleScreenEffect" + UUID.randomUUID().toString() }
+    ) {
+        val observer = lifecycleObserverFactory()
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 }
 

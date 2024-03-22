@@ -14,9 +14,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
-import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.HasDefaultViewModelProviderFactory
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.SAVED_STATE_REGISTRY_OWNER_KEY
@@ -108,17 +109,12 @@ class ModoScreenAndroidAdapter private constructor() :
     ) {
         LifecycleDisposableEffect()
 
-        CompositionLocalProvider(*getHooks().toTypedArray()) {
+        CompositionLocalProvider(*getProviders().toTypedArray()) {
             content()
         }
     }
 
     fun onDispose(screen: Screen) {
-        val context = atomicContext.getAndSet(null) ?: return
-        val activity = context.getActivity()
-        if (activity != null && activity.isChangingConfigurations) {
-            return
-        }
         viewModelStore.clear()
         disposeEvents.forEach { event ->
             lifecycle.safeHandleLifecycleEvent(event)
@@ -130,7 +126,7 @@ class ModoScreenAndroidAdapter private constructor() :
     }
 
     @Composable
-    private fun getHooks(): List<ProvidedValue<*>> {
+    private fun getProviders(): List<ProvidedValue<*>> {
         atomicContext.compareAndSet(null, LocalContext.current)
         atomicParentLifecycleOwner.compareAndSet(null, LocalLifecycleOwner.current)
 
@@ -146,33 +142,15 @@ class ModoScreenAndroidAdapter private constructor() :
     /**
      * Returns a unregister callback
      */
-    private fun registerLifecycleListener(outState: Bundle): () -> Unit {
+    private fun registerParentLifecycleListener(
+        observerFactory: () -> LifecycleObserver
+    ): () -> Unit {
         val lifecycleOwner = atomicParentLifecycleOwner.get()
         if (lifecycleOwner != null) {
-            val observer = object : DefaultLifecycleObserver {
-                override fun onPause(owner: LifecycleOwner) {
-                    lifecycle.safeHandleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-                }
-
-                override fun onResume(owner: LifecycleOwner) {
-                    lifecycle.safeHandleLifecycleEvent(Lifecycle.Event.ON_RESUME)
-                }
-
-                override fun onStart(owner: LifecycleOwner) {
-                    lifecycle.safeHandleLifecycleEvent(Lifecycle.Event.ON_START)
-                }
-
-                override fun onStop(owner: LifecycleOwner) {
-                    lifecycle.safeHandleLifecycleEvent(Lifecycle.Event.ON_STOP)
-
-                    // when the Application goes to background, perform save
-                    performSave(outState)
-                }
-            }
+            val parentLifecycleObserver = observerFactory()
             val lifecycle = lifecycleOwner.lifecycle
-            lifecycle.addObserver(observer)
-
-            return { lifecycle.removeObserver(observer) }
+            lifecycle.addObserver(parentLifecycleObserver)
+            return { lifecycle.removeObserver(parentLifecycleObserver) }
         } else {
             return { }
         }
@@ -186,7 +164,26 @@ class ModoScreenAndroidAdapter private constructor() :
         }
 
         DisposableEffect(this) {
-            val unregisterLifecycle = registerLifecycleListener(savedState)
+            val unregisterLifecycle = registerParentLifecycleListener {
+                LifecycleEventObserver { owner, event ->
+                    if (event == Lifecycle.Event.ON_DESTROY && atomicContext.get()?.getActivity()?.isChangingConfigurations == true) {
+                        /**
+                         * Instance of the screen isn't recreated during config changes so skip this event
+                         * to avoid crash while accessing to ViewModel with SavedStateHandle, because after
+                         * ON_DESTROY, [androidx.lifecycle.SavedStateHandleController] is marked as not
+                         * attached and next call of [registerSavedStateProvider] after recreating Activity
+                         * on the same instance causing the crash.
+                         */
+                        return@LifecycleEventObserver
+                    }
+                    if (event == Lifecycle.Event.ON_STOP) {
+                        // when the Application goes to background, perform save
+                        performSave(savedState)
+                    }
+                    lifecycle.safeHandleLifecycleEvent(event)
+                }
+            }
+
             emitOnStartEvents()
 
             onDispose {
@@ -201,8 +198,19 @@ class ModoScreenAndroidAdapter private constructor() :
 
     private fun LifecycleRegistry.safeHandleLifecycleEvent(event: Lifecycle.Event) {
         val currentState = currentState
-        if (!currentState.isAtLeast(Lifecycle.State.INITIALIZED)) return
+        if (!currentState.isAtLeast(Lifecycle.State.INITIALIZED)) {
+            return
+        }
+        // Protection from double event sending from the parent
+        if (event in startEvents && event.targetState <= currentState) {
+            return
+        }
+        if (event in stopEvents && event.targetState >= currentState) {
+            return
+        }
 
+        // For debugging
+//        Log.d("ModoScreenAndroidAdapter", "safeHandleLifecycleEvent ${screen.screenKey} $event")
         handleLifecycleEvent(event)
     }
 
