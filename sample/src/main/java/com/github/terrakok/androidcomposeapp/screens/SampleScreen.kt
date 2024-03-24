@@ -19,8 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.androidcomposeapp.ButtonsList
+import com.github.terrakok.androidcomposeapp.ButtonsState
 import com.github.terrakok.androidcomposeapp.ListScreen
 import com.github.terrakok.androidcomposeapp.ModelSampleScreen
+import com.github.terrakok.androidcomposeapp.SampleAppConfig
 import com.github.terrakok.androidcomposeapp.randomBackground
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleContainerScreen
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleMultiScreen
@@ -71,9 +73,11 @@ internal fun SampleContent(
 ) {
     var counter by rememberSaveable { mutableStateOf(0) }
     LaunchedEffect(key1 = Unit) {
-        while (isActive) {
-            delay(100)
-            counter++
+        if (SampleAppConfig.counterEnabled) {
+            while (isActive) {
+                delay(100)
+                counter++
+            }
         }
     }
     SampleContent(screenIndex, counter, navigator, isDialog)
@@ -113,8 +117,8 @@ internal fun SampleContent(
 private fun rememberButtons(
     navigator: NavigationContainer<StackState>,
     i: Int
-): List<Pair<String, () -> Unit>> = remember {
-    listOf(
+): ButtonsState = remember {
+    listOf<Pair<String, () -> Unit>>(
         "Forward" to { navigator.forward(SampleScreen(i + 1)) },
         "Back" to { navigator.back() },
         "Replace" to { navigator.replace(SampleScreen(i + 1)) },
@@ -154,5 +158,7 @@ private fun rememberButtons(
         "Model" to { navigator.forward(ModelSampleScreen()) },
         "Bottom Sheet" to { navigator.forward(SampleBottomSheet(i + 1)) },
         "Android ViewModel" to { navigator.forward(AndroidViewModelSampleScreen(i + 1)) },
-    )
+    ).let {
+        ButtonsState(it)
+    }
 }

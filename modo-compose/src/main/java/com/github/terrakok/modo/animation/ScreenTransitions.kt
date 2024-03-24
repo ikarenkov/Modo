@@ -10,7 +10,7 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
-import androidx.compose.animation.with
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -27,7 +27,7 @@ fun ComposeRendererScope<*>.ScreenTransition(
     modifier: Modifier = Modifier,
     transitionSpec: AnimatedContentTransitionScope<Screen>.() -> ContentTransform = {
         fadeIn(animationSpec = tween(220, delayMillis = 90)) +
-            scaleIn(initialScale = 0.92f, animationSpec = tween(220, delayMillis = 90)) with
+            scaleIn(initialScale = 0.92f, animationSpec = tween(220, delayMillis = 90)) togetherWith
             fadeOut(animationSpec = tween(90))
     },
     content: ScreenTransitionContent = { it.SaveableContent() }
