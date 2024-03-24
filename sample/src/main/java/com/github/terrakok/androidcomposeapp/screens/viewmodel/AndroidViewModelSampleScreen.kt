@@ -5,7 +5,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.terrakok.androidcomposeapp.screens.SampleContent
@@ -17,14 +19,14 @@ import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
 import com.github.terrakok.modo.stack.StackScreen
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import logcat.logcat
 
 @Parcelize
-class AndroidViewModelSampleScreen(
+internal class AndroidViewModelSampleScreen(
     private val screenPos: Int,
     override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
@@ -76,24 +78,32 @@ class AndroidViewModelSampleScreen(
         }
 
         val viewModel: SampleViewModel = viewModel {
-            SampleViewModel(screenPos)
+            SampleViewModel(screenPos, createSavedStateHandle())
         }
         val parent = LocalContainerScreen.current
-        SampleContent(screenPos, viewModel.state.collectAsState().value, parent as StackScreen)
+        SampleContent(screenPos, viewModel.stateFlow.collectAsState().value, parent as StackScreen)
     }
 
 }
 
-class SampleViewModel(private val screenPos: Int) : ViewModel() {
+internal class SampleViewModel(
+    private val screenPos: Int,
+    private val savedStateHandle: SavedStateHandle
+) : ViewModel() {
 
-    val state: MutableStateFlow<Int> = MutableStateFlow(0)
+    val stateFlow: StateFlow<Int> = savedStateHandle.getStateFlow(STATE_KEY, 0)
+    private var state: Int
+        get() = stateFlow.value
+        set(value) {
+            savedStateHandle[STATE_KEY] = value
+        }
 
     init {
         logcat { "SampleViewModel init $screenPos" }
         viewModelScope.launch {
             while (isActive) {
                 delay(10)
-                state.value += 1
+                state += 1
             }
         }
     }
@@ -101,6 +111,10 @@ class SampleViewModel(private val screenPos: Int) : ViewModel() {
     override fun onCleared() {
         logcat { "SampleViewModel onCleared $screenPos" }
         super.onCleared()
+    }
+
+    companion object {
+        private const val STATE_KEY = "STATE_KEY"
     }
 
 }
