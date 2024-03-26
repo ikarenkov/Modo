@@ -19,11 +19,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.androidcomposeapp.ButtonsList
+import com.github.terrakok.androidcomposeapp.ButtonsState
 import com.github.terrakok.androidcomposeapp.ListScreen
 import com.github.terrakok.androidcomposeapp.ModelSampleScreen
+import com.github.terrakok.androidcomposeapp.SampleAppConfig
 import com.github.terrakok.androidcomposeapp.randomBackground
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleContainerScreen
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleMultiScreen
+import com.github.terrakok.androidcomposeapp.screens.dialogs.SampleDialogWithStack
+import com.github.terrakok.androidcomposeapp.screens.viewmodel.AndroidViewModelSampleScreen
+import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.NavigationContainer
 import com.github.terrakok.modo.Screen
@@ -50,6 +55,7 @@ class SampleScreen(
     override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
 
+    @OptIn(ExperimentalModoApi::class)
     @Composable
     override fun Content() {
         OnScreenRemoved {
@@ -62,17 +68,29 @@ class SampleScreen(
 
 @Composable
 internal fun SampleContent(
-    i: Int, navigator:
-    NavigationContainer<StackState>,
+    screenIndex: Int,
+    navigator: NavigationContainer<StackState>,
     isDialog: Boolean = false
 ) {
     var counter by rememberSaveable { mutableStateOf(0) }
     LaunchedEffect(key1 = Unit) {
-        while (isActive) {
-            delay(100)
-            counter++
+        if (SampleAppConfig.counterEnabled) {
+            while (isActive) {
+                delay(100)
+                counter++
+            }
         }
     }
+    SampleContent(screenIndex, counter, navigator, isDialog)
+}
+
+@Composable
+internal fun SampleContent(
+    screenIndex: Int,
+    counter: Int,
+    navigator: NavigationContainer<StackState>,
+    isDialog: Boolean = false
+) {
     Column(
         modifier = Modifier
             .randomBackground()
@@ -83,14 +101,14 @@ internal fun SampleContent(
             text = counter.toString()
         )
         Text(
-            text = "Screen $i",
+            text = "Screen $screenIndex",
             style = MaterialTheme.typography.h6,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.size(16.dp))
         ButtonsList(
-            rememberButtons(navigator, i),
+            rememberButtons(navigator, screenIndex),
             Modifier.weight(1f, fill = false)
         )
     }
@@ -100,8 +118,8 @@ internal fun SampleContent(
 private fun rememberButtons(
     navigator: NavigationContainer<StackState>,
     i: Int
-): List<Pair<String, () -> Unit>> = remember {
-    listOf(
+): ButtonsState = remember {
+    listOf<Pair<String, () -> Unit>>(
         "Forward" to { navigator.forward(SampleScreen(i + 1)) },
         "Back" to { navigator.back() },
         "Replace" to { navigator.replace(SampleScreen(i + 1)) },
@@ -138,7 +156,11 @@ private fun rememberButtons(
 //        "2 items screen" to { navigator.forward(TwoTopItemsStackScreen(i + 1)) },
 //                "Demo" to { navigator.forward(SaveableStateHolderDemoScreen()) },
         "Dialog" to { navigator.forward(SampleDialog(i + 1)) },
+        "Dialog Container" to { navigator.forward(SampleDialogWithStack(i + 1)) },
         "Model" to { navigator.forward(ModelSampleScreen()) },
-        "Bottom Sheet" to { navigator.forward(SampleBottomSheet(i + 1)) },
-    )
+        "Bottom Sheet" to { navigator.forward(SampleBottomSheetStack(i + 1)) },
+        "Android ViewModel" to { navigator.forward(AndroidViewModelSampleScreen(i + 1)) },
+    ).let {
+        ButtonsState(it)
+    }
 }

@@ -9,14 +9,21 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+@Immutable
+data class ButtonsState(
+    val buttons: List<Pair<String, () -> Unit>>,
+)
+
 @Composable
 fun ButtonsList(
-    buttons: List<Pair<String, () -> Any>>,
+    buttonsState: ButtonsState,
     modifier: Modifier = Modifier
 ) {
+    val buttons = buttonsState.buttons
     Column(modifier) {
         for (index in buttons.indices step 2) {
             Row(
