@@ -3,25 +3,53 @@ package com.github.terrakok.modo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
+import com.github.terrakok.modo.android.ModoScreenAndroidAdapter
 import com.github.terrakok.modo.model.ScreenModelStore
 import com.github.terrakok.modo.util.currentOrThrow
+import kotlinx.coroutines.channels.Channel
 
 typealias RendererContent<State> = @Composable ComposeRendererScope<State>.() -> Unit
 
-val defaultRendererContent: (@Composable ComposeRendererScope<*>.() -> Unit) = { screen.SaveableContent() }
+val defaultRendererContent: (@Composable ComposeRendererScope<*>.() -> Unit) = {
+    screen.SaveableContent()
+    val channel = LocalTransitionCompleteChannel.current
+    // There's no animation, we can instantly mark the transition as completed
+    DisposableEffect(screen.screenKey) {
+        onDispose {
+            channel.trySend(Unit)
+        }
+    }
+}
 
-internal val LocalSaveableStateHolder = staticCompositionLocalOf<SaveableStateHolder?> { null }
+val LocalSaveableStateHolder = staticCompositionLocalOf<SaveableStateHolder?> { null }
+
+/**
+ * You can receive channel from it to inform Modo that your custom [ContainerScreen] finished transition and screen can be safely removed.
+ */
+val LocalTransitionCompleteChannel = staticCompositionLocalOf<Channel<Unit>> { error("no channel provided") }
 
 @Composable
 fun Screen.SaveableContent() {
     LocalSaveableStateHolder.currentOrThrow.SaveableStateProvider(key = screenKey) {
-        Content()
+        ModoScreenAndroidAdapter.get(this).ProvideAndroidIntegration {
+            Content()
+        }
+    }
+}
+
+@Composable
+fun Screen.SaveableContentWithAndroidIntegration() {
+    LocalSaveableStateHolder.currentOrThrow.SaveableStateProvider(key = screenKey) {
+        ModoScreenAndroidAdapter.get(this).ProvideAndroidIntegration {
+            Content()
+        }
     }
 }
 
@@ -39,6 +67,12 @@ class ComposeRendererScope<State : NavigationState>(
 internal class ComposeRenderer<State : NavigationState>(
     private val containerScreen: ContainerScreen<*>,
 ) : NavigationRenderer<State> {
+
+    /**
+     * A channel that is used to notify about completing of screen transition, so we can dispose
+     * screen that is removed out of the backstack properly.
+     */
+    val transitionCompleteChannel: Channel<Unit> = Channel(Channel.CONFLATED)
 
     private var lastState: State? = null
     var state: State? by mutableStateOf(null, neverEqualPolicy())
@@ -61,13 +95,14 @@ internal class ComposeRenderer<State : NavigationState>(
         content: RendererContent<State> = defaultRendererContent
     ) {
         val stateHolder: SaveableStateHolder = LocalSaveableStateHolder.currentOrThrow
-        DisposableEffect(key1 = state) {
-            onDispose {
+        LaunchedEffect(screen.screenKey) {
+            for (event in transitionCompleteChannel) {
                 clearScreens(stateHolder)
             }
         }
         CompositionLocalProvider(
-            LocalContainerScreen provides containerScreen
+            LocalContainerScreen provides containerScreen,
+            LocalTransitionCompleteChannel provides transitionCompleteChannel,
         ) {
             ComposeRendererScope(lastState, state, screen).content()
         }
