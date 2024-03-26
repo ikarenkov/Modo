@@ -26,6 +26,7 @@ import com.github.terrakok.androidcomposeapp.SampleAppConfig
 import com.github.terrakok.androidcomposeapp.randomBackground
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleContainerScreen
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleMultiScreen
+import com.github.terrakok.androidcomposeapp.screens.dialogs.SampleDialogWithStack
 import com.github.terrakok.androidcomposeapp.screens.viewmodel.AndroidViewModelSampleScreen
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
@@ -155,8 +156,9 @@ private fun rememberButtons(
 //        "2 items screen" to { navigator.forward(TwoTopItemsStackScreen(i + 1)) },
 //                "Demo" to { navigator.forward(SaveableStateHolderDemoScreen()) },
         "Dialog" to { navigator.forward(SampleDialog(i + 1)) },
+        "Dialog Container" to { navigator.forward(SampleDialogWithStack(i + 1)) },
         "Model" to { navigator.forward(ModelSampleScreen()) },
-        "Bottom Sheet" to { navigator.forward(SampleBottomSheet(i + 1)) },
+        "Bottom Sheet" to { navigator.forward(SampleBottomSheetStack(i + 1)) },
         "Android ViewModel" to { navigator.forward(AndroidViewModelSampleScreen(i + 1)) },
     ).let {
         ButtonsState(it)

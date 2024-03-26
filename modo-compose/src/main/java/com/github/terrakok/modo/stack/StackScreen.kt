@@ -3,6 +3,7 @@ package com.github.terrakok.modo.stack
 import android.os.Parcelable
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -10,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogWindowProvider
+import com.github.terrakok.modo.ComposeRenderer
 import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
@@ -65,6 +67,11 @@ abstract class StackScreen(
                 onDismissRequest = { back() },
                 properties = dialogConfig.dialogProperties
             ) {
+                DisposableEffect(Unit) {
+                    onDispose {
+                        (renderer as ComposeRenderer).transitionCompleteChannel.trySend(Unit)
+                    }
+                }
                 val parent = LocalView.current.parent
                 LaunchedEffect(key1 = parent) {
                     if (!dialogConfig.useSystemDim) {

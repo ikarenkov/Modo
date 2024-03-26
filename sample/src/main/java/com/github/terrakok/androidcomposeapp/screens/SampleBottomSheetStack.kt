@@ -7,22 +7,25 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.window.DialogProperties
+import com.github.terrakok.androidcomposeapp.SlideTransition
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
-import com.github.terrakok.modo.ScreenKey
-import com.github.terrakok.modo.generateScreenKey
+import com.github.terrakok.modo.stack.StackNavModel
 import com.github.terrakok.modo.stack.StackScreen
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.util.currentOrThrow
 import kotlinx.parcelize.Parcelize
 
+/**
+ * The sample of BottomSheet that contains stack of screens inside.
+ */
 @OptIn(ExperimentalModoApi::class)
 @Parcelize
-class SampleBottomSheet(
+class SampleBottomSheetStack(
     private val i: Int,
-    override val screenKey: ScreenKey = generateScreenKey()
-) : DialogScreen {
+    private val navModel: StackNavModel = StackNavModel(SampleScreen(i + 1))
+) : StackScreen(navModel), DialogScreen {
 
     override fun provideDialogConfig(): DialogScreen.DialogConfig = DialogScreen.DialogConfig(
         useSystemDim = false,
@@ -44,7 +47,9 @@ class SampleBottomSheet(
         }
         ModalBottomSheetLayout(
             sheetContent = {
-                SampleContent(i, LocalContainerScreen.current as StackScreen, isDialog = false)
+                TopScreenContent {
+                    SlideTransition()
+                }
             },
             sheetState = state
         ) {

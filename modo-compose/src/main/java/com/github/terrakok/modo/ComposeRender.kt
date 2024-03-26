@@ -30,7 +30,10 @@ val defaultRendererContent: (@Composable ComposeRendererScope<*>.() -> Unit) = {
 
 val LocalSaveableStateHolder = staticCompositionLocalOf<SaveableStateHolder?> { null }
 
-internal val LocalTransitionCompleteChannel = staticCompositionLocalOf<Channel<Unit>> { error("no channel provided") }
+/**
+ * You can receive channel from it to inform Modo that your custom [ContainerScreen] finished transition and screen can be safely removed.
+ */
+val LocalTransitionCompleteChannel = staticCompositionLocalOf<Channel<Unit>> { error("no channel provided") }
 
 @Composable
 fun Screen.SaveableContent() {
@@ -69,7 +72,7 @@ internal class ComposeRenderer<State : NavigationState>(
      * A channel that is used to notify about completing of screen transition, so we can dispose
      * screen that is removed out of the backstack properly.
      */
-    private val transitionCompleteChannel: Channel<Unit> = Channel(Channel.CONFLATED)
+    val transitionCompleteChannel: Channel<Unit> = Channel(Channel.CONFLATED)
 
     private var lastState: State? = null
     var state: State? by mutableStateOf(null, neverEqualPolicy())
