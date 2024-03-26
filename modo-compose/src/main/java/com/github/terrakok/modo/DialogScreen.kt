@@ -5,11 +5,17 @@ import androidx.compose.ui.window.DialogProperties
 @ExperimentalModoApi
 interface DialogScreen : Screen {
 
-    fun provideDialogConfig(): DialogConfig = DialogConfig()
+    fun provideDialogConfig(): DialogConfig = DialogConfig.System()
 
-    data class DialogConfig(
-        val useSystemDim: Boolean = true,
-        val dialogProperties: DialogProperties = DialogProperties()
-    )
+    sealed interface DialogConfig {
+
+        data class System(
+            val useSystemDim: Boolean = true,
+            val dialogProperties: DialogProperties = DialogProperties()
+        ) : DialogConfig
+
+        data object Custom : DialogConfig
+
+    }
 
 }

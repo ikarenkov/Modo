@@ -24,7 +24,7 @@ class SampleDialog(
     override val screenKey: ScreenKey = generateScreenKey()
 ) : DialogScreen {
 
-    override fun provideDialogConfig(): DialogScreen.DialogConfig = DialogScreen.DialogConfig(
+    override fun provideDialogConfig(): DialogScreen.DialogConfig = DialogScreen.DialogConfig.System(
         useSystemDim = true,
         dialogProperties = DialogProperties(
             usePlatformDefaultWidth = true,

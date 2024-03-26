@@ -160,6 +160,7 @@ private fun rememberButtons(
         "Model" to { navigator.forward(ModelSampleScreen()) },
         "Bottom Sheet" to { navigator.forward(SampleBottomSheetStack(i + 1)) },
         "Android ViewModel" to { navigator.forward(AndroidViewModelSampleScreen(i + 1)) },
+        "Custom Bottom Sheet" to { navigator.forward(SampleCustomBottomSheet(i + 1)) },
     ).let {
         ButtonsState(it)
     }

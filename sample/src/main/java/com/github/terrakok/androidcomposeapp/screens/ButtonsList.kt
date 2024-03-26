@@ -1,4 +1,4 @@
-package com.github.terrakok.androidcomposeapp
+package com.github.terrakok.androidcomposeapp.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +11,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Immutable
@@ -60,6 +61,6 @@ fun ModoButton(
     action: () -> Unit
 ) {
     Button(onClick = action, modifier) {
-        Text(text = text)
+        Text(text = text, textAlign = TextAlign.Center)
     }
 }
