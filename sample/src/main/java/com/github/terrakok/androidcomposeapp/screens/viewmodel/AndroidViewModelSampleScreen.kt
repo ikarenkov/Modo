@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.github.terrakok.androidcomposeapp.screens.SampleContent
+import com.github.terrakok.androidcomposeapp.screens.SampleScreenContent
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.Screen
@@ -81,7 +81,7 @@ internal class AndroidViewModelSampleScreen(
             SampleViewModel(screenPos, createSavedStateHandle())
         }
         val parent = LocalContainerScreen.current
-        SampleContent(screenPos, viewModel.stateFlow.collectAsState().value, parent as StackScreen)
+        SampleScreenContent(screenPos, viewModel.stateFlow.collectAsState().value, parent as StackScreen)
     }
 
 }

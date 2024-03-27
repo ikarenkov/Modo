@@ -5,6 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -43,49 +44,70 @@ abstract class StackScreen(
     protected fun TopScreenContent(
         content: RendererContent<StackState> = defaultRendererContent
     ) {
-        val screensToRender: Pair<Screen?, DialogScreen?> by remember {
-            derivedStateOf {
-                val stack = navigationState.stack
-                val topScreen = stack.lastOrNull()
-                if (topScreen is DialogScreen) {
-                    val screen = stack.findLast { it !is DialogScreen }!!
-                    screen to topScreen
-                } else {
-                    topScreen to null
-                }
-            }
-        }
-        val (screen, dialog) = screensToRender
-        if (screen != null) {
+        val screensToRender: ScreensToRender by rememberScreensToRender()
+        screensToRender.screen?.let { screen ->
             Content(screen, content)
         }
-        if (dialog != null) {
-            val dialogConfig = remember(dialog) {
-                dialog.provideDialogConfig()
+        if (screensToRender.dialogs.isNotEmpty()) {
+            for (dialog in screensToRender.dialogs) {
+                RenderDialog(dialog, content)
             }
-            when (dialogConfig) {
-                is DialogScreen.DialogConfig.System -> {
-                    Dialog(
-                        onDismissRequest = { back() },
-                        properties = dialogConfig.dialogProperties
-                    ) {
-                        DisposableEffect(Unit) {
-                            onDispose {
-                                (renderer as ComposeRenderer).transitionCompleteChannel.trySend(Unit)
-                            }
-                        }
-                        val parent = LocalView.current.parent
-                        LaunchedEffect(key1 = parent) {
-                            if (!dialogConfig.useSystemDim) {
-                                (parent as? DialogWindowProvider)?.window?.setDimAmount(0f)
-                            }
-                        }
-                        Content(dialog, content)
+        }
+    }
+
+    @Composable
+    @OptIn(ExperimentalModoApi::class)
+    private fun rememberScreensToRender() = remember {
+        derivedStateOf {
+            val stack = navigationState.stack
+            val topScreen = stack.lastOrNull()
+            if (topScreen is DialogScreen) {
+                val screen = stack.findLast { it !is DialogScreen }!!
+                val dialogs = mutableListOf<DialogScreen>()
+                for (dialog in stack.reversed()) {
+                    if (dialog !is DialogScreen) {
+                        break
+                    }
+                    val needRender = dialog.permanentDialog || dialogs.isEmpty()
+                    if (needRender) {
+                        dialogs += dialog
                     }
                 }
-                is DialogScreen.DialogConfig.Custom -> {
+                ScreensToRender(screen, dialogs.reversed())
+            } else {
+                ScreensToRender(topScreen, emptyList())
+            }
+        }
+    }
+
+    @Composable
+    @OptIn(ExperimentalModoApi::class)
+    private fun StackScreen.RenderDialog(dialog: DialogScreen, content: RendererContent<StackState>) {
+        val dialogConfig = remember(dialog) {
+            dialog.provideDialogConfig()
+        }
+        when (dialogConfig) {
+            is DialogScreen.DialogConfig.System -> {
+                Dialog(
+                    onDismissRequest = { back() },
+                    properties = dialogConfig.dialogProperties
+                ) {
+                    DisposableEffect(Unit) {
+                        onDispose {
+                            (renderer as ComposeRenderer).transitionCompleteChannel.trySend(Unit)
+                        }
+                    }
+                    val parent = LocalView.current.parent
+                    LaunchedEffect(key1 = parent) {
+                        if (!dialogConfig.useSystemDim) {
+                            (parent as? DialogWindowProvider)?.window?.setDimAmount(0f)
+                        }
+                    }
                     Content(dialog, content)
                 }
+            }
+            DialogScreen.DialogConfig.Custom -> {
+                Content(dialog, content)
             }
         }
     }
@@ -105,5 +127,12 @@ abstract class StackScreen(
         }
         super.InternalContent(screen, content)
     }
+
+    @OptIn(ExperimentalModoApi::class)
+    @Stable
+    data class ScreensToRender(
+        val screen: Screen?,
+        val dialogs: List<DialogScreen>,
+    )
 
 }

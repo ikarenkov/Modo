@@ -1,4 +1,4 @@
-package com.github.terrakok.androidcomposeapp.screens
+package com.github.terrakok.androidcomposeapp.screens.dialogs
 
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
@@ -7,11 +7,12 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.window.DialogProperties
-import com.github.terrakok.androidcomposeapp.SlideTransition
+import com.github.terrakok.androidcomposeapp.screens.SampleScreenContent
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
-import com.github.terrakok.modo.stack.StackNavModel
+import com.github.terrakok.modo.ScreenKey
+import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.stack.StackScreen
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.util.currentOrThrow
@@ -22,18 +23,24 @@ import kotlinx.parcelize.Parcelize
  */
 @OptIn(ExperimentalModoApi::class)
 @Parcelize
-class SampleBottomSheetStack(
+class SampleBottomSheet(
     private val i: Int,
-    private val navModel: StackNavModel = StackNavModel(SampleScreen(i + 1))
-) : StackScreen(navModel), DialogScreen {
+    private val systemDialog: Boolean = true,
+    override val permanentDialog: Boolean = false,
+    override val screenKey: ScreenKey = generateScreenKey()
+) : DialogScreen {
 
-    override fun provideDialogConfig(): DialogScreen.DialogConfig = DialogScreen.DialogConfig.System(
-        useSystemDim = false,
-        dialogProperties = DialogProperties(
-            usePlatformDefaultWidth = false,
-            decorFitsSystemWindows = false
+    override fun provideDialogConfig(): DialogScreen.DialogConfig = if (systemDialog) {
+        DialogScreen.DialogConfig.System(
+            useSystemDim = false,
+            dialogProperties = DialogProperties(
+                usePlatformDefaultWidth = false,
+                decorFitsSystemWindows = false
+            )
         )
-    )
+    } else {
+        DialogScreen.DialogConfig.Custom
+    }
 
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
@@ -47,9 +54,7 @@ class SampleBottomSheetStack(
         }
         ModalBottomSheetLayout(
             sheetContent = {
-                TopScreenContent {
-                    SlideTransition()
-                }
+                SampleScreenContent(screenIndex = i, parent = LocalContainerScreen.current as StackScreen)
             },
             sheetState = state
         ) {
