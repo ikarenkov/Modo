@@ -25,16 +25,22 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 class SampleDialogWithStack(
     private val i: Int,
+    private val systemDialog: Boolean = true,
+    override val permanentDialog: Boolean = false,
     private val navModel: StackNavModel = StackNavModel(SampleScreen(i + 1))
 ) : StackScreen(navModel), DialogScreen {
 
-    override fun provideDialogConfig(): DialogScreen.DialogConfig = DialogScreen.DialogConfig.System(
-        useSystemDim = true,
-        dialogProperties = DialogProperties(
-            usePlatformDefaultWidth = true,
-            decorFitsSystemWindows = true
+    override fun provideDialogConfig(): DialogScreen.DialogConfig = if (systemDialog) {
+        DialogScreen.DialogConfig.System(
+            useSystemDim = true,
+            dialogProperties = DialogProperties(
+                usePlatformDefaultWidth = true,
+                decorFitsSystemWindows = true
+            )
         )
-    )
+    } else {
+        DialogScreen.DialogConfig.Custom
+    }
 
     @Composable
     override fun Content() {
