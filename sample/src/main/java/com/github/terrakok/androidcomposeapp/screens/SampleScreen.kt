@@ -2,15 +2,16 @@ package com.github.terrakok.androidcomposeapp.screens
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import com.github.terrakok.androidcomposeapp.ListScreen
 import com.github.terrakok.androidcomposeapp.ModelSampleScreen
 import com.github.terrakok.androidcomposeapp.screens.base.SampleButtonsContent
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleContainerScreen
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleMultiScreen
+import com.github.terrakok.androidcomposeapp.screens.dialogs.DialogsPlayground
 import com.github.terrakok.androidcomposeapp.screens.dialogs.SampleBottomSheetStack
 import com.github.terrakok.androidcomposeapp.screens.dialogs.SampleDialog
 import com.github.terrakok.androidcomposeapp.screens.dialogs.SampleDialogWithStack
-import com.github.terrakok.androidcomposeapp.screens.dialogs.DialogsPlayground
 import com.github.terrakok.androidcomposeapp.screens.viewmodel.AndroidViewModelSampleScreen
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
@@ -53,11 +54,13 @@ class SampleScreen(
 internal fun SampleScreenContent(
     screenIndex: Int,
     parent: StackScreen,
+    modifier: Modifier = Modifier,
     isDialog: Boolean = false
 ) {
     SampleButtonsContent(
         screenIndex = screenIndex,
         buttonsState = rememberButtons(navigator = parent, i = screenIndex),
+        modifier = modifier,
         isDialog = isDialog
     )
 }
@@ -119,13 +122,14 @@ private fun rememberButtons(
         // Just experiments
 //        "2 items screen" to { navigator.forward(TwoTopItemsStackScreen(i + 1)) },
 //                "Demo" to { navigator.forward(SaveableStateHolderDemoScreen()) },
-        "Dialog" to { navigator.forward(SampleDialog(i + 1)) },
+        "Dialog" to { navigator.forward(SampleDialog(i + 1, dialogsPlayground = false, systemDialog = true, permanentDialog = false)) },
         "Permanent Dialog" to { navigator.forward(SamplePermanentDialog(i + 1)) },
         "Dialog Container" to { navigator.forward(SampleDialogWithStack(i + 1)) },
         "Model" to { navigator.forward(ModelSampleScreen()) },
         "Bottom Sheet" to { navigator.forward(SampleBottomSheetStack(i + 1)) },
         "Android ViewModel" to { navigator.forward(AndroidViewModelSampleScreen(i + 1)) },
         "Custom Bottom Sheet" to { navigator.forward(SampleCustomBottomSheet(i + 1)) },
+        "Animation Playground" to { navigator.forward(AnimationPlaygroundScreen()) },
     ).let {
         ButtonsState(it)
     }

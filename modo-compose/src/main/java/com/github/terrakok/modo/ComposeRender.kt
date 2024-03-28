@@ -11,6 +11,7 @@ import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.github.terrakok.modo.android.ModoScreenAndroidAdapter
+import com.github.terrakok.modo.animation.displayingScreens
 import com.github.terrakok.modo.model.ScreenModelStore
 import com.github.terrakok.modo.util.currentOrThrow
 import kotlinx.coroutines.channels.Channel
@@ -39,15 +40,15 @@ val LocalTransitionCompleteChannel = staticCompositionLocalOf<Channel<Unit>> { e
 fun Screen.SaveableContent() {
     LocalSaveableStateHolder.currentOrThrow.SaveableStateProvider(key = screenKey) {
         ModoScreenAndroidAdapter.get(this).ProvideAndroidIntegration {
-            Content()
-        }
-    }
-}
-
-@Composable
-fun Screen.SaveableContentWithAndroidIntegration() {
-    LocalSaveableStateHolder.currentOrThrow.SaveableStateProvider(key = screenKey) {
-        ModoScreenAndroidAdapter.get(this).ProvideAndroidIntegration {
+            DisposableEffect(this@SaveableContent) {
+                // For debugging
+//                Log.d("SaveableContent", "put screen $screenKey")
+                displayingScreens[this@SaveableContent] = Unit
+                onDispose {
+//                    Log.d("SaveableContent", "remove screen $screenKey")
+                    displayingScreens -= this@SaveableContent
+                }
+            }
             Content()
         }
     }
@@ -72,7 +73,7 @@ internal class ComposeRenderer<State : NavigationState>(
      * A channel that is used to notify about completing of screen transition, so we can dispose
      * screen that is removed out of the backstack properly.
      */
-    val transitionCompleteChannel: Channel<Unit> = Channel(Channel.CONFLATED)
+    val transitionCompleteChannel: Channel<Unit> = Channel(Channel.UNLIMITED)
 
     private var lastState: State? = null
     var state: State? by mutableStateOf(null, neverEqualPolicy())
@@ -95,8 +96,18 @@ internal class ComposeRenderer<State : NavigationState>(
         content: RendererContent<State> = defaultRendererContent
     ) {
         val stateHolder: SaveableStateHolder = LocalSaveableStateHolder.currentOrThrow
+        // For cases when content lives composition and LaunchedEffect doesn't handle event.
+        // You can reproduce it by creating custom dialog and pressing back button.
+        // Without this DisposableEffect you will not receive onDestroy events and won't clear screen model store.
+        DisposableEffect(Unit) {
+            onDispose {
+//                Log.d("ComposeRenderer", "DisposableEffect ${screen.screenKey}")
+                clearScreens(stateHolder)
+            }
+        }
         LaunchedEffect(screen.screenKey) {
             for (event in transitionCompleteChannel) {
+//                Log.d("ComposeRenderer", "LaunchedEffect ${screen.screenKey}")
                 clearScreens(stateHolder)
             }
         }
@@ -117,17 +128,32 @@ internal class ComposeRenderer<State : NavigationState>(
         if (clearAll) {
             state?.getChildScreens()?.clearStates(stateHolder)
         }
-        removedScreens.clearStates(stateHolder)
+        // There can be several transition of different screens on the screen, so it is important properly clear screens that are not visible for user.
+        val safeToRemove = removedScreens.filter { it !in displayingScreens }
+        safeToRemove.clearStates(stateHolder)
         if (removedScreens.isNotEmpty()) {
-            removedScreens.clear()
+            safeToRemove.forEach {
+                removedScreens -= it
+            }
         }
     }
 
     private fun Iterable<Screen>.clearStates(stateHolder: SaveableStateHolder) = forEach { screen ->
-        ScreenModelStore.remove(screen)
-        stateHolder.removeState(screen.screenKey)
+        screen.clearState(stateHolder)
+    }
+
+    private fun Screen.clearState(stateHolder: SaveableStateHolder) {
+        if (this in displayingScreens) {
+            ModoDevOptions.onIllegalScreenModelStoreAccess.validationFailed(
+                IllegalStateException(
+                    "Trying to remove clean state of the screen $this, why this screen still is visible for User."
+                )
+            )
+        }
+        ScreenModelStore.remove(this)
+        stateHolder.removeState(screenKey)
         // clear nested screens using recursion
-        ((screen as? ContainerScreen<*>)?.renderer as? ComposeRenderer<*>)?.clearScreens(stateHolder, clearAll = true)
+        ((this as? ContainerScreen<*>)?.renderer as? ComposeRenderer<*>)?.clearScreens(stateHolder, clearAll = true)
     }
 
     private fun calculateRemovedScreens(oldState: NavigationState, newState: NavigationState): List<Screen> {

@@ -22,15 +22,20 @@ class DialogsPlayground(
 ) : Screen {
     @Composable
     override fun Content() {
-        SampleButtonsContent(
-            screenIndex = screenIndex,
-            buttonsState = rememberDialogsButtons(LocalContainerScreen.current as StackScreen, screenIndex)
-        )
+        DialogsPlaygroundContent(screenIndex)
     }
 }
 
 @Composable
-private fun rememberDialogsButtons(
+internal fun DialogsPlaygroundContent(screenIndex: Int) {
+    SampleButtonsContent(
+        screenIndex = screenIndex,
+        buttonsState = rememberDialogsButtons(LocalContainerScreen.current as StackScreen, screenIndex)
+    )
+}
+
+@Composable
+internal fun rememberDialogsButtons(
     navigator: NavigationContainer<StackState>,
     i: Int
 ): ButtonsState =
@@ -38,10 +43,46 @@ private fun rememberDialogsButtons(
         listOf(
             "Forward" to { navigator.forward(SampleScreen(i + 1)) },
             "Forward Dialogs" to { navigator.forward(DialogsPlayground(i + 1)) },
-            "System Dialog" to { navigator.forward(SampleDialog(i + 1, systemDialog = true, permanentDialog = false)) },
-            "Custom Dialog" to { navigator.forward(SampleDialog(i + 1, systemDialog = false, permanentDialog = false)) },
-            "System Dialog perm" to { navigator.forward(SampleDialog(i + 1, systemDialog = true, permanentDialog = true)) },
-            "Custom Dialog perm" to { navigator.forward(SampleDialog(i + 1, systemDialog = false, permanentDialog = true)) },
+            "System Dialog" to {
+                navigator.forward(
+                    SampleDialog(
+                        i + 1,
+                        dialogsPlayground = true,
+                        systemDialog = true,
+                        permanentDialog = false
+                    )
+                )
+            },
+            "Custom Dialog" to {
+                navigator.forward(
+                    SampleDialog(
+                        i + 1,
+                        dialogsPlayground = true,
+                        systemDialog = false,
+                        permanentDialog = false
+                    )
+                )
+            },
+            "System Dialog perm" to {
+                navigator.forward(
+                    SampleDialog(
+                        i + 1,
+                        dialogsPlayground = true,
+                        systemDialog = true,
+                        permanentDialog = true
+                    )
+                )
+            },
+            "Custom Dialog perm" to {
+                navigator.forward(
+                    SampleDialog(
+                        i + 1,
+                        dialogsPlayground = true,
+                        systemDialog = false,
+                        permanentDialog = true
+                    )
+                )
+            },
             "System Dialog Stack" to { navigator.forward(SampleDialogWithStack(i + 1, systemDialog = true, permanentDialog = false)) },
             "Custom Dialog Stack" to { navigator.forward(SampleDialogWithStack(i + 1, systemDialog = false, permanentDialog = false)) },
             "System Dialog Stack perm" to { navigator.forward(SampleDialogWithStack(i + 1, systemDialog = true, permanentDialog = true)) },

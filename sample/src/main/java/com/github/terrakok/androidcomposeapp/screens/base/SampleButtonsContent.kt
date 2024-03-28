@@ -30,7 +30,8 @@ import kotlinx.coroutines.isActive
 internal fun SampleButtonsContent(
     screenIndex: Int,
     buttonsState: ButtonsState,
-    isDialog: Boolean = false
+    modifier: Modifier = Modifier,
+    isDialog: Boolean = false,
 ) {
     var counter by rememberSaveable { mutableStateOf(0) }
     LaunchedEffect(key1 = Unit) {
@@ -41,7 +42,7 @@ internal fun SampleButtonsContent(
             }
         }
     }
-    SampleButtonsContent(screenIndex, counter, buttonsState, isDialog)
+    SampleButtonsContent(screenIndex, counter, buttonsState, modifier, isDialog)
 }
 
 @Composable
@@ -49,10 +50,11 @@ internal fun SampleButtonsContent(
     screenIndex: Int,
     counter: Int,
     buttonsState: ButtonsState,
-    isDialog: Boolean = false
+    modifier: Modifier = Modifier,
+    isDialog: Boolean = false,
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .randomBackground()
             .padding(8.dp)
             .then(if (!isDialog) Modifier.fillMaxSize() else Modifier),
