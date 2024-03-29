@@ -41,7 +41,7 @@ class SampleScreen(
 
     @OptIn(ExperimentalModoApi::class)
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
         OnScreenRemoved {
             logcat { "Screen $screenKey was removed" }
         }

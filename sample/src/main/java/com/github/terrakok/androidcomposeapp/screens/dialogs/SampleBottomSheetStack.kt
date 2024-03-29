@@ -6,6 +6,7 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.DialogProperties
 import com.github.terrakok.androidcomposeapp.SlideTransition
 import com.github.terrakok.androidcomposeapp.screens.SampleScreen
@@ -44,7 +45,7 @@ class SampleBottomSheetStack(
 
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
         val navigation = LocalContainerScreen.currentOrThrow as StackScreen
         val state = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.HalfExpanded)
         LaunchedEffect(key1 = state.currentValue) {

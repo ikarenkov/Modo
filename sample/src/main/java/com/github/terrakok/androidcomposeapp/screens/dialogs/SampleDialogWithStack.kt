@@ -43,7 +43,7 @@ class SampleDialogWithStack(
     }
 
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
         Box(
             Modifier
                 .fillMaxHeight(0.7f)

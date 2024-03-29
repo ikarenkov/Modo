@@ -43,7 +43,7 @@ class SampleMultiScreen(
     override val reducer: NavigationReducer<MultiScreenState> = CustomReducer()
 
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
         var showAllStacks by rememberSaveable {
             mutableStateOf(false)
         }
@@ -84,7 +84,7 @@ class SampleMultiScreen(
                     if (showAllStacks || pos == navigationState.selected) {
                         Box(modifier = Modifier.weight(1f)) {
                             // внутри вызывается используется SaveableStateProvider с одинаковым ключом для экрана
-                            Content(container)
+                            Content(container, Modifier)
                         }
                     }
                 }
@@ -114,5 +114,5 @@ class SampleMultiScreen(
 @Preview
 @Composable
 fun PreviewSampleMultiScreen() {
-    SampleMultiScreen().Content()
+    SampleMultiScreen().Content(Modifier)
 }

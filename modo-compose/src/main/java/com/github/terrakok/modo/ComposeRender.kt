@@ -10,16 +10,17 @@ import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
 import com.github.terrakok.modo.android.ModoScreenAndroidAdapter
 import com.github.terrakok.modo.animation.displayingScreens
 import com.github.terrakok.modo.model.ScreenModelStore
 import com.github.terrakok.modo.util.currentOrThrow
 import kotlinx.coroutines.channels.Channel
 
-typealias RendererContent<State> = @Composable ComposeRendererScope<State>.() -> Unit
+typealias RendererContent<State> = @Composable ComposeRendererScope<State>.(Modifier) -> Unit
 
-val defaultRendererContent: (@Composable ComposeRendererScope<*>.() -> Unit) = {
-    screen.SaveableContent()
+val defaultRendererContent: (@Composable ComposeRendererScope<*>.(Modifier) -> Unit) = { modifier ->
+    screen.SaveableContent(modifier)
     val channel = LocalTransitionCompleteChannel.current
     // There's no animation, we can instantly mark the transition as completed
     DisposableEffect(screen.screenKey) {
@@ -37,7 +38,7 @@ val LocalSaveableStateHolder = staticCompositionLocalOf<SaveableStateHolder?> { 
 val LocalTransitionCompleteChannel = staticCompositionLocalOf<Channel<Unit>> { error("no channel provided") }
 
 @Composable
-fun Screen.SaveableContent() {
+fun Screen.SaveableContent(modifier: Modifier) {
     LocalSaveableStateHolder.currentOrThrow.SaveableStateProvider(key = screenKey) {
         ModoScreenAndroidAdapter.get(this).ProvideAndroidIntegration {
             DisposableEffect(this@SaveableContent) {
@@ -49,7 +50,7 @@ fun Screen.SaveableContent() {
                     displayingScreens -= this@SaveableContent
                 }
             }
-            Content()
+            Content(modifier)
         }
     }
 }
@@ -93,6 +94,7 @@ internal class ComposeRenderer<State : NavigationState>(
     @Composable
     fun Content(
         screen: Screen,
+        modifier: Modifier = Modifier,
         content: RendererContent<State> = defaultRendererContent
     ) {
         val stateHolder: SaveableStateHolder = LocalSaveableStateHolder.currentOrThrow
@@ -115,7 +117,7 @@ internal class ComposeRenderer<State : NavigationState>(
             LocalContainerScreen provides containerScreen,
             LocalTransitionCompleteChannel provides transitionCompleteChannel,
         ) {
-            ComposeRendererScope(lastState, state, screen).content()
+            ComposeRendererScope(lastState, state, screen).content(modifier)
         }
     }
 

@@ -26,7 +26,10 @@ fun ComposeRendererScope<StackState>.SlideTransition() {
                 transitionType == StackTransitionType.Replace -> {
                     scaleIn(initialScale = 2f) + fadeIn() togetherWith fadeOut()
                 }
-                oldState?.stack?.last() is DialogScreen && newState?.stack?.last() is DialogScreen -> {
+                oldState?.stack?.last() is DialogScreen -> {
+                    fadeIn() togetherWith fadeOut()
+                }
+                oldState?.stack?.last() !is DialogScreen && newState?.stack?.last() is DialogScreen -> {
                     fadeIn() togetherWith fadeOut()
                 }
                 else -> {

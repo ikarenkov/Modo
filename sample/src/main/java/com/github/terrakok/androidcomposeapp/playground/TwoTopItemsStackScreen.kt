@@ -32,7 +32,7 @@ class TwoTopItemsStackScreen(
 ) : StackScreen(navModel) {
 
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
         BackHandler(enabled = navigationState.stack.size > 1) {
             back()
         }

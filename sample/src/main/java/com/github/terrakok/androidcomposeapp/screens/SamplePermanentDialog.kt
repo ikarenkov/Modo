@@ -37,7 +37,7 @@ class SamplePermanentDialog(
     )
 
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
         Box(
             Modifier
                 .padding(50.dp)

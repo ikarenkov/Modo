@@ -43,7 +43,7 @@ class SampleContainerScreen(
 
     @OptIn(ExperimentalModoApi::class)
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
         LifecycleScreenEffect {
             object : LifecycleEventObserver {
                 override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
@@ -82,5 +82,5 @@ class SampleContainerScreen(
 @Preview
 @Composable
 private fun PreviewContainerScreen() {
-    SampleContainerScreen(1).Content()
+    SampleContainerScreen(1).Content(Modifier)
 }

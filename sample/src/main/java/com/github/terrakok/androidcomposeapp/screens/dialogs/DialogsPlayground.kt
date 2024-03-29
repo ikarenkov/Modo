@@ -2,6 +2,7 @@ package com.github.terrakok.androidcomposeapp.screens.dialogs
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import com.github.terrakok.androidcomposeapp.screens.ButtonsState
 import com.github.terrakok.androidcomposeapp.screens.SampleScreen
 import com.github.terrakok.androidcomposeapp.screens.base.SampleButtonsContent
@@ -21,7 +22,7 @@ class DialogsPlayground(
     override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
         DialogsPlaygroundContent(screenIndex)
     }
 }

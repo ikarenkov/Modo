@@ -2,6 +2,7 @@ package com.github.terrakok.androidcomposeapp.screens.viewmodel
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -33,7 +34,7 @@ internal class AndroidViewModelSampleScreen(
 
     @OptIn(ExperimentalModoApi::class)
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
 //        val lifecycleOwner = LocalLifecycleOwner.current
 
         // You will lose onResume, onStop, if you use regular DisposableEffect or LaunchedEffect, because it finishes as far as composition ends.

@@ -33,7 +33,7 @@ fun ComposeRendererScope<*>.ScreenTransition(
             scaleIn(initialScale = 0.92f, animationSpec = tween(220, delayMillis = 90)) togetherWith
             fadeOut(animationSpec = tween(90))
     },
-    content: ScreenTransitionContent = { it.SaveableContent() }
+    content: ScreenTransitionContent = { it.SaveableContent(modifier) }
 ) {
     val transition = updateTransition(targetState = screen, label = "ScreenTransition")
     transition.AnimatedContent(

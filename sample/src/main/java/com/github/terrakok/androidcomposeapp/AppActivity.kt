@@ -5,6 +5,7 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import com.github.terrakok.androidcomposeapp.screens.SampleScreen
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleStack
@@ -24,7 +25,7 @@ class AppActivity : AppCompatActivity() {
         }
         setContent {
             Surface(color = MaterialTheme.colors.background) {
-                rootScreen?.Content()
+                rootScreen?.Content(Modifier)
             }
         }
     }

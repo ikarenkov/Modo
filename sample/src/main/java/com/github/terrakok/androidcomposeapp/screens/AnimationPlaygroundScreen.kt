@@ -40,7 +40,7 @@ class AnimationPlaygroundScreen(
     override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
         val stack = remember {
             mutableStateListOf(Item(Color.Yellow))
         }
