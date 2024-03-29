@@ -44,7 +44,7 @@ class SamplePermanentDialog(
                 .clip(RoundedCornerShape(16.dp))
                 .background(Color.White)
         ) {
-            SampleScreenContent(i, LocalContainerScreen.current as StackScreen, isDialog = true)
+            SampleScreenContent(i, LocalContainerScreen.current as StackScreen, modifier)
         }
     }
 }

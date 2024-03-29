@@ -82,7 +82,7 @@ internal class AndroidViewModelSampleScreen(
             SampleViewModel(screenPos, createSavedStateHandle())
         }
         val parent = LocalContainerScreen.current
-        SampleScreenContent(screenPos, viewModel.stateFlow.collectAsState().value, parent as StackScreen)
+        SampleScreenContent(screenPos, viewModel.stateFlow.collectAsState().value, parent as StackScreen, modifier)
     }
 
 }

@@ -55,8 +55,8 @@ class SampleBottomSheetStack(
         }
         ModalBottomSheetLayout(
             sheetContent = {
-                TopScreenContent {
-                    SlideTransition()
+                TopScreenContent { modifier ->
+                    SlideTransition(modifier)
                 }
             },
             sheetState = state

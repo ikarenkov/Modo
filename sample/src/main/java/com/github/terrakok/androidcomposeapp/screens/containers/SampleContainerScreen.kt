@@ -6,8 +6,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -34,7 +37,7 @@ import logcat.logcat
 class SampleContainerScreen(
     private val i: Int,
     private val navModel: StackNavModel
-) : StackScreen(navModel) {
+) : SampleStack(navModel) {
 
     constructor(
         i: Int,
@@ -52,7 +55,7 @@ class SampleContainerScreen(
             }
         }
         val parent = LocalContainerScreen.current as StackScreen
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = modifier) {
             Row(modifier = Modifier.padding(2.dp)) {
                 Text("Container $i")
                 Spacer(modifier = Modifier.weight(1f))
@@ -70,8 +73,10 @@ class SampleContainerScreen(
                     .padding(2.dp)
                     .background(Color.White)
             ) {
-                TopScreenContent {
-                    SlideTransition()
+                TopScreenContent(
+                    modifier = Modifier.fillMaxSize()
+                ) { modifier ->
+                    SlideTransition(modifier)
                 }
             }
         }

@@ -28,12 +28,13 @@ typealias ScreenTransitionContent = @Composable AnimatedVisibilityScope.(Screen)
 @Composable
 fun ComposeRendererScope<*>.ScreenTransition(
     modifier: Modifier = Modifier,
+    screenModifier: Modifier = Modifier,
     transitionSpec: AnimatedContentTransitionScope<Screen>.() -> ContentTransform = {
         fadeIn(animationSpec = tween(220, delayMillis = 90)) +
             scaleIn(initialScale = 0.92f, animationSpec = tween(220, delayMillis = 90)) togetherWith
             fadeOut(animationSpec = tween(90))
     },
-    content: ScreenTransitionContent = { it.SaveableContent(modifier) }
+    content: ScreenTransitionContent = { it.SaveableContent(screenModifier) }
 ) {
     val transition = updateTransition(targetState = screen, label = "ScreenTransition")
     transition.AnimatedContent(

@@ -57,7 +57,8 @@ class SampleBottomSheet(
             sheetContent = {
                 SampleScreenContent(screenIndex = i, parent = LocalContainerScreen.current as StackScreen)
             },
-            sheetState = state
+            sheetState = state,
+            modifier = modifier
         ) {
         }
     }

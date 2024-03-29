@@ -38,7 +38,7 @@ val LocalSaveableStateHolder = staticCompositionLocalOf<SaveableStateHolder?> { 
 val LocalTransitionCompleteChannel = staticCompositionLocalOf<Channel<Unit>> { error("no channel provided") }
 
 @Composable
-fun Screen.SaveableContent(modifier: Modifier) {
+fun Screen.SaveableContent(modifier: Modifier = Modifier) {
     LocalSaveableStateHolder.currentOrThrow.SaveableStateProvider(key = screenKey) {
         ModoScreenAndroidAdapter.get(this).ProvideAndroidIntegration {
             DisposableEffect(this@SaveableContent) {

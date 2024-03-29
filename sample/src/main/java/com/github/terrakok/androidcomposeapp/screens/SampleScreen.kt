@@ -46,7 +46,7 @@ class SampleScreen(
             logcat { "Screen $screenKey was removed" }
         }
         val parent = LocalContainerScreen.current
-        SampleScreenContent(i, parent as StackScreen, isDialog = false)
+        SampleScreenContent(i, parent as StackScreen, modifier)
     }
 }
 
@@ -55,13 +55,11 @@ internal fun SampleScreenContent(
     screenIndex: Int,
     parent: StackScreen,
     modifier: Modifier = Modifier,
-    isDialog: Boolean = false
 ) {
     SampleButtonsContent(
         screenIndex = screenIndex,
         buttonsState = rememberButtons(navigator = parent, i = screenIndex),
         modifier = modifier,
-        isDialog = isDialog
     )
 }
 
@@ -70,13 +68,13 @@ internal fun SampleScreenContent(
     screenIndex: Int,
     counter: Int,
     parent: StackScreen,
-    isDialog: Boolean = false
+    modifier: Modifier
 ) {
     SampleButtonsContent(
         screenIndex = screenIndex,
         buttonsState = rememberButtons(navigator = parent, i = screenIndex),
-        isDialog = isDialog,
-        counter = counter
+        counter = counter,
+        modifier = modifier
     )
 }
 

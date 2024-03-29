@@ -40,7 +40,7 @@ abstract class StackScreen(
      */
     @Composable
     override fun Content(modifier: Modifier) {
-        TopScreenContent()
+        TopScreenContent(modifier)
     }
 
     /**
@@ -189,7 +189,8 @@ data class DialogPlaceHolder(
     @Composable
     override fun Content(modifier: Modifier) {
         Box(
-            modifier.fillMaxSize()
+            // ignore modifier, because it is just invisible placeholder
+            Modifier.fillMaxSize()
         )
     }
 

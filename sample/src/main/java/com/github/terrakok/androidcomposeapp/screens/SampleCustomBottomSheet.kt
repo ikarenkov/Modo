@@ -38,7 +38,7 @@ class SampleCustomBottomSheet(
         }
         ModalBottomSheetLayout(
             sheetContent = {
-                SampleScreenContent(i, LocalContainerScreen.current as StackScreen, isDialog = false)
+                SampleScreenContent(i, LocalContainerScreen.current as StackScreen, modifier)
             },
             sheetState = state
         ) {

@@ -26,7 +26,7 @@ import com.github.terrakok.modo.stack.back
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class SampleStack(
+open class SampleStack(
     private val stackNavModel: StackNavModel
 ) : StackScreen(stackNavModel) {
 
@@ -34,10 +34,12 @@ class SampleStack(
 
     @Composable
     override fun Content(modifier: Modifier) {
-        Box(Modifier.windowInsetsPadding(WindowInsets.systemBars)) {
-            TopScreenContent {
-                SlideTransition()
-            }
+        TopScreenContent(
+            Modifier
+                .windowInsetsPadding(WindowInsets.systemBars)
+                .fillMaxSize()
+        ) { modifier ->
+            SlideTransition(modifier)
         }
     }
 

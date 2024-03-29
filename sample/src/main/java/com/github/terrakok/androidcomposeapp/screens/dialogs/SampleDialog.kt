@@ -69,7 +69,7 @@ class SampleDialog(
                 if (dialogsPlayground) {
                     DialogsPlaygroundContent(screenIndex)
                 } else {
-                    SampleScreenContent(screenIndex, container, isDialog = true)
+                    SampleScreenContent(screenIndex, container, modifier)
                 }
             }
         } else {
@@ -77,7 +77,6 @@ class SampleDialog(
                 SampleButtonsContent(
                     screenIndex = screenIndex,
                     buttonsState = rememberDialogsButtons(LocalContainerScreen.current as StackScreen, screenIndex),
-                    isDialog = true,
                     modifier = modifier
                         .align(Alignment.Center)
                         .padding(horizontal = 50.dp)
