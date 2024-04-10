@@ -43,9 +43,12 @@ class SampleBottomSheetStack(
         DialogScreen.DialogConfig.Custom
     }
 
+    override fun provideDialogPlaceholderScreen(): DialogScreen? = null
+
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content(modifier: Modifier) {
+        SetupSystemBar()
         val navigation = LocalContainerScreen.currentOrThrow as StackScreen
         val state = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.HalfExpanded)
         LaunchedEffect(key1 = state.currentValue) {
@@ -59,7 +62,8 @@ class SampleBottomSheetStack(
                     SlideTransition(modifier)
                 }
             },
-            sheetState = state
+            sheetState = state,
+            modifier = modifier
         ) {
         }
     }

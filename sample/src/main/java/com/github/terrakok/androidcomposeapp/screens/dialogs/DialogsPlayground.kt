@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import com.github.terrakok.androidcomposeapp.screens.ButtonsState
 import com.github.terrakok.androidcomposeapp.screens.SampleScreen
 import com.github.terrakok.androidcomposeapp.screens.base.SampleButtonsContent
+import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.NavigationContainer
 import com.github.terrakok.modo.Screen
@@ -28,13 +29,15 @@ class DialogsPlayground(
 }
 
 @Composable
-internal fun DialogsPlaygroundContent(screenIndex: Int) {
+internal fun DialogsPlaygroundContent(screenIndex: Int, modifier: Modifier = Modifier) {
     SampleButtonsContent(
         screenIndex = screenIndex,
-        buttonsState = rememberDialogsButtons(LocalContainerScreen.current as StackScreen, screenIndex)
+        buttonsState = rememberDialogsButtons(LocalContainerScreen.current as StackScreen, screenIndex),
+        modifier = modifier
     )
 }
 
+@OptIn(ExperimentalModoApi::class)
 @Composable
 internal fun rememberDialogsButtons(
     navigator: NavigationContainer<StackState>,
@@ -96,6 +99,7 @@ internal fun rememberDialogsButtons(
             "Custom BS Stack" to { navigator.forward(SampleBottomSheetStack(i + 1, systemDialog = false, permanentDialog = false)) },
             "System BS Stack perm" to { navigator.forward(SampleBottomSheetStack(i + 1, systemDialog = true, permanentDialog = false)) },
             "Custom BS Stack perm" to { navigator.forward(SampleBottomSheetStack(i + 1, systemDialog = false, permanentDialog = false)) },
+            "System Dialog random dim" to { navigator.forward(SystemDialogWithCustomDimSample(i + 1)) },
         ).let {
             ButtonsState(it)
         }

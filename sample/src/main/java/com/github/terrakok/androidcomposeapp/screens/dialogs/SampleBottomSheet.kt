@@ -1,5 +1,6 @@
 package com.github.terrakok.androidcomposeapp.screens.dialogs
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
@@ -46,6 +47,7 @@ class SampleBottomSheet(
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content(modifier: Modifier) {
+        SetupSystemBar()
         val navigation = LocalContainerScreen.currentOrThrow as StackScreen
         val state = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.HalfExpanded)
         LaunchedEffect(key1 = state.currentValue) {
@@ -55,10 +57,14 @@ class SampleBottomSheet(
         }
         ModalBottomSheetLayout(
             sheetContent = {
-                SampleScreenContent(screenIndex = i, parent = LocalContainerScreen.current as StackScreen)
+                SampleScreenContent(
+                    screenIndex = i,
+                    parent = LocalContainerScreen.current as StackScreen,
+                    modifier = Modifier.fillMaxSize()
+                )
             },
             sheetState = state,
-            modifier = modifier
+            modifier = modifier.fillMaxSize()
         ) {
         }
     }

@@ -82,7 +82,7 @@ object ScreenModelStore {
         screenModel: ScreenModel,
         name: String,
         noinline onDispose: @DisallowComposableCalls (T) -> Unit = {},
-        noinline factory: @DisallowComposableCalls (DependencyKey) -> T
+        factory: @DisallowComposableCalls (DependencyKey) -> T
     ): T {
         val key = getDependencyKey(screenModel, name)
         return getOrPutDependency<T>(key, factory, onDispose)
@@ -105,7 +105,7 @@ object ScreenModelStore {
         name: String,
         tag: String? = null,
         noinline onDispose: @DisallowComposableCalls (T) -> Unit = {},
-        noinline factory: @DisallowComposableCalls (DependencyKey) -> T
+        factory: @DisallowComposableCalls (DependencyKey) -> T
     ): T {
         val key = getDependencyKey(screen, name, tag)
         return getOrPutDependency(key, factory, onDispose)

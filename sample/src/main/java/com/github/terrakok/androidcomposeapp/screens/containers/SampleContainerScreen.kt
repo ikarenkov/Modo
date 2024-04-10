@@ -6,11 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -26,6 +23,7 @@ import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.NavModel
 import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
+import com.github.terrakok.modo.model.OnScreenRemoved
 import com.github.terrakok.modo.stack.StackNavModel
 import com.github.terrakok.modo.stack.StackScreen
 import com.github.terrakok.modo.stack.StackState
@@ -48,11 +46,12 @@ class SampleContainerScreen(
     @Composable
     override fun Content(modifier: Modifier) {
         LifecycleScreenEffect {
-            object : LifecycleEventObserver {
-                override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-                    logcat { "AndroidViewModelSampleScreen $screenKey: Lifecycle.Event $event" }
-                }
+            LifecycleEventObserver { source: LifecycleOwner, event: Lifecycle.Event ->
+                logcat(tag = "SampleContainerScreen") { "$screenKey: Lifecycle.Event $event" }
             }
+        }
+        OnScreenRemoved {
+            logcat { "Screen $screenKey was removed" }
         }
         val parent = LocalContainerScreen.current as StackScreen
         Column(modifier = modifier) {

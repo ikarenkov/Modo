@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -16,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogWindowProvider
+import androidx.core.view.WindowCompat
 import com.github.terrakok.modo.ComposeRenderer
 import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.DialogScreen
@@ -44,6 +44,14 @@ abstract class StackScreen(
     }
 
     /**
+     * The palace holder screen that is used to support animation of showing first dialog appearance.
+     * You can return null to handle appearance animation by yourself.
+     * For more details check out [DialogPlaceHolder] and [TopScreenContent].
+     */
+    @OptIn(ExperimentalModoApi::class)
+    open fun provideDialogPlaceholderScreen(): DialogScreen? = DialogPlaceHolder()
+
+    /**
      * Renders last screen from stack.
      */
     @OptIn(ExperimentalModoApi::class)
@@ -58,14 +66,12 @@ abstract class StackScreen(
             Content(screen, modifier, content)
         }
         val dialogPlaceHolder = rememberSaveable {
-            DialogPlaceHolder()
-        }
+            OptionalScreen(provideDialogPlaceholderScreen())
+        }.screen
         val dialogs = remember {
             derivedStateOf {
-                if (screensToRender.dialogs.isEmpty()) {
-                    listOf(dialogPlaceHolder)
-                } else {
-                    screensToRender.dialogs
+                screensToRender.dialogs.ifEmpty {
+                    listOfNotNull(dialogPlaceHolder)
                 }
             }
         }
@@ -131,10 +137,14 @@ abstract class StackScreen(
                         }
                     }
                     val parent = LocalView.current.parent
-                    LaunchedEffect(key1 = parent) {
-                        if (!dialogConfig.useSystemDim) {
-                            (parent as? DialogWindowProvider)?.window?.setDimAmount(0f)
+                    DisposableEffect(parent) {
+                        (parent as? DialogWindowProvider)?.window?.let { window ->
+                            WindowCompat.setDecorFitsSystemWindows(window, false)
+                            if (!dialogConfig.useSystemDim) {
+                                window.setDimAmount(0f)
+                            }
                         }
+                        onDispose { }
                     }
                     Content(dialog, modifier, content)
                 }
@@ -172,6 +182,12 @@ abstract class StackScreen(
     )
 
 }
+
+@Stable
+@Parcelize
+private data class OptionalScreen<T : Screen?>(
+    val screen: T
+) : Parcelable
 
 /**
  * Special dialog that is used to support Screen.Transition in dialogs.

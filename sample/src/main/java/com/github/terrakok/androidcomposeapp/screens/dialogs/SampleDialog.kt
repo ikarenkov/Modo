@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -26,8 +26,13 @@ import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
 import com.github.terrakok.modo.stack.StackScreen
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.parcelize.Parcelize
 import logcat.logcat
+
+// Only this solution can arrange correct work.
+val showingDialogsCount = MutableStateFlow<Int>(0)
 
 @OptIn(ExperimentalModoApi::class)
 @Parcelize
@@ -51,9 +56,9 @@ class SampleDialog(
         DialogScreen.DialogConfig.Custom
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     override fun Content(modifier: Modifier) {
+        SetupSystemBar()
         LifecycleScreenEffect {
             LifecycleEventObserver { _, event ->
                 logcat(tag = "SampleDialog") { "$screenKey $event" }
@@ -62,14 +67,14 @@ class SampleDialog(
         val container = LocalContainerScreen.current as StackScreen
         if (systemDialog) {
             Box(
-                Modifier
+                modifier
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White)
             ) {
                 if (dialogsPlayground) {
                     DialogsPlaygroundContent(screenIndex)
                 } else {
-                    SampleScreenContent(screenIndex, container, modifier)
+                    SampleScreenContent(screenIndex, container)
                 }
             }
         } else {
@@ -90,6 +95,26 @@ class SampleDialog(
                             indication = null
                         ) {}
                 )
+            }
+        }
+    }
+}
+
+/**
+ * Setups counter of showing dialogs to be able to draw
+ */
+@OptIn(ExperimentalModoApi::class)
+@Composable
+internal fun DialogScreen.SetupSystemBar() {
+    val needDimSystemBars = remember {
+        val dialogConfig = provideDialogConfig()
+        dialogConfig is DialogScreen.DialogConfig.System && !dialogConfig.useSystemDim
+    }
+    if (needDimSystemBars) {
+        DisposableEffect(Unit) {
+            showingDialogsCount.update { it + 1 }
+            onDispose {
+                showingDialogsCount.update { it - 1 }
             }
         }
     }
