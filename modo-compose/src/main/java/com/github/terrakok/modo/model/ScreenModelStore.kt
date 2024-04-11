@@ -5,6 +5,7 @@ import com.github.terrakok.modo.ModoDevOptions
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import kotlinx.coroutines.flow.MutableStateFlow
+import org.jetbrains.annotations.VisibleForTesting
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
@@ -46,7 +47,8 @@ object ScreenModelStore {
     /**
      * For debugging, contains keys of screen that was removed.
      */
-    private val removedScreenKeys = ConcurrentHashMap<ScreenKey, Unit>()
+    @VisibleForTesting
+    internal val removedScreenKeys = ConcurrentHashMap<ScreenKey, Unit>()
 
     private val Screen.isRemoved: Boolean get() = screenKey.isRemoved
     private val ScreenKey.isRemoved: Boolean get() = removedScreenKeys[this] != null
