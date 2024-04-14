@@ -2,6 +2,7 @@ package com.github.terrakok.androidcomposeapp.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,12 +20,15 @@ import kotlinx.parcelize.Parcelize
 
 @OptIn(ExperimentalModoApi::class)
 @Parcelize
-class SampleDialog(
+class SamplePermanentDialog(
     private val i: Int,
     override val screenKey: ScreenKey = generateScreenKey()
 ) : DialogScreen {
 
-    override fun provideDialogConfig(): DialogScreen.DialogConfig = DialogScreen.DialogConfig(
+    override val permanentDialog: Boolean
+        get() = true
+
+    override fun provideDialogConfig(): DialogScreen.DialogConfig = DialogScreen.DialogConfig.System(
         useSystemDim = true,
         dialogProperties = DialogProperties(
             usePlatformDefaultWidth = true,
@@ -33,13 +37,14 @@ class SampleDialog(
     )
 
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
         Box(
             Modifier
+                .padding(50.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .background(Color.White)
         ) {
-            SampleContent(i, LocalContainerScreen.current as StackScreen, isDialog = true)
+            SampleScreenContent(i, LocalContainerScreen.current as StackScreen, modifier)
         }
     }
 }

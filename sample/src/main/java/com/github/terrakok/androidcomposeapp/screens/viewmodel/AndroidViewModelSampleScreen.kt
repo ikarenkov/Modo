@@ -2,6 +2,7 @@ package com.github.terrakok.androidcomposeapp.screens.viewmodel
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -10,7 +11,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.github.terrakok.androidcomposeapp.screens.SampleContent
+import com.github.terrakok.androidcomposeapp.screens.SampleScreenContent
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.Screen
@@ -33,7 +34,7 @@ internal class AndroidViewModelSampleScreen(
 
     @OptIn(ExperimentalModoApi::class)
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
 //        val lifecycleOwner = LocalLifecycleOwner.current
 
         // You will lose onResume, onStop, if you use regular DisposableEffect or LaunchedEffect, because it finishes as far as composition ends.
@@ -81,7 +82,7 @@ internal class AndroidViewModelSampleScreen(
             SampleViewModel(screenPos, createSavedStateHandle())
         }
         val parent = LocalContainerScreen.current
-        SampleContent(screenPos, viewModel.stateFlow.collectAsState().value, parent as StackScreen)
+        SampleScreenContent(screenPos, viewModel.stateFlow.collectAsState().value, parent as StackScreen, modifier)
     }
 
 }

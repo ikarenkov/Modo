@@ -38,7 +38,7 @@ class SaveableStateHolderDemoScreen(
 ) : Screen {
 
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
         ScreenContent()
     }
 

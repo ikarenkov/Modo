@@ -8,7 +8,7 @@ interface NavigationState : Parcelable {
 
 interface NavigationAction
 
-interface NavigationReducer<State : NavigationState> {
+fun interface NavigationReducer<State : NavigationState> {
     fun reduce(action: NavigationAction, state: State): State
 }
 

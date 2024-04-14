@@ -5,6 +5,7 @@ import com.github.terrakok.modo.ModoDevOptions
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import kotlinx.coroutines.flow.MutableStateFlow
+import org.jetbrains.annotations.VisibleForTesting
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
@@ -46,7 +47,8 @@ object ScreenModelStore {
     /**
      * For debugging, contains keys of screen that was removed.
      */
-    private val removedScreenKeys = ConcurrentHashMap<ScreenKey, Unit>()
+    @VisibleForTesting
+    internal val removedScreenKeys = ConcurrentHashMap<ScreenKey, Unit>()
 
     private val Screen.isRemoved: Boolean get() = screenKey.isRemoved
     private val ScreenKey.isRemoved: Boolean get() = removedScreenKeys[this] != null
@@ -82,7 +84,7 @@ object ScreenModelStore {
         screenModel: ScreenModel,
         name: String,
         noinline onDispose: @DisallowComposableCalls (T) -> Unit = {},
-        noinline factory: @DisallowComposableCalls (DependencyKey) -> T
+        factory: @DisallowComposableCalls (DependencyKey) -> T
     ): T {
         val key = getDependencyKey(screenModel, name)
         return getOrPutDependency<T>(key, factory, onDispose)
@@ -105,7 +107,7 @@ object ScreenModelStore {
         name: String,
         tag: String? = null,
         noinline onDispose: @DisallowComposableCalls (T) -> Unit = {},
-        noinline factory: @DisallowComposableCalls (DependencyKey) -> T
+        factory: @DisallowComposableCalls (DependencyKey) -> T
     ): T {
         val key = getDependencyKey(screen, name, tag)
         return getOrPutDependency(key, factory, onDispose)
@@ -138,23 +140,34 @@ object ScreenModelStore {
 
     @PublishedApi
     internal fun assertGetOrPutScreenModelsCorrect(screen: Screen, valueInMap: Any?) {
-        assertGetOrPutCorrect(screen.isRemoved, valueInMap != null)
+        assertGetOrPutCorrect(
+            isScreenRemoved = screen.isRemoved,
+            hasScreenAssociatedValue = valueInMap != null,
+            screenKey = screen.screenKey,
+            screen = screen
+        )
     }
 
     @PublishedApi
     internal fun assertGetOrPutDependencyCorrect(dependencyKey: DependencyKey, valueInMap: Any?) {
-        val screenKey: ScreenKey = ScreenKey(dependencyKey.substringBefore(":"))
-        assertGetOrPutCorrect(screenKey.isRemoved, valueInMap != null)
+        val screenKey = ScreenKey(dependencyKey.substringBefore(":"))
+        assertGetOrPutCorrect(
+            isScreenRemoved = screenKey.isRemoved,
+            hasScreenAssociatedValue = valueInMap != null,
+            screenKey = screenKey,
+            screen = null
+        )
     }
 
     /**
      * If screen is already removed, and we don't have value in map means,
      * that we are going initialize value for removed screen and the error must be reported.
      */
-    private fun assertGetOrPutCorrect(isScreenRemoved: Boolean, hasScreenAssociatedValue: Boolean) {
+    private fun assertGetOrPutCorrect(isScreenRemoved: Boolean, hasScreenAssociatedValue: Boolean, screenKey: ScreenKey, screen: Screen?) {
         if (isScreenRemoved && !hasScreenAssociatedValue) {
             val text = """
                     Trying to initialize dependency after screen is gone.
+                    screenKey = $screenKey, screen = $screen.
                     If you straggled with this issue during implementation your custom ScreenContainer,
                     please take a look to the examples of usage com.github.terrakok.modo.LocalTransitionCompleteChannel at
                     com.github.terrakok.modo.animation.ScreenTransition or com.github.terrakok.modo.defaultRendererContent.

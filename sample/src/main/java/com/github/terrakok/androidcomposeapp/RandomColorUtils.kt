@@ -8,8 +8,12 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import kotlin.random.Random
 
-fun Modifier.randomBackground() = composed {
+fun Modifier.randomBackground(
+    alpha: Float = 1f
+) = composed {
     val backgroundColorInt = rememberSaveable { Random.nextInt() }
-    val backgroundColor = remember { Color(backgroundColorInt) }
+    val backgroundColor = remember { Color(backgroundColorInt).copy(alpha = alpha) }
     then(Modifier.background(backgroundColor))
 }
+
+fun randomColor() = Color(Random.nextInt()).copy(alpha = 1f)

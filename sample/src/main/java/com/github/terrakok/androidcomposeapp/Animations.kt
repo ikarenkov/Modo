@@ -8,6 +8,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import com.github.terrakok.modo.ComposeRendererScope
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
@@ -18,15 +19,23 @@ import com.github.terrakok.modo.stack.StackState
 
 @Composable
 @OptIn(ExperimentalAnimationApi::class, ExperimentalModoApi::class)
-fun ComposeRendererScope<StackState>.SlideTransition() {
+fun ComposeRendererScope<StackState>.SlideTransition(
+    modifier: Modifier,
+    screenModifier: Modifier = Modifier
+) {
     ScreenTransition(
+        modifier = modifier,
+        screenModifier = screenModifier,
         transitionSpec = {
             val transitionType = calculateStackTransitionType(oldState, newState)
             when {
                 transitionType == StackTransitionType.Replace -> {
                     scaleIn(initialScale = 2f) + fadeIn() togetherWith fadeOut()
                 }
-                oldState?.stack?.last() is DialogScreen && newState?.stack?.last() is DialogScreen -> {
+                oldState?.stack?.last() is DialogScreen -> {
+                    fadeIn() togetherWith fadeOut()
+                }
+                oldState?.stack?.last() !is DialogScreen && newState?.stack?.last() is DialogScreen -> {
                     fadeIn() togetherWith fadeOut()
                 }
                 else -> {

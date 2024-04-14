@@ -23,6 +23,7 @@ import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.NavModel
 import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
+import com.github.terrakok.modo.model.OnScreenRemoved
 import com.github.terrakok.modo.stack.StackNavModel
 import com.github.terrakok.modo.stack.StackScreen
 import com.github.terrakok.modo.stack.StackState
@@ -34,7 +35,7 @@ import logcat.logcat
 class SampleContainerScreen(
     private val i: Int,
     private val navModel: StackNavModel
-) : StackScreen(navModel) {
+) : SampleStack(navModel) {
 
     constructor(
         i: Int,
@@ -43,16 +44,17 @@ class SampleContainerScreen(
 
     @OptIn(ExperimentalModoApi::class)
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
         LifecycleScreenEffect {
-            object : LifecycleEventObserver {
-                override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-                    logcat { "AndroidViewModelSampleScreen $screenKey: Lifecycle.Event $event" }
-                }
+            LifecycleEventObserver { source: LifecycleOwner, event: Lifecycle.Event ->
+                logcat(tag = "SampleContainerScreen") { "$screenKey: Lifecycle.Event $event" }
             }
         }
+        OnScreenRemoved {
+            logcat { "Screen $screenKey was removed" }
+        }
         val parent = LocalContainerScreen.current as StackScreen
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = modifier) {
             Row(modifier = Modifier.padding(2.dp)) {
                 Text("Container $i")
                 Spacer(modifier = Modifier.weight(1f))
@@ -70,8 +72,10 @@ class SampleContainerScreen(
                     .padding(2.dp)
                     .background(Color.White)
             ) {
-                TopScreenContent {
-                    SlideTransition()
+                TopScreenContent(
+                    modifier = Modifier.fillMaxSize()
+                ) { modifier ->
+                    SlideTransition(modifier)
                 }
             }
         }
@@ -82,5 +86,5 @@ class SampleContainerScreen(
 @Preview
 @Composable
 private fun PreviewContainerScreen() {
-    SampleContainerScreen(1).Content()
+    SampleContainerScreen(1).Content(Modifier)
 }

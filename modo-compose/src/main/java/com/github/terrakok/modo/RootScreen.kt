@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.compose.ui.Modifier
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -16,12 +17,12 @@ class RootScreen<T : Screen>(
 ) : Screen {
 
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
         val stateHolder: SaveableStateHolder = LocalSaveableStateHolder.current ?: rememberSaveableStateHolder()
         CompositionLocalProvider(
             LocalSaveableStateHolder providesDefault stateHolder
         ) {
-            screen.Content()
+            screen.Content(modifier)
         }
     }
 

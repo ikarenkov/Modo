@@ -4,9 +4,15 @@ import com.github.terrakok.modo.MockScreen
 import com.github.terrakok.modo.MockScreenModel
 import com.github.terrakok.modo.ScreenKey
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class ScreenModelStoreTest {
+
+    @BeforeEach
+    fun setup() {
+        ScreenModelStore.removedScreenKeys.clear()
+    }
 
     @Test
     fun `When screen is removed - than screen model is removed too`() {

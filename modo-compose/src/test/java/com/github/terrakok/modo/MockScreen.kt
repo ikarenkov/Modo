@@ -1,6 +1,7 @@
 package com.github.terrakok.modo
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -9,5 +10,5 @@ class MockScreen(
 ) : Screen {
 
     @Composable
-    override fun Content() = Unit
+    override fun Content(modifier: Modifier) = Unit
 }

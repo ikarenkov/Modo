@@ -4,6 +4,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
 import com.github.terrakok.modo.stack.CompositeAction
 
 val LocalContainerScreen = staticCompositionLocalOf<ContainerScreen<*>?> { null }
@@ -29,10 +30,11 @@ abstract class ContainerScreen<State : NavigationState>(
     @Composable
     protected fun InternalContent(
         screen: Screen,
+        modifier: Modifier,
         content: RendererContent<State> = defaultRendererContent
     ) {
         val composeRenderer = renderer as ComposeRenderer
-        composeRenderer.Content(screen, content)
+        composeRenderer.Content(screen, modifier, content)
     }
 
     override fun toString(): String = screenKey.value

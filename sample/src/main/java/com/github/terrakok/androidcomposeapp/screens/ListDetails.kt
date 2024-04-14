@@ -29,7 +29,7 @@ class ListScreen(
 ) : Screen {
 
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
         val conScreen = LocalContainerScreen.current as StackScreen
         Box(Modifier.fillMaxSize()) {
             val lazyColumnState = rememberSaveable(saver = LazyListState.Saver) {
@@ -61,7 +61,7 @@ class DetailsScreen(
 ) : Screen {
 
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
         Box(Modifier.fillMaxSize()) {
             Column(Modifier.align(Alignment.Center)) {
                 Text(text = "Profile details $userId")

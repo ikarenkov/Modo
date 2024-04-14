@@ -1,31 +1,16 @@
 package com.github.terrakok.androidcomposeapp.screens
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import com.github.terrakok.androidcomposeapp.ButtonsList
-import com.github.terrakok.androidcomposeapp.ButtonsState
 import com.github.terrakok.androidcomposeapp.ListScreen
 import com.github.terrakok.androidcomposeapp.ModelSampleScreen
-import com.github.terrakok.androidcomposeapp.SampleAppConfig
-import com.github.terrakok.androidcomposeapp.randomBackground
+import com.github.terrakok.androidcomposeapp.screens.base.SampleButtonsContent
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleContainerScreen
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleMultiScreen
+import com.github.terrakok.androidcomposeapp.screens.dialogs.DialogsPlayground
+import com.github.terrakok.androidcomposeapp.screens.dialogs.SampleBottomSheetStack
+import com.github.terrakok.androidcomposeapp.screens.dialogs.SampleDialog
 import com.github.terrakok.androidcomposeapp.screens.dialogs.SampleDialogWithStack
 import com.github.terrakok.androidcomposeapp.screens.viewmodel.AndroidViewModelSampleScreen
 import com.github.terrakok.modo.ExperimentalModoApi
@@ -44,7 +29,6 @@ import com.github.terrakok.modo.stack.newStack
 import com.github.terrakok.modo.stack.replace
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import logcat.logcat
@@ -57,61 +41,41 @@ class SampleScreen(
 
     @OptIn(ExperimentalModoApi::class)
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
         OnScreenRemoved {
             logcat { "Screen $screenKey was removed" }
         }
         val parent = LocalContainerScreen.current
-        SampleContent(i, parent as StackScreen)
+        SampleScreenContent(i, parent as StackScreen, modifier)
     }
 }
 
 @Composable
-internal fun SampleContent(
+internal fun SampleScreenContent(
     screenIndex: Int,
-    navigator: NavigationContainer<StackState>,
-    isDialog: Boolean = false
+    parent: StackScreen,
+    modifier: Modifier = Modifier,
 ) {
-    var counter by rememberSaveable { mutableStateOf(0) }
-    LaunchedEffect(key1 = Unit) {
-        if (SampleAppConfig.counterEnabled) {
-            while (isActive) {
-                delay(100)
-                counter++
-            }
-        }
-    }
-    SampleContent(screenIndex, counter, navigator, isDialog)
+    SampleButtonsContent(
+        screenIndex = screenIndex,
+        buttonsState = rememberButtons(navigator = parent, i = screenIndex),
+        modifier = modifier,
+    )
 }
 
 @Composable
-internal fun SampleContent(
+internal fun SampleScreenContent(
     screenIndex: Int,
     counter: Int,
-    navigator: NavigationContainer<StackState>,
-    isDialog: Boolean = false
+    parent: StackScreen,
+    modifier: Modifier
 ) {
-    Column(
-        modifier = Modifier
-            .randomBackground()
-            .padding(8.dp)
-            .then(if (!isDialog) Modifier.fillMaxSize() else Modifier),
-    ) {
-        Text(
-            text = counter.toString()
-        )
-        Text(
-            text = "Screen $screenIndex",
-            style = MaterialTheme.typography.h6,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.size(16.dp))
-        ButtonsList(
-            rememberButtons(navigator, screenIndex),
-            Modifier.weight(1f, fill = false)
-        )
-    }
+    SampleButtonsContent(
+        screenIndex = screenIndex,
+        buttonsState = rememberButtons(navigator = parent, i = screenIndex),
+        counter = counter,
+        modifier = modifier
+    )
 }
 
 @Composable
@@ -121,6 +85,7 @@ private fun rememberButtons(
 ): ButtonsState = remember {
     listOf<Pair<String, () -> Unit>>(
         "Forward" to { navigator.forward(SampleScreen(i + 1)) },
+        "Dialogs Playground" to { navigator.forward(DialogsPlayground(i + 1)) },
         "Back" to { navigator.back() },
         "Replace" to { navigator.replace(SampleScreen(i + 1)) },
         "New stack" to {
@@ -155,11 +120,14 @@ private fun rememberButtons(
         // Just experiments
 //        "2 items screen" to { navigator.forward(TwoTopItemsStackScreen(i + 1)) },
 //                "Demo" to { navigator.forward(SaveableStateHolderDemoScreen()) },
-        "Dialog" to { navigator.forward(SampleDialog(i + 1)) },
+        "Dialog" to { navigator.forward(SampleDialog(i + 1, dialogsPlayground = false, systemDialog = true, permanentDialog = false)) },
+        "Permanent Dialog" to { navigator.forward(SamplePermanentDialog(i + 1)) },
         "Dialog Container" to { navigator.forward(SampleDialogWithStack(i + 1)) },
         "Model" to { navigator.forward(ModelSampleScreen()) },
         "Bottom Sheet" to { navigator.forward(SampleBottomSheetStack(i + 1)) },
         "Android ViewModel" to { navigator.forward(AndroidViewModelSampleScreen(i + 1)) },
+        "Custom Bottom Sheet" to { navigator.forward(SampleCustomBottomSheet(i + 1)) },
+        "Animation Playground" to { navigator.forward(AnimationPlaygroundScreen()) },
     ).let {
         ButtonsState(it)
     }

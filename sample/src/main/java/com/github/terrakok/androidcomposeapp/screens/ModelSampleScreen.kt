@@ -23,7 +23,7 @@ class ModelSampleScreen(
 ) : Screen {
 
     @Composable
-    override fun Content() {
+    override fun Content(modifier: Modifier) {
         val screenModel = rememberScreenModel {
             SampleScreenModel()
         }
