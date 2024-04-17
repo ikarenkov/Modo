@@ -20,7 +20,7 @@ import com.github.terrakok.modo.ComposeRenderer
 import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
-import com.github.terrakok.modo.NavigationReducer
+import com.github.terrakok.modo.NavigationContainer
 import com.github.terrakok.modo.RendererContent
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
@@ -28,11 +28,15 @@ import com.github.terrakok.modo.defaultRendererContent
 import com.github.terrakok.modo.generateScreenKey
 import kotlinx.parcelize.Parcelize
 
+typealias StackContainer = NavigationContainer<StackState, StackAction>
+
+/**
+ * Basic screen container that represents stack of [Screen]'s.
+ */
 abstract class StackScreen(
     navigationModel: StackNavModel
-) : ContainerScreen<StackState>(navigationModel), Parcelable {
+) : ContainerScreen<StackState, StackAction>(navigationModel), Parcelable {
 
-    override val reducer: NavigationReducer<StackState> = StackReducer()
     open val defaultBackHandler: Boolean = true
 
     /**

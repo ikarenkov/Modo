@@ -1,27 +1,17 @@
 package com.github.terrakok.androidcomposeapp.screens.containers
 
-import com.github.terrakok.modo.NavigationAction
-import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.Screen
-import com.github.terrakok.modo.multiscreen.MultiReducer
+import com.github.terrakok.modo.multiscreen.MultiScreenReducerAction
 import com.github.terrakok.modo.multiscreen.MultiScreenState
 
 class AddTab(
     val id: String,
     val rootScreen: Screen
-) : NavigationAction
-
-class CustomReducer : NavigationReducer<MultiScreenState> {
-    private val multiReducer = MultiReducer()
-
-    override fun reduce(action: NavigationAction, state: MultiScreenState): MultiScreenState {
-        if (action is AddTab) {
-            return MultiScreenState(
-                state.containers + SampleStack(action.rootScreen),
-                state.selected
-            )
-        }
-        return multiReducer.reduce(action, state)
+) : MultiScreenReducerAction {
+    override fun reduce(oldState: MultiScreenState): MultiScreenState {
+        return MultiScreenState(
+            oldState.containers + SampleStack(rootScreen),
+            oldState.selected
+        )
     }
-
 }

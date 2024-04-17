@@ -3,16 +3,13 @@ package com.github.terrakok.modo.multiscreen
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.github.terrakok.modo.ContainerScreen
-import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.RendererContent
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.defaultRendererContent
 
 abstract class MultiScreen(
     navigationModel: MultiScreenNavModel
-) : ContainerScreen<MultiScreenState>(navigationModel) {
-
-    override val reducer: NavigationReducer<MultiScreenState> = MultiReducer()
+) : ContainerScreen<MultiScreenState, MultiScreenAction>(navigationModel) {
 
     @Composable
     override fun Content(modifier: Modifier) {

@@ -34,13 +34,13 @@ object Modo {
     /**
      * Must be called to clear all data from [ScreenModelStore], related with removed screens.
      */
-    fun <T: ContainerScreen<*>> onRootScreenFinished(rootScreen: RootScreen<T>?) {
+    fun <T: ContainerScreen<*, *>> onRootScreenFinished(rootScreen: RootScreen<T>?) {
         rootScreen?.screen?.let(::clearScreenModel)
     }
 
     private fun clearScreenModel(screen: Screen) {
         ScreenModelStore.remove(screen)
-        (screen as? ContainerScreen<*>)?.navigationState?.getChildScreens()?.forEach(::clearScreenModel)
+        (screen as? ContainerScreen<*, *>)?.navigationState?.getChildScreens()?.forEach(::clearScreenModel)
     }
 
 }

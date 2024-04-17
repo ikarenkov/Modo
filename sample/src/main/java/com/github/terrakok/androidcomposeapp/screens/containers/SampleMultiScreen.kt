@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.github.terrakok.androidcomposeapp.screens.SampleScreen
 import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.multiscreen.MultiScreen
+import com.github.terrakok.modo.multiscreen.MultiScreenAction
 import com.github.terrakok.modo.multiscreen.MultiScreenNavModel
 import com.github.terrakok.modo.multiscreen.MultiScreenState
 import com.github.terrakok.modo.multiscreen.selectContainer
@@ -40,7 +41,9 @@ class SampleMultiScreen(
 ) : MultiScreen(navModel) {
 
     @IgnoredOnParcel
-    override val reducer: NavigationReducer<MultiScreenState> = CustomReducer()
+    override val reducer: NavigationReducer<MultiScreenState, MultiScreenAction> = NavigationReducer { action, state ->
+        if (action is AddTab) state else null
+    }
 
     @Composable
     override fun Content(modifier: Modifier) {

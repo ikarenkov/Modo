@@ -40,7 +40,7 @@ internal fun DialogsPlaygroundContent(screenIndex: Int, modifier: Modifier = Mod
 @OptIn(ExperimentalModoApi::class)
 @Composable
 internal fun rememberDialogsButtons(
-    navigator: NavigationContainer<StackState>,
+    navigator: StackScreen,
     i: Int
 ): ButtonsState =
     remember {
