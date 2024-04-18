@@ -62,15 +62,17 @@ class SampleDialogWithStack(
         val container = LocalContainerScreen.current as StackScreen
         if (systemDialog) {
             Box(
-                Modifier
+                modifier
                     .fillMaxHeight(0.6f)
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White)
             ) {
                 TopScreenContent { modifier ->
                     SlideTransition(
-                        modifier,
-                        screenModifier = Modifier.background(Color.Black)
+                        Modifier,
+                        screenModifier = modifier
+                            .fillMaxSize()
+                            .background(Color.Black)
                     )
                 }
             }

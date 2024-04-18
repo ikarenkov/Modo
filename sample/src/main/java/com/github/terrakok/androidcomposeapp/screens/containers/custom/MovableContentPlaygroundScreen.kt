@@ -15,7 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.movableContentOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -30,7 +33,10 @@ internal class MovableContentPlaygroundScreen(
     override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
 
-    private var list by mutableStateOf(List(20) { it })
+    private var counter = 3
+    private var list = mutableStateListOf<Int>().apply {
+        for (i in 0..< counter) add(i)
+    }
 
     @Composable
     override fun Content(modifier: Modifier) {
@@ -38,7 +44,7 @@ internal class MovableContentPlaygroundScreen(
             InnerContent(
                 title = "Item $item",
                 onRemoveClick = {
-                    list = list.filter { item != it }
+                    list.remove(item)
                 },
                 modifier = Modifier
                     .height(height = 50.dp)
@@ -46,11 +52,18 @@ internal class MovableContentPlaygroundScreen(
             )
         }
         Column(modifier.windowInsetsPadding(WindowInsets.systemBars)) {
-            Button(onClick = { list = list.filterIndexed { index, innerScreen -> index != 0 } }) {
+            Button(onClick = { list.removeFirst()}) {
                 Text(text = "Remove first")
             }
-            LazyColumn {
-                items(list) { item ->
+            Button(
+                onClick = {
+                    list.add(0, counter++)
+                }
+            ) {
+                Text(text = "Add first")
+            }
+            Column {
+                list.forEach { item ->
                     listComposable(item)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
@@ -62,16 +75,18 @@ internal class MovableContentPlaygroundScreen(
     fun <T> List<T>.movable(
         transform: @Composable (item: T) -> Unit
     ): @Composable (item: T) -> Unit {
-        val composedItems = rememberSaveable { mutableMapOf<T, @Composable () -> Unit>() }
-        DisposableEffect(key1 = this) {
-            val movableContentScreens = composedItems.keys
-            val actualScreens = this@movable.toSet()
-            val removedScreens = movableContentScreens - actualScreens
-            removedScreens.forEach {
-                composedItems -= it
-            }
-            onDispose { }
+        val composedItems = remember {
+            mutableStateMapOf<T, @Composable () -> Unit>()
         }
+//        DisposableEffect(key1 = this) {
+//            val movableContentScreens = composedItems.keys
+//            val actualScreens = this@movable.toSet()
+//            val removedScreens = movableContentScreens - actualScreens
+//            removedScreens.forEach {
+//                composedItems -= it
+//            }
+//            onDispose { }
+//        }
         return { item: T ->
             composedItems.getOrPut(item) {
                 movableContentOf { transform(item) }

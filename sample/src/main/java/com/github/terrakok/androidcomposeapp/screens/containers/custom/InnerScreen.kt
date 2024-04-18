@@ -50,14 +50,17 @@ class InnerScreen(
                 logcat(tag = "InnerScreen Lifecycle") { "$screenKey $event" }
             }
         }
-        InnerContent(title = "Screen $screenKey", onRemoveClick = closeScreen, modifier = modifier)
+        InnerContent(
+            title = "Screen $screenKey",
+            onRemoveClick = closeScreen,
+            modifier = modifier)
     }
 }
 
 @Composable
 fun InnerContent(
     title: String,
-    onRemoveClick: () -> Unit,
+    onRemoveClick: (() -> Unit)?,
     modifier: Modifier = Modifier
 ) {
     val parent = LocalContainerScreen.current
@@ -73,11 +76,13 @@ fun InnerContent(
             val counter by rememberCounterState()
             Text(text = "$counter")
         }
-        IconButton(onClick = onRemoveClick) {
-            Icon(
-                painter = rememberVectorPainter(image = Icons.Outlined.Close),
-                contentDescription = "Close screen"
-            )
+        if (onRemoveClick != null) {
+            IconButton(onClick = onRemoveClick) {
+                Icon(
+                    painter = rememberVectorPainter(image = Icons.Outlined.Close),
+                    contentDescription = "Close screen"
+                )
+            }
         }
     }
 }

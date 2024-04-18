@@ -18,6 +18,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.movableContentOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -93,7 +94,7 @@ internal class SampleCustomContainerScreen(
                     onClick = {
                         navModel.dispatch(
                             CustomContainerReducerAction { state ->
-                                CustomContainerState(state.screens + InnerScreen())
+                                CustomContainerState(listOf(InnerScreen()) + state.screens)
                             }
                         )
                     },
@@ -130,16 +131,15 @@ internal class SampleCustomContainerScreen(
         transform: @Composable (screen: Screen) -> Unit
     ): @Composable (item: Screen) -> Unit {
         val screens = navigationState.screens
-        val composedItems = remember { mutableMapOf<Screen, @Composable () -> Unit>() }
+        val composedItems = remember { mutableStateMapOf<Screen, @Composable () -> Unit>() }
         DisposableEffect(key1 = this) {
-            onDispose {
-                val movableContentScreens = composedItems.keys
-                val actualScreens = screens.toSet()
-                val removedScreens = movableContentScreens - actualScreens
-                removedScreens.forEach {
-                    composedItems -= it
-                }
+            val movableContentScreens = composedItems.keys
+            val actualScreens = screens.toSet()
+            val removedScreens = movableContentScreens - actualScreens
+            removedScreens.forEach {
+                composedItems -= it
             }
+            onDispose {}
         }
         return { item: Screen ->
             composedItems.getOrPut(item) {

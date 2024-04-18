@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 val LocalContainerScreen = staticCompositionLocalOf<ContainerScreen<*, *>?> { null }
 
 class CompositeAction<State : NavigationState, Action : NavigationAction<State>>(vararg val actions: Action) : NavigationAction<State>
+
 fun interface ReducerAction<State : NavigationState> : NavigationAction<State> {
     fun reduce(oldState: State): State
 }
