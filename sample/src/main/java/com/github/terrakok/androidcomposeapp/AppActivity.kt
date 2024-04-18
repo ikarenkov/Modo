@@ -27,7 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
-import com.github.terrakok.androidcomposeapp.screens.SampleScreen
+import com.github.terrakok.androidcomposeapp.screens.MainScreen
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleStack
 import com.github.terrakok.androidcomposeapp.screens.dialogs.showingDialogsCount
 import com.github.terrakok.modo.Modo
@@ -42,7 +42,7 @@ class AppActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         rootScreen = Modo.init(savedInstanceState, rootScreen) {
-            SampleStack(SampleScreen(1))
+            SampleStack(MainScreen(1))
         }
         setContent {
             Surface(color = MaterialTheme.colors.background) {

@@ -4,16 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.github.terrakok.androidcomposeapp.screens.ButtonsState
-import com.github.terrakok.androidcomposeapp.screens.SampleScreen
-import com.github.terrakok.androidcomposeapp.screens.base.SampleButtonsContent
+import com.github.terrakok.androidcomposeapp.screens.MainScreen
+import com.github.terrakok.androidcomposeapp.screens.base.MainButtonsContent
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
-import com.github.terrakok.modo.NavigationContainer
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.stack.StackScreen
-import com.github.terrakok.modo.stack.StackState
 import com.github.terrakok.modo.stack.forward
 import kotlinx.parcelize.Parcelize
 
@@ -24,14 +22,15 @@ class DialogsPlayground(
 ) : Screen {
     @Composable
     override fun Content(modifier: Modifier) {
-        DialogsPlaygroundContent(screenIndex)
+        DialogsPlaygroundContent(screenIndex, screenKey)
     }
 }
 
 @Composable
-internal fun DialogsPlaygroundContent(screenIndex: Int, modifier: Modifier = Modifier) {
-    SampleButtonsContent(
+internal fun DialogsPlaygroundContent(screenIndex: Int, screenKey: ScreenKey, modifier: Modifier = Modifier) {
+    MainButtonsContent(
         screenIndex = screenIndex,
+        screenKey = screenKey,
         buttonsState = rememberDialogsButtons(LocalContainerScreen.current as StackScreen, screenIndex),
         modifier = modifier
     )
@@ -45,7 +44,7 @@ internal fun rememberDialogsButtons(
 ): ButtonsState =
     remember {
         listOf(
-            "Forward" to { navigator.forward(SampleScreen(i + 1)) },
+            "Forward" to { navigator.forward(MainScreen(i + 1)) },
             "Forward Dialogs" to { navigator.forward(DialogsPlayground(i + 1)) },
             "System Dialog" to {
                 navigator.forward(

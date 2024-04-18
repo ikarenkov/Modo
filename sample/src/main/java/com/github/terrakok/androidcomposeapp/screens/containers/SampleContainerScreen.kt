@@ -18,7 +18,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.github.terrakok.androidcomposeapp.SlideTransition
-import com.github.terrakok.androidcomposeapp.screens.SampleScreen
+import com.github.terrakok.androidcomposeapp.screens.MainScreen
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.NavModel
@@ -39,7 +39,7 @@ class SampleContainerScreen(
 
     constructor(
         i: Int,
-        sampleNavigationState: StackState = StackState(SampleScreen(1))
+        sampleNavigationState: StackState = StackState(MainScreen(1))
     ) : this(i, NavModel(sampleNavigationState))
 
     @OptIn(ExperimentalModoApi::class)

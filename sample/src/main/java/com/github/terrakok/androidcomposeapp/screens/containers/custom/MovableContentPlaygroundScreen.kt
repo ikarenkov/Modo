@@ -13,14 +13,10 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.Screen
@@ -35,7 +31,7 @@ internal class MovableContentPlaygroundScreen(
 
     private var counter = 3
     private var list = mutableStateListOf<Int>().apply {
-        for (i in 0..< counter) add(i)
+        for (i in 0..<counter) add(i)
     }
 
     @Composable
@@ -52,7 +48,7 @@ internal class MovableContentPlaygroundScreen(
             )
         }
         Column(modifier.windowInsetsPadding(WindowInsets.systemBars)) {
-            Button(onClick = { list.removeFirst()}) {
+            Button(onClick = { list.removeFirst() }) {
                 Text(text = "Remove first")
             }
             Button(
@@ -62,8 +58,8 @@ internal class MovableContentPlaygroundScreen(
             ) {
                 Text(text = "Add first")
             }
-            Column {
-                list.forEach { item ->
+            LazyColumn {
+                items(list, key = { it }) { item ->
                     listComposable(item)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
@@ -78,15 +74,15 @@ internal class MovableContentPlaygroundScreen(
         val composedItems = remember {
             mutableStateMapOf<T, @Composable () -> Unit>()
         }
-//        DisposableEffect(key1 = this) {
-//            val movableContentScreens = composedItems.keys
-//            val actualScreens = this@movable.toSet()
-//            val removedScreens = movableContentScreens - actualScreens
-//            removedScreens.forEach {
-//                composedItems -= it
-//            }
-//            onDispose { }
-//        }
+        DisposableEffect(key1 = this) {
+            val movableContentScreens = composedItems.keys
+            val actualScreens = this@movable.toSet()
+            val removedScreens = movableContentScreens - actualScreens
+            removedScreens.forEach {
+                composedItems -= it
+            }
+            onDispose { }
+        }
         return { item: T ->
             composedItems.getOrPut(item) {
                 movableContentOf { transform(item) }

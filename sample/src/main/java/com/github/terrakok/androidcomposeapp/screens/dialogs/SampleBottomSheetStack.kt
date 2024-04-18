@@ -9,7 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.DialogProperties
 import com.github.terrakok.androidcomposeapp.SlideTransition
-import com.github.terrakok.androidcomposeapp.screens.SampleScreen
+import com.github.terrakok.androidcomposeapp.screens.MainScreen
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
@@ -28,7 +28,7 @@ class SampleBottomSheetStack(
     private val i: Int,
     private val systemDialog: Boolean = true,
     override val permanentDialog: Boolean = false,
-    private val navModel: StackNavModel = StackNavModel(SampleScreen(i + 1))
+    private val navModel: StackNavModel = StackNavModel(MainScreen(i + 1))
 ) : StackScreen(navModel), DialogScreen {
 
     override fun provideDialogConfig(): DialogScreen.DialogConfig = if (systemDialog) {

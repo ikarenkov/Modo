@@ -19,7 +19,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.github.terrakok.androidcomposeapp.screens.SampleScreen
+import com.github.terrakok.androidcomposeapp.screens.MainScreen
 import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.multiscreen.MultiScreen
 import com.github.terrakok.modo.multiscreen.MultiScreenAction
@@ -33,9 +33,9 @@ import kotlinx.parcelize.Parcelize
 class SampleMultiScreen(
     private val navModel: MultiScreenNavModel = MultiScreenNavModel(
         containers = listOf(
-            SampleStack(SampleScreen(1)),
-            SampleStack(SampleScreen(2)),
-            SampleStack(SampleScreen(3)),
+            SampleStack(MainScreen(1)),
+            SampleStack(MainScreen(2)),
+            SampleStack(MainScreen(3)),
         ),
         selected = 1
     )
@@ -71,7 +71,7 @@ class SampleMultiScreen(
                 }
                 Text(
                     modifier = Modifier
-                        .clickable { dispatch(AddTab(navigationState.containers.size.toString(), SampleScreen(1))) }
+                        .clickable { dispatch(AddTab(navigationState.containers.size.toString(), MainScreen(1))) }
                         .padding(16.dp),
                     textAlign = TextAlign.Center,
                     text = "[+]"

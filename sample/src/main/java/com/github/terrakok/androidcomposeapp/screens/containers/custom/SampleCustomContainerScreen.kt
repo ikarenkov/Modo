@@ -82,7 +82,7 @@ internal class SampleCustomContainerScreen(
                     }
                 } else {
                     LazyColumn {
-                        items(navigationState.screens) { screen ->
+                        items(navigationState.screens, key = { it.screenKey }) { screen ->
                             screenContent(screen)
                             Spacer(modifier = Modifier.height(8.dp))
                         }

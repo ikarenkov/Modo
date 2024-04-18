@@ -1,9 +1,11 @@
 package com.github.terrakok.androidcomposeapp.screens.containers
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -17,35 +19,29 @@ import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.lifecycle.LifecycleEventObserver
-import com.github.terrakok.androidcomposeapp.screens.SampleScreen
-import com.github.terrakok.androidcomposeapp.screens.containers.custom.InnerContent
+import androidx.compose.ui.unit.dp
+import com.github.terrakok.androidcomposeapp.screens.MainScreen
 import com.github.terrakok.modo.ContainerScreen
-import com.github.terrakok.modo.ExperimentalModoApi
-import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.NavModel
-import com.github.terrakok.modo.Screen
-import com.github.terrakok.modo.ScreenKey
-import com.github.terrakok.modo.generateScreenKey
-import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
 import com.github.terrakok.modo.list.ListNavigationAction
 import com.github.terrakok.modo.list.ListNavigationState
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
-import logcat.logcat
 
 @Parcelize
 class HorizontalPagerScreen(
     private val navModel: NavModel<ListNavigationState, ListNavigationAction> = NavModel(
         ListNavigationState(
             listOf(
-                SampleStack(SampleScreen(0)),
-                PageScreen(canBeRemoved = true),
-                PageScreen(canBeRemoved = true),
+                SampleStack(MainScreen(0)),
+                SampleStack(MainScreen(0)),
+                SampleStack(MainScreen(0)),
             )
         )
     )
@@ -87,48 +83,31 @@ class HorizontalPagerScreen(
                 }
             }
             HorizontalPager(
-                state = pagerState
+                state = pagerState,
+                key = { navigationState.screens[it].screenKey }
             ) { pos ->
-                InternalContent(screen = navigationState.screens[pos], Modifier.fillMaxSize())
+                Box {
+                    val screen = navigationState.screens[pos]
+                    InternalContent(screen = screen, Modifier.fillMaxSize())
+                    IconButton(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(16.dp),
+                        onClick = { dispatch(ListNavigationAction.Remove(screen)) }
+                    ) {
+                        Icon(
+                            painter = rememberVectorPainter(image = Icons.Default.Close),
+                            contentDescription = "Close screen"
+                        )
+                    }
+                }
             }
         }
     }
 
     object AddStack : ListNavigationAction {
         override fun reduce(oldState: ListNavigationState): ListNavigationState = ListNavigationState(
-            oldState.screens + SampleStack(SampleScreen(0))
+            oldState.screens + SampleStack(MainScreen(0))
         )
     }
-}
-
-@Parcelize
-internal class PageScreen(
-    val canBeRemoved: Boolean,
-    override val screenKey: ScreenKey = generateScreenKey()
-) : Screen {
-
-    @OptIn(ExperimentalModoApi::class)
-    @Composable
-    override fun Content(modifier: Modifier) {
-        val parent = LocalContainerScreen.current as HorizontalPagerScreen
-        LifecycleScreenEffect {
-            LifecycleEventObserver { _, event ->
-                logcat(tag = "PageScreen Lifecycle") { "$screenKey $event" }
-            }
-        }
-        InnerContent(
-            title = screenKey.value,
-            onRemoveClick = takeIf { canBeRemoved }?.let {
-                {
-                    parent.dispatch(
-                        ListNavigationAction {
-                            ListNavigationState(it.screens.filter { it != this })
-                        }
-                    )
-                }
-            },
-            modifier = modifier
-        )
-    }
-
 }
