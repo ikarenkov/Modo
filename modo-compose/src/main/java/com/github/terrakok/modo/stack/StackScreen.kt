@@ -35,7 +35,7 @@ typealias StackContainer = NavigationContainer<StackState, StackAction>
  */
 abstract class StackScreen(
     navigationModel: StackNavModel
-) : ContainerScreen<StackState, StackAction>(navigationModel), Parcelable {
+) : ContainerScreen<StackState, StackAction>(navigationModel), StackNavigationContainer {
 
     open val defaultBackHandler: Boolean = true
 

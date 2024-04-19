@@ -10,7 +10,7 @@ import kotlinx.parcelize.Parcelize
 
 typealias MultiScreenNavModel = NavModel<MultiScreenState, MultiScreenAction>
 
-typealias MultiScreenContainer = NavigationContainer<MultiScreenState, MultiScreenAction>
+interface MultiScreenContainer : NavigationContainer<MultiScreenState, MultiScreenAction>
 
 fun MultiScreenNavModel(
     containers: List<ContainerScreen<*, *>>,

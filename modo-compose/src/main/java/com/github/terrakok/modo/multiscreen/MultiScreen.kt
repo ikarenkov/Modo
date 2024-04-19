@@ -9,7 +9,7 @@ import com.github.terrakok.modo.defaultRendererContent
 
 abstract class MultiScreen(
     navigationModel: MultiScreenNavModel
-) : ContainerScreen<MultiScreenState, MultiScreenAction>(navigationModel) {
+) : ContainerScreen<MultiScreenState, MultiScreenAction>(navigationModel), MultiScreenContainer {
 
     @Composable
     override fun Content(modifier: Modifier) {

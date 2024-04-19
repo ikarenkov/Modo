@@ -33,6 +33,19 @@ class NewStack(val screen: Screen, vararg val screens: Screen) : StackReducerAct
 }
 
 class BackTo(val backToCondition: (pos: Int, screen: Screen) -> Boolean) : StackReducerAction {
+
+    constructor(screenKey: ScreenKey) : this(
+        { _, screen ->
+            screen.screenKey == screenKey
+        }
+    )
+
+    constructor(screen: Screen) : this(
+        { _, screen ->
+            screen == screen
+        }
+    )
+
     override fun reduce(oldState: StackState): StackState {
         val stack = oldState.stack
         var foundPos = -1
@@ -46,12 +59,8 @@ class BackTo(val backToCondition: (pos: Int, screen: Screen) -> Boolean) : Stack
     }
 
     companion object {
-        operator fun invoke(screenKey: ScreenKey): StackReducerAction = BackTo { _, screen ->
-            screen.screenKey == screenKey
-        }
-
-        operator fun invoke(backToScreen: Screen): StackReducerAction = BackTo { _, screen ->
-            screen == backToScreen
+        inline operator fun <reified T : Screen> invoke(): StackReducerAction = BackTo { _, screen ->
+            screen is T
         }
     }
 }

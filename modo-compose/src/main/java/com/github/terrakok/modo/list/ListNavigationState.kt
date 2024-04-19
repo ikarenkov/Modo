@@ -50,7 +50,7 @@ fun interface ListNavigationAction : ReducerAction<ListNavigationState> {
 
 }
 
-typealias ListNavigationContainer = NavigationContainer<ListNavigationState, ListNavigationAction>
+interface ListNavigationContainer : NavigationContainer<ListNavigationState, ListNavigationAction>
 
 fun ListNavigationContainer.dispatch(updateLambda: (ListNavigationState) -> ListNavigationState) =
     dispatch(ListNavigationAction { updateLambda(it) })
