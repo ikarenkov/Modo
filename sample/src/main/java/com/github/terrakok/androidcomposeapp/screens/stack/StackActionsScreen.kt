@@ -18,7 +18,7 @@ import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.stack.Back
 import com.github.terrakok.modo.stack.Forward
-import com.github.terrakok.modo.stack.StackScreen
+import com.github.terrakok.modo.stack.StackNavigationContainer
 import com.github.terrakok.modo.stack.StackState
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.backTo
@@ -44,7 +44,7 @@ class StackActionsScreen(
             screenKey = screenKey,
             screenIndex = screenIndex,
             buttonsState = rememberButtons(
-                LocalContainerScreen.current as StackScreen,
+                LocalContainerScreen.current as StackNavigationContainer,
                 screenIndex
             )
         )
@@ -53,7 +53,7 @@ class StackActionsScreen(
 
 @Composable
 private fun rememberButtons(
-    navigator: StackScreen,
+    navigator: StackNavigationContainer,
     screenIndex: Int
 ): ButtonsState {
     val coroutineScope = rememberCoroutineScope()
