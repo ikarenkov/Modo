@@ -71,12 +71,6 @@ class RemoveScreens(val condition: (pos: Int, screen: Screen) -> Boolean) : Stac
     )
 }
 
-object BackToRoot : StackReducerAction {
-    override fun reduce(oldState: StackState): StackState = StackState(
-        listOfNotNull(oldState.stack.firstOrNull())
-    )
-}
-
 class Back(private val screensToDrop: Int = 1) : StackReducerAction {
     override fun reduce(oldState: StackState): StackState = StackState(
         oldState.stack.dropLast(screensToDrop)

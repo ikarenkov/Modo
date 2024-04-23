@@ -99,6 +99,9 @@ private fun rememberButtons(
             "Back to MainScreen" to {
                 navigator.backTo<MainScreen>()
             },
+            "Back to root" to {
+                navigator.backTo { pos, _ -> pos == 0 }
+            },
             "Custom action" to {
                 navigator.dispatch { oldState ->
                     StackState(
