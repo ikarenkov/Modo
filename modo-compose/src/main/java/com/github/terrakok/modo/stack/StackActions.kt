@@ -77,21 +77,23 @@ object BackToRoot : StackReducerAction {
     )
 }
 
-object Back : StackReducerAction {
+class Back(private val screensToDrop: Int = 1) : StackReducerAction {
     override fun reduce(oldState: StackState): StackState = StackState(
-        oldState.stack.dropLast(1)
+        oldState.stack.dropLast(screensToDrop)
     )
 }
 
-fun StackContainer.setStack(state: StackState) = dispatch(SetStack(state))
-fun StackContainer.forward(screen: Screen, vararg screens: Screen) =
-    dispatch(Forward(screen, *screens))
+fun StackNavigationContainer.dispatch(action: (StackState) -> StackState) = dispatch(StackReducerAction(action))
 
+fun StackContainer.setStack(state: StackState) = dispatch(SetStack(state))
+fun StackContainer.forward(screen: Screen, vararg screens: Screen) = dispatch(Forward(screen, *screens))
 fun StackContainer.replace(screen: Screen, vararg screens: Screen) = dispatch(Replace(screen, *screens))
 fun StackContainer.newStack(screen: Screen, vararg screens: Screen) = dispatch(NewStack(screen, *screens))
+
+inline fun <reified T : Screen> StackContainer.backTo() = dispatch(BackTo<T>())
 fun StackContainer.backTo(screen: Screen) = dispatch(BackTo(screen))
 fun StackContainer.backTo(screenKey: ScreenKey) = dispatch(BackTo(screenKey))
 fun StackContainer.backTo(backToCondition: (pos: Int, screen: Screen) -> Boolean) = dispatch(BackTo(backToCondition))
+
 fun StackContainer.removeScreens(condition: (pos: Int, screen: Screen) -> Boolean) = dispatch(RemoveScreens(condition))
-fun StackContainer.backToRoot() = dispatch(BackToRoot)
-fun StackContainer.back() = dispatch(Back)
+fun StackContainer.back(screensToDrop: Int = 1) = dispatch(Back(screensToDrop))

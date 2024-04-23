@@ -40,7 +40,6 @@ class SamplePermanentDialog(
     override fun Content(modifier: Modifier) {
         Box(
             Modifier
-                .padding(50.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .background(Color.White)
         ) {

@@ -29,10 +29,11 @@ fun interface NavigationReducer<State : NavigationState, Action : NavigationActi
  * @param State - type of state that is managed by container.
  * @param Action - type for actions that can be sent to [dispatch] to request state updates.
  */
-interface NavigationContainer<State : NavigationState, Action : NavigationAction<State>> {
+interface NavigationContainer<State : NavigationState, in Action : NavigationAction<State>> {
     val navigationState: State
 
-    fun dispatch(action: Action)
+    fun dispatch(action: Action, vararg actions: Action)
+
 }
 
 interface NavigationRenderer<State : NavigationState> {

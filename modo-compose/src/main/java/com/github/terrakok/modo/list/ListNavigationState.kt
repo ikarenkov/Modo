@@ -30,6 +30,10 @@ fun interface ListNavigationAction : ReducerAction<ListNavigationState> {
         override fun reduce(oldState: ListNavigationState): ListNavigationState = ListNavigationState(
             oldState.screens.filterIndexed { index, screen -> !removeCondition(index, screen) }
         )
+
+        companion object {
+            inline operator fun <reified T : Screen> invoke() = Remove { _, screen -> screen is T }
+        }
     }
 
     class Add private constructor(private val nullablePos: Int?, private val screen: Screen) : ListNavigationAction {
@@ -52,6 +56,5 @@ fun interface ListNavigationAction : ReducerAction<ListNavigationState> {
 
 interface ListNavigationContainer : NavigationContainer<ListNavigationState, ListNavigationAction>
 
-fun ListNavigationContainer.dispatch(updateLambda: (ListNavigationState) -> ListNavigationState) =
-    dispatch(ListNavigationAction { updateLambda(it) })
-
+fun ListNavigationContainer.dispatch(action: (ListNavigationState) -> ListNavigationState) =
+    dispatch(ListNavigationAction(action))

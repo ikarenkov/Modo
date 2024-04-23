@@ -8,14 +8,8 @@ import androidx.compose.ui.Modifier
 
 val LocalContainerScreen = staticCompositionLocalOf<ContainerScreen<*, *>?> { null }
 
-class CompositeAction<State : NavigationState, Action : NavigationAction<State>>(vararg val actions: Action) : NavigationAction<State>
-
 fun interface ReducerAction<State : NavigationState> : NavigationAction<State> {
     fun reduce(oldState: State): State
-}
-
-fun <State : NavigationState> reducerAction(lambda: (oldState: State) -> State) = object : ReducerAction<State> {
-    override fun reduce(oldState: State): State = lambda(oldState)
 }
 
 abstract class ContainerScreen<State : NavigationState, Action : NavigationAction<State>>(
@@ -85,9 +79,13 @@ class NavModel<State : NavigationState, Action : NavigationAction<State>>(
         this.renderer = renderer.also { it.render(navigationState) }
     }
 
-    override fun dispatch(action: Action) {
+    override fun dispatch(action: Action, vararg actions: Action) {
         val reducer = reducerProvider!!()
-        navigationState = reduce(reducer, navigationState, action)
+        var state = reduce(reducer, navigationState, action)
+        for (varargAction in actions) {
+            state = reduce(reducer, state, varargAction)
+        }
+        navigationState = state
     }
 
     override fun describeContents(): Int = 0
@@ -99,7 +97,6 @@ class NavModel<State : NavigationState, Action : NavigationAction<State>>(
 
     private fun reduce(reducer: NavigationReducer<State, Action>?, state: State, action: Action): State =
         reducer?.reduce(action, state) ?: when (action) {
-            is CompositeAction<*, *> -> action.actions.fold(state) { state, action -> reduce(reducer, state, action as Action) }
             is ReducerAction<*> -> (action as? ReducerAction<State>)?.reduce(state)
             else -> null
         }
