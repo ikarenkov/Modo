@@ -5,12 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -19,11 +15,9 @@ import androidx.lifecycle.LifecycleEventObserver
 import com.github.terrakok.androidcomposeapp.SlideTransition
 import com.github.terrakok.androidcomposeapp.screens.dialogs.SampleBottomSheet
 import com.github.terrakok.androidcomposeapp.screens.dialogs.SampleBottomSheetStack
-import com.github.terrakok.androidcomposeapp.screens.dialogs.showingDialogsCount
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.Screen
-import com.github.terrakok.modo.lifecycle.LaunchedScreenEffect
 import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
 import com.github.terrakok.modo.stack.DialogPlaceHolder
 import com.github.terrakok.modo.stack.StackNavModel

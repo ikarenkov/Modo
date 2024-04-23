@@ -1,24 +1,24 @@
 package com.github.terrakok.androidcomposeapp.screens.containers
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.github.terrakok.androidcomposeapp.SlideTransition
+import com.github.terrakok.androidcomposeapp.components.CancelButton
 import com.github.terrakok.androidcomposeapp.screens.MainScreen
+import com.github.terrakok.androidcomposeapp.screens.base.SampleScreenContent
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.NavModel
@@ -54,30 +54,27 @@ class SampleContainerScreen(
             logcat { "Screen $screenKey was removed" }
         }
         val parent = LocalContainerScreen.current as StackScreen
-        Column(modifier = modifier) {
-            Row(modifier = Modifier.padding(2.dp)) {
-                Text("Container $i")
-                Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    modifier = Modifier.clickable {
-                        parent.back()
-                    },
-                    text = "[X]"
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .background(Color.Gray)
-                    .padding(2.dp)
-                    .background(Color.White)
+        Box {
+            SampleScreenContent(
+                screenIndex = i,
+                screenName = "SampleContainerScreen",
+                screenKey = screenKey
             ) {
                 TopScreenContent(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(16.dp))
                 ) { modifier ->
                     SlideTransition(modifier)
                 }
             }
+            CancelButton(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .windowInsetsPadding(WindowInsets.statusBars),
+                onClick = { parent.back() },
+                contentDescription = "Close screen"
+            )
         }
     }
 

@@ -19,13 +19,13 @@ import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
+import com.github.terrakok.androidcomposeapp.components.CancelButton
 import com.github.terrakok.androidcomposeapp.screens.MainScreen
 import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.NavModel
@@ -89,17 +89,13 @@ class HorizontalPagerScreen(
                 Box {
                     val screen = navigationState.screens[pos]
                     InternalContent(screen = screen, Modifier.fillMaxSize())
-                    IconButton(
+                    CancelButton(
+                        onClick = { dispatch(ListNavigationAction.Remove(screen)) },
+                        contentDescription = "Close screen",
                         modifier = Modifier
                             .align(Alignment.TopEnd)
-                            .padding(16.dp),
-                        onClick = { dispatch(ListNavigationAction.Remove(screen)) }
-                    ) {
-                        Icon(
-                            painter = rememberVectorPainter(image = Icons.Default.Close),
-                            contentDescription = "Close screen"
-                        )
-                    }
+                            .padding(16.dp)
+                    )
                 }
             }
         }
