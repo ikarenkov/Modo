@@ -18,7 +18,7 @@ private fun getNavigationStateString(prefix: String, navigationState: Navigation
         is StackState -> {
             navigationState.stack.map { screen ->
                 when (screen) {
-                    is ContainerScreen<*> -> buildString {
+                    is ContainerScreen<*, *> -> buildString {
                         append(prefix)
                         append(screen.screenKey)
                         appendLine()

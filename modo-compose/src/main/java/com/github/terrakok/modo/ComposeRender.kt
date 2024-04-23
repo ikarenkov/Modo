@@ -67,7 +67,7 @@ class ComposeRendererScope<State : NavigationState>(
  *  2. Storing and clearing composable states inside [SaveableStateHolder]
  */
 internal class ComposeRenderer<State : NavigationState>(
-    private val containerScreen: ContainerScreen<*>,
+    private val containerScreen: ContainerScreen<*, *>,
 ) : NavigationRenderer<State> {
 
     /**
@@ -155,7 +155,7 @@ internal class ComposeRenderer<State : NavigationState>(
         ScreenModelStore.remove(this)
         stateHolder.removeState(screenKey)
         // clear nested screens using recursion
-        ((this as? ContainerScreen<*>)?.renderer as? ComposeRenderer<*>)?.clearScreens(stateHolder, clearAll = true)
+        ((this as? ContainerScreen<*, *>)?.renderer as? ComposeRenderer<*>)?.clearScreens(stateHolder, clearAll = true)
     }
 
     private fun calculateRemovedScreens(oldState: NavigationState, newState: NavigationState): List<Screen> {

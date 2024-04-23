@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -18,9 +19,10 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.github.terrakok.androidcomposeapp.screens.SampleScreen
+import com.github.terrakok.androidcomposeapp.screens.MainScreen
 import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.multiscreen.MultiScreen
+import com.github.terrakok.modo.multiscreen.MultiScreenAction
 import com.github.terrakok.modo.multiscreen.MultiScreenNavModel
 import com.github.terrakok.modo.multiscreen.MultiScreenState
 import com.github.terrakok.modo.multiscreen.selectContainer
@@ -31,16 +33,18 @@ import kotlinx.parcelize.Parcelize
 class SampleMultiScreen(
     private val navModel: MultiScreenNavModel = MultiScreenNavModel(
         containers = listOf(
-            SampleStack(SampleScreen(1)),
-            SampleStack(SampleScreen(2)),
-            SampleStack(SampleScreen(3)),
+            SampleStack(MainScreen(1)),
+            SampleStack(MainScreen(2)),
+            SampleStack(MainScreen(3)),
         ),
         selected = 1
     )
 ) : MultiScreen(navModel) {
 
     @IgnoredOnParcel
-    override val reducer: NavigationReducer<MultiScreenState> = CustomReducer()
+    override val reducer: NavigationReducer<MultiScreenState, MultiScreenAction> = NavigationReducer { action, state ->
+        if (action is AddTab) state else null
+    }
 
     @Composable
     override fun Content(modifier: Modifier) {
@@ -67,7 +71,7 @@ class SampleMultiScreen(
                 }
                 Text(
                     modifier = Modifier
-                        .clickable { dispatch(AddTab(navigationState.containers.size.toString(), SampleScreen(1))) }
+                        .clickable { dispatch(AddTab(navigationState.containers.size.toString(), MainScreen(1))) }
                         .padding(16.dp),
                     textAlign = TextAlign.Center,
                     text = "[+]"
@@ -84,7 +88,7 @@ class SampleMultiScreen(
                     if (showAllStacks || pos == navigationState.selected) {
                         Box(modifier = Modifier.weight(1f)) {
                             // внутри вызывается используется SaveableStateProvider с одинаковым ключом для экрана
-                            Content(container, Modifier)
+                            Content(container, Modifier.fillMaxSize())
                         }
                     }
                 }

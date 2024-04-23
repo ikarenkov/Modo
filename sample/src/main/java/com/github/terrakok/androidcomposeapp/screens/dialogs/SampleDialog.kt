@@ -17,8 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.LifecycleEventObserver
-import com.github.terrakok.androidcomposeapp.screens.SampleScreenContent
-import com.github.terrakok.androidcomposeapp.screens.base.SampleButtonsContent
+import com.github.terrakok.androidcomposeapp.screens.MainScreenContent
+import com.github.terrakok.androidcomposeapp.screens.base.MainButtonsContent
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
@@ -72,15 +72,16 @@ class SampleDialog(
                     .background(Color.White)
             ) {
                 if (dialogsPlayground) {
-                    DialogsPlaygroundContent(screenIndex)
+                    DialogsPlaygroundContent(screenIndex, screenKey)
                 } else {
-                    SampleScreenContent(screenIndex, container)
+                    MainScreenContent(screenIndex, screenKey, container)
                 }
             }
         } else {
             Box(modifier = Modifier.fillMaxSize()) {
-                SampleButtonsContent(
+                MainButtonsContent(
                     screenIndex = screenIndex,
+                    screenKey = screenKey,
                     buttonsState = rememberDialogsButtons(LocalContainerScreen.current as StackScreen, screenIndex),
                     modifier = modifier
                         .align(Alignment.Center)

@@ -40,11 +40,10 @@ class SamplePermanentDialog(
     override fun Content(modifier: Modifier) {
         Box(
             Modifier
-                .padding(50.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .background(Color.White)
         ) {
-            SampleScreenContent(i, LocalContainerScreen.current as StackScreen, modifier)
+            MainScreenContent(i, screenKey, LocalContainerScreen.current as StackScreen, modifier)
         }
     }
 }

@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.LifecycleEventObserver
 import com.github.terrakok.androidcomposeapp.SlideTransition
-import com.github.terrakok.androidcomposeapp.screens.SampleScreen
+import com.github.terrakok.androidcomposeapp.screens.MainScreen
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
@@ -37,7 +37,7 @@ class SampleDialogWithStack(
     private val i: Int,
     private val systemDialog: Boolean = true,
     override val permanentDialog: Boolean = false,
-    private val navModel: StackNavModel = StackNavModel(SampleScreen(i + 1))
+    private val navModel: StackNavModel = StackNavModel(MainScreen(i + 1))
 ) : StackScreen(navModel), DialogScreen {
 
     override fun provideDialogConfig(): DialogScreen.DialogConfig = if (systemDialog) {
@@ -62,15 +62,17 @@ class SampleDialogWithStack(
         val container = LocalContainerScreen.current as StackScreen
         if (systemDialog) {
             Box(
-                Modifier
+                modifier
                     .fillMaxHeight(0.6f)
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White)
             ) {
                 TopScreenContent { modifier ->
                     SlideTransition(
-                        modifier,
-                        screenModifier = Modifier.background(Color.Black)
+                        Modifier,
+                        screenModifier = modifier
+                            .fillMaxSize()
+                            .background(Color.Black)
                     )
                 }
             }

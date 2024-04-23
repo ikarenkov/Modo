@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.systemBars
@@ -26,7 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
-import com.github.terrakok.androidcomposeapp.screens.SampleScreen
+import com.github.terrakok.androidcomposeapp.screens.MainScreen
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleStack
 import com.github.terrakok.androidcomposeapp.screens.dialogs.showingDialogsCount
 import com.github.terrakok.modo.Modo
@@ -41,7 +42,7 @@ class AppActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         rootScreen = Modo.init(savedInstanceState, rootScreen) {
-            SampleStack(SampleScreen(1))
+            SampleStack(MainScreen(1))
         }
         setContent {
             Surface(color = MaterialTheme.colors.background) {
@@ -54,7 +55,7 @@ class AppActivity : AppCompatActivity() {
                 }
                 SetupStatusBarColor(hasDialog || isDarkMode)
                 Box {
-                    rootScreen?.Content(Modifier)
+                    rootScreen?.Content(Modifier.fillMaxSize())
                     val color by animateColorAsState(targetValue = if (hasDialog) Color.Black.copy(alpha = 0.5f) else Color.Transparent)
                     Box(
                         modifier = Modifier

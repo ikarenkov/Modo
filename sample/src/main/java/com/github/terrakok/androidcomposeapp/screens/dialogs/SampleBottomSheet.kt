@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.DialogProperties
-import com.github.terrakok.androidcomposeapp.screens.SampleScreenContent
+import com.github.terrakok.androidcomposeapp.screens.MainScreenContent
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
@@ -57,8 +57,9 @@ class SampleBottomSheet(
         }
         ModalBottomSheetLayout(
             sheetContent = {
-                SampleScreenContent(
+                MainScreenContent(
                     screenIndex = i,
+                    screenKey = screenKey,
                     parent = LocalContainerScreen.current as StackScreen,
                     modifier = Modifier.fillMaxSize()
                 )

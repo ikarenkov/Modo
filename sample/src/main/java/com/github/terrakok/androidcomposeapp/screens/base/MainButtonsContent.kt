@@ -27,13 +27,15 @@ import com.github.terrakok.androidcomposeapp.SampleAppConfig
 import com.github.terrakok.androidcomposeapp.randomBackground
 import com.github.terrakok.androidcomposeapp.screens.ButtonsList
 import com.github.terrakok.androidcomposeapp.screens.ButtonsState
+import com.github.terrakok.modo.ScreenKey
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import logcat.logcat
 
 @Composable
-internal fun SampleButtonsContent(
+internal fun MainButtonsContent(
     screenIndex: Int,
+    screenKey: ScreenKey,
     buttonsState: ButtonsState,
     modifier: Modifier = Modifier,
 ) {
@@ -51,13 +53,14 @@ internal fun SampleButtonsContent(
             }
         }
     }
-    SampleButtonsContent(screenIndex, counter, buttonsState, modifier)
+    MainButtonsContent(screenIndex, counter, screenKey, buttonsState, modifier)
 }
 
 @Composable
-internal fun SampleButtonsContent(
+internal fun MainButtonsContent(
     screenIndex: Int,
     counter: Int,
+    screenKey: ScreenKey,
     buttonsState: ButtonsState,
     modifier: Modifier = Modifier,
 ) {
@@ -76,6 +79,12 @@ internal fun SampleButtonsContent(
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
         )
+        Text(
+            text = screenKey.value,
+            style = MaterialTheme.typography.body1,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
         Spacer(modifier = Modifier.size(16.dp))
         ButtonsList(
             buttonsState,
@@ -87,9 +96,10 @@ internal fun SampleButtonsContent(
 @Preview
 @Composable
 private fun ButtonsPreview() {
-    SampleButtonsContent(
+    MainButtonsContent(
         screenIndex = 0,
         counter = 666,
+        screenKey = ScreenKey("ScreenKey"),
         buttonsState = ButtonsState(
             listOf(
                 "Button 1",

@@ -48,9 +48,7 @@ open class SampleStack(
 
             }
         }
-        TopScreenContent(
-            Modifier.fillMaxSize()
-        ) { modifier ->
+        TopScreenContent(modifier) { modifier ->
             SlideTransition(modifier)
         }
     }
