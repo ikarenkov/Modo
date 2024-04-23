@@ -5,7 +5,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.github.terrakok.androidcomposeapp.screens.ButtonsState
 import com.github.terrakok.androidcomposeapp.screens.MainScreen
-import com.github.terrakok.androidcomposeapp.screens.base.MainButtonsContent
+import com.github.terrakok.androidcomposeapp.screens.base.ButtonsScreenContent
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.Screen
@@ -28,8 +28,9 @@ class DialogsPlayground(
 
 @Composable
 internal fun DialogsPlaygroundContent(screenIndex: Int, screenKey: ScreenKey, modifier: Modifier = Modifier) {
-    MainButtonsContent(
+    ButtonsScreenContent(
         screenIndex = screenIndex,
+        screenName = "DialogsPlayground",
         screenKey = screenKey,
         buttonsState = rememberDialogsButtons(LocalContainerScreen.current as StackScreen, screenIndex),
         modifier = modifier

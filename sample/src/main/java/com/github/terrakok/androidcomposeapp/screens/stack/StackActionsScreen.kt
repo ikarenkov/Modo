@@ -8,7 +8,7 @@ import com.github.terrakok.androidcomposeapp.screens.ButtonsState
 import com.github.terrakok.androidcomposeapp.screens.MainScreen
 import com.github.terrakok.androidcomposeapp.screens.SampleCustomBottomSheet
 import com.github.terrakok.androidcomposeapp.screens.SamplePermanentDialog
-import com.github.terrakok.androidcomposeapp.screens.base.MainButtonsContent
+import com.github.terrakok.androidcomposeapp.screens.base.ButtonsScreenContent
 import com.github.terrakok.androidcomposeapp.screens.dialogs.SampleBottomSheetStack
 import com.github.terrakok.androidcomposeapp.screens.dialogs.SampleDialog
 import com.github.terrakok.androidcomposeapp.screens.dialogs.SampleDialogWithStack
@@ -39,8 +39,9 @@ class StackActionsScreen(
 
     @Composable
     override fun Content(modifier: Modifier) {
-        MainButtonsContent(
+        ButtonsScreenContent(
             modifier = modifier,
+            screenName = "StackActionsScreen",
             screenKey = screenKey,
             screenIndex = screenIndex,
             buttonsState = rememberButtons(

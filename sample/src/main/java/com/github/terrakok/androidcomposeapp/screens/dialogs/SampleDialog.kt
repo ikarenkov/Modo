@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.LifecycleEventObserver
 import com.github.terrakok.androidcomposeapp.screens.MainScreenContent
-import com.github.terrakok.androidcomposeapp.screens.base.MainButtonsContent
+import com.github.terrakok.androidcomposeapp.screens.base.ButtonsScreenContent
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
@@ -79,8 +79,9 @@ class SampleDialog(
             }
         } else {
             Box(modifier = Modifier.fillMaxSize()) {
-                MainButtonsContent(
+                ButtonsScreenContent(
                     screenIndex = screenIndex,
+                    screenName = "SampleDialog",
                     screenKey = screenKey,
                     buttonsState = rememberDialogsButtons(LocalContainerScreen.current as StackScreen, screenIndex),
                     modifier = modifier

@@ -17,13 +17,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
@@ -32,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
+import com.github.terrakok.androidcomposeapp.components.CancelButton
 import com.github.terrakok.androidcomposeapp.screens.MainScreen
 import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.list.ListNavModel
@@ -102,17 +101,13 @@ class StackInLazyColumnScreen(
                                 .height(IntrinsicSize.Min)
                                 .clip(RoundedCornerShape(8.dp))
                         )
-                        IconButton(
+                        CancelButton(
+                            onClick = { dispatch(ListNavigationAction.Remove(screen)) },
+                            contentDescription = "Close screen",
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .padding(16.dp),
-                            onClick = { dispatch(ListNavigationAction.Remove(screen)) }
-                        ) {
-                            Icon(
-                                painter = rememberVectorPainter(image = Icons.Default.Close),
-                                contentDescription = "Close screen"
-                            )
-                        }
+                        )
                     }
                 }
 

@@ -5,7 +5,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.github.terrakok.androidcomposeapp.ListScreen
 import com.github.terrakok.androidcomposeapp.ModelSampleScreen
-import com.github.terrakok.androidcomposeapp.screens.base.MainButtonsContent
+import com.github.terrakok.androidcomposeapp.screens.base.ButtonsScreenContent
 import com.github.terrakok.androidcomposeapp.screens.containers.HorizontalPagerScreen
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleContainerScreen
 import com.github.terrakok.androidcomposeapp.screens.containers.SampleMultiScreen
@@ -52,8 +52,9 @@ internal fun MainScreenContent(
     parent: StackScreen?,
     modifier: Modifier = Modifier,
 ) {
-    MainButtonsContent(
+    ButtonsScreenContent(
         screenIndex = screenIndex,
+        screenName = "MainScreen",
         screenKey = screenKey,
         buttonsState = rememberButtons(navigator = parent, i = screenIndex),
         modifier = modifier,
@@ -68,8 +69,9 @@ internal fun MainScreenContent(
     parent: StackScreen,
     modifier: Modifier
 ) {
-    MainButtonsContent(
+    ButtonsScreenContent(
         screenIndex = screenIndex,
+        screenName = "MainScreen",
         screenKey = screenKey,
         buttonsState = rememberButtons(navigator = parent, i = screenIndex),
         counter = counter,
@@ -87,6 +89,7 @@ private fun rememberButtons(
         "Back" to { navigator?.back() },
         "Stack Playground" to { navigator?.forward(StackActionsScreen(i + 1)) },
         "Multiscreen" to { navigator?.forward(SampleMultiScreen()) },
+        "Screen Effects" to { navigator?.forward(ScreenEffectsSampleScreen(i + 1)) },
         "Dialogs & BottomSheets" to { navigator?.forward(DialogsPlayground(i + 1)) },
         "Container" to { navigator?.forward(SampleContainerScreen(i + 1)) },
         "Custom Container Actions" to { navigator?.forward(SampleCustomContainerScreen()) },
