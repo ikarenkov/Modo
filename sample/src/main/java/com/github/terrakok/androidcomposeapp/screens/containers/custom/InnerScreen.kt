@@ -53,7 +53,8 @@ class InnerScreen(
         InnerContent(
             title = "Screen $screenKey",
             onRemoveClick = closeScreen,
-            modifier = modifier)
+            modifier = modifier
+        )
     }
 }
 
