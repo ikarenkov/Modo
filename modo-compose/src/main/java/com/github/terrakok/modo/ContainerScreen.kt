@@ -3,6 +3,7 @@ package com.github.terrakok.modo
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 
@@ -33,6 +34,22 @@ abstract class ContainerScreen<State : NavigationState, Action : NavigationActio
         )
     }
 
+    /**
+     * This function can be used to provide composition locals for inner screens.
+     * This is used in implementations of ContainerScreen to provide typed composition locals to container.
+     * @see com.github.terrakok.modo.stack.LocalStackNavigation
+     */
+    open fun provideCompositionLocals(): Array<ProvidedValue<*>> =
+        provideNavigationContainer()
+            ?.let { arrayOf(it) }
+            ?: emptyArray()
+
+    /**
+     * Provides composition local for the nested hierarchy to receive NavigationContainer.
+     * @see com.github.terrakok.modo.stack.LocalStackNavigation
+     */
+    open fun provideNavigationContainer(): ProvidedValue<out NavigationContainer<*, *>>? = null
+
     @Composable
     protected fun InternalContent(
         screen: Screen,
@@ -40,7 +57,7 @@ abstract class ContainerScreen<State : NavigationState, Action : NavigationActio
         content: RendererContent<State> = defaultRendererContent
     ) {
         val composeRenderer = renderer as ComposeRenderer
-        composeRenderer.Content(screen, modifier, content)
+        composeRenderer.Content(screen, provideCompositionLocals(), modifier, content)
     }
 
     override fun toString(): String = screenKey.value

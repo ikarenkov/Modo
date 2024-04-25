@@ -15,11 +15,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
-import com.github.terrakok.modo.stack.StackScreen
+import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.forward
 import kotlinx.parcelize.Parcelize
 
@@ -30,7 +29,7 @@ class ListScreen(
 
     @Composable
     override fun Content(modifier: Modifier) {
-        val conScreen = LocalContainerScreen.current as StackScreen
+        val navigation = LocalStackNavigation.current
         Box(Modifier.fillMaxSize()) {
             val lazyColumnState = rememberSaveable(saver = LazyListState.Saver) {
                 LazyListState(
@@ -46,7 +45,7 @@ class ListScreen(
                     Text(text = "Item $it",
                          Modifier
                              .fillMaxWidth()
-                             .clickable { conScreen.forward(DetailsScreen(it.toString())) }
+                             .clickable { navigation.forward(DetailsScreen(it.toString())) }
                              .padding(16.dp))
                 }
             }

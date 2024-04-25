@@ -6,11 +6,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.ProvidableCompositionLocal
+import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.Dialog
@@ -20,7 +23,6 @@ import com.github.terrakok.modo.ComposeRenderer
 import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
-import com.github.terrakok.modo.NavigationContainer
 import com.github.terrakok.modo.RendererContent
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
@@ -28,14 +30,16 @@ import com.github.terrakok.modo.defaultRendererContent
 import com.github.terrakok.modo.generateScreenKey
 import kotlinx.parcelize.Parcelize
 
-typealias StackContainer = NavigationContainer<StackState, StackAction>
+val LocalStackNavigation: ProvidableCompositionLocal<StackNavContainer> = staticCompositionLocalOf {
+    error("There is no LocalStackNavigation in hierarchy, or maybe you override provideCompositionLocal and forgot to call supper.")
+}
 
 /**
  * Basic screen container that represents stack of [Screen]'s.
  */
 abstract class StackScreen(
     navigationModel: StackNavModel
-) : ContainerScreen<StackState, StackAction>(navigationModel), StackNavigationContainer {
+) : ContainerScreen<StackState, StackAction>(navigationModel), StackNavContainer {
 
     open val defaultBackHandler: Boolean = true
 
@@ -46,6 +50,9 @@ abstract class StackScreen(
     override fun Content(modifier: Modifier) {
         TopScreenContent(modifier)
     }
+
+    override fun provideNavigationContainer(): ProvidedValue<StackNavContainer> =
+        LocalStackNavigation provides this
 
     /**
      * The palace holder screen that is used to support animation of showing first dialog appearance.

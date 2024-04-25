@@ -12,12 +12,10 @@ import androidx.compose.ui.window.DialogProperties
 import com.github.terrakok.androidcomposeapp.screens.MainScreenContent
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
-import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
-import com.github.terrakok.modo.stack.StackScreen
+import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
-import com.github.terrakok.modo.util.currentOrThrow
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -48,7 +46,7 @@ class SampleBottomSheet(
     @Composable
     override fun Content(modifier: Modifier) {
         SetupSystemBar()
-        val navigation = LocalContainerScreen.currentOrThrow as StackScreen
+        val navigation = LocalStackNavigation.current
         val state = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.HalfExpanded)
         LaunchedEffect(key1 = state.currentValue) {
             if (state.currentValue == ModalBottomSheetValue.Hidden) {
@@ -60,7 +58,7 @@ class SampleBottomSheet(
                 MainScreenContent(
                     screenIndex = i,
                     screenKey = screenKey,
-                    parent = LocalContainerScreen.current as StackScreen,
+                    navigation = navigation,
                     modifier = Modifier.fillMaxSize()
                 )
             },

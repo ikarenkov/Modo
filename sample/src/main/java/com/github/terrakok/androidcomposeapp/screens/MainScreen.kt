@@ -17,12 +17,12 @@ import com.github.terrakok.androidcomposeapp.screens.dialogs.DialogsPlayground
 import com.github.terrakok.androidcomposeapp.screens.stack.StackActionsScreen
 import com.github.terrakok.androidcomposeapp.screens.viewmodel.AndroidViewModelSampleScreen
 import com.github.terrakok.modo.ExperimentalModoApi
-import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.model.OnScreenRemoved
-import com.github.terrakok.modo.stack.StackScreen
+import com.github.terrakok.modo.stack.LocalStackNavigation
+import com.github.terrakok.modo.stack.StackNavContainer
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.forward
 import kotlinx.parcelize.Parcelize
@@ -40,8 +40,7 @@ class MainScreen(
         OnScreenRemoved {
             logcat { "Screen $screenKey was removed" }
         }
-        val parent = LocalContainerScreen.current
-        MainScreenContent(screenIndex, screenKey, parent as? StackScreen, modifier)
+        MainScreenContent(screenIndex, screenKey, LocalStackNavigation.current, modifier)
     }
 }
 
@@ -49,14 +48,14 @@ class MainScreen(
 internal fun MainScreenContent(
     screenIndex: Int,
     screenKey: ScreenKey,
-    parent: StackScreen?,
+    navigation: StackNavContainer?,
     modifier: Modifier = Modifier,
 ) {
     ButtonsScreenContent(
         screenIndex = screenIndex,
         screenName = "MainScreen",
         screenKey = screenKey,
-        buttonsState = rememberButtons(navigator = parent, i = screenIndex),
+        buttonsState = rememberButtons(navigation = navigation, i = screenIndex),
         modifier = modifier,
     )
 }
@@ -66,14 +65,14 @@ internal fun MainScreenContent(
     screenIndex: Int,
     screenKey: ScreenKey,
     counter: Int,
-    parent: StackScreen,
+    navigation: StackNavContainer,
     modifier: Modifier
 ) {
     ButtonsScreenContent(
         screenIndex = screenIndex,
         screenName = "MainScreen",
         screenKey = screenKey,
-        buttonsState = rememberButtons(navigator = parent, i = screenIndex),
+        buttonsState = rememberButtons(navigation = navigation, i = screenIndex),
         counter = counter,
         modifier = modifier
     )
@@ -81,29 +80,29 @@ internal fun MainScreenContent(
 
 @Composable
 private fun rememberButtons(
-    navigator: StackScreen?,
+    navigation: StackNavContainer?,
     i: Int
 ): ButtonsState = remember {
     listOf<Pair<String, () -> Unit>>(
-        "Forward" to { navigator?.forward(MainScreen(i + 1)) },
-        "Back" to { navigator?.back() },
-        "Stack Playground" to { navigator?.forward(StackActionsScreen(i + 1)) },
-        "Multiscreen" to { navigator?.forward(SampleMultiScreen()) },
-        "Screen Effects" to { navigator?.forward(ScreenEffectsSampleScreen(i + 1)) },
-        "Dialogs & BottomSheets" to { navigator?.forward(DialogsPlayground(i + 1)) },
-        "Container" to { navigator?.forward(SampleContainerScreen(i + 1)) },
-        "Custom Container Actions" to { navigator?.forward(SampleCustomContainerScreen()) },
-        "Custom Container" to { navigator?.forward(RemovableItemContainerScreen()) },
-        "Horizontal Pager" to { navigator?.forward(HorizontalPagerScreen()) },
-        "Stacks in LazyColumn" to { navigator?.forward(StackInLazyColumnScreen()) },
-        "List/Details" to { navigator?.forward(ListScreen()) },
+        "Forward" to { navigation?.forward(MainScreen(i + 1)) },
+        "Back" to { navigation?.back() },
+        "Stack Playground" to { navigation?.forward(StackActionsScreen(i + 1)) },
+        "Multiscreen" to { navigation?.forward(SampleMultiScreen()) },
+        "Screen Effects" to { navigation?.forward(ScreenEffectsSampleScreen(i + 1)) },
+        "Dialogs & BottomSheets" to { navigation?.forward(DialogsPlayground(i + 1)) },
+        "Container" to { navigation?.forward(SampleContainerScreen(i + 1)) },
+        "Custom Container Actions" to { navigation?.forward(SampleCustomContainerScreen()) },
+        "Custom Container" to { navigation?.forward(RemovableItemContainerScreen()) },
+        "Horizontal Pager" to { navigation?.forward(HorizontalPagerScreen()) },
+        "Stacks in LazyColumn" to { navigation?.forward(StackInLazyColumnScreen()) },
+        "List/Details" to { navigation?.forward(ListScreen()) },
         // Just experiments
-//        "2 items screen" to { navigator.forward(TwoTopItemsStackScreen(i + 1)) },
-//                "Demo" to { navigator.forward(SaveableStateHolderDemoScreen()) },
-        "Sample Screen Model" to { navigator?.forward(ModelSampleScreen()) },
-        "Android ViewModel" to { navigator?.forward(AndroidViewModelSampleScreen(i + 1)) },
-        "Movable Content" to { navigator?.forward(MovableContentPlaygroundScreen()) },
-        "Animation Playground" to { navigator?.forward(AnimationPlaygroundScreen()) },
+//        "2 items screen" to { navigation.forward(TwoTopItemsStackScreen(i + 1)) },
+//                "Demo" to { navigation.forward(SaveableStateHolderDemoScreen()) },
+        "Sample Screen Model" to { navigation?.forward(ModelSampleScreen()) },
+        "Android ViewModel" to { navigation?.forward(AndroidViewModelSampleScreen(i + 1)) },
+        "Movable Content" to { navigation?.forward(MovableContentPlaygroundScreen()) },
+        "Animation Playground" to { navigation?.forward(AnimationPlaygroundScreen()) },
     ).let {
         ButtonsState(it)
     }

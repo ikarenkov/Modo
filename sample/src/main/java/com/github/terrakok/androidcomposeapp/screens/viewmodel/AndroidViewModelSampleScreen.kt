@@ -13,12 +13,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.terrakok.androidcomposeapp.screens.MainScreenContent
 import com.github.terrakok.modo.ExperimentalModoApi
-import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
-import com.github.terrakok.modo.stack.StackScreen
+import com.github.terrakok.modo.stack.LocalStackNavigation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
@@ -81,8 +80,7 @@ internal class AndroidViewModelSampleScreen(
         val viewModel: SampleViewModel = viewModel {
             SampleViewModel(screenPos, createSavedStateHandle())
         }
-        val parent = LocalContainerScreen.current
-        MainScreenContent(screenPos, screenKey, viewModel.stateFlow.collectAsState().value, parent as StackScreen, modifier)
+        MainScreenContent(screenPos, screenKey, viewModel.stateFlow.collectAsState().value, LocalStackNavigation.current, modifier)
     }
 
 }

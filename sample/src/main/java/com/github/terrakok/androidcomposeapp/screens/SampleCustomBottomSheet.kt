@@ -9,12 +9,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
-import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
-import com.github.terrakok.modo.stack.StackScreen
+import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
-import com.github.terrakok.modo.util.currentOrThrow
 import kotlinx.parcelize.Parcelize
 
 @OptIn(ExperimentalModoApi::class)
@@ -29,7 +27,7 @@ class SampleCustomBottomSheet(
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content(modifier: Modifier) {
-        val navigation = LocalContainerScreen.currentOrThrow as StackScreen
+        val navigation = LocalStackNavigation.current
         val state = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.HalfExpanded)
         LaunchedEffect(key1 = state.currentValue) {
             if (state.currentValue == ModalBottomSheetValue.Hidden) {
@@ -38,7 +36,7 @@ class SampleCustomBottomSheet(
         }
         ModalBottomSheetLayout(
             sheetContent = {
-                MainScreenContent(i, screenKey, LocalContainerScreen.current as StackScreen, modifier)
+                MainScreenContent(i, screenKey, navigation, modifier)
             },
             sheetState = state
         ) {

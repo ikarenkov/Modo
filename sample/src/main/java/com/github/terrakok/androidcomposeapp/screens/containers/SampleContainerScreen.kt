@@ -20,12 +20,11 @@ import com.github.terrakok.androidcomposeapp.components.CancelButton
 import com.github.terrakok.androidcomposeapp.screens.MainScreen
 import com.github.terrakok.androidcomposeapp.screens.base.SampleScreenContent
 import com.github.terrakok.modo.ExperimentalModoApi
-import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.NavModel
 import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
 import com.github.terrakok.modo.model.OnScreenRemoved
+import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.StackNavModel
-import com.github.terrakok.modo.stack.StackScreen
 import com.github.terrakok.modo.stack.StackState
 import com.github.terrakok.modo.stack.back
 import kotlinx.parcelize.Parcelize
@@ -53,7 +52,7 @@ class SampleContainerScreen(
         OnScreenRemoved {
             logcat { "Screen $screenKey was removed" }
         }
-        val parent = LocalContainerScreen.current as StackScreen
+        val navigation = LocalStackNavigation.current
         Box {
             SampleScreenContent(
                 screenIndex = i,
@@ -72,7 +71,7 @@ class SampleContainerScreen(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .windowInsetsPadding(WindowInsets.statusBars),
-                onClick = { parent.back() },
+                onClick = { navigation.back() },
                 contentDescription = "Close screen"
             )
         }

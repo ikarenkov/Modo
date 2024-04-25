@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
@@ -94,6 +95,7 @@ internal class ComposeRenderer<State : NavigationState>(
     @Composable
     fun Content(
         screen: Screen,
+        provideCompositionLocal: Array<ProvidedValue<*>> = emptyArray(),
         modifier: Modifier = Modifier,
         content: RendererContent<State> = defaultRendererContent
     ) {
@@ -116,6 +118,7 @@ internal class ComposeRenderer<State : NavigationState>(
         CompositionLocalProvider(
             LocalContainerScreen provides containerScreen,
             LocalTransitionCompleteChannel provides transitionCompleteChannel,
+            *provideCompositionLocal
         ) {
             ComposeRendererScope(lastState, state, screen).content(modifier)
         }
