@@ -17,7 +17,7 @@ class SelectContainer(private val index: Int) : MultiScreenReducerAction {
         oldState.copy(selected = index)
 }
 
-fun MultiScreenContainer.dispatch(action: (MultiScreenState) -> MultiScreenState) = dispatch(MultiScreenReducerAction(action))
+fun MultiScreenNavContainer.dispatch(action: (MultiScreenState) -> MultiScreenState) = dispatch(MultiScreenReducerAction(action))
 
 fun NavigationContainer<MultiScreenState, MultiScreenAction>.setContainers(state: MultiScreenState) = dispatch(SetContainers(state))
 fun NavigationContainer<MultiScreenState, MultiScreenAction>.selectContainer(index: Int) = dispatch(SelectContainer(index))

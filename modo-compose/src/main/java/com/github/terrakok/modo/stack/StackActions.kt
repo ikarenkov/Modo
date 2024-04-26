@@ -1,6 +1,7 @@
 package com.github.terrakok.modo.stack
 
 import com.github.terrakok.modo.NavigationAction
+import com.github.terrakok.modo.NavigationContainer
 import com.github.terrakok.modo.ReducerAction
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
@@ -40,9 +41,9 @@ class BackTo(val backToCondition: (pos: Int, screen: Screen) -> Boolean) : Stack
         }
     )
 
-    constructor(screen: Screen) : this(
+    constructor(screenBackTo: Screen) : this(
         { _, screen ->
-            screen == screen
+            screen == screenBackTo
         }
     )
 
@@ -77,17 +78,17 @@ class Back(private val screensToDrop: Int = 1) : StackReducerAction {
     )
 }
 
-fun StackNavigationContainer.dispatch(action: (StackState) -> StackState) = dispatch(StackReducerAction(action))
+fun StackNavContainer.dispatch(action: (StackState) -> StackState) = dispatch(StackReducerAction(action))
 
-fun StackContainer.setStack(state: StackState) = dispatch(SetStack(state))
-fun StackContainer.forward(screen: Screen, vararg screens: Screen) = dispatch(Forward(screen, *screens))
-fun StackContainer.replace(screen: Screen, vararg screens: Screen) = dispatch(Replace(screen, *screens))
-fun StackContainer.newStack(screen: Screen, vararg screens: Screen) = dispatch(NewStack(screen, *screens))
+fun NavigationContainer<StackState, StackAction>.setStack(state: StackState) = dispatch(SetStack(state))
+fun NavigationContainer<StackState, StackAction>.forward(screen: Screen, vararg screens: Screen) = dispatch(Forward(screen, *screens))
+fun NavigationContainer<StackState, StackAction>.replace(screen: Screen, vararg screens: Screen) = dispatch(Replace(screen, *screens))
+fun NavigationContainer<StackState, StackAction>.newStack(screen: Screen, vararg screens: Screen) = dispatch(NewStack(screen, *screens))
 
-inline fun <reified T : Screen> StackContainer.backTo() = dispatch(BackTo<T>())
-fun StackContainer.backTo(screen: Screen) = dispatch(BackTo(screen))
-fun StackContainer.backTo(screenKey: ScreenKey) = dispatch(BackTo(screenKey))
-fun StackContainer.backTo(backToCondition: (pos: Int, screen: Screen) -> Boolean) = dispatch(BackTo(backToCondition))
+inline fun <reified T : Screen> NavigationContainer<StackState, StackAction>.backTo() = dispatch(BackTo<T>())
+fun NavigationContainer<StackState, StackAction>.backTo(screen: Screen) = dispatch(BackTo(screen))
+fun NavigationContainer<StackState, StackAction>.backTo(screenKey: ScreenKey) = dispatch(BackTo(screenKey))
+fun NavigationContainer<StackState, StackAction>.backTo(backToCondition: (pos: Int, screen: Screen) -> Boolean) = dispatch(BackTo(backToCondition))
 
-fun StackContainer.removeScreens(condition: (pos: Int, screen: Screen) -> Boolean) = dispatch(RemoveScreens(condition))
-fun StackContainer.back(screensToDrop: Int = 1) = dispatch(Back(screensToDrop))
+fun NavigationContainer<StackState, StackAction>.removeScreens(condition: (pos: Int, screen: Screen) -> Boolean) = dispatch(RemoveScreens(condition))
+fun NavigationContainer<StackState, StackAction>.back(screensToDrop: Int = 1) = dispatch(Back(screensToDrop))

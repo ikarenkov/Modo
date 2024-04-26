@@ -31,11 +31,13 @@ private fun getNavigationStateString(prefix: String, navigationState: Navigation
             }.joinToString(separator = "")
         }
         is MultiScreenState -> buildString {
-            val screen = navigationState.containers[navigationState.selected]
+            val screen = navigationState.screens[navigationState.selected]
             append(prefix)
             append(screen.screenKey)
             appendLine()
-            append(getNavigationStateString("$prefix|  ", screen.navigationState))
+            if (screen is ContainerScreen<*, *>) {
+                append(getNavigationStateString("$prefix|  ", screen.navigationState))
+            }
         }
         else -> "unknown state type: ${navigationState::class.simpleName}"
     }

@@ -61,7 +61,7 @@ class SampleMultiScreen(
                     textAlign = TextAlign.Center,
                     text = "🪄"
                 )
-                repeat(navigationState.containers.size) { tabPos ->
+                repeat(navigationState.screens.size) { tabPos ->
                     Tab(
                         modifier = Modifier.weight(1f),
                         isSelected = navigationState.selected == tabPos,
@@ -71,7 +71,7 @@ class SampleMultiScreen(
                 }
                 Text(
                     modifier = Modifier
-                        .clickable { dispatch(AddTab(navigationState.containers.size.toString(), MainScreen(1))) }
+                        .clickable { dispatch(AddTab(navigationState.screens.size.toString(), MainScreen(1))) }
                         .padding(16.dp),
                     textAlign = TextAlign.Center,
                     text = "[+]"
@@ -84,7 +84,7 @@ class SampleMultiScreen(
     fun TopContent(showAllStacks: Boolean, modifier: Modifier) {
         Box(modifier = modifier) {
             Row {
-                for ((pos, container) in navigationState.containers.withIndex()) {
+                for ((pos, container) in navigationState.screens.withIndex()) {
                     if (showAllStacks || pos == navigationState.selected) {
                         Box(modifier = Modifier.weight(1f)) {
                             // внутри вызывается используется SaveableStateProvider с одинаковым ключом для экрана

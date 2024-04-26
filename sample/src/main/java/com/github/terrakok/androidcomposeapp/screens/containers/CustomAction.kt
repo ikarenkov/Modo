@@ -10,7 +10,7 @@ class AddTab(
 ) : MultiScreenReducerAction {
     override fun reduce(oldState: MultiScreenState): MultiScreenState {
         return MultiScreenState(
-            oldState.containers + SampleStack(rootScreen),
+            oldState.screens + SampleStack(rootScreen),
             oldState.selected
         )
     }

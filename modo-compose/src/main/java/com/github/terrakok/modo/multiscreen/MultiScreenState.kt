@@ -1,7 +1,6 @@
 package com.github.terrakok.modo.multiscreen
 
 import android.os.Parcelable
-import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.NavModel
 import com.github.terrakok.modo.NavigationContainer
 import com.github.terrakok.modo.NavigationState
@@ -10,17 +9,17 @@ import kotlinx.parcelize.Parcelize
 
 typealias MultiScreenNavModel = NavModel<MultiScreenState, MultiScreenAction>
 
-interface MultiScreenContainer : NavigationContainer<MultiScreenState, MultiScreenAction>
+interface MultiScreenNavContainer : NavigationContainer<MultiScreenState, MultiScreenAction>
 
 fun MultiScreenNavModel(
-    containers: List<ContainerScreen<*, *>>,
+    containers: List<Screen>,
     selected: Int
 ) = MultiScreenNavModel(MultiScreenState(containers, selected))
 
 @Parcelize
 data class MultiScreenState(
-    val containers: List<ContainerScreen<*, *>>,
+    val screens: List<Screen>,
     val selected: Int
 ) : NavigationState, Parcelable {
-    override fun getChildScreens(): List<Screen> = containers
+    override fun getChildScreens(): List<Screen> = screens
 }

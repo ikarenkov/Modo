@@ -25,6 +25,7 @@ import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
+import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.StackScreen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -64,7 +65,7 @@ class SampleDialog(
                 logcat(tag = "SampleDialog") { "$screenKey $event" }
             }
         }
-        val container = LocalContainerScreen.current as StackScreen
+        val navigation = LocalStackNavigation.current
         if (systemDialog) {
             Box(
                 modifier
@@ -74,7 +75,7 @@ class SampleDialog(
                 if (dialogsPlayground) {
                     DialogsPlaygroundContent(screenIndex, screenKey)
                 } else {
-                    MainScreenContent(screenIndex, screenKey, container)
+                    MainScreenContent(screenIndex, screenKey, navigation)
                 }
             }
         } else {

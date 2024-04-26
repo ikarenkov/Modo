@@ -12,7 +12,7 @@ typealias StackNavModel = NavModel<StackState, StackAction>
 fun StackNavModel(stack: List<Screen>) = StackNavModel(StackState(stack))
 fun StackNavModel(screen: Screen) = StackNavModel(listOf(screen))
 
-interface StackNavigationContainer : NavigationContainer<StackState, StackAction>
+interface StackNavContainer : NavigationContainer<StackState, StackAction>
 
 @Parcelize
 data class StackState(

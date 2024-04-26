@@ -15,7 +15,9 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -51,10 +53,17 @@ internal class RemoveScreen(val screenKey: ScreenKey) : CustomContainerReducerAc
     )
 }
 
+internal val LocalSampleCustomNavigation = compositionLocalOf<SampleCustomContainerScreen> {
+    error("CompositionLocal LocalSampleCustomNavigation is not present")
+}
+
 @Parcelize
 internal class SampleCustomContainerScreen(
     private val navModel: NavModel<CustomContainerState, CustomContainerAction> = NavModel(CustomContainerState(listOf(InnerScreen())))
 ) : ContainerScreen<CustomContainerState, CustomContainerAction>(navModel) {
+
+    override fun provideCompositionLocals(): Array<ProvidedValue<*>> =
+        arrayOf(LocalSampleCustomNavigation provides this)
 
     @OptIn(ExperimentalLayoutApi::class)
     @Composable

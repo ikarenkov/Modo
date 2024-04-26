@@ -7,11 +7,11 @@ import com.github.terrakok.androidcomposeapp.screens.ButtonsState
 import com.github.terrakok.androidcomposeapp.screens.MainScreen
 import com.github.terrakok.androidcomposeapp.screens.base.ButtonsScreenContent
 import com.github.terrakok.modo.ExperimentalModoApi
-import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
-import com.github.terrakok.modo.stack.StackScreen
+import com.github.terrakok.modo.stack.LocalStackNavigation
+import com.github.terrakok.modo.stack.StackNavContainer
 import com.github.terrakok.modo.stack.forward
 import kotlinx.parcelize.Parcelize
 
@@ -32,7 +32,7 @@ internal fun DialogsPlaygroundContent(screenIndex: Int, screenKey: ScreenKey, mo
         screenIndex = screenIndex,
         screenName = "DialogsPlayground",
         screenKey = screenKey,
-        buttonsState = rememberDialogsButtons(LocalContainerScreen.current as StackScreen, screenIndex),
+        buttonsState = rememberDialogsButtons(LocalStackNavigation.current, screenIndex),
         modifier = modifier
     )
 }
@@ -40,15 +40,15 @@ internal fun DialogsPlaygroundContent(screenIndex: Int, screenKey: ScreenKey, mo
 @OptIn(ExperimentalModoApi::class)
 @Composable
 internal fun rememberDialogsButtons(
-    navigator: StackScreen,
+    navigation: StackNavContainer,
     i: Int
 ): ButtonsState =
     remember {
         listOf(
-            "Forward" to { navigator.forward(MainScreen(i + 1)) },
-            "Forward Dialogs" to { navigator.forward(DialogsPlayground(i + 1)) },
+            "Forward" to { navigation.forward(MainScreen(i + 1)) },
+            "Forward Dialogs" to { navigation.forward(DialogsPlayground(i + 1)) },
             "System Dialog" to {
-                navigator.forward(
+                navigation.forward(
                     SampleDialog(
                         i + 1,
                         dialogsPlayground = true,
@@ -58,7 +58,7 @@ internal fun rememberDialogsButtons(
                 )
             },
             "Custom Dialog" to {
-                navigator.forward(
+                navigation.forward(
                     SampleDialog(
                         i + 1,
                         dialogsPlayground = true,
@@ -68,7 +68,7 @@ internal fun rememberDialogsButtons(
                 )
             },
             "System Dialog perm" to {
-                navigator.forward(
+                navigation.forward(
                     SampleDialog(
                         i + 1,
                         dialogsPlayground = true,
@@ -78,7 +78,7 @@ internal fun rememberDialogsButtons(
                 )
             },
             "Custom Dialog perm" to {
-                navigator.forward(
+                navigation.forward(
                     SampleDialog(
                         i + 1,
                         dialogsPlayground = true,
@@ -87,19 +87,19 @@ internal fun rememberDialogsButtons(
                     )
                 )
             },
-            "System Dialog Stack" to { navigator.forward(SampleDialogWithStack(i + 1, systemDialog = true, permanentDialog = false)) },
-            "Custom Dialog Stack" to { navigator.forward(SampleDialogWithStack(i + 1, systemDialog = false, permanentDialog = false)) },
-            "System Dialog Stack perm" to { navigator.forward(SampleDialogWithStack(i + 1, systemDialog = true, permanentDialog = true)) },
-            "Custom Dialog Stack perm" to { navigator.forward(SampleDialogWithStack(i + 1, systemDialog = false, permanentDialog = true)) },
-            "System BS" to { navigator.forward(SampleBottomSheet(i + 1, systemDialog = true, permanentDialog = false)) },
-            "Custom BS" to { navigator.forward(SampleBottomSheet(i + 1, systemDialog = false, permanentDialog = false)) },
-            "System BS perm" to { navigator.forward(SampleBottomSheet(i + 1, systemDialog = true, permanentDialog = false)) },
-            "Custom BS perm" to { navigator.forward(SampleBottomSheet(i + 1, systemDialog = false, permanentDialog = false)) },
-            "System BS Stack" to { navigator.forward(SampleBottomSheetStack(i + 1, systemDialog = true, permanentDialog = false)) },
-            "Custom BS Stack" to { navigator.forward(SampleBottomSheetStack(i + 1, systemDialog = false, permanentDialog = false)) },
-            "System BS Stack perm" to { navigator.forward(SampleBottomSheetStack(i + 1, systemDialog = true, permanentDialog = false)) },
-            "Custom BS Stack perm" to { navigator.forward(SampleBottomSheetStack(i + 1, systemDialog = false, permanentDialog = false)) },
-            "System Dialog random dim" to { navigator.forward(SystemDialogWithCustomDimSample(i + 1)) },
+            "System Dialog Stack" to { navigation.forward(SampleDialogWithStack(i + 1, systemDialog = true, permanentDialog = false)) },
+            "Custom Dialog Stack" to { navigation.forward(SampleDialogWithStack(i + 1, systemDialog = false, permanentDialog = false)) },
+            "System Dialog Stack perm" to { navigation.forward(SampleDialogWithStack(i + 1, systemDialog = true, permanentDialog = true)) },
+            "Custom Dialog Stack perm" to { navigation.forward(SampleDialogWithStack(i + 1, systemDialog = false, permanentDialog = true)) },
+            "System BS" to { navigation.forward(SampleBottomSheet(i + 1, systemDialog = true, permanentDialog = false)) },
+            "Custom BS" to { navigation.forward(SampleBottomSheet(i + 1, systemDialog = false, permanentDialog = false)) },
+            "System BS perm" to { navigation.forward(SampleBottomSheet(i + 1, systemDialog = true, permanentDialog = false)) },
+            "Custom BS perm" to { navigation.forward(SampleBottomSheet(i + 1, systemDialog = false, permanentDialog = false)) },
+            "System BS Stack" to { navigation.forward(SampleBottomSheetStack(i + 1, systemDialog = true, permanentDialog = false)) },
+            "Custom BS Stack" to { navigation.forward(SampleBottomSheetStack(i + 1, systemDialog = false, permanentDialog = false)) },
+            "System BS Stack perm" to { navigation.forward(SampleBottomSheetStack(i + 1, systemDialog = true, permanentDialog = false)) },
+            "Custom BS Stack perm" to { navigation.forward(SampleBottomSheetStack(i + 1, systemDialog = false, permanentDialog = false)) },
+            "System Dialog random dim" to { navigation.forward(SystemDialogWithCustomDimSample(i + 1)) },
         ).let {
             ButtonsState(it)
         }

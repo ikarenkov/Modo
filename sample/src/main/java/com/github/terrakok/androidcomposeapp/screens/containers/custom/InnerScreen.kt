@@ -41,9 +41,9 @@ class InnerScreen(
     @OptIn(ExperimentalModoApi::class)
     @Composable
     override fun Content(modifier: Modifier) {
-        val parent = LocalContainerScreen.current
+        val parent = LocalSampleCustomNavigation.current
         val closeScreen by rememberUpdatedState {
-            (parent as? SampleCustomContainerScreen)?.dispatch(RemoveScreen(screenKey)) ?: Unit
+            parent.dispatch(RemoveScreen(screenKey))
         }
         LifecycleScreenEffect {
             LifecycleEventObserver { _, event ->

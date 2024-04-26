@@ -15,14 +15,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.github.terrakok.androidcomposeapp.screens.base.SampleScreenContent
 import com.github.terrakok.modo.ExperimentalModoApi
-import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.lifecycle.DisposableScreenEffect
 import com.github.terrakok.modo.lifecycle.LaunchedScreenEffect
 import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
-import com.github.terrakok.modo.stack.StackNavigationContainer
+import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.forward
 import kotlinx.parcelize.Parcelize
@@ -57,7 +56,7 @@ class ScreenEffectsSampleScreen(
                 logcat { "Analytics: screen destroyed" }
             }
         }
-        val parent = LocalContainerScreen.current as StackNavigationContainer
+        val navigation = LocalStackNavigation.current
         SampleScreenContent(
             screenIndex = screenIndex,
             screenName = "ScreenEffectsSampleScreen",
@@ -67,8 +66,8 @@ class ScreenEffectsSampleScreen(
             ButtonsList(
                 buttonsState = remember {
                     listOf(
-                        "Forward" to { parent.forward(MainScreen(screenIndex + 1)) },
-                        "Back" to { parent.back() }
+                        "Forward" to { navigation.forward(MainScreen(screenIndex + 1)) },
+                        "Back" to { navigation.back() }
                     ).let {
                         ButtonsState(it)
                     }
