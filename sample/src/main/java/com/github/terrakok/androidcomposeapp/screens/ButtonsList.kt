@@ -10,56 +10,79 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-@Immutable
-data class ButtonsState(
-    val buttons: List<Pair<String, () -> Unit>>,
+fun ButtonsState(buttons: List<Pair<String, () -> Unit>>) = GroupedButtonsState(
+    listOf(GroupedButtonsState.Group(null, buttons))
 )
 
+@Immutable
+data class GroupedButtonsState(
+    val groups: List<Group>,
+) {
+    @Immutable
+    data class Group(
+        val title: String?,
+        val buttons: List<Pair<String, () -> Unit>>,
+    )
+}
+
 @Composable
-fun ButtonsList(
-    buttonsState: ButtonsState,
+fun GroupedButtonsList(
+    state: GroupedButtonsState,
     modifier: Modifier = Modifier
 ) {
-    val buttons = buttonsState.buttons
     Column(modifier) {
-        for (index in buttons.indices step 2) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f, fill = false)
-                    .height(IntrinsicSize.Max)
-            ) {
-                ModoButton(
+        for (group in state.groups) {
+            if (group.title != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = group.title,
+                    style = MaterialTheme.typography.h6,
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            val buttons = group.buttons
+            for (index in buttons.indices step 2) {
+                Row(
                     modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
-                    text = buttons[index].first
+                        .fillMaxWidth()
+                        .weight(1f, fill = false)
+                        .height(IntrinsicSize.Max)
                 ) {
-                    buttons[index].second()
-                }
-                Spacer(modifier = Modifier.size(8.dp))
-                if (index + 1 in buttons.indices) {
                     ModoButton(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight(),
-                        text = buttons[index + 1].first
+                        text = buttons[index].first
                     ) {
-                        buttons[index + 1].second()
+                        buttons[index].second()
                     }
-                } else {
-                    Box(modifier = Modifier.weight(1f))
+                    Spacer(modifier = Modifier.size(8.dp))
+                    if (index + 1 in buttons.indices) {
+                        ModoButton(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight(),
+                            text = buttons[index + 1].first
+                        ) {
+                            buttons[index + 1].second()
+                        }
+                    } else {
+                        Box(modifier = Modifier.weight(1f))
+                    }
                 }
+                Spacer(modifier = Modifier.height(8.dp))
             }
-            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
@@ -77,15 +100,20 @@ fun ModoButton(
 
 @Preview
 @Composable
-private fun ButtonsListPreview() {
-    ButtonsList(
-        buttonsState = ButtonsState(
+private fun GroupedButtonsListPreview() {
+    GroupedButtonsList(
+        state = GroupedButtonsState(
             listOf(
-                "Button 1",
-                "Button 2",
-                "Button 3",
-                "Button with a very long text",
-            ).map { it to {} }
-        ),
+                GroupedButtonsState.Group(
+                    "Group 1",
+                    listOf(
+                        "Button 1",
+                        "Button 2",
+                        "Button 3",
+                        "Button with a very long text",
+                    ).map { it to {} }
+                )
+            ),
+        )
     )
 }

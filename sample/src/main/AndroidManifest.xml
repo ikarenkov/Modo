@@ -7,13 +7,16 @@
         android:name=".ModoSampleApplication"
         android:theme="@style/Theme.Modo">
         <activity
-            android:name=".AppActivity"
+            android:name=".ModoSampleActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ModoLegacyIntegrationActivity"
+            android:exported="true"/>
     </application>
 
 </manifest>

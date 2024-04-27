@@ -1,6 +1,11 @@
 package com.github.terrakok.modo
 
+import android.app.Activity
 import android.os.Bundle
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import com.github.terrakok.modo.model.ScreenModelStore
 
 object Modo {
@@ -34,8 +39,50 @@ object Modo {
     /**
      * Must be called to clear all data from [ScreenModelStore], related with removed screens.
      */
-    fun <T : ContainerScreen<*, *>> onRootScreenFinished(rootScreen: RootScreen<T>?) {
-        rootScreen?.screen?.let(::clearScreenModel)
+    fun <T : Screen> onRootScreenFinished(rootScreen: RootScreen<T>?) {
+        rootScreen?.let(::clearScreenModel)
+    }
+
+    /**
+     * Creates [RootScreen] with provided screen, if there is no saved value. Otherwise [RootScreen] is restored from savedState.
+     * It automatically clears all data from [ScreenModelStore], .
+     * It also saves and restores screenCounterKey for correct [generateScreenKey] usage.
+     * Integration point for your screen hierarchy. You can use this fun to integrate Modo to your Fragment or Activity.
+     */
+    @Composable
+    fun <T : Screen> Activity.rememberRootScreen(
+        rootScreenFactory: () -> T
+    ): RootScreen<T> {
+        rememberSaveable<Int>(
+            key = MODO_SCREEN_COUNTER_KEY,
+            saver = Saver(
+                restore = {
+                    restoreScreenCounter(it as Int)
+                    it
+                },
+                save = {
+                    val counter = screenCounterKey.get()
+                    if (counter == -1) {
+                        null
+                    } else {
+                        counter
+                    }
+                }
+            )
+        ) {
+            screenCounterKey.get()
+        }
+        val rootScreen = rememberSaveable(key = MODO_GRAPH) {
+            RootScreen(rootScreenFactory())
+        }
+        DisposableEffect(rootScreen, this) {
+            onDispose {
+                if (isFinishing) {
+                    onRootScreenFinished(rootScreen)
+                }
+            }
+        }
+        return rootScreen
     }
 
     private fun clearScreenModel(screen: Screen) {

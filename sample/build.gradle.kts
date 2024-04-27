@@ -39,4 +39,6 @@ dependencies {
     implementation(libs.androidx.compose.material)
 
     implementation(libs.debug.logcat)
+
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
 }
