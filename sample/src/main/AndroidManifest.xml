@@ -17,6 +17,9 @@
         <activity
             android:name=".ModoLegacyIntegrationActivity"
             android:exported="true"/>
+        <activity
+            android:name=".fragment.ModoFragmentIntegrationActivity"
+            android:exported="true"/>
     </application>
 
 </manifest>

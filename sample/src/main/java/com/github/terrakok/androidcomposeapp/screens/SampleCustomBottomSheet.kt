@@ -36,7 +36,13 @@ class SampleCustomBottomSheet(
         }
         ModalBottomSheetLayout(
             sheetContent = {
-                MainScreenContent(i, screenKey, navigation, modifier)
+                MainScreenContent(
+                    screenIndex = i,
+                    screenKey = screenKey,
+                    canOpenFragment = false,
+                    navigation = navigation,
+                    modifier = modifier
+                )
             },
             sheetState = state
         ) {

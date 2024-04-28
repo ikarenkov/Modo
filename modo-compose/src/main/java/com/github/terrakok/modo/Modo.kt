@@ -4,9 +4,17 @@ import android.app.Activity
 import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.github.terrakok.modo.model.ScreenModelStore
+import com.github.terrakok.modo.util.getActivity
 
 object Modo {
 
@@ -53,7 +61,20 @@ object Modo {
     fun <T : Screen> Activity.rememberRootScreen(
         rootScreenFactory: () -> T
     ): RootScreen<T> {
-        rememberSaveable<Int>(
+        val rootScreen = rememberCounterAndRoot(rootScreenFactory)
+        DisposableEffect(rootScreen, this) {
+            onDispose {
+                if (isFinishing) {
+                    onRootScreenFinished(rootScreen)
+                }
+            }
+        }
+        return rootScreen
+    }
+
+    @Composable
+    private fun <T : Screen> rememberCounterAndRoot(rootScreenFactory: () -> T): RootScreen<T> {
+        rememberSaveable(
             key = MODO_SCREEN_COUNTER_KEY,
             saver = Saver(
                 restore = {
@@ -75,11 +96,48 @@ object Modo {
         val rootScreen = rememberSaveable(key = MODO_GRAPH) {
             RootScreen(rootScreenFactory())
         }
-        DisposableEffect(rootScreen, this) {
-            onDispose {
-                if (isFinishing) {
-                    onRootScreenFinished(rootScreen)
+        return rootScreen
+    }
+
+    /**
+     * Creates [RootScreen] with provided screen, if there is no saved value. Otherwise [RootScreen] is restored from savedState.
+     * It automatically clears all data from [ScreenModelStore], .
+     * It also saves and restores screenCounterKey for correct [generateScreenKey] usage.
+     * Integration point for your screen hierarchy. You can use this fun to integrate Modo to your Fragment or Activity.
+     */
+    @OptIn(ExperimentalModoApi::class)
+    @Composable
+    fun <T : Screen> Fragment.rememberRootScreen(
+        rootScreenFactory: () -> T
+    ): RootScreen<T> {
+        val rootScreen = rememberCounterAndRoot(rootScreenFactory)
+
+        val context = LocalContext.current
+        var hasAnyObserver by rememberSaveable {
+            mutableStateOf(false)
+        }
+        DisposableEffect(this) {
+            // Add observer only once. We don't care about observer removal because it automatically removes itself ON_DESTROY.
+            if (!hasAnyObserver) {
+                hasAnyObserver = true
+                val activity = context.getActivity()!!
+                val lifecycleObserver = LifecycleEventObserver { owner, event ->
+                    // If parent activity is finishes - fragment also is finishing.
+                    // But if activity is not finishes, then it can be just fragment removal from backstack.
+                    // This check is not taking into account the case, when an activity is destroyed by system, but it is going to be restored.
+
+                    if (event == Lifecycle.Event.ON_DESTROY) {
+                        val activityFinishing = activity.isFinishing
+                        val fragmentRemovedFromBackStack = !activityFinishing && !activity.isChangingConfigurations && !isStateSaved
+                        if (activityFinishing || fragmentRemovedFromBackStack) {
+                            onRootScreenFinished(rootScreen)
+                        }
+                    }
                 }
+                lifecycle.addObserver(lifecycleObserver)
+            }
+            onDispose {
+                // we don't remove lifecycleObserver onDispose because onDispose in Composable happens earlier then onDispose in Fragment
             }
         }
         return rootScreen

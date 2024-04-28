@@ -1,6 +1,5 @@
 package com.github.terrakok.modo.android
 
-import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.os.Bundle
@@ -45,7 +44,10 @@ import java.util.concurrent.atomic.AtomicReference
 /**
  * Adapter to link modo with android. It the single instance of [ModoScreenAndroidAdapter] per Screen.
  */
-class ModoScreenAndroidAdapter private constructor() :
+class ModoScreenAndroidAdapter private constructor(
+//    just for debug purpose.
+//    internal val screen: Screen
+) :
     LifecycleOwner,
     ViewModelStoreOwner,
     SavedStateRegistryOwner,
@@ -76,13 +78,12 @@ class ModoScreenAndroidAdapter private constructor() :
                 extras.set<Bundle>(DEFAULT_ARGS_KEY, getArguments())
             }*/
         }
-
-    private val atomicContext = AtomicReference<Context>()
-    private val atomicParentLifecycleOwner = AtomicReference<LifecycleOwner>()
     private val controller = SavedStateRegistryController.create(this)
     private var isCreated: Boolean by mutableStateOf(false)
 
-    private val activity: Activity? get() = atomicContext.get()?.getActivity()
+    // Atomic references for cases when we unable take it directly from the composition.
+    private val atomicContext = AtomicReference<Context>()
+    private val atomicParentLifecycleOwner = AtomicReference<LifecycleOwner>()
     private val application: Application? get() = atomicContext.get()?.applicationContext?.getApplication()
 
     init {
@@ -115,8 +116,9 @@ class ModoScreenAndroidAdapter private constructor() :
     fun ProvideAndroidIntegration(
         content: @Composable () -> Unit
     ) {
-        LifecycleDisposableEffect()
-
+        val context: Context = LocalContext.current
+        val parentLifecycleOwner = LocalLifecycleOwner.current
+        LifecycleDisposableEffect(context, parentLifecycleOwner)
         CompositionLocalProvider(*getProviders().toTypedArray()) {
             content()
         }
@@ -165,29 +167,37 @@ class ModoScreenAndroidAdapter private constructor() :
      * Returns a unregister callback
      */
     private fun registerParentLifecycleListener(
+        lifecycleOwner: LifecycleOwner?,
         observerFactory: () -> LifecycleObserver
     ): () -> Unit {
-        val lifecycleOwner = atomicParentLifecycleOwner.get()
         if (lifecycleOwner != null) {
             val parentLifecycleObserver = observerFactory()
             val lifecycle = lifecycleOwner.lifecycle
             lifecycle.addObserver(parentLifecycleObserver)
-            return { lifecycle.removeObserver(parentLifecycleObserver) }
+            return {
+                lifecycle.removeObserver(parentLifecycleObserver)
+            }
         } else {
             return { }
         }
     }
 
     @Composable
-    private fun LifecycleDisposableEffect() {
+    private fun LifecycleDisposableEffect(
+        context: Context,
+        parentLifecycleOwner: LifecycleOwner,
+    ) {
+        val activity = remember(context) {
+            context.getActivity()
+        }
         val savedState = rememberSaveable { Bundle() }
         if (!isCreated) {
             onCreate(savedState) // do this in the UI thread to force it to be called before anything else
         }
 
         DisposableEffect(this) {
-            val unregisterLifecycle = registerParentLifecycleListener {
-                LifecycleEventObserver { _, event ->
+            val unregisterLifecycle = registerParentLifecycleListener(parentLifecycleOwner) {
+                LifecycleEventObserver { owner, event ->
                     when {
                         /**
                          * Instance of the screen isn't recreated during config changes so skip this event
@@ -197,8 +207,10 @@ class ModoScreenAndroidAdapter private constructor() :
                          * on the same instance causing the crash.
                          *
                          * Also when activity is destroyed, but not finished, screen is not destroyed.
+                         *
+                         * In the case of Fragments, we unsubscribe before ON_DESTROY event, so there is no problem with this.
                          */
-                        event == Lifecycle.Event.ON_DESTROY && activity?.isFinishing == false ->
+                        event == Lifecycle.Event.ON_DESTROY && (activity?.isFinishing == false || activity?.isChangingConfigurations == true) ->
                             return@LifecycleEventObserver
                         // when the Application goes to background, perform save
                         event == Lifecycle.Event.ON_STOP ->
@@ -226,7 +238,7 @@ class ModoScreenAndroidAdapter private constructor() :
             return
         }
         // Protection from double event sending from the parent
-        if (event in startEvents && event.targetState <= currentState) {
+        if ((event in startEvents || event in initEvents) && event.targetState <= currentState) {
             return
         }
         if (event in stopEvents && event.targetState >= currentState) {

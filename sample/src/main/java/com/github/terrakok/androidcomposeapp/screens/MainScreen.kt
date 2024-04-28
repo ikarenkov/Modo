@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -11,6 +12,8 @@ import com.github.terrakok.androidcomposeapp.ListScreen
 import com.github.terrakok.androidcomposeapp.ModelSampleScreen
 import com.github.terrakok.androidcomposeapp.ModoLegacyIntegrationActivity
 import com.github.terrakok.androidcomposeapp.ModoSampleActivity
+import com.github.terrakok.androidcomposeapp.fragment.ModoFragment
+import com.github.terrakok.androidcomposeapp.fragment.ModoFragmentIntegrationActivity
 import com.github.terrakok.androidcomposeapp.screens.base.ButtonsScreenContent
 import com.github.terrakok.androidcomposeapp.screens.containers.HorizontalPagerScreen
 import com.github.terrakok.androidcomposeapp.screens.containers.OpenActivityAction
@@ -33,12 +36,14 @@ import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.StackNavContainer
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.forward
+import com.github.terrakok.modo.util.getActivity
 import kotlinx.parcelize.Parcelize
 import logcat.logcat
 
 @Parcelize
 class MainScreen(
     private val screenIndex: Int,
+    private val canOpenFragment: Boolean = false,
     override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
 
@@ -53,7 +58,13 @@ class MainScreen(
                 logcat { "$screenKey: Lifecycle.Event $event" }
             }
         }
-        MainScreenContent(screenIndex, screenKey, LocalStackNavigation.current, modifier)
+        MainScreenContent(
+            screenIndex = screenIndex,
+            screenKey = screenKey,
+            navigation = LocalStackNavigation.current,
+            modifier = modifier,
+            canOpenFragment = canOpenFragment,
+        )
     }
 }
 
@@ -63,12 +74,17 @@ internal fun MainScreenContent(
     screenKey: ScreenKey,
     navigation: StackNavContainer?,
     modifier: Modifier = Modifier,
+    canOpenFragment: Boolean = false,
 ) {
     ButtonsScreenContent(
         screenIndex = screenIndex,
         screenName = "MainScreen",
         screenKey = screenKey,
-        state = rememberButtons(navigation = navigation, i = screenIndex),
+        state = rememberButtons(
+            navigation = navigation,
+            i = screenIndex,
+            canOpenFragment = canOpenFragment
+        ),
         modifier = modifier,
     )
 }
@@ -79,13 +95,18 @@ internal fun MainScreenContent(
     screenKey: ScreenKey,
     counter: Int,
     navigation: StackNavContainer,
-    modifier: Modifier
+    modifier: Modifier,
+    canOpenFragment: Boolean = false,
 ) {
     ButtonsScreenContent(
         screenIndex = screenIndex,
         screenName = "MainScreen",
         screenKey = screenKey,
-        state = rememberButtons(navigation = navigation, i = screenIndex),
+        state = rememberButtons(
+            navigation = navigation,
+            i = screenIndex,
+            canOpenFragment = canOpenFragment
+        ),
         counter = counter,
         modifier = modifier
     )
@@ -94,16 +115,18 @@ internal fun MainScreenContent(
 @Composable
 private fun rememberButtons(
     navigation: StackNavContainer?,
-    i: Int
+    i: Int,
+    canOpenFragment: Boolean
 ): GroupedButtonsState {
     val context = LocalContext.current
-    return remember {
+    return remember(context, navigation) {
+        val activity = context.getActivity() as? FragmentActivity
         GroupedButtonsState(
             listOf(
                 GroupedButtonsState.Group(
                     title = null,
                     listOf(
-                        "Forward" to { navigation?.forward(MainScreen(i + 1)) },
+                        "Forward" to { navigation?.forward(MainScreen(i + 1, canOpenFragment)) },
                         "Back" to { navigation?.back() },
                     )
                 ),
@@ -129,9 +152,22 @@ private fun rememberButtons(
                 ),
                 GroupedButtonsState.Group(
                     title = "Integrations",
-                    listOf(
+                    listOfNotNull(
                         "Modern Activity integration" to { navigation?.dispatch(OpenActivityAction<ModoSampleActivity>(context)) },
                         "Legacy Activity integration" to { navigation?.dispatch(OpenActivityAction<ModoLegacyIntegrationActivity>(context)) },
+                        "Fragment integration" to { navigation?.dispatch(OpenActivityAction<ModoFragmentIntegrationActivity>(context)) },
+                        activity?.let { activity ->
+                            if (canOpenFragment) {
+                                "New fragment" to {
+                                    activity.supportFragmentManager.beginTransaction()
+                                        .replace(android.R.id.content, ModoFragment())
+                                        .addToBackStack("ModoFragment")
+                                        .commit()
+                                }
+                            } else {
+                                null
+                            }
+                        },
                     )
                 ),
                 GroupedButtonsState.Group(

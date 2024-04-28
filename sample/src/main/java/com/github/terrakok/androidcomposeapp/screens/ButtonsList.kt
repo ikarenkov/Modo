@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -40,7 +42,7 @@ fun GroupedButtonsList(
     state: GroupedButtonsState,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier) {
+    Column(modifier.verticalScroll(rememberScrollState())) {
         for (group in state.groups) {
             if (group.title != null) {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -56,8 +58,7 @@ fun GroupedButtonsList(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f, fill = false)
-                        .height(IntrinsicSize.Max)
+                        .height(IntrinsicSize.Min)
                 ) {
                     ModoButton(
                         modifier = Modifier
