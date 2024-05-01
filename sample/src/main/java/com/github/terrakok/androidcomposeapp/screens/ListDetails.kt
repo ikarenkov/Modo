@@ -1,4 +1,4 @@
-package com.github.terrakok.androidcomposeapp
+package com.github.terrakok.androidcomposeapp.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -27,6 +27,7 @@ class ListScreen(
     override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
 
+    @Suppress("MagicNumber")
     @Composable
     override fun Content(modifier: Modifier) {
         val navigation = LocalStackNavigation.current

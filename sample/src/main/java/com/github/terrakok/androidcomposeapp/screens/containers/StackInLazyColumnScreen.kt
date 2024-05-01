@@ -43,6 +43,7 @@ import kotlinx.parcelize.Parcelize
  */
 @Parcelize
 class StackInLazyColumnScreen(
+    @Suppress("MagicNumber")
     private val navModel: ListNavModel = ListNavModel(
         buildList {
             repeat(5) {
@@ -53,6 +54,7 @@ class StackInLazyColumnScreen(
 ) : ContainerScreen<ListNavigationState, ListNavigationAction>(
     navModel
 ) {
+    @Suppress("LongMethod")
     @Composable
     override fun Content(modifier: Modifier) {
         val lazyColumnState = rememberLazyListState()

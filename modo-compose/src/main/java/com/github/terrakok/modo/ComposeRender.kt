@@ -20,8 +20,8 @@ import kotlinx.coroutines.channels.Channel
 
 typealias RendererContent<State> = @Composable ComposeRendererScope<State>.(Modifier) -> Unit
 
-val defaultRendererContent: (@Composable ComposeRendererScope<*>.(Modifier) -> Unit) = { modifier ->
-    screen.SaveableContent(modifier)
+val defaultRendererContent: (@Composable ComposeRendererScope<*>.(screenModifier: Modifier) -> Unit) = { screenModifier ->
+    screen.SaveableContent(screenModifier)
     val channel = LocalTransitionCompleteChannel.current
     // There's no animation, we can instantly mark the transition as completed
     DisposableEffect(screen.screenKey) {
@@ -92,11 +92,12 @@ internal class ComposeRenderer<State : NavigationState>(
         this.state = state
     }
 
+    @Suppress("UnusedPrivateProperty", "SpreadOperator")
     @Composable
     fun Content(
         screen: Screen,
-        provideCompositionLocal: Array<ProvidedValue<*>> = emptyArray(),
         modifier: Modifier = Modifier,
+        provideCompositionLocal: Array<ProvidedValue<*>> = emptyArray(),
         content: RendererContent<State> = defaultRendererContent
     ) {
         val stateHolder: SaveableStateHolder = LocalSaveableStateHolder.currentOrThrow
@@ -133,7 +134,8 @@ internal class ComposeRenderer<State : NavigationState>(
         if (clearAll) {
             state?.getChildScreens()?.clearStates(stateHolder)
         }
-        // There can be several transition of different screens on the screen, so it is important properly clear screens that are not visible for user.
+        // There can be several transition of different screens on the screen,
+        // so it is important properly clear screens that are not visible for user.
         val safeToRemove = removedScreens.filter { it !in displayingScreens }
         safeToRemove.clearStates(stateHolder)
         if (removedScreens.isNotEmpty()) {

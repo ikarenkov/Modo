@@ -21,7 +21,6 @@ import com.github.terrakok.androidcomposeapp.SlideTransition
 import com.github.terrakok.androidcomposeapp.screens.MainScreen
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
-import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
 import com.github.terrakok.modo.stack.StackNavModel
 import com.github.terrakok.modo.stack.StackScreen
@@ -52,6 +51,7 @@ class SampleDialogWithStack(
         DialogScreen.DialogConfig.Custom
     }
 
+    @Suppress("MagicNumber")
     @Composable
     override fun Content(modifier: Modifier) {
         LifecycleScreenEffect {
@@ -59,7 +59,6 @@ class SampleDialogWithStack(
                 logcat(tag = "SampleDialog") { "$screenKey $event" }
             }
         }
-        val container = LocalContainerScreen.current as StackScreen
         if (systemDialog) {
             Box(
                 modifier
@@ -67,10 +66,10 @@ class SampleDialogWithStack(
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White)
             ) {
-                TopScreenContent { modifier ->
+                TopScreenContent { screenModifier ->
                     SlideTransition(
                         Modifier,
-                        screenModifier = modifier
+                        screenModifier = screenModifier
                             .fillMaxSize()
                             .background(Color.Black)
                     )
@@ -78,9 +77,9 @@ class SampleDialogWithStack(
             }
         } else {
             Box(modifier = modifier.fillMaxSize()) {
-                TopScreenContent { modifier ->
+                TopScreenContent { transitionModifier ->
                     SlideTransition(
-                        modifier = modifier
+                        modifier = transitionModifier
                             .align(Alignment.Center)
                             .padding(horizontal = 50.dp)
                             .clip(RoundedCornerShape(16.dp)),

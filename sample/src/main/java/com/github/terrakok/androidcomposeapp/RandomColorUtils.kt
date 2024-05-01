@@ -8,6 +8,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import kotlin.random.Random
 
+@Suppress("ModifierComposed")
 fun Modifier.randomBackground(
     alpha: Float = 1f
 ) = composed {

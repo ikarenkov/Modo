@@ -45,6 +45,15 @@ fun Project.configureJetpackCompose(
             composeOptions.kotlinCompilerExtensionVersion = libs.versions.kotlinCompilerExtension.get()
         }
     }
+    tasks.withType<KotlinCompile>().configureEach {
+        kotlinOptions {
+            freeCompilerArgs = freeCompilerArgs + listOf(
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
+                    "${rootProject.projectDir.absoluteFile}/config/compose/compose_compiler_config.conf"
+            )
+        }
+    }
 }
 
 /**

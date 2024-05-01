@@ -55,6 +55,7 @@ inline fun <reified T : Any> Screen.rememberDependency(
 @PublishedApi
 internal const val ON_SCREEN_REMOVED_CALLBACK_NAME = "OnScreenRemovedCallBack"
 
+@Suppress("LambdaParameterInRestartableEffect")
 @ExperimentalModoApi
 @Composable
 inline fun Screen.OnScreenRemoved(
@@ -72,13 +73,13 @@ inline fun Screen.OnScreenRemoved(
     }
 }
 
-public interface ScreenModel {
+interface ScreenModel {
 
-    public fun onDispose() {}
+    fun onDispose() {}
 }
 
-public abstract class StateScreenModel<S>(initialState: S) : ScreenModel {
+abstract class StateScreenModel<S>(initialState: S) : ScreenModel {
 
     protected val mutableState: MutableStateFlow<S> = MutableStateFlow(initialState)
-    public val state: StateFlow<S> = mutableState.asStateFlow()
+    val state: StateFlow<S> = mutableState.asStateFlow()
 }

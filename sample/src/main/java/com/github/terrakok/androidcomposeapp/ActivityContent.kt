@@ -26,7 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.github.terrakok.androidcomposeapp.screens.dialogs.showingDialogsCount
 
 @Composable
-fun ComponentActivity.ActivityContent(content: @Composable () -> Unit) {
+internal fun ComponentActivity.ActivityContent(content: @Composable () -> Unit) {
     Surface(color = MaterialTheme.colors.background) {
         val systemBarPaddings = WindowInsets.systemBars.asPaddingValues()
         val hasDialog = showingDialogsCount.collectAsState().value > 0

@@ -1,5 +1,6 @@
 package com.github.terrakok.androidcomposeapp.screens.base
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
@@ -13,11 +14,11 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.IntState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +32,8 @@ import com.github.terrakok.modo.ScreenKey
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
+internal const val COUNTER_DELAY_MS = 100L
+
 @Composable
 internal fun ButtonsScreenContent(
     screenIndex: Int,
@@ -39,16 +42,22 @@ internal fun ButtonsScreenContent(
     state: GroupedButtonsState,
     modifier: Modifier = Modifier,
 ) {
-    var counter by rememberSaveable { mutableStateOf(0) }
+    val counter by rememberCounterState()
+    ButtonsScreenContent(screenIndex, screenName, counter, screenKey, state, modifier)
+}
+
+@Composable
+fun rememberCounterState(): IntState {
+    val counter = rememberSaveable { mutableIntStateOf(0) }
     LaunchedEffect(key1 = Unit) {
         if (SampleAppConfig.counterEnabled) {
             while (isActive) {
-                delay(100)
-                counter++
+                delay(COUNTER_DELAY_MS)
+                counter.intValue++
             }
         }
     }
-    ButtonsScreenContent(screenIndex, screenName, counter, screenKey, state, modifier)
+    return counter
 }
 
 @Composable
@@ -82,15 +91,7 @@ internal fun SampleScreenContent(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    var counter by rememberSaveable { mutableStateOf(0) }
-    LaunchedEffect(key1 = Unit) {
-        if (SampleAppConfig.counterEnabled) {
-            while (isActive) {
-                delay(100)
-                counter++
-            }
-        }
-    }
+    val counter by rememberCounterState()
     SampleScreenContent(screenIndex, screenName, counter, screenKey, modifier, content)
 }
 
@@ -106,6 +107,7 @@ internal fun SampleScreenContent(
     Column(
         modifier = modifier
             .randomBackground()
+            .clickable { }
             .windowInsetsPadding(WindowInsets.systemBars)
             .padding(8.dp),
     ) {

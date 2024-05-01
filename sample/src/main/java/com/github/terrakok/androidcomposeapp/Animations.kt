@@ -20,7 +20,7 @@ import com.github.terrakok.modo.stack.StackState
 @Composable
 @OptIn(ExperimentalAnimationApi::class, ExperimentalModoApi::class)
 fun ComposeRendererScope<StackState>.SlideTransition(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     screenModifier: Modifier = Modifier
 ) {
     ScreenTransition(

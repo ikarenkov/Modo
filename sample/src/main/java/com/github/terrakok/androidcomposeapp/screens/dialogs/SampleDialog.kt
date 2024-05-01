@@ -57,6 +57,7 @@ class SampleDialog(
         DialogScreen.DialogConfig.Custom
     }
 
+    @Suppress("ModifierNotUsedAtRoot")
     @Composable
     override fun Content(modifier: Modifier) {
         SetupSystemBar()

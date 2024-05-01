@@ -36,7 +36,7 @@ abstract class MultiScreen(
     @Composable
     fun Content(
         screen: Screen,
-        modifier: Modifier,
+        modifier: Modifier = Modifier,
         content: RendererContent<MultiScreenState> = defaultRendererContent
     ) {
         // report issue to google issue tracker

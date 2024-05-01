@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.github.terrakok.androidcomposeapp.screens.base.SampleScreenContent
+import com.github.terrakok.androidcomposeapp.screens.base.rememberCounterState
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
@@ -40,20 +41,21 @@ class ScreenEffectsSampleScreen(
             mutableStateOf(listOf<Lifecycle.Event>())
         }
         val scaffoldState = rememberScaffoldState()
+        val counter by rememberCounterState()
         // This effect is going to be launched once despite on activity recreation.
         LaunchedScreenEffect {
-            scaffoldState.snackbarHostState.showSnackbar("LaunchedScreenEffect!")
+            scaffoldState.snackbarHostState.showSnackbar("LaunchedScreenEffect! Counter: $counter.")
         }
         LifecycleScreenEffect {
             LifecycleEventObserver { _, event ->
                 lifecycleEventsHistory += event
-                logcat { "Lifecycle event $event" }
+                logcat { "Lifecycle event $event. Counter: $counter." }
             }
         }
         DisposableScreenEffect {
-            logcat { "Analytics: screen created" }
+            logcat { "Analytics: screen created. Counter: $counter." }
             onDispose {
-                logcat { "Analytics: screen destroyed" }
+                logcat { "Analytics: screen destroyed.  Counter: $counter." }
             }
         }
         val navigation = LocalStackNavigation.current
@@ -61,6 +63,7 @@ class ScreenEffectsSampleScreen(
             screenIndex = screenIndex,
             screenName = "ScreenEffectsSampleScreen",
             screenKey = screenKey,
+            counter = counter,
             modifier = modifier,
         ) {
             GroupedButtonsList(

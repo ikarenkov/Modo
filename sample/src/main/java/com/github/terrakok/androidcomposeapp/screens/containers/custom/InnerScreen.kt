@@ -9,12 +9,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,14 +18,13 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleEventObserver
 import com.github.terrakok.androidcomposeapp.randomBackground
+import com.github.terrakok.androidcomposeapp.screens.base.rememberCounterState
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.parcelize.Parcelize
 import logcat.logcat
 
@@ -86,18 +81,4 @@ fun InnerContent(
             }
         }
     }
-}
-
-@Composable
-fun rememberCounterState(): State<Int> {
-    val value = rememberSaveable {
-        mutableStateOf(0)
-    }
-    LaunchedEffect(Unit) {
-        while (isActive) {
-            delay(100)
-            value.value++
-        }
-    }
-    return value
 }

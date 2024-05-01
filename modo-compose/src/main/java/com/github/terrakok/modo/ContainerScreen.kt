@@ -57,7 +57,7 @@ abstract class ContainerScreen<State : NavigationState, Action : NavigationActio
         content: RendererContent<State> = defaultRendererContent
     ) {
         val composeRenderer = renderer as ComposeRenderer
-        composeRenderer.Content(screen, provideCompositionLocals(), modifier, content)
+        composeRenderer.Content(screen, modifier, provideCompositionLocals(), content)
     }
 
     override fun toString(): String = screenKey.value

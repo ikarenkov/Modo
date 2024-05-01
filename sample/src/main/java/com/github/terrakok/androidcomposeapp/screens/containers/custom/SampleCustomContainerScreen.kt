@@ -53,6 +53,7 @@ internal class RemoveScreen(val screenKey: ScreenKey) : CustomContainerReducerAc
     )
 }
 
+@Suppress("CompositionLocalAllowlist")
 internal val LocalSampleCustomNavigation = compositionLocalOf<SampleCustomContainerScreen> {
     error("CompositionLocal LocalSampleCustomNavigation is not present")
 }
@@ -135,6 +136,8 @@ internal class SampleCustomContainerScreen(
         }
     }
 
+    // actually it is remembered, but in composedItems
+    @Suppress("RememberContentMissing")
     @Composable
     fun movableScreen(
         transform: @Composable (screen: Screen) -> Unit

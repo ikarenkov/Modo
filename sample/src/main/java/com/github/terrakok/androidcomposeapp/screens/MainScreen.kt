@@ -8,8 +8,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import com.github.terrakok.androidcomposeapp.ListScreen
-import com.github.terrakok.androidcomposeapp.ModelSampleScreen
 import com.github.terrakok.androidcomposeapp.ModoLegacyIntegrationActivity
 import com.github.terrakok.androidcomposeapp.ModoSampleActivity
 import com.github.terrakok.androidcomposeapp.fragment.ModoFragment
@@ -95,7 +93,7 @@ internal fun MainScreenContent(
     screenKey: ScreenKey,
     counter: Int,
     navigation: StackNavContainer,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     canOpenFragment: Boolean = false,
 ) {
     ButtonsScreenContent(

@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.SaveableStateHolder
@@ -24,11 +24,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.github.terrakok.androidcomposeapp.screens.base.rememberCounterState
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.parcelize.Parcelize
 import kotlin.random.Random
 
@@ -50,10 +49,10 @@ private fun ScreenContent() {
     val screens1 = remember {
         listOf("11", "12", "13")
     }
-    val screens2 = remember {
-        listOf("21", "22", "23")
-    }
-    var selectedPos by rememberSaveable { mutableStateOf(0) }
+//    val screens2 = remember {
+//        listOf("21", "22", "23")
+//    }
+    var selectedPos by rememberSaveable { mutableIntStateOf(0) }
     var showAllStacks by rememberSaveable {
         mutableStateOf(false)
     }
@@ -88,7 +87,7 @@ private fun BrokenRememberSaveableContent(
     screens: List<String>,
     saveableStateHolder: SaveableStateHolder,
     selectedPos: Int,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     Text(
         text = "Broken",
@@ -117,13 +116,15 @@ private fun BrokenRememberSaveableContent(
     }
 }
 
+// Playground, suppress everything
+@Suppress("UnusedPrivateMember", "MultipleEmitters")
 @Composable
 private fun WorkingRememberSaveableContent(
     showAllStacks: Boolean,
     screens: List<String>,
     saveableStateHolder: SaveableStateHolder,
     selectedPos: Int,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     Text(
         text = "Working",
@@ -150,17 +151,11 @@ private fun WorkingRememberSaveableContent(
 fun ScreenContent(
     saveableStateHolder: SaveableStateHolder,
     id: String,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     saveableStateHolder.SaveableStateProvider(key = id) {
         val background = rememberSaveable(key = id) { Random.nextInt() }
-        var counter by rememberSaveable { mutableStateOf(0) }
-        LaunchedEffect(key1 = Unit) {
-            while (isActive) {
-                delay(1000)
-                counter++
-            }
-        }
+        val counter by rememberCounterState()
         Column(
             modifier = modifier.background(color = Color(background)),
             verticalArrangement = Arrangement.Center,

@@ -25,13 +25,16 @@ import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.backTo
 import com.github.terrakok.modo.stack.dispatch
 import com.github.terrakok.modo.stack.forward
-import com.github.terrakok.modo.stack.newStack
+import com.github.terrakok.modo.stack.setStack
 import com.github.terrakok.modo.stack.removeScreens
 import com.github.terrakok.modo.stack.replace
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 
+/**
+ * Sample playground screen to take a look to available navigation operations for stack.
+ */
 @Parcelize
 class StackActionsScreen(
     private val screenIndex: Int,
@@ -53,6 +56,7 @@ class StackActionsScreen(
     }
 }
 
+@Suppress("LongMethod", "MagicNumber")
 @Composable
 private fun rememberButtons(
     navigation: StackNavContainer,
@@ -64,8 +68,8 @@ private fun rememberButtons(
             "Forward" to { navigation.forward(StackActionsScreen(screenIndex + 1)) },
             "Back" to { navigation.back() },
             "Replace" to { navigation.replace(StackActionsScreen(screenIndex + 1)) },
-            "New stack" to {
-                navigation.newStack(
+            "Set new stack" to {
+                navigation.setStack(
                     StackActionsScreen(screenIndex + 1),
                     StackActionsScreen(screenIndex + 2),
                     StackActionsScreen(screenIndex + 3)
@@ -78,7 +82,7 @@ private fun rememberButtons(
                     StackActionsScreen(screenIndex + 3)
                 )
             },
-            "New root" to { navigation.newStack(StackActionsScreen(screenIndex + 1)) },
+            "New root" to { navigation.setStack(StackActionsScreen(screenIndex + 1)) },
             "Forward 3 sec delay" to {
                 coroutineScope.launch {
                     delay(3000)

@@ -11,25 +11,26 @@ interface StackAction : NavigationAction<StackState>
 fun interface StackReducerAction : StackAction, ReducerAction<StackState>
 
 class SetStack(val state: StackState) : StackReducerAction {
+    @Suppress("SpreadOperator")
+    constructor(screen: Screen, vararg screens: Screen) : this(
+        StackState(listOf(screen, *screens))
+    )
+
     override fun reduce(oldState: StackState): StackState =
         state
 }
 
 class Forward(val screen: Screen, vararg val screens: Screen) : StackReducerAction {
+    @Suppress("SpreadOperator")
     override fun reduce(oldState: StackState): StackState = StackState(
         oldState.stack + listOf(screen, *screens)
     )
 }
 
 class Replace(val screen: Screen, vararg val screens: Screen) : StackReducerAction {
+    @Suppress("SpreadOperator")
     override fun reduce(oldState: StackState): StackState = StackState(
         oldState.stack.dropLast(1) + listOf(screen, *screens)
-    )
-}
-
-class NewStack(val screen: Screen, vararg val screens: Screen) : StackReducerAction {
-    override fun reduce(oldState: StackState): StackState = StackState(
-        listOf(screen, *screens)
     )
 }
 
@@ -80,10 +81,10 @@ class Back(private val screensToDrop: Int = 1) : StackReducerAction {
 
 fun StackNavContainer.dispatch(action: (StackState) -> StackState) = dispatch(StackReducerAction(action))
 
-fun NavigationContainer<StackState, StackAction>.setStack(state: StackState) = dispatch(SetStack(state))
 fun NavigationContainer<StackState, StackAction>.forward(screen: Screen, vararg screens: Screen) = dispatch(Forward(screen, *screens))
 fun NavigationContainer<StackState, StackAction>.replace(screen: Screen, vararg screens: Screen) = dispatch(Replace(screen, *screens))
-fun NavigationContainer<StackState, StackAction>.newStack(screen: Screen, vararg screens: Screen) = dispatch(NewStack(screen, *screens))
+fun NavigationContainer<StackState, StackAction>.setStack(screen: Screen, vararg screens: Screen) = dispatch(SetStack(screen, *screens))
+fun NavigationContainer<StackState, StackAction>.setState(state: StackState) = dispatch(SetStack(state))
 
 inline fun <reified T : Screen> NavigationContainer<StackState, StackAction>.backTo() = dispatch(BackTo<T>())
 fun NavigationContainer<StackState, StackAction>.backTo(screen: Screen) = dispatch(BackTo(screen))

@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -29,7 +30,9 @@ internal class MovableContentPlaygroundScreen(
     override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
 
+    @IgnoredOnParcel
     private var counter = 3
+    @IgnoredOnParcel
     private var list = mutableStateListOf<Int>().apply {
         for (i in 0..<counter) add(i)
     }
@@ -67,6 +70,8 @@ internal class MovableContentPlaygroundScreen(
         }
     }
 
+    // Actually it is remembered in the composedItems
+    @Suppress("RememberContentMissing")
     @Composable
     fun <T> List<T>.movable(
         transform: @Composable (item: T) -> Unit

@@ -41,6 +41,7 @@ class SampleContainerScreen(
         sampleNavigationState: StackState = StackState(MainScreen(1))
     ) : this(i, NavModel(sampleNavigationState))
 
+    @Suppress("ModifierNotUsedAtRoot")
     @OptIn(ExperimentalModoApi::class)
     @Composable
     override fun Content(modifier: Modifier) {
