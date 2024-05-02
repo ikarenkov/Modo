@@ -3,6 +3,7 @@ package com.github.terrakok
 import io.gitlab.arturbosch.detekt.Detekt
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.register
 
@@ -23,6 +24,10 @@ class DetektPlugin : Plugin<Project> {
 
 fun Project.setupDetektTask() {
     tasks.register<Detekt>("detektAll") {
+        reports {
+            sarif.required = true
+            reports.sarif.outputLocation.set(file("detekt.sarif"))
+        }
         // The directories where detekt looks for source files.
         // Defaults to `files("src/main/java", "src/test/java", "src/main/kotlin", "src/test/kotlin")`.
         setSource(projectDir)
