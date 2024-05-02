@@ -5,6 +5,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import com.github.terrakok.androidcomposeapp.screens.ButtonsState
+import com.github.terrakok.androidcomposeapp.screens.GroupedButtonsState
 import com.github.terrakok.androidcomposeapp.screens.MainScreen
 import com.github.terrakok.androidcomposeapp.screens.SampleCustomBottomSheet
 import com.github.terrakok.androidcomposeapp.screens.SamplePermanentDialog
@@ -44,7 +45,7 @@ class StackActionsScreen(
             screenName = "StackActionsScreen",
             screenKey = screenKey,
             screenIndex = screenIndex,
-            buttonsState = rememberButtons(
+            state = rememberButtons(
                 LocalStackNavigation.current,
                 screenIndex
             )
@@ -56,7 +57,7 @@ class StackActionsScreen(
 private fun rememberButtons(
     navigation: StackNavContainer,
     screenIndex: Int
-): ButtonsState {
+): GroupedButtonsState {
     val coroutineScope = rememberCoroutineScope()
     return remember {
         listOf<Pair<String, () -> Unit>>(

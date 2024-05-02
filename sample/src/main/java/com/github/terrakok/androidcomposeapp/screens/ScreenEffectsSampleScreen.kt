@@ -63,8 +63,8 @@ class ScreenEffectsSampleScreen(
             screenKey = screenKey,
             modifier = modifier,
         ) {
-            ButtonsList(
-                buttonsState = remember {
+            GroupedButtonsList(
+                state = remember {
                     listOf(
                         "Forward" to { navigation.forward(MainScreen(screenIndex + 1)) },
                         "Back" to { navigation.back() }

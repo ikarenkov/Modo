@@ -24,8 +24,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.androidcomposeapp.SampleAppConfig
 import com.github.terrakok.androidcomposeapp.randomBackground
-import com.github.terrakok.androidcomposeapp.screens.ButtonsList
 import com.github.terrakok.androidcomposeapp.screens.ButtonsState
+import com.github.terrakok.androidcomposeapp.screens.GroupedButtonsList
+import com.github.terrakok.androidcomposeapp.screens.GroupedButtonsState
 import com.github.terrakok.modo.ScreenKey
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -35,7 +36,7 @@ internal fun ButtonsScreenContent(
     screenIndex: Int,
     screenName: String,
     screenKey: ScreenKey,
-    buttonsState: ButtonsState,
+    state: GroupedButtonsState,
     modifier: Modifier = Modifier,
 ) {
     var counter by rememberSaveable { mutableStateOf(0) }
@@ -47,7 +48,7 @@ internal fun ButtonsScreenContent(
             }
         }
     }
-    ButtonsScreenContent(screenIndex, screenName, counter, screenKey, buttonsState, modifier)
+    ButtonsScreenContent(screenIndex, screenName, counter, screenKey, state, modifier)
 }
 
 @Composable
@@ -56,7 +57,7 @@ internal fun ButtonsScreenContent(
     screenName: String,
     counter: Int,
     screenKey: ScreenKey,
-    buttonsState: ButtonsState,
+    state: GroupedButtonsState,
     modifier: Modifier = Modifier,
 ) {
     SampleScreenContent(
@@ -66,8 +67,8 @@ internal fun ButtonsScreenContent(
         screenKey = screenKey,
         modifier = modifier,
     ) {
-        ButtonsList(
-            buttonsState,
+        GroupedButtonsList(
+            state,
             Modifier.weight(1f, fill = false)
         )
     }
@@ -113,13 +114,13 @@ internal fun SampleScreenContent(
         )
         Text(
             text = "$screenName $screenIndex",
-            style = MaterialTheme.typography.h6,
+            style = MaterialTheme.typography.h5,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
         )
         Text(
             text = "ScreenKey: ${screenKey.value}",
-            style = MaterialTheme.typography.body2,
+            style = MaterialTheme.typography.body1,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
         )
@@ -136,7 +137,7 @@ private fun ButtonsPreview() {
         counter = 666,
         screenName = "ButtonsPreview",
         screenKey = ScreenKey("ScreenKey"),
-        buttonsState = ButtonsState(
+        state = ButtonsState(
             listOf(
                 "Button 1",
                 "Button 2",

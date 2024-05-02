@@ -1,5 +1,8 @@
 package com.github.terrakok.androidcomposeapp.screens.containers
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,10 +24,28 @@ import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
 import com.github.terrakok.modo.stack.DialogPlaceHolder
 import com.github.terrakok.modo.stack.StackNavModel
+import com.github.terrakok.modo.stack.StackReducerAction
 import com.github.terrakok.modo.stack.StackScreen
+import com.github.terrakok.modo.stack.StackState
 import com.github.terrakok.modo.stack.back
 import kotlinx.parcelize.Parcelize
 import logcat.logcat
+
+class OpenActivityAction(
+    private val context: Context,
+    private val clazz: Class<*>
+) : StackReducerAction {
+    override fun reduce(oldState: StackState): StackState {
+        context.startActivity(
+            Intent(context, clazz)
+        )
+        return oldState
+    }
+
+    companion object {
+        inline operator fun <reified T : Activity> invoke(context: Context) = OpenActivityAction(context, T::class.java)
+    }
+}
 
 @Parcelize
 open class SampleStack(
@@ -39,7 +60,6 @@ open class SampleStack(
         LifecycleScreenEffect {
             LifecycleEventObserver { _, event ->
                 logcat(tag = "SampleStack") { "$screenKey lifecycle event $event" }
-
             }
         }
         TopScreenContent(modifier) { modifier ->

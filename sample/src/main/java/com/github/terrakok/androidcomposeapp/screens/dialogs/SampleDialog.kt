@@ -84,7 +84,7 @@ class SampleDialog(
                     screenIndex = screenIndex,
                     screenName = "SampleDialog",
                     screenKey = screenKey,
-                    buttonsState = rememberDialogsButtons(LocalContainerScreen.current as StackScreen, screenIndex),
+                    state = rememberDialogsButtons(LocalContainerScreen.current as StackScreen, screenIndex),
                     modifier = modifier
                         .align(Alignment.Center)
                         .padding(horizontal = 50.dp)

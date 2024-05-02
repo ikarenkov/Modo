@@ -119,7 +119,7 @@ object ScreenModelStore {
     fun remove(screen: Screen) {
         if (removedScreenKeys[screen.screenKey] != null) {
             ModoDevOptions.onIllegalScreenModelStoreAccess.validationFailed(
-                IllegalStateException("Trying to remove screen $screen the second time.")
+                IllegalStateException("Trying to remove screen $screen ${screen::class} the second time.")
             )
         }
         screenModels.onEach(screen) { key ->

@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.github.terrakok.androidcomposeapp.screens.ButtonsState
+import com.github.terrakok.androidcomposeapp.screens.GroupedButtonsState
 import com.github.terrakok.androidcomposeapp.screens.MainScreen
 import com.github.terrakok.androidcomposeapp.screens.base.ButtonsScreenContent
 import com.github.terrakok.modo.ExperimentalModoApi
@@ -32,7 +33,7 @@ internal fun DialogsPlaygroundContent(screenIndex: Int, screenKey: ScreenKey, mo
         screenIndex = screenIndex,
         screenName = "DialogsPlayground",
         screenKey = screenKey,
-        buttonsState = rememberDialogsButtons(LocalStackNavigation.current, screenIndex),
+        state = rememberDialogsButtons(LocalStackNavigation.current, screenIndex),
         modifier = modifier
     )
 }
@@ -42,7 +43,7 @@ internal fun DialogsPlaygroundContent(screenIndex: Int, screenKey: ScreenKey, mo
 internal fun rememberDialogsButtons(
     navigation: StackNavContainer,
     i: Int
-): ButtonsState =
+): GroupedButtonsState =
     remember {
         listOf(
             "Forward" to { navigation.forward(MainScreen(i + 1)) },

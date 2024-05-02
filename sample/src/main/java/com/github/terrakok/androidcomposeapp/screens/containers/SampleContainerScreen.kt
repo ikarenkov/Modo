@@ -46,7 +46,7 @@ class SampleContainerScreen(
     override fun Content(modifier: Modifier) {
         LifecycleScreenEffect {
             LifecycleEventObserver { source: LifecycleOwner, event: Lifecycle.Event ->
-                logcat(tag = "SampleContainerScreen") { "$screenKey: Lifecycle.Event $event" }
+                logcat { "$screenKey: Lifecycle.Event $event" }
             }
         }
         OnScreenRemoved {
