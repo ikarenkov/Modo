@@ -9,9 +9,9 @@ import org.jetbrains.annotations.VisibleForTesting
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
-private typealias ScreenModelKey = String
-
 internal typealias DependencyKey = String
+
+private typealias ScreenModelKey = String
 private typealias DependencyInstance = Any
 private typealias DependencyOnDispose = (Any) -> Unit
 private typealias Dependency = Pair<DependencyInstance, DependencyOnDispose>
