@@ -157,4 +157,4 @@ private fun Project.readEnvironmentVariables() {
     }
 }
 
-private fun Project.getExtraString(name: String) = extra[name]?.toString()
+private fun Project.getExtraString(name: String): String? = if (extra.has(name)) extra[name]?.toString() else null
