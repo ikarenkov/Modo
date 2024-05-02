@@ -26,7 +26,6 @@ fun Project.setupDetektTask() {
     tasks.register<Detekt>("detektAll") {
         reports {
             sarif.required = true
-            reports.sarif.outputLocation.set(file("detekt.sarif"))
         }
         // The directories where detekt looks for source files.
         // Defaults to `files("src/main/java", "src/test/java", "src/main/kotlin", "src/test/kotlin")`.
@@ -67,6 +66,6 @@ fun Project.setupDetektTask() {
 
         // Specify the base path for file paths in the formatted reports.
         // If not set, all file paths reported will be absolute file path.
-        basePath = rootProject.projectDir.path
+        basePath = rootProject.projectDir.absolutePath
     }
 }
