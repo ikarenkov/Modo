@@ -61,8 +61,7 @@ object ScreenModelStore {
     internal fun getDependencyKey(screenModel: ScreenModel, name: String): DependencyKey =
         screenModels
             .firstNotNullOfOrNull {
-                if (it.value == screenModel) it.key
-                else null
+                if (it.value == screenModel) it.key else null
             }
             ?: lastScreenModelKey.value
                 ?.let { "$it:$name" }
@@ -97,7 +96,9 @@ object ScreenModelStore {
     ): T {
         assertGetOrPutDependencyCorrect(key, dependencies[key])
         return dependencies
-            .getOrPut(key) { DependencyWithRemoveOrder(dependencyCounter.getAndIncrement(), (factory(key) to onDispose) as Dependency) }
+            .getOrPut(key) {
+                DependencyWithRemoveOrder(dependencyCounter.getAndIncrement(), (factory(key) to onDispose) as Dependency)
+            }
             .dependency
             .first as T
     }
@@ -165,6 +166,7 @@ object ScreenModelStore {
      */
     private fun assertGetOrPutCorrect(isScreenRemoved: Boolean, hasScreenAssociatedValue: Boolean, screenKey: ScreenKey, screen: Screen?) {
         if (isScreenRemoved && !hasScreenAssociatedValue) {
+            @Suppress("Indentation")
             val text = """
                     Trying to initialize dependency after screen is gone.
                     screenKey = $screenKey, screen = $screen.

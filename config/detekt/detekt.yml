@@ -303,6 +303,78 @@ exceptions:
       - 'RuntimeException'
       - 'Throwable'
 
+formatting:
+  active: true
+  android: true
+  autoCorrect: true
+  MaxLineLength:
+    active: true
+    maxLineLength: 150
+  BackingPropertyNaming:
+    active: true
+  BinaryExpressionWrapping:
+    active: true
+  BlankLineBeforeDeclaration:
+    active: false
+  ConditionWrapping:
+    active: true
+  Filename:
+    active: true
+  FunctionSignature:
+    active: false
+  Kdoc:
+    active: true
+    excludes: ['**/*.kts']
+  MaximumLineLength:
+    active: false
+  MultilineExpressionWrapping:
+    active: false
+  MultilineLoop:
+    active: true
+  NoEmptyFirstLineInClassBody:
+    active: false
+  SpacingAroundSquareBrackets:
+    active: true
+  StringTemplateIndent:
+    active: false
+  ValueArgumentComment:
+    active: false
+  NoBlankLineBeforeRbrace:
+    active: false
+  ArgumentListWrapping:
+    maxLineLength: 150
+    active: true
+  IfElseWrapping:
+    active: true
+  ImportOrdering:
+    active: true
+  Indentation:
+    active: true
+  MultiLineIfElse:
+    active: true
+  NoBlankLineInList:
+    active: true
+  NoConsecutiveBlankLines:
+    active: true
+  NoEmptyFirstLineInMethodBlock:
+    active: true
+  NoUnusedImports:
+    active: true
+  ParameterListWrapping:
+    active: false
+  ParameterWrapping:
+    active: false
+  PropertyName:
+    active: false
+  SpacingAroundColon:
+    active: true
+  SpacingBetweenDeclarationsWithAnnotations:
+    active: true
+  TrailingCommaOnCallSite:
+    active: false
+  Wrapping:
+    active: true
+
 naming:
   active: true
   BooleanPropertyNaming:

@@ -38,6 +38,7 @@ internal fun DialogsPlaygroundContent(screenIndex: Int, screenKey: ScreenKey, mo
     )
 }
 
+@Suppress("Wrapping")
 @OptIn(ExperimentalModoApi::class)
 @Composable
 internal fun rememberDialogsButtons(

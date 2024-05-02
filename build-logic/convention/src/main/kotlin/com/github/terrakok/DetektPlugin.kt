@@ -6,7 +6,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.register
 
-class DetektConventionPlugin : Plugin<Project> {
+class DetektPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             withVersionCatalog {
@@ -14,6 +14,7 @@ class DetektConventionPlugin : Plugin<Project> {
                 setupDetektTask()
                 dependencies {
                     add("detektPlugins", libs.detekt.composeRules)
+                    add("detektPlugins", libs.detekt.formatting)
                 }
             }
         }
@@ -22,7 +23,6 @@ class DetektConventionPlugin : Plugin<Project> {
 
 fun Project.setupDetektTask() {
     tasks.register<Detekt>("detektAll") {
-
         // The directories where detekt looks for source files.
         // Defaults to `files("src/main/java", "src/test/java", "src/main/kotlin", "src/test/kotlin")`.
         setSource(projectDir)

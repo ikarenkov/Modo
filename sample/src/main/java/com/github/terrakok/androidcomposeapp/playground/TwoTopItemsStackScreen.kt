@@ -93,7 +93,6 @@ class TwoTopItemsStackScreen(
                 }
                 .clip(RoundedCornerShape(8.dp))
                 .background(Color.Green)
-
         ) {
             TopScreenContent()
         }

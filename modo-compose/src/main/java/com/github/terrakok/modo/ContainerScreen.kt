@@ -113,12 +113,13 @@ class NavModel<State : NavigationState, Action : NavigationAction<State>>(
     }
 
     private fun reduce(reducer: NavigationReducer<State, Action>?, state: State, action: Action): State =
-        reducer?.reduce(action, state) ?: when (action) {
-            is ReducerAction<*> -> (action as? ReducerAction<State>)?.reduce(state)
-            else -> null
-        }
-        // TODO: print logs when fallback to state
-        ?: state
+        reducer?.reduce(action, state)
+            ?: when (action) {
+                is ReducerAction<*> -> (action as? ReducerAction<State>)?.reduce(state)
+                else -> null
+            }
+            // TODO: print logs when fallback to state
+            ?: state
 
     companion object CREATOR : Parcelable.Creator<NavModel<*, *>> {
         override fun createFromParcel(parcel: Parcel): NavModel<NavigationState, *> {

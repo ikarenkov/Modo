@@ -1,7 +1,5 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.github.terrakok.configureJetpackCompose
 import com.github.terrakok.configureKotlinAndroid
-import java.util.Properties
 
 plugins {
     alias(libs.plugins.modo.android.library)

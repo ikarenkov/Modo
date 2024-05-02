@@ -34,6 +34,7 @@ androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "l
 androidx-fragment = { group = "androidx.fragment", name = "fragment-ktx", version = "1.6.2" }
 
 detekt-composeRules = { module = "io.nlopez.compose.rules:detekt", version.ref = "detektComposeVersion" }
+detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detektVersion" }
 leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroid" }
 test-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version = "5.10.1" }
 

@@ -32,6 +32,7 @@ internal class MovableContentPlaygroundScreen(
 
     @IgnoredOnParcel
     private var counter = 3
+
     @IgnoredOnParcel
     private var list = mutableStateListOf<Int>().apply {
         for (i in 0..<counter) add(i)

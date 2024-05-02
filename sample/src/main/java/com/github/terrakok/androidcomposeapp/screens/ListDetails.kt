@@ -43,11 +43,13 @@ class ListScreen(
                 lazyColumnState
             ) {
                 items((1..100).toList()) {
-                    Text(text = "Item $it",
-                         Modifier
-                             .fillMaxWidth()
-                             .clickable { navigation.forward(DetailsScreen(it.toString())) }
-                             .padding(16.dp))
+                    Text(
+                        text = "Item $it",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { navigation.forward(DetailsScreen(it.toString())) }
+                            .padding(16.dp)
+                    )
                 }
             }
         }

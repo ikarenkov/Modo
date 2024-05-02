@@ -35,7 +35,7 @@ gradlePlugin {
         }
         register("modo-detekt") {
             id = "modo-detekt"
-            implementationClass = "com.github.terrakok.DetektConventionPlugin"
+            implementationClass = "com.github.terrakok.DetektPlugin"
         }
         register("modo-android-library") {
             id = "modo-android-library"

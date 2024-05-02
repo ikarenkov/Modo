@@ -25,9 +25,9 @@ import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.backTo
 import com.github.terrakok.modo.stack.dispatch
 import com.github.terrakok.modo.stack.forward
-import com.github.terrakok.modo.stack.setStack
 import com.github.terrakok.modo.stack.removeScreens
 import com.github.terrakok.modo.stack.replace
+import com.github.terrakok.modo.stack.setStack
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize

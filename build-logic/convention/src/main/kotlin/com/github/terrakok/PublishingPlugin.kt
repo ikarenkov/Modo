@@ -1,3 +1,5 @@
+@file:Suppress("NoUnusedImports")
+
 package com.github.terrakok
 
 import com.android.build.api.dsl.LibraryExtension

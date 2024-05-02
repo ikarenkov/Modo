@@ -76,7 +76,12 @@ private fun ScreenContent() {
 //                    .weight(1f)
 //                    .fillMaxWidth()
 //            )
-        BottomBar(screens1.size, selectedPos, changeDisplayTypeClick = { showAllStacks = !showAllStacks }, onTabClick = { selectedPos = it })
+        BottomBar(
+            screens1.size,
+            selectedPos,
+            changeDisplayTypeClick = { showAllStacks = !showAllStacks },
+            onTabClick = { selectedPos = it }
+        )
     }
 
 }
