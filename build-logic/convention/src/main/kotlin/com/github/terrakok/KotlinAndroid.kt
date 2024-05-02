@@ -18,7 +18,7 @@ fun Project.configureKotlinAndroid(
     commonExtension: CommonExtension<*, *, *, *, *>,
 ) {
     commonExtension.apply {
-        withVersionCatalog { libs ->
+        withVersionCatalog {
             compileSdk = libs.versions.compileSdk.get().toInt()
 
             defaultConfig {
@@ -41,7 +41,7 @@ fun Project.configureJetpackCompose(
 ) {
     commonExtension.apply {
         buildFeatures.compose = true
-        withVersionCatalog { libs ->
+        withVersionCatalog {
             composeOptions.kotlinCompilerExtensionVersion = libs.versions.kotlinCompilerExtension.get()
         }
     }

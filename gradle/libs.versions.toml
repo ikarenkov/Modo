@@ -1,6 +1,9 @@
 [versions]
+leakcanaryAndroid = "2.14"
+modo = "0.9.0-dev7"
 androidGradlePlugin = "8.2.2"
 detektComposeVersion = "0.3.19"
+detektVersion = "1.23.4"
 junit = "4.13.2"
 androidxComposeBom = "2024.04.01"
 androidxActivityCompose = "1.9.0"
@@ -9,7 +12,7 @@ androidxCore = "1.13.0"
 androidxFragment = "1.5.7"
 androidxAppCompat = "1.6.1"
 androidxJunit = "1.1.5"
-androidTools = "31.3.2"
+androidTools = "31.4.0"
 kotlin = "1.9.23"
 kotlinCompilerExtension = "1.5.12"
 minSdk = "21"
@@ -31,6 +34,7 @@ androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "l
 androidx-fragment = { group = "androidx.fragment", name = "fragment-ktx", version = "1.6.2" }
 
 detekt-composeRules = { module = "io.nlopez.compose.rules:detekt", version.ref = "detektComposeVersion" }
+leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroid" }
 test-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version = "5.10.1" }
 
 debug-logcat = { group = "com.squareup.logcat", name = "logcat", version = "0.1" }
@@ -40,10 +44,16 @@ android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", ver
 android-tools-common = { group = "com.android.tools", name = "common", version.ref = "androidTools" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxJunit" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+detektPlugin = { group = "io.gitlab.arturbosch.detekt", name = "detekt-gradle-plugin", version.ref = "detektVersion" }
 
 [plugins]
-detekt = { id = "io.gitlab.arturbosch.detekt", version = "1.23.4" }
+modo-detekt = { id = "modo-detekt", version = "unspecified" }
+modo-android-library = { id = "modo-android-library", version = "unspecified" }
+modo-android-app = { id = "modo-android-app", version = "unspecified" }
+modo-publishing = { id = "modo-publishing", version = "unspecified" }
 
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detektVersion" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
-kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
