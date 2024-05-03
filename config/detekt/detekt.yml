@@ -52,6 +52,7 @@ output-reports:
 
 comments:
   active: true
+  severity: error
   AbsentOrWrongFileLicense:
     active: false
     licenseTemplateFile: 'license.template'
@@ -92,6 +93,7 @@ comments:
 
 complexity:
   active: true
+  severity: error
   CognitiveComplexMethod:
     active: false
     threshold: 15
@@ -178,6 +180,7 @@ complexity:
 
 coroutines:
   active: true
+  severity: error
   GlobalCoroutineUsage:
     active: false
   InjectDispatcher:
@@ -199,6 +202,7 @@ coroutines:
 
 empty-blocks:
   active: true
+  severity: error
   EmptyCatchBlock:
     active: true
     allowedExceptionNameRegex: '_|(ignore|expected).*'
@@ -234,6 +238,7 @@ empty-blocks:
 
 exceptions:
   active: true
+  severity: error
   ExceptionRaisedInUnexpectedLocation:
     active: true
     methodNames:
@@ -307,6 +312,7 @@ formatting:
   active: true
   android: true
   autoCorrect: true
+  severity: error
   MaxLineLength:
     active: true
     maxLineLength: 150
@@ -324,7 +330,7 @@ formatting:
     active: false
   Kdoc:
     active: true
-    excludes: ['**/*.kts']
+    excludes: [ '**/*.kts' ]
   MaximumLineLength:
     active: false
   MultilineExpressionWrapping:
@@ -377,6 +383,7 @@ formatting:
 
 naming:
   active: true
+  severity: error
   BooleanPropertyNaming:
     active: false
     allowedPattern: '^(is|has|are)'
@@ -453,6 +460,7 @@ naming:
 
 performance:
   active: true
+  severity: error
   ArrayPrimitive:
     active: true
   CouldBeSequence:
@@ -471,6 +479,7 @@ performance:
 
 potential-bugs:
   active: true
+  severity: error
   AvoidReferentialEquality:
     active: true
     forbiddenTypePatterns:
@@ -575,6 +584,7 @@ potential-bugs:
 
 style:
   active: true
+  severity: error
   AlsoCouldBeApply:
     active: false
   BracesOnIfStatements:
@@ -857,6 +867,8 @@ style:
 #      - 'java.util.*'
 
 Compose:
+  active: true
+  severity: error
   ComposableAnnotationNaming:
     active: true
   ComposableNaming:
