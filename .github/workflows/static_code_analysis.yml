@@ -1,4 +1,4 @@
-name: Detekt Check
+name: Static code analysis
 run-name: Running Detekt checks
 on:
   push:
@@ -33,6 +33,6 @@ jobs:
       - name: "Upload Lint sarif results"
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: build/reports/detekt/lint-merged.sarif
+          sarif_file: build/reports/lint-merged.sarif
           category: lint
 

@@ -4,7 +4,6 @@ import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.internal.lint.AndroidLintTask
 import io.gitlab.arturbosch.detekt.report.ReportMergeTask
 import org.gradle.api.Project
-import org.gradle.api.logging.LogLevel
 
 fun Project.configureLintAndroid(
     commonExtension: CommonExtension<*, *, *, *, *>,
