@@ -52,6 +52,7 @@ modo-detekt = { id = "modo-detekt", version = "unspecified" }
 modo-android-library = { id = "modo-android-library", version = "unspecified" }
 modo-android-app = { id = "modo-android-app", version = "unspecified" }
 modo-publishing = { id = "modo-publishing", version = "unspecified" }
+modo-collectSarif = { id = "modo-collect-sarif", version = "unspecified" }
 
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detektVersion" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }

@@ -49,5 +49,9 @@ gradlePlugin {
             id = "modo-publishing"
             implementationClass = "com.github.terrakok.PublishingPlugin"
         }
+        register("modo-collect-sarif") {
+            id = "modo-collect-sarif"
+            implementationClass = "com.github.terrakok.CollectSarifPlugin"
+        }
     }
 }

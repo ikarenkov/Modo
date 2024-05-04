@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.modo.android.app) apply false
     alias(libs.plugins.modo.publishing) apply false
     alias(libs.plugins.modo.detekt)
+    alias(libs.plugins.modo.collectSarif)
 }
 
 tasks.named<Wrapper>("wrapper") {

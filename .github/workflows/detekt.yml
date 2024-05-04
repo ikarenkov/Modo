@@ -20,8 +20,8 @@ jobs:
           distribution: "temurin"
           cache: gradle
 
-      - name: "Run Detekt"
-        run: ./gradlew detektAll
+      - name: "Run static analysis"
+        run: ./gradlew detektAll mergeLintSarif
         continue-on-error: false
 
       - name: "Upload Detkt sarif results"
@@ -29,4 +29,10 @@ jobs:
         with:
           sarif_file: build/reports/detekt/detekt.sarif
           category: detekt
+
+      - name: "Upload Lint sarif results"
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: build/reports/detekt/lint-merged.sarif
+          category: lint
 

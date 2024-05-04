@@ -13,7 +13,9 @@ class AndroidLibraryPlugin : Plugin<Project> {
                     apply(libs.plugins.android.library.get().pluginId)
                     apply(libs.plugins.kotlin.android.get().pluginId)
                 }
-                configureKotlinAndroid(extensions.getByType<LibraryExtension>())
+                val android = extensions.getByType<LibraryExtension>()
+                configureKotlinAndroid(android)
+                configureLintAndroid(android)
             }
         }
     }
