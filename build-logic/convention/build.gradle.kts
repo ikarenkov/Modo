@@ -29,10 +29,6 @@ dependencies {
 
 gradlePlugin {
     plugins {
-        register("build-logic") {
-            id = "build-logic"
-            implementationClass = "StubConventionPlugin"
-        }
         register("modo-detekt") {
             id = "modo-detekt"
             implementationClass = "com.github.terrakok.DetektPlugin"
