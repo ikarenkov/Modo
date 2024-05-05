@@ -1,3 +1,5 @@
+@file:Suppress("NoUnusedImports")
+
 package com.github.terrakok
 
 import io.gitlab.arturbosch.detekt.Detekt
