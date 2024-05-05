@@ -32,7 +32,7 @@ import kotlinx.parcelize.Parcelize
 import kotlin.random.Random
 
 @Parcelize
-class SaveableStateHolderDemoScreen(
+internal class SaveableStateHolderDemoScreen(
     override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
 
@@ -44,7 +44,7 @@ class SaveableStateHolderDemoScreen(
 }
 
 @Composable
-private fun ScreenContent() {
+internal fun ScreenContent() {
     val saveableStateHolder = rememberSaveableStateHolder()
     val screens1 = remember {
         listOf("11", "12", "13")

@@ -15,7 +15,7 @@ private val JAVA_VERSION = JavaVersion.VERSION_1_8
  * Configure base Kotlin with Android options
  */
 fun Project.configureKotlinAndroid(
-    commonExtension: CommonExtension<*, *, *, *, *>,
+    commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
     commonExtension.apply {
         withVersionCatalog {
@@ -37,7 +37,7 @@ fun Project.configureKotlinAndroid(
 }
 
 fun Project.configureJetpackCompose(
-    commonExtension: CommonExtension<*, *, *, *, *>,
+    commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
     commonExtension.apply {
         buildFeatures.compose = true

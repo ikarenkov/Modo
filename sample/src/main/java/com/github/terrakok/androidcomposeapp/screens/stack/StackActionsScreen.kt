@@ -36,7 +36,7 @@ import kotlinx.parcelize.Parcelize
  * Sample playground screen to take a look to available navigation operations for stack.
  */
 @Parcelize
-class StackActionsScreen(
+internal class StackActionsScreen(
     private val screenIndex: Int,
     override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
@@ -58,7 +58,7 @@ class StackActionsScreen(
 
 @Suppress("LongMethod", "MagicNumber")
 @Composable
-private fun rememberButtons(
+internal fun rememberButtons(
     navigation: StackNavContainer,
     screenIndex: Int
 ): GroupedButtonsState {

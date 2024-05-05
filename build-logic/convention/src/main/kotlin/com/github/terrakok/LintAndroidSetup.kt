@@ -6,7 +6,7 @@ import io.gitlab.arturbosch.detekt.report.ReportMergeTask
 import org.gradle.api.Project
 
 fun Project.configureLintAndroid(
-    commonExtension: CommonExtension<*, *, *, *, *>,
+    commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
     commonExtension.lint {
         abortOnError = false
@@ -15,6 +15,7 @@ fun Project.configureLintAndroid(
         sarifReport = true
         checkAllWarnings = true
         htmlReport = true
+        lintConfig = rootProject.file("config/lint/lint.xml")
     }
     rootProject.tasks.named(
         CollectSarifPlugin.MERGE_LINT_SARIF,
