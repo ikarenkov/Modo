@@ -1,16 +1,20 @@
 [versions]
-androidGradlePlugin = "8.2.2"
+leakcanaryAndroid = "2.14"
+modo = "0.9.0-dev7"
+androidGradlePlugin = "8.4.0"
+detektComposeVersion = "0.3.20"
+detektVersion = "1.23.6"
 junit = "4.13.2"
-androidxComposeBom = "2024.03.00"
-androidxActivityCompose = "1.8.2"
+androidxComposeBom = "2024.05.00"
+androidxActivityCompose = "1.9.0"
 androidxLifecycle = "2.7.0"
-androidxCore = "1.12.0"
+androidxCore = "1.13.1"
 androidxFragment = "1.5.7"
 androidxAppCompat = "1.6.1"
 androidxJunit = "1.1.5"
-androidTools = "31.3.1"
+androidTools = "31.4.0"
 kotlin = "1.9.23"
-kotlinCompilerExtension = "1.5.11"
+kotlinCompilerExtension = "1.5.12"
 minSdk = "21"
 compileSdk = "34"
 
@@ -27,8 +31,11 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
 androidx-lifecycle-runtimeKtx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
 androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
-androidx-fragment = { group = "androidx.fragment", name = "fragment-ktx", version = "1.6.2" }
+androidx-fragment = { group = "androidx.fragment", name = "fragment-ktx", version = "1.7.0" }
 
+detekt-composeRules = { module = "io.nlopez.compose.rules:detekt", version.ref = "detektComposeVersion" }
+detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detektVersion" }
+leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroid" }
 test-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version = "5.10.1" }
 
 debug-logcat = { group = "com.squareup.logcat", name = "logcat", version = "0.1" }
@@ -38,8 +45,17 @@ android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", ver
 android-tools-common = { group = "com.android.tools", name = "common", version.ref = "androidTools" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxJunit" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+detektPlugin = { group = "io.gitlab.arturbosch.detekt", name = "detekt-gradle-plugin", version.ref = "detektVersion" }
 
 [plugins]
+modo-detekt = { id = "modo-detekt", version = "unspecified" }
+modo-android-library = { id = "modo-android-library", version = "unspecified" }
+modo-android-app = { id = "modo-android-app", version = "unspecified" }
+modo-publishing = { id = "modo-publishing", version = "unspecified" }
+modo-collectSarif = { id = "modo-collect-sarif", version = "unspecified" }
+
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detektVersion" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
-kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }

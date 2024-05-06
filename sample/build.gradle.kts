@@ -2,10 +2,8 @@ import com.github.terrakok.configureJetpackCompose
 import com.github.terrakok.configureKotlinAndroid
 
 plugins {
-    id("com.android.application")
-    kotlin("android")
-    id("kotlin-parcelize")
-    id("build-logic")
+    alias(libs.plugins.modo.android.app)
+    alias(libs.plugins.kotlin.parcelize)
 }
 
 android {
@@ -40,5 +38,5 @@ dependencies {
 
     implementation(libs.debug.logcat)
 
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
+    debugImplementation(libs.leakcanary.android)
 }

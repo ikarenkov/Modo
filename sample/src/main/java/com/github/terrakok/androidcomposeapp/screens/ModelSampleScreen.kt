@@ -1,11 +1,12 @@
-package com.github.terrakok.androidcomposeapp
+package com.github.terrakok.androidcomposeapp.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.Modifier
+import com.github.terrakok.androidcomposeapp.screens.base.COUNTER_DELAY_MS
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
@@ -28,7 +29,7 @@ class ModelSampleScreen(
             SampleScreenModel()
         }
         Column(Modifier.fillMaxSize()) {
-            Text(text = screenModel.state.value.toString())
+            Text(text = screenModel.state.intValue.toString())
         }
     }
 
@@ -36,13 +37,13 @@ class ModelSampleScreen(
 
 private class SampleScreenModel : ScreenModel {
 
-    val state = mutableStateOf(0)
+    val state = mutableIntStateOf(0)
 
     init {
         coroutineScope.launch {
             while (isActive) {
-                delay(1000)
-                state.value++
+                delay(COUNTER_DELAY_MS)
+                state.intValue++
             }
         }
     }

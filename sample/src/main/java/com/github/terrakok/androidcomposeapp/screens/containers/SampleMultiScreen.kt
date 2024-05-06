@@ -29,6 +29,7 @@ import com.github.terrakok.modo.multiscreen.selectContainer
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
+@Suppress("MagicNumber")
 @Parcelize
 class SampleMultiScreen(
     private val navModel: MultiScreenNavModel = MultiScreenNavModel(
@@ -81,7 +82,7 @@ class SampleMultiScreen(
     }
 
     @Composable
-    fun TopContent(showAllStacks: Boolean, modifier: Modifier) {
+    fun TopContent(showAllStacks: Boolean, modifier: Modifier = Modifier) {
         Box(modifier = modifier) {
             Row {
                 for ((pos, container) in navigationState.screens.withIndex()) {
@@ -117,6 +118,6 @@ class SampleMultiScreen(
 
 @Preview
 @Composable
-fun PreviewSampleMultiScreen() {
+private fun PreviewSampleMultiScreen() {
     SampleMultiScreen().Content(Modifier)
 }

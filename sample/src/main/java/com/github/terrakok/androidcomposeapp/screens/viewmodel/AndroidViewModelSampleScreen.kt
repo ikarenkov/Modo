@@ -12,6 +12,7 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.terrakok.androidcomposeapp.screens.MainScreenContent
+import com.github.terrakok.androidcomposeapp.screens.base.COUNTER_DELAY_MS
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
@@ -101,7 +102,7 @@ internal class SampleViewModel(
         logcat { "SampleViewModel init $screenPos" }
         viewModelScope.launch {
             while (isActive) {
-                delay(10)
+                delay(COUNTER_DELAY_MS)
                 state += 1
             }
         }

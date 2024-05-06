@@ -5,6 +5,8 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.DisposableEffectResult
 import androidx.compose.runtime.DisposableEffectScope
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.LifecycleObserver
@@ -31,6 +33,7 @@ fun Screen.LaunchedScreenEffect(
     tag: String = rememberSaveable { UUID.randomUUID().toString() },
     block: suspend CoroutineScope.() -> Unit
 ) {
+    val latestBlock by rememberUpdatedState(newValue = block)
     LaunchedEffect(this) {
         ScreenModelStore.getOrPutDependency<CoroutineScope>(
             screen = this@LaunchedScreenEffect,
@@ -42,7 +45,7 @@ fun Screen.LaunchedScreenEffect(
             factory = { key ->
                 screenCoroutineMainScope(key).also { scope ->
                     scope.launch {
-                        block()
+                        latestBlock()
                     }
                 }
             }
@@ -56,6 +59,7 @@ fun Screen.LaunchedScreenEffect(
  * 1. [effect] lambda called once per screen
  * 2. `onDispose` is called when the screen lives hierarchy
  */
+@Suppress("LambdaParameterInRestartableEffect")
 @ExperimentalModoApi
 @Composable
 fun Screen.DisposableScreenEffect(

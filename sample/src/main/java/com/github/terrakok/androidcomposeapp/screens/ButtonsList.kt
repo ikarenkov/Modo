@@ -90,8 +90,8 @@ fun GroupedButtonsList(
 
 @Composable
 fun ModoButton(
-    modifier: Modifier,
     text: String,
+    modifier: Modifier = Modifier,
     action: () -> Unit
 ) {
     Button(onClick = action, modifier) {

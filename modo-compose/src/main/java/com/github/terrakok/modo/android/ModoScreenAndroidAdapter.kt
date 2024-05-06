@@ -119,11 +119,13 @@ class ModoScreenAndroidAdapter private constructor(
         val context: Context = LocalContext.current
         val parentLifecycleOwner = LocalLifecycleOwner.current
         LifecycleDisposableEffect(context, parentLifecycleOwner)
-        CompositionLocalProvider(*getProviders().toTypedArray()) {
+        @Suppress("SpreadOperator")
+        CompositionLocalProvider(*getProviders()) {
             content()
         }
     }
 
+    @Suppress("UnusedParameter")
     fun onDispose(screen: Screen) {
         viewModelStore.clear()
         disposeEvents.forEach { event ->
@@ -136,12 +138,12 @@ class ModoScreenAndroidAdapter private constructor(
     }
 
     @Composable
-    private fun getProviders(): List<ProvidedValue<*>> {
-        disposableAtomicReference(LocalContext, atomicContext)
-        disposableAtomicReference(LocalLifecycleOwner, atomicParentLifecycleOwner)
+    private fun getProviders(): Array<ProvidedValue<*>> {
+        DisposableAtomicReference(LocalContext, atomicContext)
+        DisposableAtomicReference(LocalLifecycleOwner, atomicParentLifecycleOwner)
 
         return remember(this) {
-            listOf(
+            arrayOf(
                 LocalLifecycleOwner provides this,
                 LocalViewModelStoreOwner provides this,
                 LocalSavedStateRegistryOwner provides this
@@ -153,7 +155,7 @@ class ModoScreenAndroidAdapter private constructor(
      * Capture value from [compositionLocal] to [atomicReference] when it enters the composition and clears it when lives or new value is provided.
      */
     @Composable
-    private fun <T> disposableAtomicReference(compositionLocal: CompositionLocal<T>, atomicReference: AtomicReference<T>) {
+    private fun <T> DisposableAtomicReference(compositionLocal: CompositionLocal<T>, atomicReference: AtomicReference<T>) {
         val value = compositionLocal.current
         DisposableEffect(value) {
             atomicReference.compareAndSet(null, value)
@@ -234,20 +236,16 @@ class ModoScreenAndroidAdapter private constructor(
 
     private fun LifecycleRegistry.safeHandleLifecycleEvent(event: Lifecycle.Event) {
         val currentState = currentState
-        if (!currentState.isAtLeast(Lifecycle.State.INITIALIZED)) {
-            return
-        }
-        // Protection from double event sending from the parent
-        if ((event in startEvents || event in initEvents) && event.targetState <= currentState) {
-            return
-        }
-        if (event in stopEvents && event.targetState >= currentState) {
-            return
-        }
+        val skippEvent = !currentState.isAtLeast(Lifecycle.State.INITIALIZED) ||
+            // Protection from double event sending from the parent
+            ((event in startEvents || event in initEvents) && event.targetState <= currentState) ||
+            (event in stopEvents && event.targetState >= currentState)
 
         // For debugging
 //        Log.d("ModoScreenAndroidAdapter", "safeHandleLifecycleEvent ${screen.screenKey} $event")
-        handleLifecycleEvent(event)
+        if (!skippEvent) {
+            handleLifecycleEvent(event)
+        }
     }
 
     companion object {

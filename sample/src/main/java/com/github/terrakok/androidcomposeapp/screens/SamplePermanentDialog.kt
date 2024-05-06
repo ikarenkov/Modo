@@ -34,6 +34,7 @@ class SamplePermanentDialog(
         )
     )
 
+    @Suppress("ModifierNotUsedAtRoot")
     @Composable
     override fun Content(modifier: Modifier) {
         Box(

@@ -1,6 +1,5 @@
 package com.github.terrakok.androidcomposeapp
 
-
 /**
  * The default light scrim, as defined by androidx and the platform:
  * https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:activity/activity/src/main/java/androidx/activity/EdgeToEdge.kt;l=35-38;drc=27e7d52e8604a080133e8b842db10c89b4482598

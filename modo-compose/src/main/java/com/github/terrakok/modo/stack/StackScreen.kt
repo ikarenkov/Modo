@@ -91,6 +91,7 @@ abstract class StackScreen(
         }
     }
 
+    @Suppress("ModifierWithoutDefault")
     @OptIn(ExperimentalModoApi::class)
     @Composable
     protected open fun DecorateCustomDialog(
@@ -132,7 +133,11 @@ abstract class StackScreen(
 
     @Composable
     @OptIn(ExperimentalModoApi::class)
-    private fun StackScreen.RenderDialog(dialog: DialogScreen, content: RendererContent<StackState>, modifier: Modifier) {
+    private fun StackScreen.RenderDialog(
+        dialog: DialogScreen,
+        content: RendererContent<StackState>,
+        modifier: Modifier = Modifier
+    ) {
         val dialogConfig = remember(dialog) {
             dialog.provideDialogConfig()
         }
