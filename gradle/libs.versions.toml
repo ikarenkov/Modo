@@ -1,12 +1,12 @@
 [versions]
 leakcanaryAndroid = "2.14"
-modo = "0.9.0-dev7"
+modo = "0.9.0-dev8"
 androidGradlePlugin = "8.4.0"
 detektComposeVersion = "0.3.20"
 detektVersion = "1.23.6"
 junit = "4.13.2"
-androidxComposeBom = "2024.05.00"
-androidxActivityCompose = "1.9.0"
+androidxComposeBom = "2024.03.00"
+androidxActivityCompose = "1.7.2"
 androidxLifecycle = "2.7.0"
 androidxCore = "1.13.1"
 androidxFragment = "1.5.7"
@@ -31,7 +31,7 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
 androidx-lifecycle-runtimeKtx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
 androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
-androidx-fragment = { group = "androidx.fragment", name = "fragment-ktx", version = "1.7.0" }
+androidx-fragment = { group = "androidx.fragment", name = "fragment-ktx", version = "1.6.2" }
 
 detekt-composeRules = { module = "io.nlopez.compose.rules:detekt", version.ref = "detektComposeVersion" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detektVersion" }
