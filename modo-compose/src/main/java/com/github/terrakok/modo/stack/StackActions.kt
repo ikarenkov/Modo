@@ -89,7 +89,9 @@ fun NavigationContainer<StackState, StackAction>.setState(state: StackState) = d
 inline fun <reified T : Screen> NavigationContainer<StackState, StackAction>.backTo() = dispatch(BackTo<T>())
 fun NavigationContainer<StackState, StackAction>.backTo(screen: Screen) = dispatch(BackTo(screen))
 fun NavigationContainer<StackState, StackAction>.backTo(screenKey: ScreenKey) = dispatch(BackTo(screenKey))
+fun NavigationContainer<StackState, StackAction>.backTo(pos: Int) = backTo { backToPos, _ -> pos == backToPos }
 fun NavigationContainer<StackState, StackAction>.backTo(backToCondition: (pos: Int, screen: Screen) -> Boolean) = dispatch(BackTo(backToCondition))
+fun NavigationContainer<StackState, StackAction>.backToRoot() = backTo(0)
 
 fun NavigationContainer<StackState, StackAction>.removeScreens(condition: (pos: Int, screen: Screen) -> Boolean) = dispatch(RemoveScreens(condition))
 fun NavigationContainer<StackState, StackAction>.back(screensToDrop: Int = 1) = dispatch(Back(screensToDrop))
