@@ -1,5 +1,5 @@
 name: Static code analysis
-run-name: Running Detekt checks
+run-name: Running static code analysis
 on:
   push:
     branches:
@@ -8,12 +8,12 @@ on:
     branches:
       - "dev"
 jobs:
-  detekt-check:
+  static-analysis-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: "Set up JDK 17"
         uses: actions/setup-java@v4
         with:
           java-version: "17"
