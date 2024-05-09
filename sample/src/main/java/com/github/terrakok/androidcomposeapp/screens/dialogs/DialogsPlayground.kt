@@ -102,6 +102,7 @@ internal fun rememberDialogsButtons(
             "System BS Stack perm" to { navigation.forward(SampleBottomSheetStack(i + 1, systemDialog = true, permanentDialog = false)) },
             "Custom BS Stack perm" to { navigation.forward(SampleBottomSheetStack(i + 1, systemDialog = false, permanentDialog = false)) },
             "System Dialog random dim" to { navigation.forward(SystemDialogWithCustomDimSample(i + 1)) },
+            "M3 BottomSheet" to { navigation.forward(M3BottomSheet(i + 1)) },
         ).let {
             ButtonsState(it)
         }
