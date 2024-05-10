@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.github.terrakok.androidcomposeapp">
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
-        android:name=".ModoSampleApplication"
+        android:name="com.github.terrakok.sample.ModoSampleApplication"
         android:theme="@style/Theme.Modo">
         <activity
-            android:name=".ModoSampleActivity"
+            android:name="com.github.terrakok.sample.ModoSampleActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -15,10 +14,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ModoLegacyIntegrationActivity"
+            android:name="com.github.terrakok.sample.ModoLegacyIntegrationActivity"
             android:exported="true"/>
         <activity
-            android:name=".fragment.ModoFragmentIntegrationActivity"
+            android:name="com.github.terrakok.sample.fragment.ModoFragmentIntegrationActivity"
             android:exported="true"/>
     </application>
 

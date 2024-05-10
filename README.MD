@@ -142,11 +142,11 @@ The best way to lear the library is discovering [sample application](sample). Yo
 You can implement container screen by your own, but Modo provides several default containers
 
 1. [StackScreen](modo-compose/src/main/java/com/github/terrakok/modo/stack) - stack navigation
-   implementation. [Sample of navigation](sample/src/main/java/com/github/terrakok/androidcomposeapp/screens/stack/StackActionsScreen.kt)
+   implementation. [Sample of navigation](sample/src/main/java/com/github/terrakok/modo/sample/screens/stack/StackActionsScreen.kt)
 
    <img src="media/modo_base_navigation.gif" width=200 />
 2. [Multiscreen](modo-compose/src/main/java/com/github/terrakok/modo/multiscreen) - multiscreen
-   navigation. [Sample of navigation](sample/src/main/java/com/github/terrakok/androidcomposeapp/screens/containers/SampleMultiScreen.kt)
+   navigation. [Sample of navigation](sample/src/main/java/com/github/terrakok/modo/sample/screens/containers/SampleMultiScreen.kt)
 
    <img src="media/modo_multiscreen.gif" width=200 />
 
