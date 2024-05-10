@@ -17,7 +17,7 @@ class ModoSampleActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             ActivityContent {
-                // Remember root screen in the composition,
+                // Remember root screen using rememberSeaveable under the hood.
                 val rootScreen = rememberRootScreen {
                     SampleStack(MainScreen(1))
                 }
