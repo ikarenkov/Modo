@@ -115,7 +115,6 @@ object Modo {
                 }
             )
         ) {
-            Log.d("Modo", "rootScreenFactory creation")
             RootScreen(rootScreenFactory())
         }
         return rootScreen
