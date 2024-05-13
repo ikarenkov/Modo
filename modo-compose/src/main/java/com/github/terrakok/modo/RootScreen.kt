@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class RootScreenState<T : Screen>(
+data class RootScreenState<T : Screen>(
     internal val screen: T
 ) : NavigationState {
     override fun getChildScreens(): List<Screen> = listOf(screen)

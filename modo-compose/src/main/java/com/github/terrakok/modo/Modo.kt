@@ -2,6 +2,7 @@ package com.github.terrakok.modo
 
 import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -15,11 +16,17 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.github.terrakok.modo.model.ScreenModelStore
 import com.github.terrakok.modo.util.getActivity
+import java.util.concurrent.ConcurrentHashMap
 
 object Modo {
 
     private const val MODO_SCREEN_COUNTER_KEY = "MODO_SCREEN_COUNTER_KEY"
     private const val MODO_GRAPH = "MODO_GRAPH"
+
+    /**
+     * Contains root screens to priovide stability of returned instance when use [rememberRootScreen] and return a same instance in per a process.
+     */
+    private val rootScreens: MutableMap<ScreenKey, RootScreen<*>> = ConcurrentHashMap()
 
     /**
      * Saves provided screen with nested graph to bundle for further restoration.
@@ -48,12 +55,17 @@ object Modo {
      * Must be called to clear all data from [ScreenModelStore], related with removed screens.
      */
     fun <T : Screen> onRootScreenFinished(rootScreen: RootScreen<T>?) {
-        // TODO: store root screen in memory and clear it here
-        rootScreen?.let(::clearScreenModel)
+        if (rootScreen != null) {
+            Log.d("Modo", "rootScreen removing $rootScreen")
+            rootScreens.remove(rootScreen.screenKey)
+            clearScreenModel(rootScreen)
+        }
     }
 
     /**
      * Creates [RootScreen] with provided screen, if there is no saved value. Otherwise [RootScreen] is restored from savedState.
+     * Returns same instance of [RootScreen] for same process. A new instance returned only after process death.
+     * So you can safelly inject returned value to your DI.
      * It automatically clears all data from [ScreenModelStore], .
      * It also saves and restores screenCounterKey for correct [generateScreenKey] usage.
      * Integration point for your screen hierarchy. You can use this fun to integrate Modo to your Fragment or Activity.
@@ -94,8 +106,18 @@ object Modo {
         ) {
             screenCounterKey.get()
         }
-        // FIXME: return same instance if there was no process death
-        val rootScreen = rememberSaveable(key = MODO_GRAPH) {
+        val rootScreen = rememberSaveable(
+            key = MODO_GRAPH,
+            saver = Saver(
+                save = { rootScreen ->
+                    rootScreens.put(rootScreen.screenKey, rootScreen)
+                    rootScreen
+                },
+                restore = { rootScreen ->
+                    rootScreens.get(rootScreen.screenKey)?.let { it as RootScreen<T> } ?: rootScreen
+                }
+            )
+        ) {
             RootScreen(rootScreenFactory())
         }
         return rootScreen
@@ -103,6 +125,8 @@ object Modo {
 
     /**
      * Creates [RootScreen] with provided screen, if there is no saved value. Otherwise [RootScreen] is restored from savedState.
+     * Returns same instance of [RootScreen] for same process. A new instance returned only after process death.
+     * So you can safelly inject returned value to your DI.
      * It automatically clears all data from [ScreenModelStore], .
      * It also saves and restores screenCounterKey for correct [generateScreenKey] usage.
      * Integration point for your screen hierarchy. You can use this fun to integrate Modo to your Fragment or Activity.

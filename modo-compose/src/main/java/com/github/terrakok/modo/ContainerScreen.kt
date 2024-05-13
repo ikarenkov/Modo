@@ -60,7 +60,7 @@ abstract class ContainerScreen<State : NavigationState, Action : NavigationActio
         composeRenderer.Content(screen, modifier, provideCompositionLocals(), content)
     }
 
-    override fun toString(): String = screenKey.value
+    override fun toString(): String = this::class.java.simpleName + "(navModel: $navModel)"
 
 }
 
@@ -120,6 +120,8 @@ class NavModel<State : NavigationState, Action : NavigationAction<State>>(
             }
             // TODO: print logs when fallback to state
             ?: state
+
+    override fun toString(): String = "NavModel(navigationState=$navigationState, screenKey=$screenKey)"
 
     companion object CREATOR : Parcelable.Creator<NavModel<*, *>> {
         override fun createFromParcel(parcel: Parcel): NavModel<NavigationState, *> {
