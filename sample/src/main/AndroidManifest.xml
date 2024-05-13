@@ -3,10 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
-        android:name="com.github.terrakok.sample.ModoSampleApplication"
+        android:name=".ModoSampleApplication"
         android:theme="@style/Theme.Modo">
         <activity
-            android:name="com.github.terrakok.sample.ModoSampleActivity"
+            android:name=".ModoSampleActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -14,10 +14,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.github.terrakok.sample.ModoLegacyIntegrationActivity"
+            android:name=".ModoLegacyIntegrationActivity"
             android:exported="true"/>
         <activity
-            android:name="com.github.terrakok.sample.fragment.ModoFragmentIntegrationActivity"
+            android:name=".fragment.ModoFragmentIntegrationActivity"
             android:exported="true"/>
     </application>
 
