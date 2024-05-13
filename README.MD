@@ -125,23 +125,6 @@ The best way to lear the library is discovering [sample application](sample). Yo
 
 # List of features
 
-[Dialogs playground](sample/src/main/java/com/github/terrakok/modo/sample/screens/dialogs/DialogsPlayground.kt)
-[StackScreen](modo-compose/src/main/java/com/github/terrakok/modo/stack/StackScreen.kt)
-[build-in commands](modo-compose/src/main/java/com/github/terrakok/modo/stack/StackActions.kt)
-[MultiScreen](modo-compose/src/main/java/com/github/terrakok/modo/multiscreen/MultiScreen.kt), [build-in commands](modo-compose/src/main/java/com/github/terrakok/modo/multiscreen/MultiScreenActions.kt)
-[DialogScreen](modo-compose/src/main/java/com/github/terrakok/modo/DialogScreen.kt), [build-in commands](modo-compose/src/main/java/com/github/terrakok/modo/multiscreen/MultiScreenActions.kt)
-[MainScreen](sample/src/main/java/com/github/terrakok/modo/sample/screens/MainScreen.kt)
-[ScreenTransition](modo-compose/src/main/java/com/github/terrakok/modo/animation/ScreenTransitions.kt), [helpers for stack screen transition ](modo-compose/src/main/java/com/github/terrakok/modo/animation/StackTransitionType.kt)
-[ModoScreenAndroidAdapter](modo-compose/src/main/java/com/github/terrakok/modo/android/ModoScreenAndroidAdapter.kt) connect Modo with android-related
-features.
-
-[Modo](modo-compose/src/main/java/com/github/terrakok/modo/Modo.kt)
-[ScreenEffects](modo-compose/src/main/java/com/github/terrakok/modo/lifecycle/ScreenEffects.kt)
-[ModoSampleActivity](sample/src/main/java/com/github/terrakok/modo/sample/ModoSampleActivity.kt)
-[ModoSampleActivity](sample/src/main/java/com/github/terrakok/modo/sample/ModoSampleActivity.kt), [ModoFragment.kt](sample/src/main/java/com/github/terrakok/modo/sample/fragment/ModoFragment.kt), [ModoLegacyIntegrationActivity.kt](sample/src/main/java/com/github/terrakok/modo/sample/ModoLegacyIntegrationActivity.kt)
-
-[AndroidViewModelSampleScreen.kt](sample/src/main/java/com/github/terrakok/modo/sample/screens/viewmodel/AndroidViewModelSampleScreen.kt)
-
 | Feature                             | Status | Source/Docs                                                                                                                                                                                                                                                                                                                 | Sample                                                                                                                                                                                                                                                                                                                        |
 |-------------------------------------|:------:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Stack navigation                    |   ✅    | [StackScreen](modo-compose/src/main/java/com/github/terrakok/modo/stack/StackScreen.kt), [build-in commands](modo-compose/src/main/java/com/github/terrakok/modo/stack/StackActions.kt)                                                                                                                                     | [SampleStack](sample/src/main/java/com/github/terrakok/modo/sample/screens/containers/SampleStack.kt), [sample](sample/src/main/java/com/github/terrakok/modo/sample/screens/stack/StackActionsScreen.kt) of navigation actions                                                                                               |
