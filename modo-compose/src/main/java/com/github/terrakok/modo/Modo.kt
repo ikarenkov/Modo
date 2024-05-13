@@ -23,7 +23,10 @@ object Modo {
     private const val MODO_SCREEN_COUNTER_KEY = "MODO_SCREEN_COUNTER_KEY"
     private const val MODO_GRAPH = "MODO_GRAPH"
 
-    internal val rootScreens: MutableMap<ScreenKey, RootScreen<*>> = ConcurrentHashMap()
+    /**
+     * Contains root screens to priovide stability of returned instance when use [rememberRootScreen] and return a same instance in per a process.
+     */
+    private val rootScreens: MutableMap<ScreenKey, RootScreen<*>> = ConcurrentHashMap()
 
     /**
      * Saves provided screen with nested graph to bundle for further restoration.
