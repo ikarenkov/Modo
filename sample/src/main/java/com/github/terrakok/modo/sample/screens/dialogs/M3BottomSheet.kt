@@ -22,7 +22,7 @@ import com.github.terrakok.modo.stack.back
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-@ExperimentalModoApi
+@OptIn(ExperimentalModoApi::class)
 class M3BottomSheet(
     private val screenIndex: Int,
     override val screenKey: ScreenKey = generateScreenKey()

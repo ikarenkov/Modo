@@ -17,5 +17,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "Modo"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 include(":modo-compose")
 include(":sample")
