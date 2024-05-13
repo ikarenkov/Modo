@@ -82,7 +82,6 @@
     </JetCodeStyleSettings>
     <XML>
       <option name="XML_KEEP_BLANK_LINES" value="1" />
-      <option name="XML_SPACE_INSIDE_EMPTY_TAG" value="false" />
     </XML>
     <codeStyleSettings language="JAVA">
       <option name="RIGHT_MARGIN" value="150" />
@@ -465,7 +464,6 @@
                   <XML_NAMESPACE>http://schemas.android.com/apk/res/android</XML_NAMESPACE>
                 </AND>
               </match>
-              <order>ANDROID_ATTRIBUTE_ORDER</order>
             </rule>
           </section>
           <section>

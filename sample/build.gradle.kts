@@ -7,13 +7,13 @@ plugins {
 }
 
 android {
-    namespace = "com.github.terrakok.androidcomposeapp"
+    namespace = "com.github.terrakok.modo.sample"
 
     configureKotlinAndroid(this)
     configureJetpackCompose(this)
 
     defaultConfig {
-        applicationId = "com.github.terrakok.androidcomposeapp"
+        applicationId = "com.github.terrakok.modo.sample"
         targetSdk = libs.versions.compileSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
@@ -35,6 +35,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
 
     implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.compose.material3)
 
     implementation(libs.debug.logcat)
 

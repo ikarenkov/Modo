@@ -48,6 +48,7 @@ object Modo {
      * Must be called to clear all data from [ScreenModelStore], related with removed screens.
      */
     fun <T : Screen> onRootScreenFinished(rootScreen: RootScreen<T>?) {
+        // TODO: store root screen in memory and clear it here
         rootScreen?.let(::clearScreenModel)
     }
 
@@ -93,6 +94,7 @@ object Modo {
         ) {
             screenCounterKey.get()
         }
+        // FIXME: return same instance if there was no process death
         val rootScreen = rememberSaveable(key = MODO_GRAPH) {
             RootScreen(rootScreenFactory())
         }
@@ -105,7 +107,6 @@ object Modo {
      * It also saves and restores screenCounterKey for correct [generateScreenKey] usage.
      * Integration point for your screen hierarchy. You can use this fun to integrate Modo to your Fragment or Activity.
      */
-    @OptIn(ExperimentalModoApi::class)
     @Composable
     fun <T : Screen> Fragment.rememberRootScreen(
         rootScreenFactory: () -> T

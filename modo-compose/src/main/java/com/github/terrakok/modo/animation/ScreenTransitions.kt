@@ -24,6 +24,9 @@ val displayingScreens = mutableStateMapOf<Screen, Unit>()
 
 typealias ScreenTransitionContent = @Composable AnimatedVisibilityScope.(Screen) -> Unit
 
+/**
+ * The way to animate [Screen]'s changing (transition).
+ */
 @Suppress("MagicNumber")
 @ExperimentalAnimationApi
 @Composable

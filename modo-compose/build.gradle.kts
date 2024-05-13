@@ -1,5 +1,4 @@
 import com.github.terrakok.configureJetpackCompose
-import com.github.terrakok.configureKotlinAndroid
 
 plugins {
     alias(libs.plugins.modo.android.library)
@@ -10,7 +9,6 @@ plugins {
 android {
     namespace = "com.github.terrakok.modo.android.compose"
 
-    configureKotlinAndroid(this)
     configureJetpackCompose(this)
 }
 
