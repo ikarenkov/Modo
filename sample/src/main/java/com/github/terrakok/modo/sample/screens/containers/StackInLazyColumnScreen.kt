@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -31,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.ContainerScreen
+import com.github.terrakok.modo.lazylist.screenItems
 import com.github.terrakok.modo.list.ListNavModel
 import com.github.terrakok.modo.list.ListNavigationAction
 import com.github.terrakok.modo.list.ListNavigationState
@@ -93,8 +93,9 @@ class StackInLazyColumnScreen(
                         Text(text = "Add item", modifier = Modifier.align(Alignment.CenterVertically))
                     }
                 }
-                // Defining key is vital - you are gonna have crush on screens removal instead
-                items(navigationState.screens, key = { it.screenKey }) { screen ->
+
+                // A shortcat for items(navigationState.screens, key = { it.screenKey })
+                screenItems(navigationState.screens) { screen ->
                     Box {
                         InternalContent(
                             screen = screen,
