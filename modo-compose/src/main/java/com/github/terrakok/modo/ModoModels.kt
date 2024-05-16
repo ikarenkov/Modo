@@ -1,6 +1,7 @@
 package com.github.terrakok.modo
 
 import android.os.Parcelable
+import androidx.compose.runtime.Stable
 
 /**
  * State of navigation used in [NavigationContainer]. Can be any type.
@@ -29,6 +30,7 @@ fun interface NavigationReducer<State : NavigationState, Action : NavigationActi
  * @param State - type of state that is managed by container.
  * @param Action - type for actions that can be sent to [dispatch] to request state updates.
  */
+@Stable
 interface NavigationContainer<State : NavigationState, in Action : NavigationAction<State>> {
     val navigationState: State
 
