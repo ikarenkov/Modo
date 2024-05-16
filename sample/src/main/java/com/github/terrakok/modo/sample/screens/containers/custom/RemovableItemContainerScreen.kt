@@ -18,6 +18,7 @@ import com.github.terrakok.modo.ReducerAction
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
+import com.github.terrakok.modo.lazylist.screenItem
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -58,18 +59,18 @@ class RemovableItemContainerScreen(
     override fun Content(modifier: Modifier) {
         Column {
             LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                item(navigationState.screen1) {
+                screenItem(navigationState.screen1) {
                     InternalContent(navigationState.screen1)
                 }
-                item(navigationState.screen2) {
+                screenItem(navigationState.screen2) {
                     InternalContent(navigationState.screen2)
                 }
-                navigationState.screen3?.let {
-                    item("screen3") {
-                        InternalContent(it)
+                navigationState.screen3?.let { screen3 ->
+                    screenItem(screen3) {
+                        InternalContent(screen3)
                     }
                 }
-                item(navigationState.screen4) {
+                screenItem(navigationState.screen4) {
                     InternalContent(navigationState.screen4)
                 }
             }
