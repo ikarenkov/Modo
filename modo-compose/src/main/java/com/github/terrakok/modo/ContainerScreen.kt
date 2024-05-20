@@ -4,6 +4,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidedValue
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 
@@ -13,6 +14,7 @@ fun interface ReducerAction<State : NavigationState> : NavigationAction<State> {
     fun reduce(oldState: State): State
 }
 
+@Stable
 abstract class ContainerScreen<State : NavigationState, Action : NavigationAction<State>>(
     private val navModel: NavModel<State, Action>
 ) : Screen, NavigationContainer<State, Action> by navModel {

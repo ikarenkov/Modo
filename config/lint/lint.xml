@@ -2,4 +2,6 @@
 <lint>
     <issue id="NewerVersionAvailable" severity="informational"/>
     <issue id="GradleDependency" severity="informational"/>
+    <issue id="UnknownIssueId" severity="informational"/>
+    <issue id="UsingMaterialAndMaterial3Libraries" severity="ignore"/>
 </lint>
