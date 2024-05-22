@@ -37,17 +37,33 @@ object Modo {
     }
 
     /**
-     * Entrance point for screen integration.
+     * Creates [RootScreen] provided by [rootScreenProvider], if there is no data in [savedState] or in-memory.
+     * Otherwise [RootScreen] is firstly taking from memoryr and then restored from savedState, if there is no RootScreen in memory.
+     * Returns same instance of [RootScreen] for same process. A new instance returned only after process death.
      * @param savedState - container with modo state and graph
      * @param rootScreenProvider invokes when [savedState] is null and [inMemoryScreen] is null and we need to provide root screen.
      */
     fun <T : Screen> init(savedState: Bundle?, inMemoryScreen: RootScreen<T>?, rootScreenProvider: () -> T): RootScreen<T> {
+        // taking saved state to obtain screenKey
         val modoGraph = savedState?.getParcelable<RootScreen<T>>(MODO_GRAPH)
         return if (modoGraph != null) {
-            restoreScreenCounter(savedState.getInt(MODO_SCREEN_COUNTER_KEY))
-            modoGraph
+            // If restoring after activity death, but not after process death, then [inMemoryScreen] is null, but we have cached object in rootScreens
+            // So we trying to restore it from memory and only if it is null - taking it from savedState.
+            val cachedRootScreen = rootScreens.get(modoGraph.screenKey)?.let { it as RootScreen<T> }
+            if (cachedRootScreen != null) {
+                cachedRootScreen
+            } else {
+                restoreScreenCounter(savedState.getInt(MODO_SCREEN_COUNTER_KEY))
+                modoGraph
+            }
         } else {
+            // saved state is going to be null after taking fragment from backstack, beckause in this case
+            // 1. onSaveInstaneState is not called
+            // 2. View is destroyed
+            // 3. Fragment is not destroyed and have inMemoryScreen != null if it is not a first call
             inMemoryScreen ?: RootScreen(rootScreenProvider())
+        }.also { rootScreen ->
+            rootScreens.put(rootScreen.screenKey, rootScreen)
         }
     }
 
