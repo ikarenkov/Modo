@@ -21,8 +21,8 @@ android {
 }
 
 dependencies {
-    implementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(platform(libs.androidx.compose.bom))
+    implementation(platform(libs.androidx.compose.bom.app))
+    androidTestImplementation(platform(libs.androidx.compose.bom.app))
 
     implementation(projects.modoCompose)
     implementation(libs.androidx.core.ktx)
@@ -30,6 +30,7 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.foundation.beta)
     implementation(libs.androidx.lifecycle.runtimeKtx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)

@@ -69,8 +69,8 @@ class ScreenEffectsSampleScreen(
             GroupedButtonsList(
                 state = remember {
                     listOf(
-                        "Forward" to { navigation.forward(MainScreen(screenIndex + 1)) },
-                        "Back" to { navigation.back() }
+                        ModoButtonSpec("Forward") { navigation.forward(MainScreen(screenIndex + 1)) },
+                        ModoButtonSpec("Back") { navigation.back() }
                     ).let {
                         ButtonsState(it)
                     }

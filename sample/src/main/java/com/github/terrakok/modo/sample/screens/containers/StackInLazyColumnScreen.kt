@@ -1,5 +1,6 @@
 package com.github.terrakok.modo.sample.screens.containers
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -54,6 +55,7 @@ class StackInLazyColumnScreen(
 ) : ContainerScreen<ListNavigationState, ListNavigationAction>(
     navModel
 ) {
+    @OptIn(ExperimentalFoundationApi::class)
     @Suppress("LongMethod")
     @Composable
     override fun Content(modifier: Modifier) {
@@ -96,7 +98,7 @@ class StackInLazyColumnScreen(
 
                 // A shortcat for items(navigationState.screens, key = { it.screenKey })
                 screenItems(navigationState.screens) { screen ->
-                    Box {
+                    Box(modifier = Modifier.animateItem()) {
                         InternalContent(
                             screen = screen,
                             modifier = Modifier

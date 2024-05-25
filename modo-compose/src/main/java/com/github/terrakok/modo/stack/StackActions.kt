@@ -73,10 +73,20 @@ class RemoveScreens(val condition: (pos: Int, screen: Screen) -> Boolean) : Stac
     )
 }
 
-class Back(private val screensToDrop: Int = 1) : StackReducerAction {
-    override fun reduce(oldState: StackState): StackState = StackState(
-        oldState.stack.dropLast(screensToDrop)
-    )
+/**
+ * @param screensToDrop count of screens to drop from top of the stack
+ * @param canEmptyStack if true, then stack can be empty after this action
+ */
+class Back(
+    private val screensToDrop: Int = 1,
+    private val canEmptyStack: Boolean = false
+) : StackReducerAction {
+    override fun reduce(oldState: StackState): StackState =
+        if (canEmptyStack || oldState.stack.size > 1) {
+            StackState(oldState.stack.dropLast(screensToDrop))
+        } else {
+            oldState
+        }
 }
 
 fun StackNavContainer.dispatch(action: (StackState) -> StackState) = dispatch(StackReducerAction(action))
@@ -95,4 +105,10 @@ fun NavigationContainer<StackState, StackAction>.backTo(backToCondition: (pos: I
 fun NavigationContainer<StackState, StackAction>.backToRoot() = backTo(0)
 
 fun NavigationContainer<StackState, StackAction>.removeScreens(condition: (pos: Int, screen: Screen) -> Boolean) = dispatch(RemoveScreens(condition))
-fun NavigationContainer<StackState, StackAction>.back(screensToDrop: Int = 1) = dispatch(Back(screensToDrop))
+
+/**
+ * @param screensToDrop count of screens to drop from top of the stack
+ * @param canEmptyStack if true, then stack can be empty after this action
+ */
+fun NavigationContainer<StackState, StackAction>.back(screensToDrop: Int = 1, canEmptyStack: Boolean = false) =
+    dispatch(Back(screensToDrop, canEmptyStack))

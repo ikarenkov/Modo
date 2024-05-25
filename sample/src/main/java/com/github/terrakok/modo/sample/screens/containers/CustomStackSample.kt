@@ -30,8 +30,11 @@ import com.github.terrakok.modo.stack.back
 import kotlinx.parcelize.Parcelize
 import logcat.logcat
 
+/**
+ * Sample stack inside custom container.
+ */
 @Parcelize
-class SampleContainerScreen(
+class CustomStackSample(
     private val i: Int,
     private val navModel: StackNavModel
 ) : SampleStack(navModel) {
@@ -83,5 +86,5 @@ class SampleContainerScreen(
 @Preview
 @Composable
 private fun PreviewContainerScreen() {
-    SampleContainerScreen(1).Content(Modifier)
+    CustomStackSample(1).Content(Modifier)
 }

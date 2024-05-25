@@ -22,7 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-fun ButtonsState(buttons: List<Pair<String, () -> Unit>>) = GroupedButtonsState(
+fun ButtonsState(buttons: List<ModoButtonSpec>) = GroupedButtonsState(
     listOf(GroupedButtonsState.Group(null, buttons))
 )
 
@@ -33,8 +33,9 @@ data class GroupedButtonsState(
     @Immutable
     data class Group(
         val title: String?,
-        val buttons: List<Pair<String, () -> Unit>>,
+        val buttons: List<ModoButtonSpec>,
     )
+
 }
 
 @Composable
@@ -61,23 +62,19 @@ fun GroupedButtonsList(
                         .height(IntrinsicSize.Min)
                 ) {
                     ModoButton(
+                        spec = buttons[index],
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight(),
-                        text = buttons[index].first
-                    ) {
-                        buttons[index].second()
-                    }
+                    )
                     Spacer(modifier = Modifier.size(8.dp))
                     if (index + 1 in buttons.indices) {
                         ModoButton(
+                            spec = buttons[index + 1],
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight(),
-                            text = buttons[index + 1].first
-                        ) {
-                            buttons[index + 1].second()
-                        }
+                        )
                     } else {
                         Box(modifier = Modifier.weight(1f))
                     }
@@ -88,14 +85,20 @@ fun GroupedButtonsList(
     }
 }
 
+@Immutable
+data class ModoButtonSpec(
+    val text: String,
+    val isEnabled: Boolean = true,
+    val action: () -> Unit
+)
+
 @Composable
 fun ModoButton(
-    text: String,
+    spec: ModoButtonSpec,
     modifier: Modifier = Modifier,
-    action: () -> Unit
 ) {
-    Button(onClick = action, modifier) {
-        Text(text = text, textAlign = TextAlign.Center)
+    Button(onClick = spec.action, enabled = spec.isEnabled, modifier = modifier) {
+        Text(text = spec.text, textAlign = TextAlign.Center)
     }
 }
 
@@ -108,11 +111,11 @@ private fun GroupedButtonsListPreview() {
                 GroupedButtonsState.Group(
                     "Group 1",
                     listOf(
-                        "Button 1",
-                        "Button 2",
-                        "Button 3",
-                        "Button with a very long text",
-                    ).map { it to {} }
+                        ModoButtonSpec("Button 1") {},
+                        ModoButtonSpec("Button 2", isEnabled = false) {},
+                        ModoButtonSpec("Button 3") {},
+                        ModoButtonSpec("Button with a very long text") {}
+                    )
                 )
             ),
         )
