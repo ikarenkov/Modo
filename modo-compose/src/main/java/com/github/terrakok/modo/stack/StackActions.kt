@@ -85,6 +85,7 @@ fun NavigationContainer<StackState, StackAction>.forward(screen: Screen, vararg 
 fun NavigationContainer<StackState, StackAction>.replace(screen: Screen, vararg screens: Screen) = dispatch(Replace(screen, *screens))
 fun NavigationContainer<StackState, StackAction>.setStack(screen: Screen, vararg screens: Screen) = dispatch(SetStack(screen, *screens))
 fun NavigationContainer<StackState, StackAction>.setState(state: StackState) = dispatch(SetStack(state))
+fun NavigationContainer<StackState, StackAction>.clearStack() = dispatch(SetStack(StackState()))
 
 inline fun <reified T : Screen> NavigationContainer<StackState, StackAction>.backTo() = dispatch(BackTo<T>())
 fun NavigationContainer<StackState, StackAction>.backTo(screen: Screen) = dispatch(BackTo(screen))
