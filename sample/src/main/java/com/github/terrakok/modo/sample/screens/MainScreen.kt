@@ -20,6 +20,7 @@ import com.github.terrakok.modo.sample.ModoLegacyIntegrationActivity
 import com.github.terrakok.modo.sample.ModoSampleActivity
 import com.github.terrakok.modo.sample.fragment.ModoFragment
 import com.github.terrakok.modo.sample.fragment.ModoFragmentIntegrationActivity
+import com.github.terrakok.modo.sample.quickstart.QuickStartActivity
 import com.github.terrakok.modo.sample.screens.base.ButtonsScreenContent
 import com.github.terrakok.modo.sample.screens.containers.CustomStackSample
 import com.github.terrakok.modo.sample.screens.containers.HorizontalPagerScreen
@@ -168,6 +169,9 @@ private fun rememberButtons(
                         },
                         ModoButtonSpec("Legacy Activity integration") {
                             navigation?.dispatch(OpenActivityAction<ModoLegacyIntegrationActivity>(context))
+                        },
+                        ModoButtonSpec("Quick Start Activity") {
+                            navigation?.dispatch(OpenActivityAction<QuickStartActivity>(context))
                         },
                         ModoButtonSpec("Fragment integration") {
                             navigation?.dispatch(OpenActivityAction<ModoFragmentIntegrationActivity>(context))

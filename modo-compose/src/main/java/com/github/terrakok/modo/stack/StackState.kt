@@ -1,6 +1,7 @@
 package com.github.terrakok.modo.stack
 
 import android.os.Parcelable
+import androidx.compose.runtime.Stable
 import com.github.terrakok.modo.NavModel
 import com.github.terrakok.modo.NavigationContainer
 import com.github.terrakok.modo.NavigationState
@@ -12,6 +13,7 @@ typealias StackNavModel = NavModel<StackState, StackAction>
 fun StackNavModel(stack: List<Screen>) = StackNavModel(StackState(stack))
 fun StackNavModel(screen: Screen) = StackNavModel(listOf(screen))
 
+@Stable
 interface StackNavContainer : NavigationContainer<StackState, StackAction>
 
 @Parcelize

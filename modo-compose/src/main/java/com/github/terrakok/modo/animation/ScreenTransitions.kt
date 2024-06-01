@@ -28,7 +28,6 @@ typealias ScreenTransitionContent = @Composable AnimatedVisibilityScope.(Screen)
  * The way to animate [Screen]'s changing (transition).
  */
 @Suppress("MagicNumber")
-@ExperimentalAnimationApi
 @Composable
 fun ComposeRendererScope<*>.ScreenTransition(
     modifier: Modifier = Modifier,

@@ -5,6 +5,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
+import com.github.terrakok.modo.Modo.rememberRootScreen
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -15,7 +16,7 @@ data class RootScreenState<T : Screen>(
 }
 
 /**
- * Screen for single source of providing [LocalSaveableStateHolder]. Should be used with [Modo.init].
+ * Screen for single source of providing [LocalSaveableStateHolder]. Should be used with [Modo.rememberRootScreen] or [Modo.getOrCreateRootScreen].
  */
 @Parcelize
 class RootScreen<T : Screen> internal constructor(
