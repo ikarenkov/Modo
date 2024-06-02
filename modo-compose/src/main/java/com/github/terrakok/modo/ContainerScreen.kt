@@ -5,6 +5,8 @@ import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.saveable.SaveableStateHolder
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 
@@ -52,6 +54,11 @@ abstract class ContainerScreen<State : NavigationState, Action : NavigationActio
      */
     open fun provideNavigationContainer(): ProvidedValue<out NavigationContainer<*, *>>? = null
 
+    /**
+     * Use this function to render the content of nested screens. It provides correct work of [rememberSaveable] by using [SaveableStateHolder].
+     * It also provides other integrations like correct lifecycle, screen model, android integration and so on.
+     * @param screen - the screen to render
+     */
     @Composable
     protected fun InternalContent(
         screen: Screen,

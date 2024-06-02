@@ -19,6 +19,9 @@
         <activity
             android:name=".fragment.ModoFragmentIntegrationActivity"
             android:exported="true"/>
+        <activity
+            android:name=".quickstart.QuickStartActivity"
+            android:exported="true"/>
     </application>
 
 </manifest>

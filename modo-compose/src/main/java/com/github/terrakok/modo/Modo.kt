@@ -43,7 +43,7 @@ object Modo {
      * @param savedState - container with modo state and graph
      * @param rootScreenProvider invokes when [savedState] is null and [inMemoryScreen] is null and we need to provide root screen.
      */
-    fun <T : Screen> init(savedState: Bundle?, inMemoryScreen: RootScreen<T>?, rootScreenProvider: () -> T): RootScreen<T> {
+    fun <T : Screen> getOrCreateRootScreen(savedState: Bundle?, inMemoryScreen: RootScreen<T>?, rootScreenProvider: () -> T): RootScreen<T> {
         // taking saved state to obtain screenKey
         val modoGraph = savedState?.getParcelable<RootScreen<T>>(MODO_GRAPH)
         return if (modoGraph != null) {
@@ -66,6 +66,13 @@ object Modo {
             rootScreens.put(rootScreen.screenKey, rootScreen)
         }
     }
+
+    @Deprecated(
+        "Renamed it getOrCreateRootScreen to except misunderstanding. Use getOrCreateRootScreen instead.",
+        ReplaceWith("Modo.getOrCreateRootScreen(savedState, inMemoryScreen, rootScreenProvider)")
+    )
+    fun <T : Screen> init(savedState: Bundle?, inMemoryScreen: RootScreen<T>?, rootScreenProvider: () -> T): RootScreen<T> =
+        getOrCreateRootScreen(savedState, inMemoryScreen, rootScreenProvider)
 
     /**
      * Must be called to clear all data from [ScreenModelStore], related with removed screens.

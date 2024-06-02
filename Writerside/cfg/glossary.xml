@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE terms SYSTEM "https://resources.jetbrains.com/writerside/1.0/glossary.dtd">
+<terms>
+    <term name="parcelize">The kotlin-parcelize plugin provides a Parcelable implementation generator. When you annotate a class with @Parcelize, a
+        Parcelable implementation is automatically generated.
+    </term>
+    <term name="StackTransitionType">The enum class that contains Push, Pop, Replace and Idle transition types.</term>
+</terms>

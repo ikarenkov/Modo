@@ -1,6 +1,5 @@
 package com.github.terrakok.modo.sample.screens.base
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +28,7 @@ import com.github.terrakok.modo.sample.randomBackground
 import com.github.terrakok.modo.sample.screens.ButtonsState
 import com.github.terrakok.modo.sample.screens.GroupedButtonsList
 import com.github.terrakok.modo.sample.screens.GroupedButtonsState
+import com.github.terrakok.modo.sample.screens.ModoButtonSpec
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
@@ -107,7 +107,6 @@ internal fun SampleScreenContent(
     Column(
         modifier = modifier
             .randomBackground()
-            .clickable { }
             .windowInsetsPadding(WindowInsets.systemBars)
             .padding(8.dp),
     ) {
@@ -141,11 +140,11 @@ private fun ButtonsPreview() {
         screenKey = ScreenKey("ScreenKey"),
         state = ButtonsState(
             listOf(
-                "Button 1",
-                "Button 2",
-                "Button 3",
-                "Button with a very long text",
-            ).map { it to {} }
+                ModoButtonSpec("Button 1") {},
+                ModoButtonSpec("Button 2") {},
+                ModoButtonSpec("Button 3") {},
+                ModoButtonSpec("Button with a very long text") {},
+            )
         ),
         modifier = Modifier.fillMaxSize()
     )

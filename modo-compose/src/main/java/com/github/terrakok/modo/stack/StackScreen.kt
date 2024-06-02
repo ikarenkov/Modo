@@ -197,6 +197,10 @@ abstract class StackScreen(
         val dialogs: List<DialogScreen>,
     )
 
+    companion object {
+        operator fun invoke(navigationModel: StackNavModel) = DefaultStackScreen(navigationModel)
+    }
+
 }
 
 @Stable

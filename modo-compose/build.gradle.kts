@@ -13,8 +13,8 @@ android {
 }
 
 dependencies {
-    implementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(platform(libs.androidx.compose.bom))
+    implementation(platform(libs.androidx.compose.bom.modo))
+    androidTestImplementation(platform(libs.androidx.compose.bom.modo))
 
     implementation(libs.androidx.fragment)
 

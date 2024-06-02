@@ -10,15 +10,20 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import com.github.terrakok.modo.Modo.rememberRootScreen
 import com.github.terrakok.modo.sample.screens.MainScreen
 import com.github.terrakok.modo.sample.screens.containers.SampleStack
 
+/**
+ * Sample of integration Modo into the fragment
+ */
 class ModoFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         ComposeView(inflater.context).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 Column {
                     Text(text = "ModoFragment", style = MaterialTheme.typography.h5)

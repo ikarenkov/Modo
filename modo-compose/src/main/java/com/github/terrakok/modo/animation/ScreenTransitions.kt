@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ContentTransform
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
@@ -28,7 +27,6 @@ typealias ScreenTransitionContent = @Composable AnimatedVisibilityScope.(Screen)
  * The way to animate [Screen]'s changing (transition).
  */
 @Suppress("MagicNumber")
-@ExperimentalAnimationApi
 @Composable
 fun ComposeRendererScope<*>.ScreenTransition(
     modifier: Modifier = Modifier,

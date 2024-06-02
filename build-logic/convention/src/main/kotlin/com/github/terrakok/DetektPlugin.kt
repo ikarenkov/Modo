@@ -37,6 +37,7 @@ fun Project.setupDetektTask() {
         include("**/*.kts")
         exclude("**/resources/")
         exclude("**/build/")
+        exclude("Writerside/codeSnippets/")
 
         // Builds the AST in parallel. Rules are always executed in parallel.
         // Can lead to speedups in larger projects. `false` by default.

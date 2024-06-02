@@ -49,4 +49,4 @@ fun calculateStackTransitionType(oldState: StackState?, newState: StackState?): 
 /**
  * @see calculateStackTransitionType
  */
-fun ComposeRendererScope<StackState>.calculateStackTransitionType() = calculateStackTransitionType(oldState, newState)
+fun ComposeRendererScope<StackState>.calculateStackTransitionType(): StackTransitionType = calculateStackTransitionType(oldState, newState)

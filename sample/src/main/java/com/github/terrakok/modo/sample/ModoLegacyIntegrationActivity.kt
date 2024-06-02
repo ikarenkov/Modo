@@ -19,7 +19,7 @@ class ModoLegacyIntegrationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        rootScreen = Modo.init(savedInstanceState, rootScreen) {
+        rootScreen = Modo.getOrCreateRootScreen(savedInstanceState, rootScreen) {
             SampleStack(MainScreen(1))
         }
         setContent {
