@@ -21,7 +21,7 @@ class SampleScreen(
 
 @Composable
 private fun SampleScreenContent(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     screenIndex: Int,
     openNextScreen: () -> Unit,
 ) {

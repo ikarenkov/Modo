@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import com.github.terrakok.modo.Modo.rememberRootScreen
-import com.github.terrakok.modo.stack.DefaultStackScreen
 import com.github.terrakok.modo.stack.StackNavModel
 
 class QuickStartActivity : AppCompatActivity() {

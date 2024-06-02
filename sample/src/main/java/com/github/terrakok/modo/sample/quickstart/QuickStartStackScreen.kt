@@ -46,9 +46,9 @@ class QuickStartStackScreen(
                     .clip(shape = RoundedCornerShape(32.dp))
                     .fillMaxSize()
                     .background(Color.White)
-            ) { modifier ->
+            ) { screenModifier ->
                 ScreenTransition(
-                    modifier = modifier,
+                    modifier = screenModifier,
                     transitionSpec = {
                         val screenTransitionType = calculateStackTransitionType()
                         when (screenTransitionType) {
