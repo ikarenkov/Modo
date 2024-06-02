@@ -40,7 +40,7 @@ class QuickStartScreen(
 }
 
 @Composable
-private fun QuickStartScreenContent(
+internal fun QuickStartScreenContent(
     screenIndex: Int,
     openNextScreen: () -> Unit,
     modifier: Modifier = Modifier,
