@@ -1,4 +1,4 @@
-# Modo
+# [Modo](https://ikarenkov.github.io/Modo) - state-based Jetpack Compose navigation
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.terrakok/modo-compose)](https://repo1.maven.org/maven2/com/github/terrakok)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -29,6 +29,10 @@ Modo is a simple and convenient state-base navigation library for Jetpack Compos
         </td>
     </tr>
 </table>
+
+# [Project website](https://ikarenkov.github.io/Modo)
+
+Check out our website to get the most up-to-date information about the library.
 
 ## The Main idea
 
