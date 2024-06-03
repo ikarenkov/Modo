@@ -3,7 +3,7 @@
 Modo is a state-based navigation library for jetpack compose. It represents UI as a structure of `Screen`s and `ContainerScreen`s (which is an
 implementation of `Screen`).
 
-![diagram_1.png](diagram_1.png){ height = 400 }
+<include from="snippets.topic" element-id="navigation_is_a_graph"/>
 
 ## Container Screen
 

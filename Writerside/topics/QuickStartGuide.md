@@ -1,5 +1,7 @@
 # Quick Start Guide
 
+<list columns="2">
+<li>
 From this tutorial you will learn how to start using Modo. You will learn how to:
 
 * Create `Screen` and integrate it in an activity
@@ -7,8 +9,12 @@ From this tutorial you will learn how to start using Modo. You will learn how to
 * Pass arguments to screens
 * Customize `StackScreen` animation and content
 
-At the end of this tutorial, you will have a simple application with a single screen and basic navigation:
-![final_result.png](final_result.png){ height = 500 }
+At the end of this tutorial, you will have a simple application with a single screen and basic navigation.
+</li>
+<li>
+<img src="final_result.png" alt="final_result"/>
+</li>
+</list>
 
 ## Before you start
 
@@ -18,8 +24,6 @@ Make sure that:
 - You know basics in the Android development like creating activities and fragments and can launch an application.
 
 ## Build your first Modo application with a single Screen
-
-{ collapsible="true"}
 
 ### Setup dependencies
 
@@ -158,8 +162,6 @@ class QuickStartActivity : AppCompatActivity() {
 
 ## Perform basic navigation operations
 
-{collapsible="true"}
-
 To perform navigation let's use a `StackScreen`. It's a container screen that can contain multiple child screens and renders the top one.
 
 1. Use the `DefaultStackScreen` in your activity:
@@ -287,8 +289,6 @@ class QuickStartActivity : AppCompatActivity() {
 
 ## Pass arguments to Screens
 
-{collapsible="true"}
-
 To pass arguments to the screen, you can use the constructor argument.
 
 1. Let's add a screen index to the `QuickStartScreen`:
@@ -344,8 +344,6 @@ To pass arguments to the screen, you can use the constructor argument.
    ```
 
 ## Customize StackScreen animation and Content
-
-{ collapsible="true" }
 
 Before we used build-in `DefaultStackScreen` that implement `StackScreen` and provides default animation and content. Let's take
 a `DefaultStackScreen` as a starting point and customise it
