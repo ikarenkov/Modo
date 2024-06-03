@@ -5,6 +5,8 @@
 
 Modo is a simple and convenient state-base navigation library for Jetpack Compose.
 
+<video src="https://github.com/ikarenkov/Modo/raw/dev/Writerside/videos/modo_0.9.0_sample_overview.mp4"></video>
+
 <table>
     <tr>
         <td>
