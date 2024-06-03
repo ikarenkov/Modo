@@ -1,12 +1,14 @@
 # How to integrate modo into your app
 
-To provide correctness of navigation, Modo requires usage of build-in functions for integration.
-To intagrate Modo to your app you have 2 approaches:
+<link-summary>This topic provides guide for available app integrations. It also describes explains some details of the implementation.</link-summary>
 
-* `rememberRootScreen` - convinient intagration to `Activity` or `Fragment`. You call it inside `setContent` function.
+To provide correctness of navigation, Modo requires usage of build-in functions for integration.
+To integrate Modo to your app you have 2 approaches:
+
+* `rememberRootScreen` - convenient integration to `Activity` or `Fragment`. You call it inside `setContent` function.
 * `Modo.getOrCreateRootScreen`, `Modo.save` and `Modo.onRootScreenFinished` - for manual integration.
 
-> `rememberRootScreen` and `Modo.getOrCreateRootScreen` return the same instance of `RootScreen` in the same process, so you can safelly inject it
+> `rememberRootScreen` and `Modo.getOrCreateRootScreen` return the same instance of `RootScreen` in the same process, so you can safely inject it
 > into your DI
 > container.
 
@@ -14,7 +16,7 @@ To intagrate Modo to your app you have 2 approaches:
 
 ## Convenient integration to Activity and Fragment
 
-`rememberRootScreen` is a convinient way to integrate Modo to your `Activity` or `Fragment`. It automatically handles saving and restoring
+`rememberRootScreen` is a convenient way to integrate Modo to your `Activity` or `Fragment`. It automatically handles saving and restoring
 of `RootScreen` during `Activity` lifecycle and process death.
 
 To use modo inside your Activity or Fragment you need:
@@ -49,7 +51,7 @@ the [ModoLegacyIntegrationActivity](%github_code_url%sample/src/main/java/com/gi
 sample project for an example.
 
 - `Modo.getOrCreateRootScreen` - initializes `RootScreen` with provided screen's or returns the existing instance.
-- `Modo.save` - saves the current state of `RootScreen` and othe internal data (like `screenCounterKey`) to the bundle for further restore
+- `Modo.save` - saves the current state of `RootScreen` and other internal data (like `screenCounterKey`) to the bundle for further restore
   in `Modo.getOrCreateRootScreen`.
 - `Modo.onRootScreenFinished` - should be called when `RootScreen` is no longer needed, f.e. at the finish of the Activity or the Fragment. It removes
   the instance of `RootScreen` from the

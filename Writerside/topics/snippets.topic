@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/xhtml-entities.dtd">
+<topic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/topic.v2.xsd"
+       title="Navigation is a graph" id="snippets"
+       is-library="true" help-id="snippets">
+    <snippet id="navigation_is_a_graph">
+        <procedure type="choices">
+            <title>
+                Navigation - is a graph
+            </title>
+            <p>
+                Each integration of Modo is a
+                <a href="https://en.wikipedia.org/wiki/Tree_(graph_theory)#Rooted_tree"
+                   summary="A rooted tree is a tree in which one vertex has been designated the root.">rooted tree (wiki)</a> that can be displayed:
+            </p>
+            <img src="diagram_1.png" alt="modo graph"/>
+            <step>Each node - is a <code>Screen</code> or <code>ContainerScreen</code></step>
+            <step>Leafs nodes - are <code>Screen</code>s.</step>
+            <step>Inner nodes - are <code>ContainerScreen</code>s. They can contain other <code>Screen</code>s or <code>ContainerScreen</code>s in
+                their <code>navigationState</code>.
+            </step>
+            <step>Root node - is a <code>RootScreen</code>. You can have multiply roots in your app. See <a
+                    href="How-to-integrate-modo-to-your-app.md"> How to integrate Modo</a> for details.
+            </step>
+        </procedure>
+    </snippet>
+    <snippet id="under_develop_note">
+        <note>
+            <b>Under development</b>:
+            this part of the documentation can contain incomplete information or empty sections. We are actively working on expanding and improving
+            this section.
+        </note>
+    </snippet>
+</topic>

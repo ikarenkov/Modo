@@ -3,10 +3,16 @@
 
 <instance-profile name="Modo docs" id="modo-docs" start-page="ModoOverview.md">
 
-    <toc-element topic="ModoOverview.md" />
-    <toc-element topic="QuickStartGuide.md" />
-    <toc-element topic="Core-concepts.md" />
-    <toc-element topic="Modo-and-DI.md" />
-    <toc-element topic="How-to-integrate-modo-to-your-app.md" />
+    <toc-element topic="ModoOverview.md" >
+        <toc-element topic="QuickStartGuide.md" />
+        <toc-element topic="Core-concepts.md" />
+        <toc-element topic="How-to-integrate-modo-to-your-app.md" />
+    </toc-element>
+    <toc-element topic="Features.md" >
+        <toc-element topic="StackScreen.md" />
+        <toc-element topic="Modo-and-DI.md" />
+        <toc-element topic="Screen-effects.md" />
+    </toc-element>
+    <toc-element topic="Screen-model-and-view-model.md" />
     <toc-element topic="Community-and-contribution.md" />
 </instance-profile>
