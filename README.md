@@ -5,32 +5,7 @@
 
 Modo is a simple and convenient state-base navigation library for Jetpack Compose.
 
-<video src="https://github.com/ikarenkov/Modo/raw/dev/Writerside/videos/modo_0.9.0_sample_overview.mp4"></video>
-
-<table>
-    <tr>
-        <td>
-            <img src="media/modo_base_navigation.gif" width="256"/>
-        </td>
-        <td>
-            <img src="media/modo_multiscreen.gif" width="256"/>
-        </td>
-        <td>
-            <img src="media/modo_nested_navigation.gif" width="256"/>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            Basic navigation
-        </td>
-        <td>
-            MultiScreen navigation
-        </td>
-        <td>
-            Nested navigation
-        </td>
-    </tr>
-</table>
+https://github.com/ikarenkov/Modo/assets/17216532/e2977736-bdda-44a9-83f3-379731ddfecc
 
 # [Project website](https://ikarenkov.github.io/Modo)
 
