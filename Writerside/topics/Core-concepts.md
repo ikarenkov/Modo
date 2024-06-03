@@ -3,7 +3,37 @@
 Modo is a state-based navigation library for jetpack compose. It represents UI as a structure of `Screen`s and `ContainerScreen`s (which is an
 implementation of `Screen`).
 
+<include from="snippets.topic" element-id="under_develop_note"/>
+
 <include from="snippets.topic" element-id="navigation_is_a_graph"/>
+
+## Screen
+
+`Screen` is a basic unit of UI. It displays content defined in overridden `fun Content(modifier: Modifier)`
+
+```kotlin
+```
+
+{ src="SampleScreen.kt" include-lines="1-20"}
+
+### Screen key
+
+Each screen is identified by `ScreenKey` - a unique key that represents the screen.
+This key is widely used in internal implementation. It is required to be unique per a screen, even after process death. For this you must use
+build-in `generateScreenKey` function.
+
+### Arguments
+
+To pass arguments - use parcelable constructor parameters.
+
+### Saving and restoring
+
+Each screen is `Parcelable`, that helps to save and restore it during lifecycle changes. Use <tooltip term="parcelize">
+parcelable</tooltip> [gradle plugin](https://developer.android.com/kotlin/parcelize) and `@Parcelable` annotation to generate `Parcelable`
+implementation on the fly.
+
+It's vital to use build-in function like `rememberRootScreen` to integrate Modo with your application. Read [](How-to-integrate-modo-to-your-app.md)
+for details.
 
 ## Container Screen
 
