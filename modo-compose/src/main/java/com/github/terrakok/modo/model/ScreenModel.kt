@@ -55,6 +55,10 @@ inline fun <reified T : Any> Screen.rememberDependency(
 @PublishedApi
 internal const val ON_SCREEN_REMOVED_CALLBACK_NAME = "OnScreenRemovedCallBack"
 
+@Deprecated(
+    "moved to the package com.github.terrakok.modo.lifecycle",
+    ReplaceWith("OnScreenRemoved(tag, onScreenRemoved)", "com.github.terrakok.modo.lifecycle.OnScreenRemoved")
+)
 @Suppress("LambdaParameterInRestartableEffect")
 @ExperimentalModoApi
 @Composable

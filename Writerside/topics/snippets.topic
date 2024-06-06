@@ -33,4 +33,6 @@
             this section.
         </note>
     </snippet>
+    <snippet id="toothpick"><a href="https://github.com/stephanenicolas/toothpick"
+                               summary="Toothpick is a scope tree based Dependency Injection (DI) library for Java">Toothpick</a></snippet>
 </topic>

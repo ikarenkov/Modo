@@ -37,7 +37,7 @@ internal class AndroidViewModelSampleScreen(
     override fun Content(modifier: Modifier) {
 //        val lifecycleOwner = LocalLifecycleOwner.current
 
-        // You will lose onResume, onStop, if you use regular DisposableEffect or LaunchedEffect, because it finishes as far as composition ends.
+        // You will lose onResume, onStop, if you use regular DisposableEffect or LaunchedEffect, because it finishes as soon it leaves composition.
 //        DisposableEffect(lifecycleOwner) {
 //            val observer = LifecycleEventObserver { _, event ->
 //                logcat { "AndroidViewModelSampleScreen DisposableEffect $screenKey: event $event" }

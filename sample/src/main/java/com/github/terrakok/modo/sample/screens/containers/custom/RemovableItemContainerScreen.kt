@@ -31,20 +31,20 @@ data class RemovableItemContainerState(
     override fun getChildScreens(): List<Screen> = listOfNotNull(screen1, screen2, screen3, screen4)
 }
 
-fun interface RemovableItemContainerAction : ReducerAction<RemovableItemContainerState>
+internal fun interface RemovableItemContainerAction : ReducerAction<RemovableItemContainerState> {
+    class Remove : RemovableItemContainerAction {
+        override fun reduce(oldState: RemovableItemContainerState): RemovableItemContainerState =
+            oldState.copy(screen3 = null)
+    }
 
-internal class Remove : RemovableItemContainerAction {
-    override fun reduce(oldState: RemovableItemContainerState): RemovableItemContainerState =
-        oldState.copy(screen3 = null)
-}
-
-internal class CreateScreen : RemovableItemContainerAction {
-    override fun reduce(oldState: RemovableItemContainerState): RemovableItemContainerState =
-        oldState.copy(screen3 = NestedScreen(canBeRemoved = true))
+    class CreateScreen : RemovableItemContainerAction {
+        override fun reduce(oldState: RemovableItemContainerState): RemovableItemContainerState =
+            oldState.copy(screen3 = NestedScreen(canBeRemoved = true))
+    }
 }
 
 @Parcelize
-class RemovableItemContainerScreen(
+internal class RemovableItemContainerScreen(
     private val navModel: NavModel<RemovableItemContainerState, RemovableItemContainerAction> = NavModel(
         RemovableItemContainerState(
             NestedScreen(canBeRemoved = false),
@@ -77,7 +77,7 @@ class RemovableItemContainerScreen(
             Column {
                 Button(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { dispatch(CreateScreen()) }
+                    onClick = { dispatch(RemovableItemContainerAction.CreateScreen()) }
                 ) {
                     Text(text = "Create screen")
                 }
@@ -97,7 +97,7 @@ internal class NestedScreen(
         val parent = LocalContainerScreen.current as RemovableItemContainerScreen
         InnerContent(
             title = screenKey.value,
-            onRemoveClick = takeIf { canBeRemoved }?.let { { parent.dispatch(Remove()) } },
+            onRemoveClick = takeIf { canBeRemoved }?.let { { parent.dispatch(RemovableItemContainerAction.Remove()) } },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(400.dp)
