@@ -1,6 +1,7 @@
 package com.github.terrakok.modo.lifecycle
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisallowComposableCalls
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.DisposableEffectResult
 import androidx.compose.runtime.DisposableEffectScope
@@ -13,6 +14,7 @@ import androidx.lifecycle.LifecycleObserver
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.model.DependencyKey
+import com.github.terrakok.modo.model.ON_SCREEN_REMOVED_CALLBACK_NAME
 import com.github.terrakok.modo.model.ScreenModelStore
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -97,6 +99,24 @@ fun Screen.LifecycleScreenEffect(
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
+    }
+}
+
+@Suppress("LambdaParameterInRestartableEffect")
+@ExperimentalModoApi
+@Composable
+inline fun Screen.OnScreenRemoved(
+    tag: String = rememberSaveable { UUID.randomUUID().toString() },
+    crossinline onScreenRemoved: @DisallowComposableCalls () -> Unit
+) {
+    LaunchedEffect(tag) {
+        ScreenModelStore.getOrPutDependency(
+            screen = this@OnScreenRemoved,
+            name = ON_SCREEN_REMOVED_CALLBACK_NAME,
+            tag = tag,
+            onDispose = { onScreenRemoved() },
+            factory = { Any() }
+        )
     }
 }
 

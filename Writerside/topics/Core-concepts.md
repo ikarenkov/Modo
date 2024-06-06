@@ -22,9 +22,14 @@ Each screen is identified by `ScreenKey` - a unique key that represents the scre
 This key is widely used in internal implementation. It is required to be unique per a screen, even after process death. For this you must use
 build-in `generateScreenKey` function.
 
-### Arguments
+### Arguments { id="arguments"}
 
-To pass arguments - use parcelable constructor parameters.
+To pass arguments to the screen, declare it in the Screen's constructor:
+    
+```Kotlin
+```
+
+{ src="SampleScreen.kt" include-lines="2-5,7-8" }
 
 ### Saving and restoring
 
@@ -35,12 +40,73 @@ implementation on the fly.
 It's vital to use build-in function like `rememberRootScreen` to integrate Modo with your application. Read [](How-to-integrate-modo-to-your-app.md)
 for details.
 
-## Container Screen
+## ContainerScreen { id="container-screen" }
 
-Container Screens are the type of screens that can contain other screens. The most used container screen is `StackScreen` that represents a stack of
-screens and renders the last one.
+`ContainerScreen`s are the type of screens that can contain other screens. It's a basic building block for complex navigation structures.
+[`StackScreen`](StackScreen.md) and `MultiScreen` are build-in implementations of `ContainerScreen`.
 
 ![diagram_2.png](diagram_2.png){ height = 300 }
+
+Each ContainerScreen is defined by 2 typed parameters: State and Action.
+
+```Kotlin
+@Stable
+abstract class ContainerScreen<State : NavigationState, Action : NavigationAction<State>>(
+    private val navModel: NavModel<State, Action>
+) : Screen, NavigationContainer<State, Action> by navModel 
+```
+
+{ collapsible="true" default-state="collapsed" collapsed-title="ContainerScreen"}
+
+<procedure>
+<title>State</title>
+<p>
+<code>NavigationState</code> - class that can contains nested screens and other additional info. State can be updated by calling <code>dispatch(action)</code>.
+</p>
+<code-block lang="kotlin" collapsible="true" default-state="collapsed" collapsed-title-line-number="2">
+@Parcelize
+data class SampleState(
+  val screen1: Screen,
+  val screen2: Screen,
+  val screen3: Screen?,
+) : NavigationState {
+  // You need to return all nested screens in order to provide correct work.
+  override fun getChildScreens(): List<Screen> = listOfNotNull(screen1, screen2, screen3)
+}
+</code-block>
+</procedure>
+
+<procedure>
+<title>Action</title>
+<p>
+<code>NavigationAction</code> - marker interface to distinguish actions for this container on specific <code>State</code>. You can also use 
+<code>ReducerAction</code> for defining actions with update function in-place:
+<code-block src="SampleAction.kt" lang="kotlin" collapsible="true" default-state="collapsed"/>
+
+</p>
+
+</procedure>
+
+<procedure>
+<title>Updating State</title>
+<p>
+To update state of <code>ContainerScreen</code> you must use <code>dispatch(action: Action)</code>.
+There are 2 ways how to define you action:
+</p>
+<step>
+(Recommended) ReducerAction - allows to define update function in-place.
+<code-block src="SampleAction.kt" lang="kotlin" collapsible="true" default-state="collapsed"/>
+</step>
+<step>
+Custom reducer + Action. You can provide a reducer in you <code>ContainerScreen</code> implementation.
+<code-block lang="kotlin" collapsible="true" default-state="collapsed">TODO</code-block>
+</step>
+
+</procedure>
+
+
+`NavModel` - storage of state, that responsible for state updates and triggering updating UI. Each ContainerScreen has a NavModel as a constructor
+parameter.
 
 To render nested screens inside a container screen, you **must** use `InternalContent` function. This function provides all necessary integrations,
 like:

@@ -15,7 +15,7 @@ import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
-import com.github.terrakok.modo.model.OnScreenRemoved
+import com.github.terrakok.modo.lifecycle.OnScreenRemoved
 import com.github.terrakok.modo.sample.ModoLegacyIntegrationActivity
 import com.github.terrakok.modo.sample.ModoSampleActivity
 import com.github.terrakok.modo.sample.fragment.ModoFragment
@@ -156,7 +156,7 @@ private fun rememberButtons(
                         // Just experiments
 //        ModoButtonSpec("2 items screen") { navigation.forward(TwoTopItemsStackScreen(i + 1)) },
 //                ModoButtonSpec("Demo") { navigation.forward(SaveableStateHolderDemoScreen()) },
-                        ModoButtonSpec("Sample Screen Model") { navigation?.forward(ModelSampleScreen()) },
+                        ModoButtonSpec("Sample Screen Model") { navigation?.forward(ScreenModelSampleScreen()) },
                         ModoButtonSpec("Android ViewModel") { navigation?.forward(AndroidViewModelSampleScreen(i + 1)) },
                         ModoButtonSpec("List/Details") { navigation?.forward(ListScreen()) },
                     )

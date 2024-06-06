@@ -68,5 +68,5 @@ Modo is easy to use library, there are some most-used features of Modo navigatio
 To get started with Modo, check out our [Quick Start Guide](QuickStartGuide.md) and explore
 the [sample application](https://github.com/ikarenkov/Modo/tree/dev/sample) to see how Modo can simplify your navigation needs.
 
-## [List of features](Features.md)
+## [List of features](Features.topic)
 
