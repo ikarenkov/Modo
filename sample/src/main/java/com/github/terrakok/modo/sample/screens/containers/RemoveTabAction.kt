@@ -5,4 +5,4 @@ import com.github.terrakok.modo.multiscreen.MultiScreenAction
 /**
  * The sample of the action that is handled by reducer
  */
-internal class RemoveTab(val pos: Int) : MultiScreenAction
+internal class RemoveTabAction(val pos: Int) : MultiScreenAction

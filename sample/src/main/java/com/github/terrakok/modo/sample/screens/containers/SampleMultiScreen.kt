@@ -50,7 +50,7 @@ internal class SampleMultiScreen(
 
     @IgnoredOnParcel
     override val reducer: NavigationReducer<MultiScreenState, MultiScreenAction> = NavigationReducer { action, state ->
-        if (action is RemoveTab && action.pos in state.screens.indices) {
+        if (action is RemoveTabAction && action.pos in state.screens.indices) {
             state.copy(
                 screens = state.screens.filterIndexed { index, _ -> index != action.pos },
                 selected = if (state.selected == action.pos) 0 else state.selected
@@ -70,7 +70,7 @@ internal class SampleMultiScreen(
                 TopContent(showAllStacks)
                 if (navigationState.screens.size > 1) {
                     CancelButton(
-                        onClick = { dispatch(RemoveTab(navigationState.selected)) },
+                        onClick = { dispatch(RemoveTabAction(navigationState.selected)) },
                         contentDescription = "Cansel screen",
                         modifier = Modifier
                             .align(Alignment.TopEnd)
