@@ -1,15 +1,16 @@
-# Screen model and view model
+# Screen Model and ViewModel
 
-Modo provides support of [Android ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel) and also provides it's
+Modo provides support for [Android ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel) and also includes its
 own `ScreenModel`.
 
 ## ScreenModel
 
-ScreenModel is similar to ViewModel, it is a interface that has `onDispose` function which is called when `ScreenModel` needs to be cleared.
+`ScreenModel` is similar to `ViewModel`. It is an interface that has an `onDispose` function, which is called when the `ScreenModel` needs to be
+cleared.
 
-To use it inside screen, call `rememberScreenModel` inside `Content` function:
+To use it inside a screen, call `rememberScreenModel` inside the `Content` function:
 
-```Kotlin
+```kotlin
 ```
 
 { src="ScreenModelSample.kt" }
@@ -18,4 +19,4 @@ To use it inside screen, call `rememberScreenModel` inside `Content` function:
 
 You can use `ViewModel` from Android Jetpack in Modo:
 
-<include from="snippets.topic" element-id="under_develop_note"></include>
+<include from="snippets.topic" element-id="under_develop_note"/>
