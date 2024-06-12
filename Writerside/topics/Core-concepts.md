@@ -1,7 +1,7 @@
-# Core concepts
+# Core Concepts
 
-Modo is a state-based navigation library for jetpack compose. It represents UI as a structure of `Screen`s and `ContainerScreen`s (which is an
-implementation of `Screen`).
+Modo is a state-based navigation library for Jetpack Compose. It represents the UI as a structure of `Screen`s and `ContainerScreen`s (which are
+implementations of `Screen`).
 
 <include from="snippets.topic" element-id="under_develop_note"/>
 
@@ -9,47 +9,48 @@ implementation of `Screen`).
 
 ## Screen
 
-`Screen` is a basic unit of UI. It displays content defined in overridden `fun Content(modifier: Modifier)`
+A `Screen` is the basic unit of the UI. It displays content defined in the overridden `fun Content(modifier: Modifier)`.
 
 ```kotlin
 ```
 
 { src="SampleScreen.kt" include-lines="1-20"}
 
-### Screen key
+### Screen Key
 
-Each screen is identified by `ScreenKey` - a unique key that represents the screen.
-This key is widely used in internal implementation. It is required to be unique per a screen, even after process death. For this you must use
-build-in `generateScreenKey` function.
+Each screen is identified by a `ScreenKey` - a unique key representing the screen. This key is extensively used in internal implementation. It must be
+unique for each screen, even after process death. To ensure this, use the built-in `generateScreenKey` function.
 
 ### Arguments { id="arguments"}
 
-To pass arguments to the screen, declare it in the Screen's constructor:
-    
-```Kotlin
+To pass arguments to the screen, declare them in the Screen's constructor:
+
+```kotlin
 ```
 
 { src="SampleScreen.kt" include-lines="2-5,7-8" }
 
-### Saving and restoring
+### Saving and Restoring
 
-Each screen is `Parcelable`, that helps to save and restore it during lifecycle changes. Use <tooltip term="parcelize">
-parcelable</tooltip> [gradle plugin](https://developer.android.com/kotlin/parcelize) and `@Parcelable` annotation to generate `Parcelable`
+Each screen is `Parcelable`, which helps to save and restore it during lifecycle changes. Use the <tooltip term="parcelize">
+parcelable</tooltip> [Gradle plugin](https://developer.android.com/kotlin/parcelize) and the `@Parcelize` annotation to generate the `Parcelable`
 implementation on the fly.
 
-It's vital to use build-in function like `rememberRootScreen` to integrate Modo with your application. Read [](How-to-integrate-modo-to-your-app.md)
-for details.
+It's crucial to use built-in functions like `rememberRootScreen` to integrate Modo with your application.
+Read [](How-to-integrate-modo-to-your-app.md) for details.
 
-## ContainerScreen { id="container-screen" }
+## ContainerScreen
 
-`ContainerScreen`s are the type of screens that can contain other screens. It's a basic building block for complex navigation structures.
-[`StackScreen`](StackScreen.md) and `MultiScreen` are build-in implementations of `ContainerScreen`.
+{ id="container-screen" }
+
+`ContainerScreen`s are types of screens that can contain other screens. They are fundamental building blocks for complex navigation
+structures. [`StackScreen`](StackScreen.md) and `MultiScreen` are built-in implementations of `ContainerScreen`.
 
 ![diagram_2.png](diagram_2.png){ height = 300 }
 
-Each ContainerScreen is defined by 2 typed parameters: State and Action.
+Each ContainerScreen is defined by two typed parameters: State and Action.
 
-```Kotlin
+```kotlin
 @Stable
 abstract class ContainerScreen<State : NavigationState, Action : NavigationAction<State>>(
     private val navModel: NavModel<State, Action>
@@ -61,7 +62,7 @@ abstract class ContainerScreen<State : NavigationState, Action : NavigationActio
 <procedure>
 <title>State</title>
 <p>
-<code>NavigationState</code> - class that can contains nested screens and other additional info. State can be updated by calling <code>dispatch(action)</code>.
+<code>NavigationState</code> - a class that can contain nested screens and other additional information. The state can be updated by calling <code>dispatch(action)</code>.
 </p>
 <code-block lang="kotlin" collapsible="true" default-state="collapsed" collapsed-title-line-number="2">
 @Parcelize
@@ -70,54 +71,55 @@ data class SampleState(
   val screen2: Screen,
   val screen3: Screen?,
 ) : NavigationState {
-  // You need to return all nested screens in order to provide correct work.
+  // You need to return all nested screens to ensure correct functionality.
   override fun getChildScreens(): List<Screen> = listOfNotNull(screen1, screen2, screen3)
 }
 </code-block>
+
+Read the <a href="#state-update">State Update</a> section for more details.
+
 </procedure>
 
 <procedure>
 <title>Action</title>
 <p>
-<code>NavigationAction</code> - marker interface to distinguish actions for this container on specific <code>State</code>. You can also use 
-<code>ReducerAction</code> for defining actions with update function in-place:
-<code-block src="SampleAction.kt" lang="kotlin" collapsible="true" default-state="collapsed"/>
+<code>NavigationAction</code> - a marker interface to distinguish actions for this container on a specific <code>State</code>. You can also use 
+<code>ReducerAction</code> to define actions with an in-place update function:
+<code-block src="SampleAction.kt" lang="kotlin" collapsible="true" default-state="collapsed" include-lines="1-12"/>
 
 </p>
 
 </procedure>
 
-<procedure>
-<title>Updating State</title>
-<p>
-To update state of <code>ContainerScreen</code> you must use <code>dispatch(action: Action)</code>.
-There are 2 ways how to define you action:
-</p>
-<step>
-(Recommended) ReducerAction - allows to define update function in-place.
-<code-block src="SampleAction.kt" lang="kotlin" collapsible="true" default-state="collapsed"/>
-</step>
-<step>
-Custom reducer + Action. You can provide a reducer in you <code>ContainerScreen</code> implementation.
-<code-block lang="kotlin" collapsible="true" default-state="collapsed">TODO</code-block>
-</step>
+`NavModel` - a state storage responsible for state updates and triggering UI updates. Each ContainerScreen has a NavModel as a constructor parameter.
 
-</procedure>
+### Rendering Nested Screens
 
+To render nested screens inside a container screen, you **must** use the `InternalContent` function. This function provides all necessary
+integrations, such as:
 
-`NavModel` - storage of state, that responsible for state updates and triggering updating UI. Each ContainerScreen has a NavModel as a constructor
-parameter.
+* Correct usage of `rememberSaveable` inside nested screens by using `SaveableStateHolder`.
+* Integration of `ScreenModel`, ensuring consistency for the same screen and clearing it when the `Screen` leaves the hierarchy.
+* Android integration, including `Lifecycle` and `ViewModel` support.
 
-To render nested screens inside a container screen, you **must** use `InternalContent` function. This function provides all necessary integrations,
-like:
+The built-in `StackScreen` and `MultiScreen` use `InternalContent` under the hood to ensure correct nested screen functionality.
 
-* Correct work of `rememberSaveable` inside nested screens by using `SaveableStateHolder`
-* `ScreenModel`'s integration, that should be the same for the same screen and be cleared when `Screen` leaves the hierarchy
-* Android integration, like `Lifecycle` and `ViewModel` support
+## State Update
 
-Build-in `StackScreen` and `MultiScreen` uses `InternalContent` under the hood, to provide correct work of nested screens.
+To update the state of a `ContainerScreen`, use `dispatch(action: Action)`.
+There are two ways to define your action:
+
+### ReducerAction (Recommended)
+
+ReducerAction allows defining the update function in-place.
+<code-block src="SampleAction.kt" lang="kotlin" collapsible="true" default-state="collapsed" include-lines="1-12"/>
+
+### Custom Reducer + Action
+
+You can provide a reducer in your <code>ContainerScreen</code> implementation.
+<code-block src="SampleAction.kt" lang="kotlin" collapsible="true" default-state="collapsed" include-lines="13-42"/>
 
 ## Root Screen
 
-To integrate Modo into your application, you use one of the build-in functions from Modo file. It returns a `RootScreen`, that simply provides
+To integrate Modo into your application, use one of the built-in functions from the Modo file. It returns a `RootScreen`, which provides
 a `SaveableStateHolder`.

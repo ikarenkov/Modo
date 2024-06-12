@@ -6,9 +6,7 @@
        title="Features" id="Features">
 
     <p>
-
         The list of available features in Modo:
-
     </p>
     <include from="snippets.topic" element-id="under_develop_note"/>
     <table>
@@ -19,20 +17,20 @@
             <td>Sample</td>
         </tr>
         <tr>
-            <td><a href="StackScreen.md">Stack navigation</a></td>
+            <td><a href="StackScreen.md">Stack Navigation</a></td>
             <td>✅</td>
             <td><a href="%github_code_url%modo-compose/src/main/java/com/github/terrakok/modo/stack/StackScreen.kt">StackScreen</a>, <a
-                    href="%github_code_url%modo-compose/src/main/java/com/github/terrakok/modo/stack/StackActions.kt#L94">build-in commands</a></td>
+                    href="%github_code_url%modo-compose/src/main/java/com/github/terrakok/modo/stack/StackActions.kt#L94">built-in commands</a></td>
             <td><a href="%github_code_url%sample/src/main/java/com/github/terrakok/modo/sample/screens/containers/SampleStack.kt">SampleStack</a>, <a
                     href="%github_code_url%sample/src/main/java/com/github/terrakok/modo/sample/screens/stack/StackActionsScreen.kt">sample</a> of
                 navigation actions
             </td>
         </tr>
         <tr>
-            <td>Multi screen navigation</td>
+            <td>Multi-Screen Navigation</td>
             <td>✅</td>
             <td><a href="%github_code_url%modo-compose/src/main/java/com/github/terrakok/modo/multiscreen/MultiScreen.kt">MultiScreen</a>, <a
-                    href="%github_code_url%modo-compose/src/main/java/com/github/terrakok/modo/multiscreen/MultiScreenActions.kt">build-in
+                    href="%github_code_url%modo-compose/src/main/java/com/github/terrakok/modo/multiscreen/MultiScreenActions.kt">built-in
                 commands</a></td>
             <td><a href="%github_code_url%sample/src/main/java/com/github/terrakok/modo/sample/screens/containers/SampleMultiScreen.kt">SampleMultiscreen</a>
             </td>
@@ -42,12 +40,12 @@
             <td>✅</td>
             <td><a href="%github_code_url%modo-compose/src/main/java/com/github/terrakok/modo/DialogScreen.kt">DialogScreen</a></td>
             <td><a href="%github_code_url%sample/src/main/java/com/github/terrakok/modo/sample/screens/dialogs/DialogsPlayground.kt">Dialogs
-                playground</a></td>
+                Playground</a></td>
         </tr>
         <tr>
             <td><a href="Core-concepts.md" anchor="arguments"/></td>
             <td>✅</td>
-            <td>Arguments can be passed as constructor parameter of Screen.</td>
+            <td>Arguments can be passed as a constructor parameter of Screen.</td>
             <td><a href="%github_code_url%sample/src/main/java/com/github/terrakok/modo/sample/screens/MainScreen.kt">MainScreen</a></td>
         </tr>
         <tr>
@@ -59,25 +57,19 @@
             <td><a href="%github_code_url%sample/src/main/java/com/github/terrakok/modo/sample/screens/containers/SampleStack.kt">SampleStack</a></td>
         </tr>
         <tr>
-            <td><a href="Android-integrations.md">Android lifecycle and view model</a></td>
+            <td><a href="Android-integrations.md">Android Lifecycle and ViewModel</a></td>
             <td>✅</td>
-            <td>
-                <a href="%github_code_url%modo-compose/src/main/java/com/github/terrakok/modo/android/ModoScreenAndroidAdapter.kt">ModoScreenAndroidAdapter</a>
-                connect Modo with android-related features.
+            <td><a href="%github_code_url%modo-compose/src/main/java/com/github/terrakok/modo/android/ModoScreenAndroidAdapter.kt">ModoScreenAndroidAdapter</a>
+                connects Modo with Android-related features.
             </td>
-            <td>
-                <a href="%github_code_url%sample/src/main/java/com/github/terrakok/modo/sample/screens/MainScreen.kt">MainScreen</a>
-                <a href="%github_code_url%sample/src/main/java/com/github/terrakok/modo/sample/screens/viewmodel/AndroidViewModelSampleScreen.kt">AndroidViewModelSampleScreen.kt</a>
+            <td><a href="%github_code_url%sample/src/main/java/com/github/terrakok/modo/sample/screens/MainScreen.kt">MainScreen</a>, <a
+                    href="%github_code_url%sample/src/main/java/com/github/terrakok/modo/sample/screens/viewmodel/AndroidViewModelSampleScreen.kt">AndroidViewModelSampleScreen.kt</a>
             </td>
         </tr>
         <tr>
-            <td>
-                <a href="How-to-integrate-modo-to-your-app.md">Activity and fragment integration, process death handling</a>
-            </td>
+            <td><a href="How-to-integrate-modo-to-your-app.md">Activity and Fragment Integration, Process Death Handling</a></td>
             <td>✅</td>
-            <td>
-                <a href="%github_code_url%modo-compose/src/main/java/com/github/terrakok/modo/Modo.kt">Modo</a>
-            </td>
+            <td><a href="%github_code_url%modo-compose/src/main/java/com/github/terrakok/modo/Modo.kt">Modo</a></td>
             <td><a href="%github_code_url%sample/src/main/java/com/github/terrakok/modo/sample/ModoSampleActivity.kt">ModoSampleActivity</a>, <a
                     href="%github_code_url%sample/src/main/java/com/github/terrakok/modo/sample/fragment/ModoFragment.kt">ModoFragment.kt</a>, <a
                     href="%github_code_url%sample/src/main/java/com/github/terrakok/modo/sample/ModoLegacyIntegrationActivity.kt">ModoLegacyIntegrationActivity.kt</a>
@@ -86,20 +78,20 @@
         <tr>
             <td><a href="Screen-effects.md"/></td>
             <td>✅</td>
-            <td>You can use <code>LaunchedScreenEffect</code> and <code>DisposableScreenEffect</code> analogies for <code>Screen</code>, it's linked
-                to life time of a <code>Screen</code>. There is also <code>LifecycleScreenEffect</code> for easy observing lifecycle. See <a
-                        href="%github_code_url%modo-compose/src/main/java/com/github/terrakok/modo/lifecycle/ScreenEffects.kt">ScreenEffects</a> for
-                details.
+            <td>You can use <code>LaunchedScreenEffect</code> and <code>DisposableScreenEffect</code> analogs for <code>Screen</code>. These are
+                linked to the lifetime of a <code>Screen</code>. Additionally, <code>LifecycleScreenEffect</code> is available for easy lifecycle
+                observation. See <a href="%github_code_url%modo-compose/src/main/java/com/github/terrakok/modo/lifecycle/ScreenEffects.kt">ScreenEffects</a>
+                for details.
             </td>
             <td><a href="%github_code_url%sample/src/main/java/com/github/terrakok/modo/sample/screens/ScreenEffectsSampleScreen.kt">ScreenEffectsSampleScreen.kt</a>
             </td>
         </tr>
         <tr>
-            <td>Pager and LazyList integration</td>
+            <td>Pager and LazyList Integration</td>
             <td>✅</td>
             <td>You can create custom <code>ContainerScreen</code> and use internal <code>Screen</code> inside <code>Vertical/HorizontalPager</code>
-                and <code>LazyRow/Column</code>. It's vital to define <code>key = {}</code> lambda with <code>InternalContent</code> for correct
-                integration. For more details take a look to the samples. <a
+                and <code>LazyRow/Column</code>. It is vital to define <code>key = {}</code> lambda with <code>InternalContent</code> for correct
+                integration. For more details, refer to the samples. <a
                         href="%github_code_url%modo-compose%2Fsrc%2Fmain%2Fjava%2Fcom%2Fgithub%2Fterrakok%2Fmodo%2Flazylist%2FLazyListUtils.kt">LazyListUtils</a>
             </td>
             <td><a href="%github_code_url%sample/src/main/java/com/github/terrakok/modo/sample/screens/containers/StackInLazyColumnScreen.kt">StackInLazyColumnScreen.kt</a>,

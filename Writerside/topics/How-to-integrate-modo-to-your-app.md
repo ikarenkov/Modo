@@ -1,29 +1,28 @@
-# How to integrate modo into your app
+# How to Integrate Modo into Your App
 
-<link-summary>This topic provides guide for available app integrations. It also describes explains some details of the implementation.</link-summary>
+<link-summary>This guide provides instructions for integrating Modo into your app, along with details of the implementation.</link-summary>
 
-To provide correctness of navigation, Modo requires usage of build-in functions for integration.
-To integrate Modo to your app you have 2 approaches:
+To ensure the correctness of navigation, Modo requires the use of built-in functions for integration. You have two approaches to integrate Modo into
+your app:
 
-* `rememberRootScreen` - convenient integration to `Activity` or `Fragment`. You call it inside `setContent` function.
-* `Modo.getOrCreateRootScreen`, `Modo.save` and `Modo.onRootScreenFinished` - for manual integration.
+* `rememberRootScreen` - a convenient integration for `Activity` or `Fragment`. Use it inside the `setContent` function.
+* `Modo.getOrCreateRootScreen`, `Modo.save`, and `Modo.onRootScreenFinished` - for manual integration.
 
-> `rememberRootScreen` and `Modo.getOrCreateRootScreen` return the same instance of `RootScreen` in the same process, so you can safely inject it
-> into your DI
-> container.
+> `rememberRootScreen` and `Modo.getOrCreateRootScreen` return the same instance of `RootScreen` within the same process, so you can safely inject it
+> into your DI container.
 
 { style="note" }
 
-## Convenient integration to Activity and Fragment
+## Convenient Integration for Activity and Fragment
 
-`rememberRootScreen` is a convenient way to integrate Modo to your `Activity` or `Fragment`. It automatically handles saving and restoring
-of `RootScreen` during `Activity` lifecycle and process death.
+`rememberRootScreen` is an easy way to integrate Modo into your `Activity` or `Fragment`. It automatically handles the saving and restoring
+of `RootScreen` during the `Activity` lifecycle and process death.
 
-To use modo inside your Activity or Fragment you need:
+To use Modo inside your Activity or Fragment, follow these steps:
 
-1. Use `rememberRootScreen` inside `setContent` function and pass Screen that you want to render. You will have instance of the `RootScreen` for
-   further displaying.
-2. Display content by calling `fun Content(modifier: Modifier)` on created instance of `RootScreen`
+1. Use `rememberRootScreen` inside the `setContent` function and pass the screen you want to render. This will give you an instance of
+   the `RootScreen` for further display.
+2. Display content by calling `fun Content(modifier: Modifier)` on the created instance of `RootScreen`.
 
 <tabs>
     <tab title="Activity">
@@ -32,30 +31,28 @@ To use modo inside your Activity or Fragment you need:
     <tab title="Fragment">
         <code-block src="ModoFragment.kt" lang="kotlin"/>
         <note>
-            For Fragments we create <code>ComposeView</code> and call <code>setContent</code> on it. So don't forget to use
+            For Fragments, create a <code>ComposeView</code> and call <code>setContent</code> on it. Remember to use
             <code-block lang="kotlin">
                 setViewCompositionStrategy(
                     ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
                 )
             </code-block>
-            for your <code>ComposeView</code> for Fragment. <a href="https://developer.android.com/develop/ui/compose/migrate/interoperability-apis/compose-in-views#compose-in-fragments">Documentation reference.</a>
+            for your <code>ComposeView</code> in the Fragment. <a href="https://developer.android.com/develop/ui/compose/migrate/interoperability-apis/compose-in-views#compose-in-fragments">Documentation reference.</a>
         </note>
     </tab>
 </tabs>
 
-## Manual integration
+## Manual Integration
 
-If you want to have more control over Modo integration, you can use `Modo.getOrCreateRootScreen`, `Modo.save` and `Modo.onRootScreenFinished`
-functions. Check-out
+If you prefer more control over Modo integration, you can use `Modo.getOrCreateRootScreen`, `Modo.save`, and `Modo.onRootScreenFinished`. Check out
 the [ModoLegacyIntegrationActivity](%github_code_url%sample/src/main/java/com/github/terrakok/modo/sample/ModoLegacyIntegrationActivity.kt) in the
 sample project for an example.
 
-- `Modo.getOrCreateRootScreen` - initializes `RootScreen` with provided screen's or returns the existing instance.
-- `Modo.save` - saves the current state of `RootScreen` and other internal data (like `screenCounterKey`) to the bundle for further restore
+- `Modo.getOrCreateRootScreen` - initializes `RootScreen` with the provided screen or returns the existing instance.
+- `Modo.save` - saves the current state of `RootScreen` and other internal data (like `screenCounterKey`) to the bundle for future restoration
   in `Modo.getOrCreateRootScreen`.
-- `Modo.onRootScreenFinished` - should be called when `RootScreen` is no longer needed, f.e. at the finish of the Activity or the Fragment. It removes
-  the instance of `RootScreen` from the
-  internal runtime-cache and clears the other internal resources.
+- `Modo.onRootScreenFinished` - should be called when `RootScreen` is no longer needed, such as when the Activity or Fragment finishes. It removes the
+  instance of `RootScreen` from the internal runtime cache and clears other internal resources.
 
 <tabs>
     <tab title="Activity">

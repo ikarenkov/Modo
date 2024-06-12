@@ -8,31 +8,34 @@
     <snippet id="navigation_is_a_graph">
         <procedure type="choices">
             <title>
-                Navigation - is a graph
+                Navigation is a Graph
             </title>
             <p>
                 Each integration of Modo is a
                 <a href="https://en.wikipedia.org/wiki/Tree_(graph_theory)#Rooted_tree"
-                   summary="A rooted tree is a tree in which one vertex has been designated the root.">rooted tree (wiki)</a> that can be displayed:
+                   summary="A rooted tree is a tree in which one vertex has been designated the root.">rooted tree (wiki)</a> that can be displayed as
+                follows:
             </p>
             <img src="diagram_1.png" alt="modo graph"/>
-            <step>Each node - is a <code>Screen</code> or <code>ContainerScreen</code></step>
-            <step>Leafs nodes - are <code>Screen</code>s.</step>
-            <step>Inner nodes - are <code>ContainerScreen</code>s. They can contain other <code>Screen</code>s or <code>ContainerScreen</code>s in
-                their <code>navigationState</code>.
+            <step>Each node is a <code>Screen</code> or <code>ContainerScreen</code>.</step>
+            <step>Leaf nodes are <code>Screen</code>s.</step>
+            <step>Inner nodes are <code>ContainerScreen</code>s. They can contain other <code>Screen</code>s or <code>ContainerScreen</code>s in their
+                <code>navigationState</code>.
             </step>
-            <step>Root node - is a <code>RootScreen</code>. You can have multiply roots in your app. See <a
-                    href="How-to-integrate-modo-to-your-app.md"> How to integrate Modo</a> for details.
+            <step>The root node is a <code>RootScreen</code>. You can have multiple roots in your app. See <a
+                    href="How-to-integrate-modo-to-your-app.md">How to integrate Modo</a> for details.
             </step>
         </procedure>
     </snippet>
     <snippet id="under_develop_note">
         <note>
-            <b>Under development</b>:
-            this part of the documentation can contain incomplete information or empty sections. We are actively working on expanding and improving
+            <b>Under Development</b>:
+            this part of the documentation may contain incomplete information or empty sections. We are actively working on expanding and improving
             this section.
         </note>
     </snippet>
-    <snippet id="toothpick"><a href="https://github.com/stephanenicolas/toothpick"
-                               summary="Toothpick is a scope tree based Dependency Injection (DI) library for Java">Toothpick</a></snippet>
+    <snippet id="toothpick">
+        <a href="https://github.com/stephanenicolas/toothpick"
+           summary="Toothpick is a scope tree-based Dependency Injection (DI) library for Java">Toothpick</a>
+    </snippet>
 </topic>

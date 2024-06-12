@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.NavModel
+import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.ReducerAction
 import com.github.terrakok.modo.Screen
@@ -31,13 +32,13 @@ data class RemovableItemContainerState(
     override fun getChildScreens(): List<Screen> = listOfNotNull(screen1, screen2, screen3, screen4)
 }
 
-internal fun interface RemovableItemContainerAction : ReducerAction<RemovableItemContainerState> {
-    class Remove : RemovableItemContainerAction {
+internal sealed interface RemovableItemContainerAction : ReducerAction<RemovableItemContainerState> {
+    data object Remove : RemovableItemContainerAction {
         override fun reduce(oldState: RemovableItemContainerState): RemovableItemContainerState =
             oldState.copy(screen3 = null)
     }
 
-    class CreateScreen : RemovableItemContainerAction {
+    data object CreateScreen : RemovableItemContainerAction {
         override fun reduce(oldState: RemovableItemContainerState): RemovableItemContainerState =
             oldState.copy(screen3 = NestedScreen(canBeRemoved = true))
     }
@@ -45,6 +46,7 @@ internal fun interface RemovableItemContainerAction : ReducerAction<RemovableIte
 
 @Parcelize
 internal class RemovableItemContainerScreen(
+    private val useCustomReducer: Boolean = false,
     private val navModel: NavModel<RemovableItemContainerState, RemovableItemContainerAction> = NavModel(
         RemovableItemContainerState(
             NestedScreen(canBeRemoved = false),
@@ -54,6 +56,22 @@ internal class RemovableItemContainerScreen(
         )
     )
 ) : ContainerScreen<RemovableItemContainerState, RemovableItemContainerAction>(navModel) {
+
+    override val reducer: NavigationReducer<RemovableItemContainerState, RemovableItemContainerAction>?
+        get() = if (useCustomReducer) {
+            NavigationReducer<RemovableItemContainerState, RemovableItemContainerAction> { action, state ->
+                when (action) {
+                    is RemovableItemContainerAction.Remove -> {
+                        state.copy(screen3 = null)
+                    }
+                    is RemovableItemContainerAction.CreateScreen -> {
+                        state.copy(screen3 = NestedScreen(canBeRemoved = true))
+                    }
+                }
+            }
+        } else {
+            null
+        }
 
     @Composable
     override fun Content(modifier: Modifier) {
@@ -77,7 +95,7 @@ internal class RemovableItemContainerScreen(
             Column {
                 Button(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { dispatch(RemovableItemContainerAction.CreateScreen()) }
+                    onClick = { dispatch(RemovableItemContainerAction.CreateScreen) }
                 ) {
                     Text(text = "Create screen")
                 }
@@ -97,7 +115,7 @@ internal class NestedScreen(
         val parent = LocalContainerScreen.current as RemovableItemContainerScreen
         InnerContent(
             title = screenKey.value,
-            onRemoveClick = takeIf { canBeRemoved }?.let { { parent.dispatch(RemovableItemContainerAction.Remove()) } },
+            onRemoveClick = takeIf { canBeRemoved }?.let { { parent.dispatch(RemovableItemContainerAction.Remove) } },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(400.dp)

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE vars SYSTEM "https://resources.jetbrains.com/writerside/1.0/vars.dtd">
 <vars>
     <var name="product" value="Modo" />
-    <var name="latest_version" value="0.9.0-dev10" />
+    <var name="latest_version" value="0.9.0-rc1" />
     <var name="latest_modo_compose_dependency" value="com.github.terrakok:modo-compose:%latest_version%" />
     <var name="github_code_url" value="https://github.com/ikarenkov/Modo/tree/dev/" />
     <var name="github_url" value="https://github.com/ikarenkov/Modo/" />

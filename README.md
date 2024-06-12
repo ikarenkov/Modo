@@ -1,45 +1,48 @@
-# [Modo](https://ikarenkov.github.io/Modo) - state-based Jetpack Compose navigation
+Here’s the improved version of your documentation text:
+
+# [Modo](https://ikarenkov.github.io/Modo) - State-Based Jetpack Compose Navigation
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.terrakok/modo-compose)](https://repo1.maven.org/maven2/com/github/terrakok)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Modo is a simple and convenient state-base navigation library for Jetpack Compose.
+Modo is a simple and convenient state-based navigation library for Jetpack Compose.
 
 https://github.com/ikarenkov/Modo/assets/17216532/e2977736-bdda-44a9-83f3-379731ddfecc
 
-## [Project website](https://ikarenkov.github.io/Modo)
+## [Project Website](https://ikarenkov.github.io/Modo)
 
 Check out our website to get the most up-to-date information about the library:
 
-* [**Modo overview**](https://ikarenkov.github.io/Modo/modooverview.html)
-* [**Quick start guide**](https://ikarenkov.github.io/Modo/quickstartguide.html)
-* [**Core concepts**](https://ikarenkov.github.io/Modo/core-concepts.html)
-* [**How to integrate Modo in your app**](https://ikarenkov.github.io/Modo/how-to-integrate-modo-to-your-app.html)
-* [**Features list**](https://ikarenkov.github.io/Modo/features.html)
+* [**Modo Overview**](https://ikarenkov.github.io/Modo/modooverview.html)
+* [**Quick Start Guide**](https://ikarenkov.github.io/Modo/quickstartguide.html)
+* [**Core Concepts**](https://ikarenkov.github.io/Modo/core-concepts.html)
+* [**How to Integrate Modo into Your App**](https://ikarenkov.github.io/Modo/how-to-integrate-modo-to-your-app.html)
+* [**Features List**](https://ikarenkov.github.io/Modo/features.html)
 
-## Navigation - is a graph
+## Navigation is a Graph
 
 Each integration of Modo is a
-<a href="https://en.wikipedia.org/wiki/Tree_(graph_theory)#Rooted_tree" summary="A rooted tree is a tree in which one vertex has been designated the root.">rooted tree (wiki)</a> that can be displayed:
+<a href="https://en.wikipedia.org/wiki/Tree_(graph_theory)#Rooted_tree" summary="A rooted tree is a tree in which one vertex has been designated the root.">rooted tree (wiki)</a> that can be displayed as follows:
 <img src="Writerside/images/coreConcepts/diagram_1.png" alt="modo graph"/>
 
-* Each node - is a <code>Screen</code> or <code>ContainerScreen</code></step>
-* Leafs nodes - are <code>Screen</code>s.</step>
-* Inner nodes - are <code>ContainerScreen</code>s. They can contain other <code>Screen</code>s or <code>ContainerScreen</code>s in
-  their <code>navigationState</code>.
-* Root node - is a <code>RootScreen</code>. You can have multiply roots in your app. See <a href="https://ikarenkov.github.io/Modo/how-to-integrate-modo-to-your-app.html"> How to integrate Modo</a> for details.
+* Each node is a <code>Screen</code> or <code>ContainerScreen</code>.
+* Leaf nodes are <code>Screen</code>s.
+* Inner nodes are <code>ContainerScreen</code>s. They can contain other <code>Screen</code>s or <code>ContainerScreen</code>s in their <code>
+  navigationState</code>.
+* The root node is a <code>RootScreen</code>. You can have multiple roots in your app.
+  See <a href="https://ikarenkov.github.io/Modo/how-to-integrate-modo-to-your-app.html">How to integrate Modo</a> for details.
 
-## State defines UI
+## State Defines UI
 
-* `NavigationState` defines UI
-    * Initial state is defined in constructor of `ContainerScreen` by `navModel: NavModel<State, Action>`
-    * To update state, use `dispatch(action: Action)` on `NavigationContainer`, or build-in extension functions
+* `NavigationState` defines the UI:
+    * The initial state is defined in the constructor of `ContainerScreen` by `navModel: NavModel<State, Action>`.
+    * To update the state, use `dispatch(action: Action)` on `NavigationContainer`, or use the built-in extension functions
       for [StackScreen](modo-compose/src/main/java/com/github/terrakok/modo/stack/StackActions.kt)
-      and [MultiScreen](modo-compose/src/main/java/com/github/terrakok/modo/multiscreen/MultiScreenActions.kt)
-* There are Screen and ContainerScreen
-    * ContainerScreen can contain and render child screens
-    * There are some build-in implementation of ContainerScreen like StackScreen and MultiScreen
-* You can easily create custom `Action` by extending `Action` or `ReducerAction`,
+      and [MultiScreen](modo-compose/src/main/java/com/github/terrakok/modo/multiscreen/MultiScreenActions.kt).
+* There are `Screen` and `ContainerScreen`:
+    * `ContainerScreen` can contain and render child screens.
+    * There are some built-in implementations of `ContainerScreen` like `StackScreen` and `MultiScreen`.
+* You can easily create custom `Action` by extending `Action` or `ReducerAction`.
 
 # License
 
