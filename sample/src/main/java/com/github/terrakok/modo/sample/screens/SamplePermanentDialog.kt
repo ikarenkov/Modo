@@ -23,8 +23,7 @@ class SamplePermanentDialog(
     override val screenKey: ScreenKey = generateScreenKey()
 ) : DialogScreen {
 
-    override val permanentDialog: Boolean
-        get() = true
+    override val permanentDialog: Boolean get() = true
 
     override fun provideDialogConfig(): DialogScreen.DialogConfig = DialogScreen.DialogConfig.System(
         useSystemDim = true,

@@ -152,7 +152,10 @@ private fun rememberButtons(
                         ModoButtonSpec("Multiscreen") { navigation?.forward(SampleMultiScreen()) },
                         ModoButtonSpec("Screen Effects") { navigation?.forward(ScreenEffectsSampleScreen(i + 1)) },
                         ModoButtonSpec("Custom Container Actions") { navigation?.forward(SampleCustomContainerScreen()) },
-                        ModoButtonSpec("Custom Container") { navigation?.forward(RemovableItemContainerScreen()) },
+                        ModoButtonSpec("Removable screen") { navigation?.forward(RemovableItemContainerScreen(useCustomReducer = false)) },
+                        ModoButtonSpec("Removable screen with reducer") {
+                            navigation?.forward(RemovableItemContainerScreen(useCustomReducer = true))
+                        },
                         // Just experiments
 //        ModoButtonSpec("2 items screen") { navigation.forward(TwoTopItemsStackScreen(i + 1)) },
 //                ModoButtonSpec("Demo") { navigation.forward(SaveableStateHolderDemoScreen()) },

@@ -18,6 +18,4 @@ To use it inside screen, call `rememberScreenModel` inside `Content` function:
 
 You can use `ViewModel` from Android Jetpack in Modo:
 
-
-
 <include from="snippets.topic" element-id="under_develop_note"></include>

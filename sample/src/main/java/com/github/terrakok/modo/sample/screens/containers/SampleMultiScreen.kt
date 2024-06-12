@@ -5,14 +5,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
@@ -25,13 +30,14 @@ import com.github.terrakok.modo.multiscreen.MultiScreenAction
 import com.github.terrakok.modo.multiscreen.MultiScreenNavModel
 import com.github.terrakok.modo.multiscreen.MultiScreenState
 import com.github.terrakok.modo.multiscreen.selectContainer
+import com.github.terrakok.modo.sample.components.CancelButton
 import com.github.terrakok.modo.sample.screens.MainScreen
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Suppress("MagicNumber")
 @Parcelize
-class SampleMultiScreen(
+internal class SampleMultiScreen(
     private val navModel: MultiScreenNavModel = MultiScreenNavModel(
         containers = listOf(
             SampleStack(MainScreen(1)),
@@ -44,7 +50,14 @@ class SampleMultiScreen(
 
     @IgnoredOnParcel
     override val reducer: NavigationReducer<MultiScreenState, MultiScreenAction> = NavigationReducer { action, state ->
-        if (action is AddTab) state else null
+        if (action is RemoveTab && action.pos in state.screens.indices) {
+            state.copy(
+                screens = state.screens.filterIndexed { index, _ -> index != action.pos },
+                selected = if (state.selected == action.pos) 0 else state.selected
+            )
+        } else {
+            null
+        }
     }
 
     @Composable
@@ -52,9 +65,20 @@ class SampleMultiScreen(
         var showAllStacks by rememberSaveable {
             mutableStateOf(false)
         }
-        Column {
-            TopContent(showAllStacks, Modifier.weight(1f))
-            Row {
+        Column(modifier) {
+            Box(Modifier.weight(1f)) {
+                TopContent(showAllStacks)
+                if (navigationState.screens.size > 1) {
+                    CancelButton(
+                        onClick = { dispatch(RemoveTab(navigationState.selected)) },
+                        contentDescription = "Cansel screen",
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .windowInsetsPadding(WindowInsets.statusBars)
+                    )
+                }
+            }
+            Row(Modifier.windowInsetsPadding(WindowInsets.navigationBars)) {
                 Text(
                     modifier = Modifier
                         .clickable { showAllStacks = !showAllStacks }
