@@ -36,9 +36,6 @@ jobs:
       - name: Build and Test
         run: ./gradlew :${{ matrix.module }}:testDebugUnitTest --continue
 
-      - name: Archive test results
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v4
         if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: test-results-${{ matrix.module }}
-          path: ${{ matrix.module }}/build/test-results/testDebugUnitTest
