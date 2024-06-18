@@ -1,0 +1,24 @@
+name: Unit tests
+run-name: Running unit tests
+on:
+  push:
+    branches:
+      - "dev"
+  pull_request:
+    branches:
+      - "dev"
+jobs:
+  static-analysis-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up JDK 17"
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: gradle
+
+      - name: Run Tests with Gradle
+        run: ./gradlew test

@@ -1,6 +1,5 @@
 package com.github.terrakok.modo.sample.screens.containers
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -29,6 +28,7 @@ import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.NavModel
 import com.github.terrakok.modo.list.ListNavigationAction
 import com.github.terrakok.modo.list.ListNavigationState
+import com.github.terrakok.modo.list.removeScreens
 import com.github.terrakok.modo.sample.components.CancelButton
 import com.github.terrakok.modo.sample.screens.MainScreen
 import kotlinx.coroutines.launch
@@ -47,7 +47,6 @@ class HorizontalPagerScreen(
     )
 ) : ContainerScreen<ListNavigationState, ListNavigationAction>(navModel) {
 
-    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun Content(modifier: Modifier) {
         val pagerState = rememberPagerState {
@@ -90,7 +89,7 @@ class HorizontalPagerScreen(
                     val screen = navigationState.screens[pos]
                     InternalContent(screen = screen, Modifier.fillMaxSize())
                     CancelButton(
-                        onClick = { dispatch(ListNavigationAction.Remove(screen)) },
+                        onClick = { removeScreens(screen) },
                         contentDescription = "Close screen",
                         modifier = Modifier
                             .align(Alignment.TopEnd)

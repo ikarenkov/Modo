@@ -37,6 +37,7 @@ val LocalStackNavigation: ProvidableCompositionLocal<StackNavContainer> = static
 /**
  * Basic screen container that represents stack of [Screen]'s.
  */
+@Stable
 abstract class StackScreen(
     navigationModel: StackNavModel
 ) : ContainerScreen<StackState, StackAction>(navigationModel), StackNavContainer {

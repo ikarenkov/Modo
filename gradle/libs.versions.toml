@@ -6,7 +6,7 @@ detektComposeVersion = "0.3.20"
 detektVersion = "1.23.6"
 junit = "4.13.2"
 androidxComposeBomModo = "2024.03.00"
-androidxComposeBomApp = "2024.05.00"
+androidxComposeBomApp = "2024.06.00"
 androidxActivityCompose = "1.8.2"
 androidxLifecycle = "2.7.0"
 androidxCore = "1.13.1"
@@ -24,7 +24,7 @@ androidx-compose-bom-modo = { group = "androidx.compose", name = "compose-bom", 
 androidx-compose-bom-app = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBomApp" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-compose-foundation-android-beta = { group = "androidx.compose.foundation", name = "foundation-android", version = "1.7.0-beta01" }
-androidx-compose-foundation-beta = { group = "androidx.compose.foundation", name = "foundation", version = "1.7.0-beta01" }
+androidx-compose-foundation-beta = { group = "androidx.compose.foundation", name = "foundation", version = "1.7.0-beta03" }
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-compose-animation = { group = "androidx.compose.animation", name = "animation" }
 androidx-compose-material = { group = "androidx.compose.material", name = "material" }

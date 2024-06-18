@@ -78,6 +78,7 @@ typealias ReducerProvider<State, Action> = () -> NavigationReducer<State, Action
 /**
  * Container for simple using [ContainerScreen] with [Parcelize]
  */
+@Stable
 class NavModel<State : NavigationState, Action : NavigationAction<State>>(
     initialState: State,
     val screenKey: ScreenKey = generateScreenKey()
