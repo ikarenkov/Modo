@@ -8,8 +8,14 @@ on:
     branches:
       - "dev"
 jobs:
-  static-analysis-check:
+  test:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        module:
+          - modo-compose
+
     steps:
       - uses: actions/checkout@v4
 
@@ -27,5 +33,12 @@ jobs:
           build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
           build-scan-terms-of-use-agree: "yes"
 
-      - name: Run Tests with Gradle
-        run: ./gradlew test
+      - name: Build and Test
+        run: ./gradlew :${{ matrix.module }}:testDebugUnitTest --continue
+
+      - name: Archive test results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results-${{ matrix.module }}
+          path: ${{ matrix.module }}/build/test-results/testDebugUnitTest
