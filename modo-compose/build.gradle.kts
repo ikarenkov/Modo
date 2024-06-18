@@ -27,6 +27,7 @@ dependencies {
 //    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:${properties["version.kotlin"]}")
 
     testImplementation(libs.test.junit.jupiter)
+    testImplementation(kotlin("test"))
 }
 
 tasks.withType(Test::class) {
