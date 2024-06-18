@@ -6,7 +6,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class MockScreen(
-    override val screenKey: ScreenKey
+    override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
 
     @Composable
