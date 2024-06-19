@@ -61,7 +61,7 @@ class ListNavigationActionAddScreensTest {
         val newState = action.reduce(oldState)
 
         assertEquals(
-            expected = listOf(screen1, screen2),
+            expected = listOf(screen1, screen2, screen3),
             actual = newState.screens
         )
     }

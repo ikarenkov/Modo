@@ -18,7 +18,7 @@ class ListNavigationActionSetTest {
         val newState = action.reduce(oldState)
 
         assertEquals(
-            expected = listOf(),
+            expected = listOf(screen3),
             actual = newState.screens
         )
     }
