@@ -1,5 +1,5 @@
-name: Static code analysis
-run-name: Running static code analysis
+name: PR checks
+run-name: Running static code analysis and unit tests
 on:
   push:
     branches:
