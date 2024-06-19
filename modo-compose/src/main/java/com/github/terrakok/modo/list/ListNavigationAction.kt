@@ -56,9 +56,15 @@ fun interface ListNavigationAction : ReducerAction<ListNavigationState> {
 
         constructor(pos: Int, screen: Screen, vararg screens: Screen) : this(
             ReducerAction { oldState ->
+                val newScreensCount = screens.size + 1
                 ListNavigationState(
-                    oldState.screens.toMutableList().apply {
-                        addAll(pos, listOf(screen, *screens))
+                    List(oldState.screens.size + newScreensCount) {
+                        when (it) {
+                            in 0 until pos -> oldState.screens[it]
+                            pos -> screen
+                            in pos + 1 until pos + newScreensCount -> screens[it - pos - 1]
+                            else -> oldState.screens[it - newScreensCount]
+                        }
                     }
                 )
             }
@@ -66,7 +72,25 @@ fun interface ListNavigationAction : ReducerAction<ListNavigationState> {
 
         constructor(screen: Screen, vararg screens: Screen, addToEnd: Boolean = false) : this(
             ReducerAction { oldState ->
-                AddScreens(if (addToEnd) oldState.screens.size else 0, screen, *screens).reduce(oldState)
+                ListNavigationState(
+                    if (addToEnd) {
+                        List(oldState.screens.size + screens.size + 1) {
+                            when (it) {
+                                in 0 until oldState.screens.size -> oldState.screens[it]
+                                oldState.screens.size -> screen
+                                else -> screens[it - oldState.screens.size - 1]
+                            }
+                        }
+                    } else {
+                        List(1 + screens.size + oldState.screens.size) {
+                            when (it) {
+                                0 -> screen
+                                in 1..screens.size -> screens[it - 1]
+                                else -> oldState.screens[it - 1 - screens.size]
+                            }
+                        }
+                    }
+                )
             }
         )
 
