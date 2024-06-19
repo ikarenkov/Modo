@@ -9,6 +9,7 @@ on:
       - "dev"
 jobs:
   static-analysis-check:
+    name: Static code analysis
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -40,6 +41,7 @@ jobs:
           category: lint
 
   run-unit-tests:
+    name: Run unit tests
     runs-on: ubuntu-latest
 
     steps:
