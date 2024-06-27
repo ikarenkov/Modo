@@ -25,6 +25,14 @@ val ScreenModel.coroutineScope: CoroutineScope
         onDispose = { scope -> scope.cancel() }
     )
 
+val Screen.coroutineScope: CoroutineScope
+    get() = ScreenModelStore.getOrPutDependency(
+        screen = this,
+        name = "ScreenModelCoroutineScope",
+        factory = { key -> MainScope() + CoroutineName(key) },
+        onDispose = { scope -> scope.cancel() }
+    )
+
 @Composable
 inline fun <reified T : ScreenModel> Screen.rememberScreenModel(
     tag: String? = null,
