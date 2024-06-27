@@ -21,6 +21,7 @@ import com.github.terrakok.modo.sample.ModoSampleActivity
 import com.github.terrakok.modo.sample.fragment.ModoFragment
 import com.github.terrakok.modo.sample.fragment.ModoFragmentIntegrationActivity
 import com.github.terrakok.modo.sample.quickstart.QuickStartActivity
+import com.github.terrakok.modo.sample.screens.animation.AnimationStackScreen
 import com.github.terrakok.modo.sample.screens.base.ButtonsScreenContent
 import com.github.terrakok.modo.sample.screens.containers.CustomStackSample
 import com.github.terrakok.modo.sample.screens.containers.HorizontalPagerScreen
@@ -157,9 +158,8 @@ private fun rememberButtons(
                         ModoButtonSpec("Removable screen with reducer") {
                             navigation?.forward(RemovableItemContainerScreen(useCustomReducer = true))
                         },
-                        ModoButtonSpec("List navigation") {
-                            navigation?.forward(SampleListNavigation())
-                        },
+                        ModoButtonSpec("List navigation") { navigation?.forward(SampleListNavigation()) },
+                        ModoButtonSpec("Animations") { navigation?.forward(AnimationStackScreen()) },
                         // Just experiments
 //        ModoButtonSpec("2 items screen") { navigation.forward(TwoTopItemsStackScreen(i + 1)) },
 //                ModoButtonSpec("Demo") { navigation.forward(SaveableStateHolderDemoScreen()) },
