@@ -35,6 +35,7 @@ import com.github.terrakok.modo.lazylist.screenItems
 import com.github.terrakok.modo.list.ListNavModel
 import com.github.terrakok.modo.list.ListNavigationAction
 import com.github.terrakok.modo.list.ListNavigationState
+import com.github.terrakok.modo.list.removeScreens
 import com.github.terrakok.modo.sample.components.CancelButton
 import com.github.terrakok.modo.sample.screens.MainScreen
 import kotlinx.parcelize.Parcelize
@@ -62,7 +63,7 @@ class StackInLazyColumnScreen(
         val lazyColumnState = rememberLazyListState()
         Scaffold(
             floatingActionButton = {
-                FloatingActionButton(onClick = { dispatch(ListNavigationAction.Add(SampleStack(MainScreen(0)))) }) {
+                FloatingActionButton(onClick = { dispatch(ListNavigationAction.AddScreens(SampleStack(MainScreen(0)))) }) {
                     Icon(painter = rememberVectorPainter(image = Icons.Default.Add), contentDescription = "Add screen")
                 }
             },
@@ -89,7 +90,7 @@ class StackInLazyColumnScreen(
                             .padding(horizontal = 16.dp)
                             .fillMaxWidth(),
                         onClick = {
-                            dispatch(ListNavigationAction.Add(pos = 0, SampleStack(MainScreen(0))))
+                            dispatch(ListNavigationAction.AddScreens(pos = 0, SampleStack(MainScreen(0))))
                         }
                     ) {
                         Text(text = "Add item", modifier = Modifier.align(Alignment.CenterVertically))
@@ -107,7 +108,7 @@ class StackInLazyColumnScreen(
                                 .clip(RoundedCornerShape(8.dp))
                         )
                         CancelButton(
-                            onClick = { dispatch(ListNavigationAction.Remove(screen)) },
+                            onClick = { removeScreens(screen) },
                             contentDescription = "Close screen",
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
@@ -123,7 +124,7 @@ class StackInLazyColumnScreen(
                             .fillMaxWidth()
                             .windowInsetsPadding(WindowInsets.navigationBars),
                         onClick = {
-                            dispatch(ListNavigationAction.Add(SampleStack(MainScreen(0))))
+                            dispatch(ListNavigationAction.AddScreens(SampleStack(MainScreen(0))))
                         }
                     ) {
                         Text(text = "Add item", modifier = Modifier.align(Alignment.CenterVertically))

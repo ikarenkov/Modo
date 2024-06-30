@@ -1,5 +1,5 @@
-name: Static code analysis
-run-name: Running static code analysis
+name: PR checks
+run-name: Running static code analysis and unit tests
 on:
   push:
     branches:
@@ -9,6 +9,7 @@ on:
       - "dev"
 jobs:
   static-analysis-check:
+    name: Static code analysis
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,6 +20,9 @@ jobs:
           java-version: "17"
           distribution: "temurin"
           cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
 
       - name: "Run static analysis"
         run: ./gradlew detektAll mergeLintSarif
@@ -36,3 +40,28 @@ jobs:
           sarif_file: build/reports/lint-merged.sarif
           category: lint
 
+  run-unit-tests:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up JDK 17"
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Run unit tests
+        run: ./gradlew testDebugUnitTest --continue
+
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v4
+        if: always()
+        with:
+          report_paths: '**/build/test-results/**/TEST-*.xml'

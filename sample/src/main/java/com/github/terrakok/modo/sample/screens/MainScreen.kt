@@ -30,6 +30,7 @@ import com.github.terrakok.modo.sample.screens.containers.StackInLazyColumnScree
 import com.github.terrakok.modo.sample.screens.containers.custom.MovableContentPlaygroundScreen
 import com.github.terrakok.modo.sample.screens.containers.custom.RemovableItemContainerScreen
 import com.github.terrakok.modo.sample.screens.containers.custom.SampleCustomContainerScreen
+import com.github.terrakok.modo.sample.screens.containers.list.SampleListNavigation
 import com.github.terrakok.modo.sample.screens.dialogs.DialogsPlayground
 import com.github.terrakok.modo.sample.screens.stack.StackActionsScreen
 import com.github.terrakok.modo.sample.screens.viewmodel.AndroidViewModelSampleScreen
@@ -155,6 +156,9 @@ private fun rememberButtons(
                         ModoButtonSpec("Removable screen") { navigation?.forward(RemovableItemContainerScreen(useCustomReducer = false)) },
                         ModoButtonSpec("Removable screen with reducer") {
                             navigation?.forward(RemovableItemContainerScreen(useCustomReducer = true))
+                        },
+                        ModoButtonSpec("List navigation") {
+                            navigation?.forward(SampleListNavigation())
                         },
                         // Just experiments
 //        ModoButtonSpec("2 items screen") { navigation.forward(TwoTopItemsStackScreen(i + 1)) },

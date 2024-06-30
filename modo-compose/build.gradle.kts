@@ -32,4 +32,7 @@ dependencies {
 
 tasks.withType(Test::class) {
     useJUnitPlatform()
+    reports {
+        junitXml.required = true
+    }
 }
