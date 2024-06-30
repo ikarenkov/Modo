@@ -14,7 +14,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleEventObserver
 import com.github.terrakok.modo.ExperimentalModoApi
-import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
@@ -49,7 +48,6 @@ internal fun ListInnerContent(
     title: String,
     modifier: Modifier = Modifier
 ) {
-    val parent = LocalContainerScreen.current
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
