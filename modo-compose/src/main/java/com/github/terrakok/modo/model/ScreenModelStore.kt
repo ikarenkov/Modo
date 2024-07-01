@@ -9,12 +9,15 @@ import org.jetbrains.annotations.VisibleForTesting
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
-internal typealias DependencyKey = String
+typealias DependencyKey = String
 
 private typealias ScreenModelKey = String
-private typealias DependencyInstance = Any
 private typealias DependencyOnDispose = (Any) -> Unit
-private typealias Dependency = Pair<DependencyInstance, DependencyOnDispose>
+
+data class Dependency(
+    val dependencyInstance: Any,
+    val onDispose: DependencyOnDispose,
+)
 
 /**
  * Class that stores remove priority for a dependency with a dependency it-selves.
@@ -97,10 +100,16 @@ object ScreenModelStore {
         assertGetOrPutDependencyCorrect(key, dependencies[key])
         return dependencies
             .getOrPut(key) {
-                DependencyWithRemoveOrder(dependencyCounter.getAndIncrement(), (factory(key) to onDispose) as Dependency)
+                DependencyWithRemoveOrder(
+                    dependencyCounter.getAndIncrement(),
+                    Dependency(
+                        dependencyInstance = factory(key),
+                        onDispose = { onDispose(it as T) }
+                    )
+                )
             }
             .dependency
-            .first as T
+            .dependencyInstance as T
     }
 
     inline fun <reified T : Any> getOrPutDependency(
@@ -128,16 +137,21 @@ object ScreenModelStore {
             screenModels -= key
         }
 
-        val screenDependencies = dependencies
-            .screenDependencies(screen)
-            .toList()
-        screenDependencies.sortedBy { it.value.removePriority }.forEach { (key, value) ->
-            val (instance, onDispose) = value.dependency
+        screenDependenciesSortedByRemovePriorityWithKey(screen).forEach { (key, dependency) ->
+            val (instance, onDispose) = dependency
             onDispose(instance)
             dependencies -= key
         }
         removedScreenKeys[screen.screenKey] = Unit
     }
+
+    fun screenDependenciesSortedByRemovePriorityWithKey(screen: Screen): Sequence<Pair<DependencyKey, Dependency>> =
+        screenDependenciesInternal(screen)
+            .sortedBy { it.value.removePriority }
+            .map { (key, dependencyWithRemoveOrder) -> key to dependencyWithRemoveOrder.dependency }
+
+    fun screenDependenciesSortedByRemovePriority(screen: Screen): Sequence<Any> =
+        screenDependenciesInternal(screen).sortedBy { it.value.removePriority }.map { it.value.dependency.dependencyInstance }
 
     @PublishedApi
     internal fun assertGetOrPutScreenModelsCorrect(screen: Screen, valueInMap: Any?) {
@@ -181,8 +195,8 @@ object ScreenModelStore {
         }
     }
 
-    private fun <T> Map<String, T>.screenDependencies(screen: Screen): Sequence<Map.Entry<String, T>> =
-        asSequence().filter { it.key.startsWith(screen.screenKey.value) }
+    internal fun screenDependenciesInternal(screen: Screen): Sequence<Map.Entry<DependencyKey, DependencyWithRemoveOrder>> =
+        dependencies.asSequence().filter { it.key.startsWith(screen.screenKey.value) }
 
     private fun <T> Map<String, T>.onEach(screen: Screen, block: (String) -> Unit) =
         asSequence()

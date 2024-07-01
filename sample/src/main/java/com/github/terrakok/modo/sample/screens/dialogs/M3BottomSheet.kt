@@ -45,7 +45,6 @@ class M3BottomSheet(
             ButtonsScreenContent(
                 screenIndex = screenIndex,
                 screenName = "SampleDialog",
-                screenKey = screenKey,
                 state = rememberDialogsButtons(LocalContainerScreen.current as StackScreen, screenIndex),
                 modifier = modifier
                     .fillMaxSize()

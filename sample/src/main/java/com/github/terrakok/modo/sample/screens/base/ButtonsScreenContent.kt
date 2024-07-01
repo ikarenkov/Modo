@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.IntState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,7 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.github.terrakok.modo.ExperimentalModoApi
+import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
+import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
 import com.github.terrakok.modo.sample.SampleAppConfig
 import com.github.terrakok.modo.sample.randomBackground
 import com.github.terrakok.modo.sample.screens.ButtonsState
@@ -31,17 +37,18 @@ import com.github.terrakok.modo.sample.screens.GroupedButtonsState
 import com.github.terrakok.modo.sample.screens.ModoButtonSpec
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import logcat.logcat
 
 internal const val COUNTER_DELAY_MS = 100L
 
 @Composable
-internal fun ButtonsScreenContent(
+internal fun Screen.ButtonsScreenContent(
     screenIndex: Int,
     screenName: String,
-    screenKey: ScreenKey,
     state: GroupedButtonsState,
     modifier: Modifier = Modifier,
 ) {
+    LogLifecycle()
     val counter by rememberCounterState()
     ButtonsScreenContent(screenIndex, screenName, counter, screenKey, state, modifier)
 }
@@ -84,15 +91,40 @@ internal fun ButtonsScreenContent(
 }
 
 @Composable
-internal fun SampleScreenContent(
+internal fun Screen.SampleScreenContent(
     screenIndex: Int,
     screenName: String,
     screenKey: ScreenKey,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    LogLifecycle()
     val counter by rememberCounterState()
     SampleScreenContent(screenIndex, screenName, counter, screenKey, modifier, content)
+}
+
+@OptIn(ExperimentalModoApi::class)
+@Composable
+fun Screen.LogLifecycle() {
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    // You will not be able to observe updates of lifecycleOwner when this content is not in the composition
+    DisposableEffect(lifecycleOwner) {
+        logcat(tag = "LifecycleDebug") { "$screenKey DisposableEffect" }
+        val observer = LifecycleEventObserver { _, event ->
+            logcat(tag = "LifecycleDebug") { "$screenKey DisposableEffect $event" }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            logcat(tag = "LifecycleDebug") { "$screenKey DisposableEffect onDispose" }
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+    LifecycleScreenEffect {
+        LifecycleEventObserver { source, event ->
+            logcat(tag = "LifecycleDebug") { "$screenKey LifecycleScreenEffect $event" }
+        }
+    }
 }
 
 @Composable

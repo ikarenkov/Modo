@@ -12,6 +12,7 @@ import com.github.terrakok.modo.sample.screens.GroupedButtonsState
 import com.github.terrakok.modo.sample.screens.MainScreen
 import com.github.terrakok.modo.sample.screens.ModoButtonSpec
 import com.github.terrakok.modo.sample.screens.base.ButtonsScreenContent
+import com.github.terrakok.modo.sample.screens.base.LogLifecycle
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.StackNavContainer
 import com.github.terrakok.modo.stack.forward
@@ -24,16 +25,16 @@ class DialogsPlayground(
 ) : Screen {
     @Composable
     override fun Content(modifier: Modifier) {
-        DialogsPlaygroundContent(screenIndex, screenKey)
+        DialogsPlaygroundContent(screenIndex)
     }
 }
 
 @Composable
-internal fun DialogsPlaygroundContent(screenIndex: Int, screenKey: ScreenKey, modifier: Modifier = Modifier) {
+internal fun Screen.DialogsPlaygroundContent(screenIndex: Int, modifier: Modifier = Modifier) {
+    LogLifecycle()
     ButtonsScreenContent(
         screenIndex = screenIndex,
         screenName = "DialogsPlayground",
-        screenKey = screenKey,
         state = rememberDialogsButtons(LocalStackNavigation.current, screenIndex),
         modifier = modifier
     )

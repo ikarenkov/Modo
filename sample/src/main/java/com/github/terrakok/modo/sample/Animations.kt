@@ -1,6 +1,7 @@
 package com.github.terrakok.modo.sample
 
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -43,8 +44,8 @@ fun ComposeRendererScope<StackState>.SlideTransition(
                         StackTransitionType.Pop -> ({ size: Int -> -size }) to ({ size: Int -> size })
                         else -> ({ size: Int -> size }) to ({ size: Int -> -size })
                     }
-                    slideInHorizontally(initialOffsetX = initialOffset) togetherWith
-                        slideOutHorizontally(targetOffsetX = targetOffset)
+                    slideInHorizontally(initialOffsetX = initialOffset, animationSpec = tween(durationMillis = 1000)) togetherWith
+                        slideOutHorizontally(targetOffsetX = targetOffset, animationSpec = tween(durationMillis = 1000))
                 }
             }
         }

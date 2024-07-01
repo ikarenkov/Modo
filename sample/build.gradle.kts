@@ -39,6 +39,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
 
     implementation(libs.debug.logcat)
+    implementation(libs.kotlinx.coroutines.android)
 
     debugImplementation(libs.leakcanary.android)
 }

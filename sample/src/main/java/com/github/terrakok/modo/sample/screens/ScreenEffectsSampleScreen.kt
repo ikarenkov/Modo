@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -13,6 +14,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.eventFlow
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
@@ -25,6 +28,9 @@ import com.github.terrakok.modo.sample.screens.base.rememberCounterState
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.forward
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import logcat.logcat
 
@@ -34,7 +40,11 @@ class ScreenEffectsSampleScreen(
     override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
 
-    @OptIn(ExperimentalModoApi::class)
+    companion object {
+        private const val TAG = "ScreenEffectsSampleScreen"
+    }
+
+    @OptIn(ExperimentalModoApi::class, ExperimentalStdlibApi::class)
     @Composable
     override fun Content(modifier: Modifier) {
         var lifecycleEventsHistory by rememberSaveable {
@@ -42,20 +52,53 @@ class ScreenEffectsSampleScreen(
         }
         val scaffoldState = rememberScaffoldState()
         val counter by rememberCounterState()
-        // This effect is going to be launched once despite on activity recreation.
+
+        // This effect is going to be launched once per screen an triggered even if screen left composition!
+        // So be careful with passing any data to lambda which lifecycle is shorter than screen lifecycle.
+        // F.e. capturing context cause leak of the context.
         LaunchedScreenEffect {
+            // Doing so will cause a leak of the scaffoldState.
             scaffoldState.snackbarHostState.showSnackbar("LaunchedScreenEffect! Counter: $counter.")
         }
+        val lifecycleOwner = LocalLifecycleOwner.current
+        LaunchedEffect(Unit) {
+            // Otherwise you will lose ON_PAUSE, ON_STOP, ON_DESTROY events, because of peculiarities of coroutines -
+            // it removes lifecycle observer before handling effects
+            //
+            withContext(Dispatchers.Main.immediate) {
+                val dispatcher = coroutineContext[CoroutineDispatcher.Key]
+                logcat(TAG) { "LaunchedEffect $dispatcher" }
+                lifecycleOwner.lifecycle.eventFlow.collect { event ->
+                    logcat(TAG) { "LaunchedEffect: event $event. Counter: $counter." }
+                }
+            }
+        }
+//        DisposableEffect(this) {
+//            val observer = LifecycleEventObserver { _, event ->
+////                lifecycleEventsHistory += event
+//                logcat(TAG) { "DisposableEffect: event $event. Counter: $counter." }
+//            }
+//            lifecycleOwner.lifecycle.addObserver(observer)
+//            onDispose {
+//                lifecycleOwner.lifecycle.removeObserver(observer)
+//            }
+//        }
+//        DisposableEffect(this) {
+//            logcat(TAG) { "Analytics: screen created. Counter: $counter." }
+//            onDispose {
+//                logcat(TAG) { "Analytics: screen destroyed.  Counter: $counter." }
+//            }
+//        }
         LifecycleScreenEffect {
             LifecycleEventObserver { _, event ->
                 lifecycleEventsHistory += event
-                logcat { "Lifecycle event $event. Counter: $counter." }
+                logcat(TAG) { "LifecycleScreenEffect: event $event. Counter: $counter." }
             }
         }
         DisposableScreenEffect {
-            logcat { "Analytics: screen created. Counter: $counter." }
+            logcat(TAG) { "Analytics: screen created. Counter: $counter." }
             onDispose {
-                logcat { "Analytics: screen destroyed.  Counter: $counter." }
+                logcat(TAG) { "Analytics: screen destroyed.  Counter: $counter." }
             }
         }
         val navigation = LocalStackNavigation.current

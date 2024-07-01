@@ -7,15 +7,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
-import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
-import com.github.terrakok.modo.lifecycle.OnScreenRemoved
 import com.github.terrakok.modo.sample.ModoLegacyIntegrationActivity
 import com.github.terrakok.modo.sample.ModoSampleActivity
 import com.github.terrakok.modo.sample.fragment.ModoFragment
@@ -40,7 +35,6 @@ import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.forward
 import com.github.terrakok.modo.util.getActivity
 import kotlinx.parcelize.Parcelize
-import logcat.logcat
 
 @Parcelize
 class MainScreen(
@@ -52,14 +46,14 @@ class MainScreen(
     @OptIn(ExperimentalModoApi::class)
     @Composable
     override fun Content(modifier: Modifier) {
-        OnScreenRemoved {
-            logcat { "Screen $screenKey was removed" }
-        }
-        LifecycleScreenEffect {
-            LifecycleEventObserver { _: LifecycleOwner, event: Lifecycle.Event ->
-                logcat { "$screenKey: Lifecycle.Event $event" }
-            }
-        }
+//        OnScreenRemoved {
+//            logcat { "Screen $screenKey was removed" }
+//        }
+//        LifecycleScreenEffect {
+//            LifecycleEventObserver { _: LifecycleOwner, event: Lifecycle.Event ->
+//                logcat { "$screenKey: Lifecycle.Event $event" }
+//            }
+//        }
         MainScreenContent(
             screenIndex = screenIndex,
             screenKey = screenKey,
@@ -71,7 +65,7 @@ class MainScreen(
 }
 
 @Composable
-internal fun MainScreenContent(
+internal fun Screen.MainScreenContent(
     screenIndex: Int,
     screenKey: ScreenKey,
     navigation: StackNavContainer?,
@@ -81,7 +75,6 @@ internal fun MainScreenContent(
     ButtonsScreenContent(
         screenIndex = screenIndex,
         screenName = "MainScreen",
-        screenKey = screenKey,
         state = rememberButtons(
             screenKey = screenKey,
             navigation = navigation,
@@ -93,9 +86,8 @@ internal fun MainScreenContent(
 }
 
 @Composable
-internal fun MainScreenContent(
+internal fun Screen.MainScreenContent(
     screenIndex: Int,
-    screenKey: ScreenKey,
     counter: Int,
     navigation: StackNavContainer,
     modifier: Modifier = Modifier,

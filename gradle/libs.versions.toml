@@ -45,6 +45,8 @@ test-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", vers
 
 debug-logcat = { group = "com.squareup.logcat", name = "logcat", version = "0.1" }
 
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.8.1" }
+
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 android-tools-common = { group = "com.android.tools", name = "common", version.ref = "androidTools" }

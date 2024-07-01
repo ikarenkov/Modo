@@ -22,6 +22,7 @@ import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
 import com.github.terrakok.modo.sample.components.CancelButton
 import com.github.terrakok.modo.sample.randomBackground
+import com.github.terrakok.modo.sample.screens.base.LogLifecycle
 import com.github.terrakok.modo.sample.screens.base.rememberCounterState
 import kotlinx.parcelize.Parcelize
 import logcat.logcat
@@ -31,18 +32,13 @@ internal class InnerScreen(
     override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
 
-    @OptIn(ExperimentalModoApi::class)
     @Composable
     override fun Content(modifier: Modifier) {
         val parent = LocalSampleCustomNavigation.current
         val closeScreen by rememberUpdatedState {
             parent.dispatch(RemoveScreen(screenKey))
         }
-        LifecycleScreenEffect {
-            LifecycleEventObserver { _, event ->
-                logcat(tag = "InnerScreen Lifecycle") { "$screenKey $event" }
-            }
-        }
+        LogLifecycle()
         InnerContent(
             title = "Screen $screenKey",
             onRemoveClick = closeScreen,
