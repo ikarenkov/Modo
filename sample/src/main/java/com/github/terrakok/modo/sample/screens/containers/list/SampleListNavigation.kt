@@ -26,6 +26,7 @@ import kotlinx.parcelize.Parcelize
  */
 @Parcelize
 internal class SampleListNavigation(
+    @Suppress("MagicNumber")
     private val navModel: ListNavModel = ListNavModel(List(5) { ListInnerScreen() })
 ) : ListNavigationContainerScreen(navModel) {
 
