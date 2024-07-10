@@ -31,6 +31,7 @@ val defaultRendererContent: (@Composable ComposeRendererScope<*>.(screenModifier
 val LocalSaveableStateHolder = staticCompositionLocalOf<SaveableStateHolder?> { null }
 
 private val LocalBeforeScreenContentOnDispose = staticCompositionLocalOf<() -> Unit> { error("No LocalBeforeScreenContentOnDispose provided!") }
+
 private val LocalAfterScreenContentOnDispose = staticCompositionLocalOf<() -> Unit> { error("No LocalAfterScreenContentOnDispose provided!") }
 
 /**
@@ -129,13 +130,17 @@ internal class ComposeRenderer<State : NavigationState>(
         val stateHolder: SaveableStateHolder = LocalSaveableStateHolder.currentOrThrow
 
         val beforeScreenContentOnDispose = remember {
-            { clearScreens(stateHolder) }
+            {
+                clearScreens(stateHolder)
+            }
         }
 
         // pre dispose means that we can send ON_DISPOSE if screen is removing,
         // to let Screen.Content to handle ON_DISPOSE by using functions like DisposableEffect
         val afterScreenContentOnDispose = remember {
-            { afterScreenContentOnDispose() }
+            {
+                afterScreenContentOnDispose()
+            }
         }
 
         CompositionLocalProvider(
