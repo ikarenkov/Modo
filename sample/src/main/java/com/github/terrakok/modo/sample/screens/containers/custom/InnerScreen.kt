@@ -13,19 +13,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LifecycleEventObserver
-import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.LocalContainerScreen
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
-import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
 import com.github.terrakok.modo.sample.components.CancelButton
 import com.github.terrakok.modo.sample.randomBackground
 import com.github.terrakok.modo.sample.screens.base.LogLifecycle
 import com.github.terrakok.modo.sample.screens.base.rememberCounterState
 import kotlinx.parcelize.Parcelize
-import logcat.logcat
 
 @Parcelize
 internal class InnerScreen(

@@ -30,9 +30,13 @@ val defaultRendererContent: (@Composable ComposeRendererScope<*>.(screenModifier
 
 val LocalSaveableStateHolder = staticCompositionLocalOf<SaveableStateHolder?> { null }
 
-private val LocalBeforeScreenContentOnDispose = staticCompositionLocalOf<() -> Unit> { error("No LocalBeforeScreenContentOnDispose provided!") }
+private val LocalBeforeScreenContentOnDispose = staticCompositionLocalOf<() -> Unit> {
+    error("No LocalBeforeScreenContentOnDispose provided!")
+}
 
-private val LocalAfterScreenContentOnDispose = staticCompositionLocalOf<() -> Unit> { error("No LocalAfterScreenContentOnDispose provided!") }
+private val LocalAfterScreenContentOnDispose = staticCompositionLocalOf<() -> Unit> {
+    error("No LocalAfterScreenContentOnDispose provided!")
+}
 
 /**
  * Provides integration of [Screen] to Modo's navigation system:
