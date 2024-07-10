@@ -7,7 +7,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
-import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
@@ -43,7 +42,6 @@ class MainScreen(
     override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
 
-    @OptIn(ExperimentalModoApi::class)
     @Composable
     override fun Content(modifier: Modifier) {
 //        OnScreenRemoved {

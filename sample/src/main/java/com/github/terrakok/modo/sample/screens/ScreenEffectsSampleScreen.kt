@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,7 +21,6 @@ import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
-import com.github.terrakok.modo.lifecycle.DisposableScreenEffect
 import com.github.terrakok.modo.lifecycle.LaunchedScreenEffect
 import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
 import com.github.terrakok.modo.sample.screens.base.SampleScreenContent
@@ -62,9 +62,9 @@ class ScreenEffectsSampleScreen(
         }
         val lifecycleOwner = LocalLifecycleOwner.current
         LaunchedEffect(Unit) {
-            // Otherwise you will lose ON_PAUSE, ON_STOP, ON_DESTROY events, because of peculiarities of coroutines -
-            // it removes lifecycle observer before handling effects
-            //
+            // Use Dispatchers.Main.immediate, otherwise you will lose ON_PAUSE, ON_STOP, ON_DESTROY events,
+            // because of peculiarities of coroutines - it removes lifecycle observer before handling effects
+            // You can try out and remove Dispatchers.Main.immediate to see the difference.
             withContext(Dispatchers.Main.immediate) {
                 val dispatcher = coroutineContext[CoroutineDispatcher.Key]
                 logcat(TAG) { "LaunchedEffect $dispatcher" }
@@ -73,32 +73,20 @@ class ScreenEffectsSampleScreen(
                 }
             }
         }
-//        DisposableEffect(this) {
-//            val observer = LifecycleEventObserver { _, event ->
-////                lifecycleEventsHistory += event
-//                logcat(TAG) { "DisposableEffect: event $event. Counter: $counter." }
-//            }
-//            lifecycleOwner.lifecycle.addObserver(observer)
-//            onDispose {
-//                lifecycleOwner.lifecycle.removeObserver(observer)
-//            }
-//        }
-//        DisposableEffect(this) {
-//            logcat(TAG) { "Analytics: screen created. Counter: $counter." }
-//            onDispose {
-//                logcat(TAG) { "Analytics: screen destroyed.  Counter: $counter." }
-//            }
-//        }
+        DisposableEffect(this) {
+            val observer = LifecycleEventObserver { _, event ->
+                logcat(TAG) { "DisposableEffect: event $event. Counter: $counter." }
+            }
+            lifecycleOwner.lifecycle.addObserver(observer)
+            onDispose {
+                logcat(TAG) { "DisposableEffect: on dispose" }
+                lifecycleOwner.lifecycle.removeObserver(observer)
+            }
+        }
         LifecycleScreenEffect {
             LifecycleEventObserver { _, event ->
                 lifecycleEventsHistory += event
                 logcat(TAG) { "LifecycleScreenEffect: event $event. Counter: $counter." }
-            }
-        }
-        DisposableScreenEffect {
-            logcat(TAG) { "Analytics: screen created. Counter: $counter." }
-            onDispose {
-                logcat(TAG) { "Analytics: screen destroyed.  Counter: $counter." }
             }
         }
         val navigation = LocalStackNavigation.current

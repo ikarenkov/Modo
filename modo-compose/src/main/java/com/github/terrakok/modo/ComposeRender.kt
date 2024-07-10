@@ -1,6 +1,5 @@
 package com.github.terrakok.modo
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -64,7 +63,7 @@ private inline fun Screen.BeforeScreenContent() {
         displayingScreensBeforeScreenContent[this@BeforeScreenContent] = Unit
         onDispose {
             displayingScreensBeforeScreenContent -= this@BeforeScreenContent
-            Log.d("LifecycleDebug", "BeforeScreenContent $screenKey onDispose")
+//            Log.d("LifecycleDebug", "BeforeScreenContent $screenKey onDispose")
             onDisposed.invoke()
         }
     }
@@ -77,7 +76,7 @@ private inline fun Screen.AfterScreenContent() {
         displayingScreensAfterScreenContent[this@AfterScreenContent] = Unit
         onDispose {
             displayingScreensAfterScreenContent -= this@AfterScreenContent
-            Log.d("LifecycleDebug", "AfterScreenContent $screenKey onDispose")
+//            Log.d("LifecycleDebug", "AfterScreenContent $screenKey onDispose")
             onPreDispose()
         }
     }

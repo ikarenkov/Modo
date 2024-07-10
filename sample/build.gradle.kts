@@ -34,6 +34,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtimeKtx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.fragment)
 
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.material3)
