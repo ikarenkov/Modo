@@ -52,7 +52,7 @@ class SystemDialogWithCustomDimSample(
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White)
             ) {
-                DialogsPlaygroundContent(screenIndex, screenKey)
+                DialogsPlaygroundContent(screenIndex)
             }
         }
     }

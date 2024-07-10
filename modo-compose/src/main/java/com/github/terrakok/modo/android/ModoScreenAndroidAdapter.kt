@@ -36,22 +36,30 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import com.github.terrakok.modo.Screen
+import com.github.terrakok.modo.lifecycle.LifecycleDependency
 import com.github.terrakok.modo.model.ScreenModelStore
+import com.github.terrakok.modo.model.ScreenModelStore.remove
 import com.github.terrakok.modo.util.getActivity
 import com.github.terrakok.modo.util.getApplication
 import java.util.concurrent.atomic.AtomicReference
 
 /**
- * Adapter to link modo with android. It the single instance of [ModoScreenAndroidAdapter] per Screen.
+ * Adapter for Screem, to support android-related features using Modo, such as:
+ * 1. ViewModel support
+ * 2. Lifecycle support
+ * 3. SavedState support
+ *
+ * It the single instance of [ModoScreenAndroidAdapter] per Screen.
  */
 class ModoScreenAndroidAdapter private constructor(
 //    just for debug purpose.
-//    internal val screen: Screen
+    internal val screen: Screen
 ) :
     LifecycleOwner,
     ViewModelStoreOwner,
     SavedStateRegistryOwner,
-    HasDefaultViewModelProviderFactory {
+    HasDefaultViewModelProviderFactory,
+    LifecycleDependency {
 
     override val lifecycle: LifecycleRegistry = LifecycleRegistry(this)
 
@@ -118,20 +126,33 @@ class ModoScreenAndroidAdapter private constructor(
     ) {
         val context: Context = LocalContext.current
         val parentLifecycleOwner = LocalLifecycleOwner.current
-        LifecycleDisposableEffect(context, parentLifecycleOwner)
-        @Suppress("SpreadOperator")
-        CompositionLocalProvider(*getProviders()) {
-            content()
+        LifecycleDisposableEffect(context, parentLifecycleOwner) {
+            @Suppress("SpreadOperator")
+            CompositionLocalProvider(*getProviders()) {
+                content()
+            }
         }
     }
 
-    @Suppress("UnusedParameter")
-    fun onDispose(screen: Screen) {
-        viewModelStore.clear()
+    /**
+     * Must be called before [remove] to inform that this screen is going to be removed.
+     * We need it to provide support of using DisposableEffect or/and LaunchedEffect inside [Screen.Content].
+     * F.e. to be able to collect ON_DISPOSE lifecycle event.
+     */
+    override fun onPreDispose() {
+//        Log.d("LifecycleDebug", "${screen.screenKey} ModoScreenAndroidAdapter.onPreDispose, emit ON_DESTROY event.")
         disposeEvents.forEach { event ->
             lifecycle.safeHandleLifecycleEvent(event)
         }
     }
+
+    @Suppress("UnusedParameter")
+    private fun onDispose() {
+//        Log.d("LifecycleDebug", "${screen.screenKey} ModoScreenAndroidAdapter.onDispose. Clear ViewModelStore.")
+        viewModelStore.clear()
+    }
+
+    override fun toString(): String = "${ModoScreenAndroidAdapter::class.simpleName}, screenKey: ${screen.screenKey}"
 
     private fun performSave(outState: Bundle) {
         controller.performSave(outState)
@@ -188,6 +209,7 @@ class ModoScreenAndroidAdapter private constructor(
     private fun LifecycleDisposableEffect(
         context: Context,
         parentLifecycleOwner: LifecycleOwner,
+        content: @Composable () -> Unit
     ) {
         val activity = remember(context) {
             context.getActivity()
@@ -196,6 +218,8 @@ class ModoScreenAndroidAdapter private constructor(
         if (!isCreated) {
             onCreate(savedState) // do this in the UI thread to force it to be called before anything else
         }
+
+        content()
 
         DisposableEffect(this) {
             val unregisterLifecycle = registerParentLifecycleListener(parentLifecycleOwner) {
@@ -225,6 +249,7 @@ class ModoScreenAndroidAdapter private constructor(
             emitOnStartEvents()
 
             onDispose {
+//                Log.d("LifecycleDebug", "ModoScreenAndroidAdapter registerParentLifecycleListener onDispose ${screen.screenKey}")
                 unregisterLifecycle()
                 // when the screen goes to stack, perform save
                 performSave(savedState)
@@ -275,7 +300,7 @@ class ModoScreenAndroidAdapter private constructor(
             ScreenModelStore.getOrPutDependency(
                 screen = screen,
                 name = "AndroidScreenLifecycleOwner",
-                onDispose = { it.onDispose(screen) }
-            ) { ModoScreenAndroidAdapter() }
+                onDispose = { it.onDispose() },
+            ) { ModoScreenAndroidAdapter(screen) }
     }
 }

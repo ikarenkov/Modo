@@ -35,6 +35,7 @@ import com.github.terrakok.modo.ReducerAction
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import kotlinx.parcelize.Parcelize
+import logcat.logcat
 
 @Stable
 @Parcelize
@@ -144,14 +145,18 @@ internal class SampleCustomContainerScreen(
     ): @Composable (item: Screen) -> Unit {
         val screens = navigationState.screens
         val composedItems = remember { mutableStateMapOf<Screen, @Composable () -> Unit>() }
-        DisposableEffect(key1 = this) {
+        DisposableEffect(key1 = screens) {
+            logcat { "movableScreen" }
             val movableContentScreens = composedItems.keys
             val actualScreens = screens.toSet()
             val removedScreens = movableContentScreens - actualScreens
             removedScreens.forEach {
                 composedItems -= it
             }
-            onDispose {}
+            logcat { "movableScreen Removed screens: $removedScreens" }
+            onDispose {
+                logcat { "movableScreen onDispose Removed screens: $removedScreens" }
+            }
         }
         return { item: Screen ->
             composedItems.getOrPut(item) {

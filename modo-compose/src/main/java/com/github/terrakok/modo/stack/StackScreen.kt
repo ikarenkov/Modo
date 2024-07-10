@@ -19,7 +19,6 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogWindowProvider
 import androidx.core.view.WindowCompat
-import com.github.terrakok.modo.ComposeRenderer
 import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
@@ -148,11 +147,6 @@ abstract class StackScreen(
                     onDismissRequest = { back() },
                     properties = dialogConfig.dialogProperties
                 ) {
-                    DisposableEffect(Unit) {
-                        onDispose {
-                            (renderer as ComposeRenderer).transitionCompleteChannel.trySend(Unit)
-                        }
-                    }
                     val parent = LocalView.current.parent
                     DisposableEffect(parent) {
                         (parent as? DialogWindowProvider)?.window?.let { window ->

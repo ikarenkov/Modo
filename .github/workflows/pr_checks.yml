@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - "dev"
+      - "releases/**"
 jobs:
   static-analysis-check:
     name: Static code analysis

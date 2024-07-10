@@ -1,6 +1,6 @@
 [versions]
 leakcanaryAndroid = "2.14"
-modo = "0.9.0"
+modo = "0.10.0-alpha1"
 androidGradlePlugin = "8.4.0"
 detektComposeVersion = "0.3.20"
 detektVersion = "1.23.6"
@@ -44,6 +44,8 @@ leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", ve
 test-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version = "5.10.1" }
 
 debug-logcat = { group = "com.squareup.logcat", name = "logcat", version = "0.1" }
+
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.8.1" }
 
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
