@@ -12,3 +12,6 @@ certain cases:
     * Check pause, stop. dispose - 2 fast back or replace
     * Check create, start, resume - 2 fast forward or replace
 * Movable content test
+* Check lifecycle order in nested screens when activity/fragment recreated, by rotating the screen. Following rules should be applied:
+    * Parent screens events ON_CREATE, ON_START, ON_RESUME should be called before child screens events
+    * Parent screens events ON_PAUSE, ON_STOP, ON_DESTROY should be called after child screens events

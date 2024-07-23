@@ -219,6 +219,11 @@ class ModoScreenAndroidAdapter private constructor(
             onCreate(savedState) // do this in the UI thread to force it to be called before anything else
         }
 
+        DisposableEffect(this) {
+            emitOnStartEvents()
+            onDispose { }
+        }
+
         content()
 
         DisposableEffect(this) {
@@ -245,8 +250,6 @@ class ModoScreenAndroidAdapter private constructor(
                     lifecycle.safeHandleLifecycleEvent(event)
                 }
             }
-
-            emitOnStartEvents()
 
             onDispose {
 //                Log.d("LifecycleDebug", "ModoScreenAndroidAdapter registerParentLifecycleListener onDispose ${screen.screenKey}")
