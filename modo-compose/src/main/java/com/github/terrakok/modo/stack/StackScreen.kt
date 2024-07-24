@@ -72,6 +72,8 @@ abstract class StackScreen(
         dialogModifier: Modifier = Modifier,
         content: RendererContent<StackState> = defaultRendererContent
     ) {
+        StackBackHandler()
+
         val screensToRender: ScreensToRender by rememberScreensToRender()
         screensToRender.screen?.let { screen ->
             Content(screen, modifier, content)
@@ -132,6 +134,18 @@ abstract class StackScreen(
     }
 
     @Composable
+    private fun StackBackHandler() {
+        val isBackHandlerEnabled by remember {
+            derivedStateOf {
+                defaultBackHandler && navigationState.getChildScreens().size > 1
+            }
+        }
+        BackHandler(enabled = isBackHandlerEnabled) {
+            back()
+        }
+    }
+
+    @Composable
     @OptIn(ExperimentalModoApi::class)
     private fun StackScreen.RenderDialog(
         dialog: DialogScreen,
@@ -174,14 +188,6 @@ abstract class StackScreen(
         modifier: Modifier = Modifier,
         content: RendererContent<StackState> = defaultRendererContent
     ) {
-        val isBackHandlerEnabled by remember {
-            derivedStateOf {
-                defaultBackHandler && navigationState.getChildScreens().size > 1
-            }
-        }
-        BackHandler(enabled = isBackHandlerEnabled) {
-            back()
-        }
         super.InternalContent(screen, modifier, content)
     }
 
