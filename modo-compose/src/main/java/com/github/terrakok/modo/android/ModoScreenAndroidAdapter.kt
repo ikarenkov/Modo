@@ -18,6 +18,12 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.lifecycle.HasDefaultViewModelProviderFactory
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Lifecycle.Event.ON_CREATE
+import androidx.lifecycle.Lifecycle.Event.ON_DESTROY
+import androidx.lifecycle.Lifecycle.Event.ON_PAUSE
+import androidx.lifecycle.Lifecycle.Event.ON_RESUME
+import androidx.lifecycle.Lifecycle.Event.ON_START
+import androidx.lifecycle.Lifecycle.Event.ON_STOP
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -99,34 +105,14 @@ class ModoScreenAndroidAdapter private constructor(
         enableSavedStateHandles()
     }
 
-    private fun onCreate(savedState: Bundle?) {
-        check(!isCreated) { "onCreate already called" }
-        isCreated = true
-        controller.performRestore(savedState)
-        initEvents.forEach {
-            lifecycle.safeHandleLifecycleEvent(it)
-        }
-    }
-
-    private fun emitOnStartEvents() {
-        startEvents.forEach {
-            lifecycle.safeHandleLifecycleEvent(it)
-        }
-    }
-
-    private fun emitOnStopEvents() {
-        stopEvents.forEach {
-            lifecycle.safeHandleLifecycleEvent(it)
-        }
-    }
-
     @Composable
     fun ProvideAndroidIntegration(
-        content: @Composable () -> Unit
+        manualResumePause: Boolean = false,
+        content: @Composable () -> Unit,
     ) {
         val context: Context = LocalContext.current
         val parentLifecycleOwner = LocalLifecycleOwner.current
-        LifecycleDisposableEffect(context, parentLifecycleOwner) {
+        LifecycleDisposableEffect(context, parentLifecycleOwner, manualResumePause) {
             @Suppress("SpreadOperator")
             CompositionLocalProvider(*getProviders()) {
                 content()
@@ -141,10 +127,18 @@ class ModoScreenAndroidAdapter private constructor(
      */
     override fun onPreDispose() {
 //        Log.d("LifecycleDebug", "${screen.screenKey} ModoScreenAndroidAdapter.onPreDispose, emit ON_DESTROY event.")
-        disposeEvents.forEach { event ->
-            lifecycle.safeHandleLifecycleEvent(event)
-        }
+        safeHandleLifecycleEvent(ON_DESTROY)
     }
+
+    override fun onPause() {
+        safeHandleLifecycleEvent(ON_PAUSE)
+    }
+
+    override fun onResume() {
+        safeHandleLifecycleEvent(ON_RESUME)
+    }
+
+    override fun toString(): String = "${ModoScreenAndroidAdapter::class.simpleName}, screenKey: ${screen.screenKey}"
 
     @Suppress("UnusedParameter")
     private fun onDispose() {
@@ -152,7 +146,12 @@ class ModoScreenAndroidAdapter private constructor(
         viewModelStore.clear()
     }
 
-    override fun toString(): String = "${ModoScreenAndroidAdapter::class.simpleName}, screenKey: ${screen.screenKey}"
+    private fun onCreate(savedState: Bundle?) {
+        check(!isCreated) { "onCreate already called" }
+        isCreated = true
+        controller.performRestore(savedState)
+        safeHandleLifecycleEvent(ON_CREATE)
+    }
 
     private fun performSave(outState: Bundle) {
         controller.performSave(outState)
@@ -209,6 +208,7 @@ class ModoScreenAndroidAdapter private constructor(
     private fun LifecycleDisposableEffect(
         context: Context,
         parentLifecycleOwner: LifecycleOwner,
+        manualResumePause: Boolean,
         content: @Composable () -> Unit
     ) {
         val activity = remember(context) {
@@ -220,7 +220,10 @@ class ModoScreenAndroidAdapter private constructor(
         }
 
         DisposableEffect(this) {
-            emitOnStartEvents()
+            safeHandleLifecycleEvent(ON_START)
+            if (!manualResumePause) {
+                safeHandleLifecycleEvent(ON_RESUME)
+            }
             onDispose { }
         }
 
@@ -228,26 +231,20 @@ class ModoScreenAndroidAdapter private constructor(
 
         DisposableEffect(this) {
             val unregisterLifecycle = registerParentLifecycleListener(parentLifecycleOwner) {
-                LifecycleEventObserver { owner, event ->
-                    when {
-                        /**
-                         * Instance of the screen isn't recreated during config changes so skip this event
-                         * to avoid crash while accessing to ViewModel with SavedStateHandle, because after
-                         * ON_DESTROY, [androidx.lifecycle.SavedStateHandleController] is marked as not
-                         * attached and next call of [registerSavedStateProvider] after recreating Activity
-                         * on the same instance causing the crash.
-                         *
-                         * Also when activity is destroyed, but not finished, screen is not destroyed.
-                         *
-                         * In the case of Fragments, we unsubscribe before ON_DESTROY event, so there is no problem with this.
-                         */
-                        event == Lifecycle.Event.ON_DESTROY && (activity?.isFinishing == false || activity?.isChangingConfigurations == true) ->
-                            return@LifecycleEventObserver
-                        // when the Application goes to background, perform save
-                        event == Lifecycle.Event.ON_STOP ->
-                            performSave(savedState)
+                LifecycleEventObserver { _, event ->
+                    // when the Application goes to background, perform save
+                    if (event == ON_STOP) {
+                        performSave(savedState)
                     }
-                    lifecycle.safeHandleLifecycleEvent(event)
+                    if (
+                        needPropagateLifecycleEventFromParent(
+                            event,
+                            isActivityFinishing = activity?.isFinishing,
+                            isChangingConfigurations = activity?.isChangingConfigurations
+                        )
+                    ) {
+                        safeHandleLifecycleEvent(event)
+                    }
                 }
             }
 
@@ -257,43 +254,34 @@ class ModoScreenAndroidAdapter private constructor(
                 // when the screen goes to stack, perform save
                 performSave(savedState)
                 // notify lifecycle screen listeners
-                emitOnStopEvents()
+                if (!manualResumePause) {
+                    safeHandleLifecycleEvent(ON_PAUSE)
+                }
+                safeHandleLifecycleEvent(ON_STOP)
             }
         }
     }
 
-    private fun LifecycleRegistry.safeHandleLifecycleEvent(event: Lifecycle.Event) {
-        val currentState = currentState
-        val skippEvent = !currentState.isAtLeast(Lifecycle.State.INITIALIZED) ||
-            // Protection from double event sending from the parent
-            ((event in startEvents || event in initEvents) && event.targetState <= currentState) ||
-            (event in stopEvents && event.targetState >= currentState)
-
-        // For debugging
-//        Log.d("ModoScreenAndroidAdapter", "safeHandleLifecycleEvent ${screen.screenKey} $event")
+    private fun safeHandleLifecycleEvent(event: Lifecycle.Event) {
+        val skippEvent = needSkipEvent(lifecycle.currentState, event)
         if (!skippEvent) {
-            handleLifecycleEvent(event)
+//            Log.d("ModoScreenAndroidAdapter", "${screen.screenKey} handleLifecycleEvent $event")
+            lifecycle.handleLifecycleEvent(event)
         }
     }
 
     companion object {
 
-        private val initEvents = arrayOf(
-            Lifecycle.Event.ON_CREATE
+        private val moveLifecycleStateUpEvents = setOf(
+            ON_CREATE,
+            ON_START,
+            ON_RESUME
         )
 
-        private val startEvents = arrayOf(
-            Lifecycle.Event.ON_START,
-            Lifecycle.Event.ON_RESUME
-        )
-
-        private val stopEvents = arrayOf(
-            Lifecycle.Event.ON_PAUSE,
-            Lifecycle.Event.ON_STOP
-        )
-
-        private val disposeEvents = arrayOf(
-            Lifecycle.Event.ON_DESTROY
+        private val moveLifecycleStateDownEvents = setOf(
+            ON_STOP,
+            ON_PAUSE,
+            ON_DESTROY
         )
 
         /**
@@ -302,8 +290,38 @@ class ModoScreenAndroidAdapter private constructor(
         fun get(screen: Screen): ModoScreenAndroidAdapter =
             ScreenModelStore.getOrPutDependency(
                 screen = screen,
-                name = "AndroidScreenLifecycleOwner",
+                name = LifecycleDependency.KEY,
                 onDispose = { it.onDispose() },
             ) { ModoScreenAndroidAdapter(screen) }
+
+        fun needPropagateLifecycleEventFromParent(
+            event: Lifecycle.Event,
+            isActivityFinishing: Boolean?,
+            isChangingConfigurations: Boolean?
+        ) =
+            /*
+             * Instance of the screen isn't recreated during config changes so skip this event
+             * to avoid crash while accessing to ViewModel with SavedStateHandle, because after
+             * ON_DESTROY, [androidx.lifecycle.SavedStateHandleController] is marked as not
+             * attached and next call of [registerSavedStateProvider] after recreating Activity
+             * on the same instance causing the crash.
+             *
+             * Also, when activity is destroyed, but not finished, screen is not destroyed.
+             *
+             * In the case of Fragments, we unsubscribe before ON_DESTROY event, so there is no problem with this.
+             */
+            if (event == ON_DESTROY && (isActivityFinishing == false || isChangingConfigurations == true)) {
+                false
+            } else {
+                // Parent can only move lifecycle state down. Because parent cant be already resumed, but child is not, because of running animation.
+                event !in moveLifecycleStateUpEvents
+            }
+
+        private fun needSkipEvent(currentState: Lifecycle.State, event: Lifecycle.Event) =
+            !currentState.isAtLeast(Lifecycle.State.INITIALIZED) ||
+                // Skipping events that moves lifecycle state up, but this state is already reached.
+                (event in moveLifecycleStateUpEvents && event.targetState <= currentState) ||
+                // Skipping events that moves lifecycle state down, but this state is already reached.
+                (event in moveLifecycleStateDownEvents && event.targetState >= currentState)
     }
 }
