@@ -287,6 +287,7 @@ class ModoScreenAndroidAdapter private constructor(
         /**
          * Creates delegate for integration with android for the given [screen] or returns existed from cache.
          */
+        @JvmStatic
         fun get(screen: Screen): ModoScreenAndroidAdapter =
             ScreenModelStore.getOrPutDependency(
                 screen = screen,
@@ -294,6 +295,7 @@ class ModoScreenAndroidAdapter private constructor(
                 onDispose = { it.onDispose() },
             ) { ModoScreenAndroidAdapter(screen) }
 
+        @JvmStatic
         fun needPropagateLifecycleEventFromParent(
             event: Lifecycle.Event,
             isActivityFinishing: Boolean?,
@@ -317,6 +319,7 @@ class ModoScreenAndroidAdapter private constructor(
                 event !in moveLifecycleStateUpEvents
             }
 
+        @JvmStatic
         private fun needSkipEvent(currentState: Lifecycle.State, event: Lifecycle.Event) =
             !currentState.isAtLeast(Lifecycle.State.INITIALIZED) ||
                 // Skipping events that moves lifecycle state up, but this state is already reached.
