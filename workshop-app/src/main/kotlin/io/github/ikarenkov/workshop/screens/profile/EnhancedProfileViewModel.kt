@@ -6,10 +6,8 @@ import io.github.ikarenkov.workshop.core.mapStateFlow
 import io.github.ikarenkov.workshop.data.ClimberProfileRepository
 import io.github.ikarenkov.workshop.domain.ClimberProfile
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
 class EnhancedProfileViewModel(
-    private val enhancedProfileScreen: EnhancedProfileScreen,
     private val climberProfileRepository: ClimberProfileRepository
 ) : ViewModel() {
 
@@ -17,20 +15,6 @@ class EnhancedProfileViewModel(
         .mapStateFlow(viewModelScope) {
             it.toUiState()
         }
-
-    init {
-        viewModelScope.launch {
-            climberProfileRepository.climberProfile.collect { profile ->
-                enhancedProfileScreen.dispatch(
-                    EnhancedProfileNavigationAction(
-                        showClimberProfile = profile.dateOfBirth != null,
-                        showBoulderLever = profile.boulderLevel.hasAllGrades(),
-                        showLeadLevel = profile.sportLevel.hasAllGrades()
-                    )
-                )
-            }
-        }
-    }
 
     private fun ClimberProfile.toUiState(): UiState = UiState(
         name = name,

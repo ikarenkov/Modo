@@ -20,8 +20,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.NavModel
+import com.github.terrakok.modo.NavigationAction
 import com.github.terrakok.modo.NavigationState
-import com.github.terrakok.modo.ReducerAction
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.lazylist.screenItem
 import com.github.terrakok.modo.stack.LocalStackNavigation
@@ -33,21 +33,26 @@ import io.github.ikarenkov.workshop.screens.personal_data.ClimberPersonalInfoScr
 import io.github.ikarenkov.workshop.screens.profile_setup.ProfileSetupFlowScreenFinal
 import kotlinx.parcelize.Parcelize
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
 
 @Parcelize
 class EnhancedProfileScreen(
-    private val navModel: NavModel<EnhancedProfileNavigationState, EnhancedProfileNavigationAction> = NavModel(EnhancedProfileNavigationState())
-) : ContainerScreen<EnhancedProfileNavigationState, EnhancedProfileNavigationAction>(
+    private val navModel: NavModel<EnhancedProfileNavigationState, EnhancedProfileNavigationActionNoOp> = NavModel(
+        // TODO: Workshop 6.2.4 - set initial state
+        EnhancedProfileNavigationState(
+            ClimberPersonalInfoScreen(),
+            ClimbingLevelScreen(ClimbingType.Sport),
+            ClimbingLevelScreen(ClimbingType.Bouldering),
+        )
+    )
+// TODO: Workshop 6.2.1 - inherit from ContainerScreen
+) : ContainerScreen<EnhancedProfileNavigationState, EnhancedProfileNavigationActionNoOp>(
     navModel
 ) {
 
     @Composable
     override fun Content(modifier: Modifier) {
         val navigation = LocalStackNavigation.current
-        val viewModel = koinViewModel<EnhancedProfileViewModel>() {
-            parametersOf(this)
-        }
+        val viewModel = koinViewModel<EnhancedProfileViewModel>()
         val state by viewModel.state.collectAsState()
         EnhancedProfileContent(
             name = state.name.orEmpty(),
@@ -61,6 +66,7 @@ class EnhancedProfileScreen(
             },
             modifier = modifier
         ) {
+            // TODO: Workshop 6.2.5 - display screens inside LazyList using build-in fun screenItem and InternalContent(screen)
             navigationState.climbingProfileScreen?.let { screen ->
                 screenItem(screen) {
                     Card {
@@ -87,7 +93,7 @@ class EnhancedProfileScreen(
 }
 
 @Composable
-private fun EnhancedProfileContent(
+fun EnhancedProfileContent(
     name: String,
     description: String,
     finishedClimbingSetup: Boolean,
@@ -146,6 +152,7 @@ private fun EnhancedProfileContent(
     }
 }
 
+// TODO: Workshop 6.2.2 - define navigation state
 @Parcelize
 data class EnhancedProfileNavigationState(
     val climbingProfileScreen: ClimberPersonalInfoScreen? = null,
@@ -161,30 +168,8 @@ data class EnhancedProfileNavigationState(
 
 }
 
-class EnhancedProfileNavigationAction(
-    private val showClimberProfile: Boolean,
-    private val showLeadLevel: Boolean,
-    private val showBoulderLever: Boolean,
-) : ReducerAction<EnhancedProfileNavigationState> {
-    override fun reduce(oldState: EnhancedProfileNavigationState): EnhancedProfileNavigationState = oldState.copy(
-        climbingProfileScreen = if (showClimberProfile) {
-            oldState.climbingProfileScreen ?: ClimberPersonalInfoScreen()
-        } else {
-            null
-        },
-        sportLevelScreen = if (showLeadLevel) {
-            oldState.sportLevelScreen ?: ClimbingLevelScreen(ClimbingType.Sport)
-        } else {
-            null
-        },
-        boulderingLevelScreen = if (showBoulderLever) {
-            oldState.boulderingLevelScreen ?: ClimbingLevelScreen(ClimbingType.Bouldering)
-        } else {
-            null
-        }
-    )
-
-}
+// TODO: Workshop 6.2.3 - define navigation action
+class EnhancedProfileNavigationActionNoOp() : NavigationAction<EnhancedProfileNavigationState>
 
 @Preview
 @Composable
