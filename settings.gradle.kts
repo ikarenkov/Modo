@@ -12,6 +12,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://jitpack.io")
     }
 }
 
@@ -20,3 +21,4 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 include(":modo-compose")
 include(":sample")
+include(":workshop-app")

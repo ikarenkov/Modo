@@ -227,7 +227,7 @@ data class DialogPlaceHolder(
     override fun Content(modifier: Modifier) {
         Box(
             // ignore modifier, because it is just invisible placeholder
-            Modifier.fillMaxSize()
+            modifier
         )
     }
 

@@ -18,6 +18,7 @@ kotlin = "1.9.23"
 kotlinCompilerExtension = "1.5.12"
 minSdk = "21"
 compileSdk = "34"
+koin = "4.0.0-RC1"
 
 [libraries]
 androidx-compose-bom-modo = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBomModo" }
@@ -54,6 +55,8 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "a
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 detektPlugin = { group = "io.gitlab.arturbosch.detekt", name = "detekt-gradle-plugin", version.ref = "detektVersion" }
 
+koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
+koin-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
 [plugins]
 modo-detekt = { id = "modo-detekt", version = "unspecified" }
 modo-android-library = { id = "modo-android-library", version = "unspecified" }
