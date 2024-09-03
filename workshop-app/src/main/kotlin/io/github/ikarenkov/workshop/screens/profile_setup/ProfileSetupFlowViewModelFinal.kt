@@ -14,6 +14,7 @@ import io.github.ikarenkov.workshop.domain.ClimbingType
 import io.github.ikarenkov.workshop.screens.TrainingRecommendationsScreen
 import io.github.ikarenkov.workshop.screens.climbing_level.ClimbingLevelScreen
 import io.github.ikarenkov.workshop.screens.personal_data.ClimberPersonalInfoScreen
+import io.github.ikarenkov.workshop.screens.personal_data.ClimberPersonalInfoScreenFinal
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -59,7 +60,7 @@ class ProfileSetupFlowViewModelFinal(
 
     @Suppress("MagicNumber")
     fun getInitialScreensList(step: Int) = listOfNotNull(
-        ClimberPersonalInfoScreen(),
+        ClimberPersonalInfoScreenFinal(),
         if (step >= 2) ClimbingLevelScreen(ClimbingType.Sport) else null,
         if (step >= 3) ClimbingLevelScreen(ClimbingType.Bouldering) else null,
         if (step >= 4) TrainingRecommendationsScreen() else null
@@ -77,20 +78,11 @@ class ProfileSetupFlowViewModelFinal(
 
     // Workshop 5.2.1 - move onContinueClick from ProfileSetupFlowScreen
     fun onContinueClick() {
-        when (val screen = profileSetupScreen.navigationState.stack.lastOrNull()) {
-            is ClimberPersonalInfoScreen -> {
-                profileSetupScreen.forward(ClimbingLevelScreen(ClimbingType.Sport))
-            }
-            is ClimbingLevelScreen -> {
-                if (screen.climbingType == ClimbingType.Bouldering) {
-                    profileSetupScreen.forward(TrainingRecommendationsScreen())
-                } else {
-                    profileSetupScreen.forward(ClimbingLevelScreen(ClimbingType.Bouldering))
-                }
-            }
-            is TrainingRecommendationsScreen -> {
-                parentNavigation.back()
-            }
+        when (profileSetupScreen.navigationState.stack.size) {
+            1 -> profileSetupScreen.forward(ClimbingLevelScreen(ClimbingType.Sport))
+            2 -> profileSetupScreen.forward(ClimbingLevelScreen(ClimbingType.Bouldering))
+            3 -> profileSetupScreen.forward(TrainingRecommendationsScreen())
+            else -> parentNavigation.back()
         }
     }
 

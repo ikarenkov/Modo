@@ -48,6 +48,7 @@ fun InputNumRow(
     onValueChange: (String) -> Unit,
     valueName: String,
     modifier: Modifier = Modifier,
+    textFieldModifier: Modifier = Modifier
 ) {
     TitleCell(title, modifier) {
         val interactionSource = remember { MutableInteractionSource() }
@@ -59,7 +60,7 @@ fun InputNumRow(
                 autoCorrectEnabled = false,
                 keyboardType = KeyboardType.Number
             ),
-            modifier = Modifier.width(100.dp),
+            modifier = textFieldModifier.width(100.dp),
             textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.End)
         ) {
             OutlinedTextFieldDefaults.DecorationBox(

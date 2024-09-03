@@ -11,7 +11,6 @@ import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -29,7 +28,8 @@ fun ComposeRendererScope<StackState>.SlideTransition(
     screenModifier: Modifier = Modifier,
     pushDirection: AnimatedContentTransitionScope.SlideDirection = Left,
     popDirection: AnimatedContentTransitionScope.SlideDirection = pushDirection.opposite(),
-    animationSpec: FiniteAnimationSpec<IntOffset> = tween(durationMillis = 1000),
+    slideAnimationSpec: FiniteAnimationSpec<IntOffset> = tween(durationMillis = 700),
+    fadeAnimationSpec: FiniteAnimationSpec<Float> = tween(durationMillis = 700),
     content: ScreenTransitionContent = { it.SaveableContent(screenModifier, manualResumePause = true) }
 ) {
     ScreenTransition(
@@ -38,18 +38,17 @@ fun ComposeRendererScope<StackState>.SlideTransition(
         transitionSpec = {
             val transitionType: StackTransitionType = calculateStackTransitionType()
             when {
-                transitionType == StackTransitionType.Replace -> {
-                    scaleIn(initialScale = 2f) + fadeIn() togetherWith fadeOut()
-                }
-                oldState?.stack?.last() is DialogScreen || newState?.stack?.last() is DialogScreen -> {
-                    fadeIn() togetherWith fadeOut()
+                transitionType == StackTransitionType.Replace ||
+                    oldState?.stack?.last() is DialogScreen ||
+                    newState?.stack?.last() is DialogScreen -> {
+                    fadeIn(fadeAnimationSpec) togetherWith fadeOut(fadeAnimationSpec)
                 }
                 else -> {
                     when (transitionType) {
-                        StackTransitionType.Push -> slideIntoContainer(pushDirection, animationSpec = animationSpec) togetherWith
-                            slideOutOfContainer(pushDirection, animationSpec = animationSpec)
-                        else -> slideIntoContainer(popDirection, animationSpec = animationSpec) togetherWith
-                            slideOutOfContainer(popDirection, animationSpec = animationSpec)
+                        StackTransitionType.Push -> slideIntoContainer(pushDirection, animationSpec = slideAnimationSpec) togetherWith
+                            slideOutOfContainer(pushDirection, animationSpec = slideAnimationSpec)
+                        else -> slideIntoContainer(popDirection, animationSpec = slideAnimationSpec) togetherWith
+                            slideOutOfContainer(popDirection, animationSpec = slideAnimationSpec)
                     }
                 }
             }

@@ -12,6 +12,7 @@ class WorkshopActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             // TODO: Workshop 1.3.1 - remember hierarchy of screens, using build-in rememberRootScreen, DefaultStackScreen and Screen
+            // TODO: Workshop 3.1.5 - show MainTabScreen first
             WorkshopTheme {
                 Surface(color = Color.White) {
                     // TODO: Workshop 1.3.2 - displaying content of root screen

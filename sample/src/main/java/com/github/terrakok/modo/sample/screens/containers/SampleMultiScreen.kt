@@ -39,7 +39,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 internal class SampleMultiScreen(
     private val navModel: MultiScreenNavModel = MultiScreenNavModel(
-        containers = listOf(
+        screens = listOf(
             SampleStack(MainScreen(1)),
             SampleStack(MainScreen(2)),
             SampleStack(MainScreen(3)),

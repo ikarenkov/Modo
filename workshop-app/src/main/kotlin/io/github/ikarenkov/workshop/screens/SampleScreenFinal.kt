@@ -10,7 +10,7 @@ import com.github.terrakok.modo.stack.forward
 import kotlinx.parcelize.Parcelize
 
 // Workshop 1.2.1 - create SampleScreen class implementing Screen interface
-// Workshop 1.2.3 - use @Parcelize annotation to make QuickStartScreen class Parcelable
+// Workshop 1.2.3 - use @Parcelize annotation to make SampleScreen class Parcelable
 @Parcelize
 class SampleScreenFinal(
     // You can pass argiment as a constructor parameter
@@ -23,7 +23,7 @@ class SampleScreenFinal(
     override fun Content(modifier: Modifier) {
         // Taking a nearest stack navigation container
         val stackNavigation = LocalStackNavigation.current
-        // Workshop 1.2.4 - implement Content function with QuickStartScreenContent composable
+        // Workshop 1.2.4 - implement Content function with SampleScreenContent composable
         SampleScreenContent(
             modifier = modifier,
             screenIndex = screenIndex,

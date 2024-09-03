@@ -14,7 +14,7 @@ import com.github.terrakok.modo.animation.SlideTransition
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.StackNavModel
 import com.github.terrakok.modo.stack.StackScreen
-import io.github.ikarenkov.workshop.screens.personal_data.ClimberPersonalInfoScreen
+import io.github.ikarenkov.workshop.screens.personal_data.ClimberPersonalInfoScreenFinal
 import kotlinx.parcelize.Parcelize
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -25,7 +25,7 @@ import org.koin.core.parameter.parametersOf
 class ProfileSetupFlowScreenFinal(
     private val restartFlow: Boolean = false,
     // Workshop 4.1.1 - stack nav model with initial screen
-    private val navModel: StackNavModel = StackNavModel(ClimberPersonalInfoScreen())
+    private val navModel: StackNavModel = StackNavModel(ClimberPersonalInfoScreenFinal())
 ) : StackScreen(navModel) {
 
     // FIXME

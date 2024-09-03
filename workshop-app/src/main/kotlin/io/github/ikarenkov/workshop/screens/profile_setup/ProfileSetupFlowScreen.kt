@@ -7,16 +7,15 @@ import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import kotlinx.parcelize.Parcelize
 
-// TODO: Workshop 4.1.1 - create ProfileSetupFlowScreen inheriting from StackScreen
 @Parcelize
 class ProfileSetupFlowScreen(
-// TODO: Workshop 4.1.2 - implement navModel in constructor and pass it to StackScreen, use ClimberPersonalInfoScreen as initial screen
+// TODO: Workshop 4.1 - implement navModel in constructor and pass it to StackScreen, use ClimberPersonalInfoScreen as initial screen
     override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
 
     @Composable
     override fun Content(modifier: Modifier) {
-        // TODO:  Workshop 4.4 - use navigation state to retrieve current step
+        // TODO: Workshop 4.4 - use navigation state to retrieve current step and title
         val state = ProfileSetupContainerUiState(
             title = "Step #1",
             currentStep = 1,

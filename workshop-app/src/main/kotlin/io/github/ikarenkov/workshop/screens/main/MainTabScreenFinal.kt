@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.github.terrakok.modo.animation.SlideTransition
 import com.github.terrakok.modo.multiscreen.MultiScreen
 import com.github.terrakok.modo.multiscreen.MultiScreenNavModel
 import com.github.terrakok.modo.multiscreen.selectContainer
@@ -38,7 +39,10 @@ class MainTabScreenFinal(
                 Modifier
                     .padding(paddingValues)
                     .fillMaxSize()
-            )
+            ) { modifier ->
+                // Workshop 3.5 - support animation using build-in SlideTransition
+                SlideTransition(modifier)
+            }
 
         }
     }
