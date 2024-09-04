@@ -62,32 +62,11 @@ class EnhancedProfileScreen(
                 navigation.forward(ProfileSetupFlowScreenFinal(restart))
             },
             onViewInsightsClick = {
-                navigation.forward(TrainingRecommendationsScreen())
+                // TODO: Workshop 6.3 - OpenDialog
             },
             modifier = modifier
         ) {
             // TODO: Workshop 6.2.5 - display screens inside LazyList using build-in fun screenItem and InternalContent(screen)
-            navigationState.climbingProfileScreen?.let { screen ->
-                screenItem(screen) {
-                    Card {
-                        InternalContent(screen)
-                    }
-                }
-            }
-            navigationState.sportLevelScreen?.let { screen ->
-                screenItem(screen) {
-                    Card {
-                        InternalContent(screen)
-                    }
-                }
-            }
-            navigationState.boulderingLevelScreen?.let { screen ->
-                screenItem(screen) {
-                    Card {
-                        InternalContent(screen)
-                    }
-                }
-            }
         }
     }
 }

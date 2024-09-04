@@ -6,8 +6,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.github.ikarenkov.workshop.screens.TrainingRecommendationsContent
 import io.github.ikarenkov.workshop.ui.progress.ProgressBar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,7 +97,9 @@ fun ProfileSetupFlowContainerContent(
                 .fillMaxSize(),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            content(Modifier.weight(1f))
+            Box(Modifier.weight(1f)) {
+                content(Modifier.fillMaxHeight())
+            }
             Button(
                 onClick = onContinueClick,
                 enabled = state.continueEnabled,
@@ -137,6 +142,29 @@ private fun PreviewProfileSetupContainer() {
                     .fillMaxWidth()
             ) {
                 Text("Content")
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewProfileSetupFinal() {
+    MaterialTheme {
+        ProfileSetupFlowContainerContent(
+            state = ProfileSetupContainerUiState(
+                title = "Step #1",
+                currentStep = 1,
+                stepsCount = 4,
+                continueEnabled = true
+            ),
+            modifier = Modifier.fillMaxSize(),
+            onBackClick = {},
+            onCancelClick = {},
+            onContinueClick = {},
+        ) { modifier ->
+            Box {
+                TrainingRecommendationsContent(modifier.fillMaxHeight())
             }
         }
     }

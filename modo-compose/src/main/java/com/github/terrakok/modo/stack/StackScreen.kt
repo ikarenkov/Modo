@@ -72,25 +72,23 @@ abstract class StackScreen(
         dialogModifier: Modifier = Modifier,
         content: RendererContent<StackState> = defaultRendererContent
     ) {
-        Box {
-            StackBackHandler()
-            val screensToRender: ScreensToRender by rememberScreensToRender()
-            screensToRender.screen?.let { screen ->
-                Content(screen, modifier, content)
-            }
-            val dialogPlaceHolder = rememberSaveable {
-                OptionalScreen(provideDialogPlaceholderScreen())
-            }.screen
-            val dialogs = remember {
-                derivedStateOf {
-                    screensToRender.dialogs.ifEmpty {
-                        listOfNotNull(dialogPlaceHolder)
-                    }
+        StackBackHandler()
+        val screensToRender: ScreensToRender by rememberScreensToRender()
+        screensToRender.screen?.let { screen ->
+            Content(screen, modifier, content)
+        }
+        val dialogPlaceHolder = rememberSaveable {
+            OptionalScreen(provideDialogPlaceholderScreen())
+        }.screen
+        val dialogs = remember {
+            derivedStateOf {
+                screensToRender.dialogs.ifEmpty {
+                    listOfNotNull(dialogPlaceHolder)
                 }
             }
-            for (dialog in dialogs.value) {
-                RenderDialog(dialog, content, dialogModifier)
-            }
+        }
+        for (dialog in dialogs.value) {
+            RenderDialog(dialog, content, dialogModifier)
         }
     }
 

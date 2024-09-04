@@ -29,8 +29,8 @@ class ProfileSetupFlowScreenFinal(
 ) : StackScreen(navModel) {
 
     // FIXME
-    @ExperimentalModoApi
-    override fun provideDialogPlaceholderScreen(): DialogScreen? = null
+//    @ExperimentalModoApi
+//    override fun provideDialogPlaceholderScreen(): DialogScreen? = null
 
     @Suppress("MagicNumber")
     @Composable
@@ -40,9 +40,7 @@ class ProfileSetupFlowScreenFinal(
         val viewModel = koinViewModel<ProfileSetupFlowViewModelFinal> { parametersOf(restartFlow, this, parentNavigation) }
         val state by viewModel.state.collectAsState()
         ProfileSetupFlowContainerContent(
-            modifier = modifier
-                .fillMaxHeight(0.8f)
-                .clip(RoundedCornerShape(16.dp)),
+            modifier = modifier,
             state = state,
             onContinueClick = {
                 // Workshop 4.2.1 - navigation based on selected screen

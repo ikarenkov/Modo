@@ -89,7 +89,7 @@ val recommendations
     }
 
 @Composable
-private fun TrainingRecommendationsContent(
+fun TrainingRecommendationsContent(
     modifier: Modifier = Modifier
 ) {
     Text(

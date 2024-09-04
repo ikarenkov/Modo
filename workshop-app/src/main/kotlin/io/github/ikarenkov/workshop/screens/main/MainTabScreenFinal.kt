@@ -10,6 +10,7 @@ import com.github.terrakok.modo.multiscreen.MultiScreenNavModel
 import com.github.terrakok.modo.multiscreen.selectContainer
 import io.github.ikarenkov.workshop.screens.SampleScreenFinal
 import io.github.ikarenkov.workshop.screens.profile.EnhancedProfileScreen
+import io.github.ikarenkov.workshop.screens.profile.EnhancedProfileScreenFinal
 import kotlinx.parcelize.Parcelize
 
 // Workshop 3.1 - create main tab screen
@@ -18,7 +19,7 @@ class MainTabScreenFinal(
 // Workshop 3.1.1 - define initial state
     private val navModel: MultiScreenNavModel = MultiScreenNavModel(
         SampleScreenFinal(0),
-        EnhancedProfileScreen(),
+        EnhancedProfileScreenFinal(),
         selected = 0
     )
 ) : MultiScreen(navModel) {
