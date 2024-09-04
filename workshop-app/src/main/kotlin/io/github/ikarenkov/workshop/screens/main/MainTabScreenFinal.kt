@@ -7,9 +7,8 @@ import androidx.compose.ui.Modifier
 import com.github.terrakok.modo.animation.SlideTransition
 import com.github.terrakok.modo.multiscreen.MultiScreen
 import com.github.terrakok.modo.multiscreen.MultiScreenNavModel
-import com.github.terrakok.modo.multiscreen.selectContainer
+import com.github.terrakok.modo.multiscreen.selectScreen
 import io.github.ikarenkov.workshop.screens.SampleScreenFinal
-import io.github.ikarenkov.workshop.screens.profile.EnhancedProfileScreen
 import io.github.ikarenkov.workshop.screens.profile.EnhancedProfileScreenFinal
 import kotlinx.parcelize.Parcelize
 
@@ -32,7 +31,7 @@ class MainTabScreenFinal(
             selectedTabPos = navigationState.selected,
             onTabClick = { pos ->
                 // Workshop 3.3 - navigate between tabs
-                selectContainer(pos)
+                selectScreen(pos)
             }
         ) { paddingValues ->
             // Workshop 3.2 - display selected screen
@@ -44,7 +43,6 @@ class MainTabScreenFinal(
                 // Workshop 3.5 - support animation using build-in SlideTransition
                 SlideTransition(modifier)
             }
-
         }
     }
 }
