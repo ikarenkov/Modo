@@ -16,6 +16,6 @@ val rootModule = module {
     viewModel { EnhancedProfileViewModelFinal(it.get(), get()) }
     viewModel { ClimberPersonalInfoViewModel(get()) }
     // TODO: Workshop 5.1.2 - di define ProfileSetupViewModel
-//    viewModel { ProfileSetupViewModel(it.get(), it.get(), it.get(), get()) }
+//    viewModel { ProfileSetupFlowViewModel(it.get(), it.get(), get()) }
     viewModel { ProfileSetupFlowViewModelFinal(it.get(), it.get(), it.get(), get()) }
 }

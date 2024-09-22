@@ -42,17 +42,41 @@ class ProfileSetupFlowViewModel(
 
     fun onContinueClick() {
         // TODO: Workshop 5.2.1 - move onContinueClick from ProfileSetupFlowScreen
+//        when (profileSetupFlowScreen.navigationState.stack.size) {
+//            1 -> ClimbingLevelScreen(ClimbingType.Sport)
+//            2 -> ClimbingLevelScreen(ClimbingType.Bouldering)
+//            3 -> TrainingRecommendationsScreen()
+//            else -> null
+//        }
+//            ?.let { profileSetupFlowScreen.forward(it) }
+//            ?: parentNavigation.back()
     }
 
     fun onCancelClick() {
         // TODO: Workshop 5.2.2 - move onCancelClick from ProfileSetupFlowScreen
+//        parentNavigation.back()
     }
 
     fun onBackClick() {
         // TODO: Workshop 5.2.3 - move onBackClick from ProfileSetupFlowScreen
+//        if (profileSetupFlowScreen.navigationState.stack.size > 1) {
+//            profileSetupFlowScreen.back()
+//        } else {
+//            parentNavigation.back()
+//        }
     }
 
 }
+
+fun getUiState(
+    navigationState: StackState,
+    profile: ClimberProfile
+) = ProfileSetupContainerUiState(
+    continueEnabled = isContinueEnabled(navigationState.stack.size, profile),
+    currentStep = navigationState.stack.size,
+    stepsCount = 4,
+    title = navigationState.stack.lastOrNull()?.let { it as? SetupStepScreen }?.title ?: "Profile Setup"
+)
 
 @Suppress("MagicNumber")
 fun isContinueEnabled(
@@ -64,14 +88,3 @@ fun isContinueEnabled(
     3 -> profile.boulderLevel.hasAllGrades()
     else -> true
 }
-
-fun getUiState(
-    navigationState: StackState,
-    currentStep: Int,
-    profile: ClimberProfile
-) = ProfileSetupContainerUiState(
-    continueEnabled = isContinueEnabled(currentStep, profile),
-    currentStep = currentStep,
-    stepsCount = 4,
-    title = navigationState.stack.lastOrNull()?.let { it as? SetupStepScreen }?.title ?: "Profile Setup"
-)

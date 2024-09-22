@@ -2,29 +2,25 @@ package io.github.ikarenkov.workshop.screens.profile_setup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.terrakok.modo.navigationStateFlow
+import com.github.terrakok.modo.navigationStateStateFlow
 import com.github.terrakok.modo.stack.StackNavContainer
 import com.github.terrakok.modo.stack.StackState
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.forward
 import com.github.terrakok.modo.stack.setState
+import io.github.ikarenkov.workshop.core.combineStateFlow
 import io.github.ikarenkov.workshop.data.ClimberProfileRepository
-import io.github.ikarenkov.workshop.domain.ClimberProfile
 import io.github.ikarenkov.workshop.domain.ClimbingType
 import io.github.ikarenkov.workshop.screens.TrainingRecommendationsScreen
 import io.github.ikarenkov.workshop.screens.climbing_level.ClimbingLevelScreen
-import io.github.ikarenkov.workshop.screens.personal_data.ClimberPersonalInfoScreen
 import io.github.ikarenkov.workshop.screens.personal_data.ClimberPersonalInfoScreenFinal
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
 
 // Workshop 5.1 - create VM
 class ProfileSetupFlowViewModelFinal(
     private val restartFlow: Boolean,
     // Workshop 5.1.1 - take screens as parametrs
-    private val profileSetupScreen: ProfileSetupFlowScreenFinal,
+    private val profileSetupFlowScreen: ProfileSetupFlowScreenFinal,
     private val parentNavigation: StackNavContainer,
     private val climberProfileRepository: ClimberProfileRepository,
 ) : ViewModel() {
@@ -44,19 +40,17 @@ class ProfileSetupFlowViewModelFinal(
                     }
                 }
             }
-        profileSetupScreen.setState(StackState(getInitialScreensList(startStep)))
+        profileSetupFlowScreen.setState(StackState(getInitialScreensList(startStep)))
     }
 
-    val state: StateFlow<ProfileSetupContainerUiState> = combine(
-        profileSetupScreen.navigationStateFlow(),
-        climberProfileRepository.climberProfile
+    // Workshop 5.3 - define state using navigationStateFlow and climberProfileRepository.climberProfile
+    val state: StateFlow<ProfileSetupContainerUiState> = combineStateFlow(
+        profileSetupFlowScreen.navigationStateStateFlow(viewModelScope),
+        climberProfileRepository.climberProfile,
+        viewModelScope,
     ) { navigationState, profile ->
         getUiState(navigationState, profile)
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(),
-        getUiState(profileSetupScreen.navigationState, climberProfileRepository.climberProfile.value)
-    )
+    }
 
     @Suppress("MagicNumber")
     fun getInitialScreensList(step: Int) = listOfNotNull(
@@ -66,22 +60,12 @@ class ProfileSetupFlowViewModelFinal(
         if (step >= 4) TrainingRecommendationsScreen() else null
     )
 
-    private fun getUiState(
-        navigationState: StackState,
-        profile: ClimberProfile
-    ) = ProfileSetupContainerUiState(
-        continueEnabled = isContinueEnabled(navigationState.stack.size, profile),
-        currentStep = navigationState.stack.size,
-        stepsCount = 4,
-        title = navigationState.stack.lastOrNull()?.let { it as? SetupStepScreen }?.title ?: "Profile Setup"
-    )
-
     // Workshop 5.2.1 - move onContinueClick from ProfileSetupFlowScreen
     fun onContinueClick() {
-        when (profileSetupScreen.navigationState.stack.size) {
-            1 -> profileSetupScreen.forward(ClimbingLevelScreen(ClimbingType.Sport))
-            2 -> profileSetupScreen.forward(ClimbingLevelScreen(ClimbingType.Bouldering))
-            3 -> profileSetupScreen.forward(TrainingRecommendationsScreen())
+        when (profileSetupFlowScreen.navigationState.stack.size) {
+            1 -> profileSetupFlowScreen.forward(ClimbingLevelScreen(ClimbingType.Sport))
+            2 -> profileSetupFlowScreen.forward(ClimbingLevelScreen(ClimbingType.Bouldering))
+            3 -> profileSetupFlowScreen.forward(TrainingRecommendationsScreen())
             else -> parentNavigation.back()
         }
     }
@@ -93,8 +77,8 @@ class ProfileSetupFlowViewModelFinal(
 
     // Workshop 5.2.3 - move onBackClick from ProfileSetupFlowScreen
     fun onBackClick() {
-        if (profileSetupScreen.navigationState.stack.size > 1) {
-            profileSetupScreen.back()
+        if (profileSetupFlowScreen.navigationState.stack.size > 1) {
+            profileSetupFlowScreen.back()
         } else {
             parentNavigation.back()
         }
