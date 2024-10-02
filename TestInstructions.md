@@ -15,3 +15,12 @@ certain cases:
 * Check lifecycle order in nested screens when activity/fragment recreated, by rotating the screen. Following rules should be applied:
     * Parent screens events ON_CREATE, ON_START, ON_RESUME should be called before child screens events
     * Parent screens events ON_PAUSE, ON_STOP, ON_DESTROY should be called after child screens events
+
+## Test cases
+
+### Removing previous screen
+
+1. Use `LifecycleScreenEffect` to subscribe to lifecycle updates in `ButtonsScreenContent` (remove comments from code).
+2. Launch app and navigate to "Stack Actions".
+3. Click "Remove previous".
+4. "LifecycleScreenEffect ON_DESTROY" in logcat for previous screen.
