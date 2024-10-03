@@ -56,30 +56,15 @@ object ScreenModelStore {
     private val Screen.isRemoved: Boolean get() = screenKey.isRemoved
     private val ScreenKey.isRemoved: Boolean get() = removedScreenKeys[this] != null
 
-    @PublishedApi
-    internal inline fun <reified T : ScreenModel> getKey(screen: Screen, tag: String?): ScreenModelKey =
-        "${screen.screenKey.value}:${T::class.qualifiedName}:${tag ?: "default"}"
-
-    @PublishedApi
-    internal fun getDependencyKey(screenModel: ScreenModel, name: String): DependencyKey =
-        screenModels
-            .firstNotNullOfOrNull {
-                if (it.value == screenModel) it.key else null
-            }
-            ?: lastScreenModelKey.value
-                ?.let { "$it:$name" }
-            ?: "standalone:$name"
-
-    @PublishedApi
-    internal inline fun <reified T : ScreenModel> getOrPut(
+    inline fun <reified T : Any> getOrPutDependency(
         screen: Screen,
-        tag: String?,
-        factory: @DisallowComposableCalls () -> T
+        name: String,
+        tag: String? = null,
+        noinline onDispose: @DisallowComposableCalls (T) -> Unit = {},
+        factory: @DisallowComposableCalls (DependencyKey) -> T
     ): T {
-        val key = getKey<T>(screen, tag)
-        lastScreenModelKey.value = key
-        assertGetOrPutScreenModelsCorrect(screen, screenModels[key])
-        return screenModels.getOrPut(key, factory) as T
+        val key = getDependencyKey(screen, name, tag)
+        return getOrPutDependency(key, factory, onDispose)
     }
 
     inline fun <reified T : Any> getOrPutDependency(
@@ -92,7 +77,8 @@ object ScreenModelStore {
         return getOrPutDependency<T>(key, factory, onDispose)
     }
 
-    inline fun <reified T : Any> getOrPutDependency(
+    @PublishedApi
+    internal inline fun <reified T : Any> getOrPutDependency(
         key: DependencyKey,
         factory: @DisallowComposableCalls (DependencyKey) -> T,
         noinline onDispose: @DisallowComposableCalls (T) -> Unit
@@ -112,16 +98,18 @@ object ScreenModelStore {
             .dependencyInstance as T
     }
 
-    inline fun <reified T : Any> getOrPutDependency(
+    inline fun <reified T : Any> getDependencyOrNull(
         screen: Screen,
         name: String,
         tag: String? = null,
-        noinline onDispose: @DisallowComposableCalls (T) -> Unit = {},
-        factory: @DisallowComposableCalls (DependencyKey) -> T
-    ): T {
-        val key = getDependencyKey(screen, name, tag)
-        return getOrPutDependency(key, factory, onDispose)
-    }
+    ): T? = getDependencyOrNull(getDependencyKey(screen, name, tag))
+
+    @PublishedApi
+    internal inline fun <reified T : Any> getDependencyOrNull(
+        key: DependencyKey,
+    ): T? = dependencies[key]
+        ?.dependency
+        ?.dependencyInstance as? T
 
     fun getDependencyKey(screen: Screen, name: String, tag: String? = null) =
         "${screen.screenKey.value}:$name${if (tag != null) ":$tag" else ""}"
@@ -152,6 +140,38 @@ object ScreenModelStore {
 
     fun screenDependenciesSortedByRemovePriority(screen: Screen): Sequence<Any> =
         screenDependenciesInternal(screen).sortedBy { it.value.removePriority }.map { it.value.dependency.dependencyInstance }
+
+    internal fun screenDependenciesInternal(screen: Screen): Sequence<Map.Entry<DependencyKey, DependencyWithRemoveOrder>> =
+        dependencies.asSequence().filter { it.key.startsWith(screen.screenKey.value) }
+
+    /**
+     * Generates a key based on input parameters.
+     */
+    @PublishedApi
+    internal inline fun <reified T : ScreenModel> getKey(screen: Screen, tag: String?): ScreenModelKey =
+        "${screen.screenKey.value}:${T::class.qualifiedName}:${tag ?: "default"}"
+
+    @PublishedApi
+    internal fun getDependencyKey(screenModel: ScreenModel, name: String): DependencyKey =
+        screenModels
+            .firstNotNullOfOrNull {
+                if (it.value == screenModel) it.key else null
+            }
+            ?: lastScreenModelKey.value
+                ?.let { "$it:$name" }
+            ?: "standalone:$name"
+
+    @PublishedApi
+    internal inline fun <reified T : ScreenModel> getOrPut(
+        screen: Screen,
+        tag: String?,
+        factory: @DisallowComposableCalls () -> T
+    ): T {
+        val key = getKey<T>(screen, tag)
+        lastScreenModelKey.value = key
+        assertGetOrPutScreenModelsCorrect(screen, screenModels[key])
+        return screenModels.getOrPut(key, factory) as T
+    }
 
     @PublishedApi
     internal fun assertGetOrPutScreenModelsCorrect(screen: Screen, valueInMap: Any?) {
@@ -194,9 +214,6 @@ object ScreenModelStore {
             )
         }
     }
-
-    internal fun screenDependenciesInternal(screen: Screen): Sequence<Map.Entry<DependencyKey, DependencyWithRemoveOrder>> =
-        dependencies.asSequence().filter { it.key.startsWith(screen.screenKey.value) }
 
     private fun <T> Map<String, T>.onEach(screen: Screen, block: (String) -> Unit) =
         asSequence()

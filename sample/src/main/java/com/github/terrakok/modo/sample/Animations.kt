@@ -1,6 +1,5 @@
 package com.github.terrakok.modo.sample
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -19,7 +18,7 @@ import com.github.terrakok.modo.animation.calculateStackTransitionType
 import com.github.terrakok.modo.stack.StackState
 
 @Composable
-@OptIn(ExperimentalAnimationApi::class, ExperimentalModoApi::class)
+@OptIn(ExperimentalModoApi::class)
 fun ComposeRendererScope<StackState>.SlideTransition(
     modifier: Modifier = Modifier,
     screenModifier: Modifier = Modifier

@@ -28,7 +28,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
-import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
 import com.github.terrakok.modo.sample.SampleAppConfig
 import com.github.terrakok.modo.sample.randomBackground
 import com.github.terrakok.modo.sample.screens.ButtonsState
@@ -120,11 +119,11 @@ fun Screen.LogLifecycle() {
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
-    LifecycleScreenEffect {
-        LifecycleEventObserver { source, event ->
-            logcat(tag = "LifecycleDebug") { "$screenKey LifecycleScreenEffect $event" }
-        }
-    }
+//    LifecycleScreenEffect {
+//        LifecycleEventObserver { source, event ->
+//            logcat(tag = "LifecycleDebug") { "$screenKey LifecycleScreenEffect $event" }
+//        }
+//    }
 }
 
 @Composable

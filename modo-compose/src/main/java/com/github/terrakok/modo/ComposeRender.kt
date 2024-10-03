@@ -13,7 +13,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle.Event.ON_PAUSE
+import androidx.lifecycle.Lifecycle.Event.ON_RESUME
+import androidx.lifecycle.Lifecycle.Event.ON_START
+import androidx.lifecycle.Lifecycle.Event.ON_STOP
 import com.github.terrakok.modo.android.ModoScreenAndroidAdapter
+import com.github.terrakok.modo.animation.ScreenTransition
 import com.github.terrakok.modo.animation.displayingScreensAfterScreenContent
 import com.github.terrakok.modo.animation.displayingScreensBeforeScreenContent
 import com.github.terrakok.modo.lifecycle.LifecycleDependency
@@ -44,11 +49,22 @@ private val LocalAfterScreenContentOnDispose = staticCompositionLocalOf<() -> Un
  * 2. Adds support of Android-related features, such as ViewModel, LifeCycle and SavedStateHandle.
  * 3. Handles lifecycle of [Screen] by adding [DisposableEffect] before and after content, in order to notify [ComposeRenderer]
  *    when [Screen.Content] is about to leave composition and when it has left composition.
+ * @param modifier is a modifier that will be passed into [Screen.Content]
+ * @param manualResumePause define whenever we are going to manually call [LifecycleDependency.onResume] and [LifecycleDependency.onPause]
+ * to emmit [ON_RESUME] and [ON_PAUSE]. Otherwise, [ON_RESUME] will be called straight after [ON_START] and [ON_PAUSE] will be called straight
+ * before [ON_STOP].
+ *
+ * F.e. it is used by [ScreenTransition]:
+ * + [ON_RESUME] emitted when animation of showing screen is finished
+ * + [ON_PAUSE] emitted when animation of hiding screen is started
  */
 @Composable
-fun Screen.SaveableContent(modifier: Modifier = Modifier) {
+fun Screen.SaveableContent(
+    modifier: Modifier = Modifier,
+    manualResumePause: Boolean = false
+) {
     LocalSaveableStateHolder.currentOrThrow.SaveableStateProvider(key = screenKey) {
-        ModoScreenAndroidAdapter.get(this).ProvideAndroidIntegration {
+        ModoScreenAndroidAdapter.get(this).ProvideAndroidIntegration(manualResumePause) {
             BeforeScreenContent()
             Content(modifier)
             AfterScreenContent()
@@ -143,7 +159,7 @@ internal class ComposeRenderer<State : NavigationState>(
         // to let Screen.Content to handle ON_DISPOSE by using functions like DisposableEffect
         val afterScreenContentOnDispose = remember {
             {
-                afterScreenContentOnDispose()
+                onPreDispose()
             }
         }
 
@@ -163,6 +179,10 @@ internal class ComposeRenderer<State : NavigationState>(
      * @param clearAll - forces to remove all screen states that renderer holds (removed and "displayed")
      */
     private fun clearScreens(stateHolder: SaveableStateHolder, clearAll: Boolean = false) {
+        fun Iterable<Screen>.clearStates(stateHolder: SaveableStateHolder) = forEach { screen ->
+            screen.clearState(stateHolder)
+        }
+
         if (clearAll) {
             state?.getChildScreens()?.clearStates(stateHolder)
         }
@@ -178,26 +198,21 @@ internal class ComposeRenderer<State : NavigationState>(
     }
 
     /**
-     * Clear states of removed screens from given [stateHolder].
-     * @param stateHolder - SaveableStateHolder that contains screen states
-     * @param clearAll - forces to remove all screen states that renderer holds (removed and "displayed")
+     * Called onPreDispose for removed screens
+     * @param clearAll - forces to call onPreDispose on all children screen states that renderer holds (removed and "displayed")
      */
-    private fun afterScreenContentOnDispose(clearAll: Boolean = false) {
+    private fun onPreDispose(clearAll: Boolean = false) {
+        fun Iterable<Screen>.onPreDispose() = forEach { screen ->
+            screen.onPreDispose()
+        }
+
         if (clearAll) {
-            state?.getChildScreens()?.afterScreenContentOnDispose()
+            state?.getChildScreens()?.onPreDispose()
         }
         // There can be several transition of different screens on the screen,
         // so it is important properly clear screens that are not visible for user.
         val safeToRemove = removedScreens.filter { it !in displayingScreensAfterScreenContent }
-        safeToRemove.afterScreenContentOnDispose()
-    }
-
-    private fun Iterable<Screen>.clearStates(stateHolder: SaveableStateHolder) = forEach { screen ->
-        screen.clearState(stateHolder)
-    }
-
-    private fun Iterable<Screen>.afterScreenContentOnDispose() = forEach { screen ->
-        screen.afterScreenContentOnDispose()
+        safeToRemove.onPreDispose()
     }
 
     private fun Screen.clearState(stateHolder: SaveableStateHolder) {
@@ -217,13 +232,13 @@ internal class ComposeRenderer<State : NavigationState>(
     }
 
     // need for correct handling lifecycle
-    private fun Screen.afterScreenContentOnDispose() {
+    private fun Screen.onPreDispose() {
 //        Log.d("LifecycleDebug", "afterScreenContentOnDispose $screenKey")
         dependenciesSortedByRemovePriority()
             .filterIsInstance<LifecycleDependency>()
             .forEach { it.onPreDispose() }
         // send afterScreenContentOnDispose to nested screens
-        ((this as? ContainerScreen<*, *>)?.renderer as? ComposeRenderer<*>)?.afterScreenContentOnDispose(clearAll = true)
+        ((this as? ContainerScreen<*, *>)?.renderer as? ComposeRenderer<*>)?.onPreDispose(clearAll = true)
     }
 
     private fun calculateRemovedScreens(oldState: NavigationState, newState: NavigationState): List<Screen> {

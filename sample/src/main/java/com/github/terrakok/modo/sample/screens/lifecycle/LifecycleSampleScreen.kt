@@ -1,4 +1,4 @@
-package com.github.terrakok.modo.sample.screens
+package com.github.terrakok.modo.sample.screens.lifecycle
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,6 +23,10 @@ import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.lifecycle.LaunchedScreenEffect
 import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
+import com.github.terrakok.modo.sample.screens.ButtonsState
+import com.github.terrakok.modo.sample.screens.GroupedButtonsList
+import com.github.terrakok.modo.sample.screens.MainScreen
+import com.github.terrakok.modo.sample.screens.ModoButtonSpec
 import com.github.terrakok.modo.sample.screens.base.SampleScreenContent
 import com.github.terrakok.modo.sample.screens.base.rememberCounterState
 import com.github.terrakok.modo.stack.LocalStackNavigation
@@ -35,7 +39,7 @@ import kotlinx.parcelize.Parcelize
 import logcat.logcat
 
 @Parcelize
-class ScreenEffectsSampleScreen(
+class LifecycleSampleScreen(
     private val screenIndex: Int,
     override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {

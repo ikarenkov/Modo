@@ -26,6 +26,8 @@ import com.github.terrakok.modo.sample.screens.containers.custom.RemovableItemCo
 import com.github.terrakok.modo.sample.screens.containers.custom.SampleCustomContainerScreen
 import com.github.terrakok.modo.sample.screens.containers.list.SampleListNavigation
 import com.github.terrakok.modo.sample.screens.dialogs.DialogsPlayground
+import com.github.terrakok.modo.sample.screens.lifecycle.KeyboardWithLifecycleScreen
+import com.github.terrakok.modo.sample.screens.lifecycle.LifecycleSampleScreen
 import com.github.terrakok.modo.sample.screens.stack.StackActionsScreen
 import com.github.terrakok.modo.sample.screens.viewmodel.AndroidViewModelSampleScreen
 import com.github.terrakok.modo.stack.LocalStackNavigation
@@ -141,7 +143,6 @@ private fun rememberButtons(
                         ModoButtonSpec("Stacks in LazyColumn") { navigation?.forward(StackInLazyColumnScreen()) },
                         ModoButtonSpec("Dialogs & BottomSheets") { navigation?.forward(DialogsPlayground(i + 1)) },
                         ModoButtonSpec("Multiscreen") { navigation?.forward(SampleMultiScreen()) },
-                        ModoButtonSpec("Screen Effects") { navigation?.forward(ScreenEffectsSampleScreen(i + 1)) },
                         ModoButtonSpec("Custom Container Actions") { navigation?.forward(SampleCustomContainerScreen()) },
                         ModoButtonSpec("Removable screen") { navigation?.forward(RemovableItemContainerScreen(useCustomReducer = false)) },
                         ModoButtonSpec("Removable screen with reducer") {
@@ -156,6 +157,13 @@ private fun rememberButtons(
                         ModoButtonSpec("Sample Screen Model") { navigation?.forward(ScreenModelSampleScreen()) },
                         ModoButtonSpec("Android ViewModel") { navigation?.forward(AndroidViewModelSampleScreen(i + 1)) },
                         ModoButtonSpec("List/Details") { navigation?.forward(ListScreen()) },
+                    )
+                ),
+                GroupedButtonsState.Group(
+                    title = "Lifecycle",
+                    buttons = listOf(
+                        ModoButtonSpec("Screen Lifecycle") { navigation?.forward(LifecycleSampleScreen(i + 1)) },
+                        ModoButtonSpec("Keyboard + Lifecycle") { navigation?.forward(KeyboardWithLifecycleScreen()) },
                     )
                 ),
                 GroupedButtonsState.Group(

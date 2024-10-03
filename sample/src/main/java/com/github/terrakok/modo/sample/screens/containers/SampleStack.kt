@@ -14,12 +14,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.LifecycleEventObserver
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.Screen
-import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
 import com.github.terrakok.modo.sample.SlideTransition
+import com.github.terrakok.modo.sample.screens.base.LogLifecycle
 import com.github.terrakok.modo.sample.screens.dialogs.SampleBottomSheet
 import com.github.terrakok.modo.sample.screens.dialogs.SampleBottomSheetStack
 import com.github.terrakok.modo.stack.DialogPlaceHolder
@@ -29,7 +28,6 @@ import com.github.terrakok.modo.stack.StackScreen
 import com.github.terrakok.modo.stack.StackState
 import com.github.terrakok.modo.stack.back
 import kotlinx.parcelize.Parcelize
-import logcat.logcat
 
 class OpenActivityAction(
     private val context: Context,
@@ -57,11 +55,7 @@ open class SampleStack(
     @OptIn(ExperimentalModoApi::class)
     @Composable
     override fun Content(modifier: Modifier) {
-        LifecycleScreenEffect {
-            LifecycleEventObserver { _, event ->
-                logcat(tag = "SampleStack") { "$screenKey lifecycle event $event" }
-            }
-        }
+        LogLifecycle()
         TopScreenContent(modifier) { modifier ->
             SlideTransition(modifier)
         }

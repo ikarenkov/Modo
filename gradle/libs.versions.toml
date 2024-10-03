@@ -1,6 +1,6 @@
 [versions]
 leakcanaryAndroid = "2.14"
-modo = "0.10.0-alpha2"
+modo = "0.10.0-alpha3"
 androidGradlePlugin = "8.4.0"
 detektComposeVersion = "0.3.20"
 detektVersion = "1.23.6"
