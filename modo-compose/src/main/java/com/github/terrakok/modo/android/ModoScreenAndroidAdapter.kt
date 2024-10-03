@@ -320,7 +320,7 @@ class ModoScreenAndroidAdapter private constructor(
             }
 
         @JvmStatic
-        private fun needSkipEvent(currentState: Lifecycle.State, event: Lifecycle.Event) =
+        internal fun needSkipEvent(currentState: Lifecycle.State, event: Lifecycle.Event) =
             !currentState.isAtLeast(Lifecycle.State.INITIALIZED) ||
                 // Skipping events that moves lifecycle state up, but this state is already reached.
                 (event in moveLifecycleStateUpEvents && event.targetState <= currentState) ||

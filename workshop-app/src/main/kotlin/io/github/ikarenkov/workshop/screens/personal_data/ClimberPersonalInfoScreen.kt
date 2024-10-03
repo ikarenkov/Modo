@@ -28,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleEventObserver
@@ -57,7 +56,8 @@ class ClimberPersonalInfoScreen(
         val state by viewModel.state.collectAsState()
         val focusRequester = remember { FocusRequester() }
         val lifecycleOwner = LocalLifecycleOwner.current
-        val keyboardController = LocalSoftwareKeyboardController.current
+        // TODO: Workshop 6.1 - use ON_RESUME and ON_PAUSE events to show and hide the keyboard
+//        val keyboardController = LocalSoftwareKeyboardController.current
         DisposableEffect(lifecycleOwner) {
             val observer = LifecycleEventObserver { _, event ->
                 // TODO: Workshop 6.1 - use ON_RESUME and ON_PAUSE events to show and hide the keyboard

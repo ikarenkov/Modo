@@ -63,7 +63,7 @@ class AuthCodeScreen(
 }
 
 @Composable
-private fun AuthCodeScreenContent(
+internal fun AuthCodeScreenContent(
     onCodeEntered: (code: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {

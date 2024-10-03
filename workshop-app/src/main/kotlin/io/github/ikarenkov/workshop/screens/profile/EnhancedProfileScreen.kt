@@ -23,11 +23,9 @@ import com.github.terrakok.modo.NavModel
 import com.github.terrakok.modo.NavigationAction
 import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.Screen
-import com.github.terrakok.modo.lazylist.screenItem
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.forward
 import io.github.ikarenkov.workshop.domain.ClimbingType
-import io.github.ikarenkov.workshop.screens.TrainingRecommendationsScreen
 import io.github.ikarenkov.workshop.screens.climbing_level.ClimbingLevelScreen
 import io.github.ikarenkov.workshop.screens.personal_data.ClimberPersonalInfoScreen
 import io.github.ikarenkov.workshop.screens.profile_setup.ProfileSetupFlowScreenFinal
@@ -148,7 +146,7 @@ data class EnhancedProfileNavigationState(
 }
 
 // TODO: Workshop 6.2.3 - define navigation action
-class EnhancedProfileNavigationActionNoOp() : NavigationAction<EnhancedProfileNavigationState>
+class EnhancedProfileNavigationActionNoOp : NavigationAction<EnhancedProfileNavigationState>
 
 @Preview
 @Composable

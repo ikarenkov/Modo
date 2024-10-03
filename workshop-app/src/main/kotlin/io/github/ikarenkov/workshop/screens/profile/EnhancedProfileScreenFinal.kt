@@ -11,7 +11,6 @@ import com.github.terrakok.modo.lazylist.screenItem
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.forward
 import io.github.ikarenkov.workshop.screens.TrainingRecommendationsDialogScreenFinal
-import io.github.ikarenkov.workshop.screens.TrainingRecommendationsScreen
 import io.github.ikarenkov.workshop.screens.profile_setup.ProfileSetupFlowScreenFinal
 import kotlinx.parcelize.Parcelize
 import org.koin.androidx.compose.koinViewModel
