@@ -17,6 +17,7 @@ import io.github.ikarenkov.workshop.screens.personal_data.ClimberPersonalInfoScr
 import kotlinx.coroutines.flow.StateFlow
 
 // Workshop 5.1 - create VM
+@Suppress("MagicNumber")
 class ProfileSetupFlowViewModelFinal(
     private val restartFlow: Boolean,
     // Workshop 5.1.1 - take screens as parametrs

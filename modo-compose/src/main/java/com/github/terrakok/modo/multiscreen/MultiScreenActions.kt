@@ -40,7 +40,9 @@ fun NavigationContainer<MultiScreenState, MultiScreenAction>.setContainers(state
     message = "This function was renamed to selectScreen. This function will be removed in further releases.",
     replaceWith = ReplaceWith("selectScreen(index)")
 )
+
 fun NavigationContainer<MultiScreenState, MultiScreenAction>.selectContainer(index: Int) = selectScreen(index)
 
 fun NavigationContainer<MultiScreenState, MultiScreenAction>.setState(state: MultiScreenState) = dispatch(SetMultiScreenState(state))
+
 fun NavigationContainer<MultiScreenState, MultiScreenAction>.selectScreen(pos: Int) = dispatch(SelectScreen(pos))

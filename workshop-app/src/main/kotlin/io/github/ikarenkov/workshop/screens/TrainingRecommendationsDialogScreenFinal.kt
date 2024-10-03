@@ -14,6 +14,7 @@ import kotlinx.parcelize.Parcelize
 
 @OptIn(ExperimentalModoApi::class)
 @Parcelize
+@Suppress("MagicNumbers")
 class TrainingRecommendationsDialogScreenFinal(
     override val screenKey: ScreenKey = generateScreenKey()
 ) : DialogScreen {

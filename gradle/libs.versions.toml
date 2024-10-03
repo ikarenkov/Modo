@@ -18,7 +18,7 @@ kotlin = "1.9.23"
 kotlinCompilerExtension = "1.5.12"
 minSdk = "21"
 compileSdk = "34"
-koin = "4.0.0-RC1"
+koin = "4.0.0"
 
 [libraries]
 androidx-compose-bom-modo = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBomModo" }
