@@ -66,7 +66,7 @@ class ClimbingLevelScreen(
 }
 
 @Composable
-private fun ClimbingLevelSetupScreenContent(
+internal fun ClimbingLevelSetupScreenContent(
     redpointGrade: FrenchScaleGrade?,
     onsightGrade: FrenchScaleGrade?,
     flashGrade: FrenchScaleGrade?,

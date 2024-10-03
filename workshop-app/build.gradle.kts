@@ -36,7 +36,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.fragment)
-    implementation("com.github.zj565061763:compose-wheel-picker:1.0.0-beta05")
+    implementation(libs.compose.wheelPicker)
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
 
