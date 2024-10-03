@@ -56,7 +56,10 @@ open class SampleStack(
     @Composable
     override fun Content(modifier: Modifier) {
         LogLifecycle()
-        TopScreenContent(modifier) { modifier ->
+        TopScreenContent(
+            modifier,
+            dialogModifier = modifier.fillMaxSize()
+        ) { modifier ->
             SlideTransition(modifier)
         }
     }

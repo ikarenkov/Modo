@@ -73,7 +73,6 @@ abstract class StackScreen(
         content: RendererContent<StackState> = defaultRendererContent
     ) {
         StackBackHandler()
-
         val screensToRender: ScreensToRender by rememberScreensToRender()
         screensToRender.screen?.let { screen ->
             Content(screen, modifier, content)
@@ -227,7 +226,7 @@ data class DialogPlaceHolder(
     override fun Content(modifier: Modifier) {
         Box(
             // ignore modifier, because it is just invisible placeholder
-            Modifier.fillMaxSize()
+            modifier
         )
     }
 

@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
-        android:name=".ModoSampleApplication"
+        android:name=".WorkshopApp"
         android:theme="@style/Theme.Modo"
         tools:ignore="MissingApplicationIcon">
         <activity
-            android:name=".ModoSampleActivity"
+            android:name=".WorkshopActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -16,14 +16,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ModoLegacyIntegrationActivity"
-            android:exported="true"/>
-        <activity
-            android:name=".fragment.ModoFragmentIntegrationActivity"
-            android:exported="true"/>
-        <activity
-            android:name=".quickstart.QuickStartActivity"
-            android:exported="true"/>
+            android:name=".WorkshopActivityFinal"
+            android:exported="true">
+            <!--            <intent-filter>-->
+            <!--                <action android:name="android.intent.action.MAIN"/>-->
+            <!--                <category android:name="android.intent.category.LAUNCHER"/>-->
+            <!--            </intent-filter>-->
+        </activity>
     </application>
 
 </manifest>
