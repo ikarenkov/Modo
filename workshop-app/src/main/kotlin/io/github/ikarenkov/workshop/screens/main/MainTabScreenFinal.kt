@@ -39,9 +39,9 @@ class MainTabScreenFinal(
                 Modifier
                     .padding(paddingValues)
                     .fillMaxSize()
-            ) { modifier ->
+            ) { innerModifier ->
                 // Workshop 3.5 - support animation using build-in SlideTransition
-                SlideTransition(modifier)
+                SlideTransition(innerModifier)
             }
         }
     }

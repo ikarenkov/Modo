@@ -146,7 +146,7 @@ data class EnhancedProfileNavigationState(
 }
 
 // TODO: Workshop 6.2.3 - define navigation action
-class EnhancedProfileNavigationActionNoOp() : NavigationAction<EnhancedProfileNavigationState>
+class EnhancedProfileNavigationActionNoOp : NavigationAction<EnhancedProfileNavigationState>
 
 @Preview
 @Composable
