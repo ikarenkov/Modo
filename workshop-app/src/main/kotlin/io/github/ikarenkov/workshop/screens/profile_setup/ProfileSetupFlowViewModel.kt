@@ -21,14 +21,13 @@ class ProfileSetupFlowViewModel(
 
     // TODO: Workshop 5.3.1 - define state using navigationStateFlow and climberProfileRepository.climberProfile
     //  Use combineStateFlow, navigationStateStateFlow, climberProfileRepository.climberProfile and getUiState
-    val state: StateFlow<ProfileSetupContainerUiState> = MutableStateFlow(
-        ProfileSetupContainerUiState(
-            continueEnabled = true,
-            currentStep = 1,
-            stepsCount = 4,
-            title = "Step #1"
-        )
-    )
+//    val state: StateFlow<ProfileSetupContainerUiState> = combineStateFlow(
+//        profileSetupFlowScreen.navigationStateStateFlow(viewModelScope),
+//        climberProfileRepository.climberProfile,
+//        viewModelScope
+//    ) { navigationState, profile ->
+//        getUiState(navigationState, profile)
+//    }
 
     fun onContinueClick() {
         // TODO: Workshop 5.2.1 - move onContinueClick from ProfileSetupFlowScreen
