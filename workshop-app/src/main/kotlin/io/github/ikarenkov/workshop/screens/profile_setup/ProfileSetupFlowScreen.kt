@@ -40,7 +40,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class ProfileSetupFlowScreen(
-// TODO: Workshop 4.1 - implement navModel in constructor and pass it to StackScreen, use ClimberPersonalInfoScreen as initial screen
+// TODO: Workshop 4.1.1 - implement navModel in constructor and pass it to StackScreen, use ClimberPersonalInfoScreen as initial screen
     override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
 
@@ -74,7 +74,7 @@ class ProfileSetupFlowScreen(
                 // TODO: 5.2.3 - move to VM
             },
         ) { modifier ->
-            // TODO: Workshop 4.1.3 - display content
+            // TODO: Workshop 4.1.2 - display content
             // TODO: Workshop 4.5 - custom animation
         }
     }
