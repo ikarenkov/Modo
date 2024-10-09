@@ -17,15 +17,7 @@ class ProfileSetupFlowViewModel(
     private val climberProfileRepository: ClimberProfileRepository,
 ) : ViewModel() {
 
-    // TODO: Workshop 5.4.2 - get starting step based on filled data and set a state to the navigation using getInitialScreensList
-
-    @Suppress("MagicNumber", "UnusedPrivateMember")
-    private fun getStartingStep(profile: ClimberProfile) = when {
-        profile.boulderLevel.hasAllGrades() -> 4
-        profile.sportLevel.hasAllGrades() -> 3
-        profile.dateOfBirth != null && profile.heightSm != null && profile.weightKg != null -> 2
-        else -> 1
-    }
+    // TODO: Workshop 5.4 - set navigation initial state using getProfileSetupStartingStep and getProfileSetupInitialScreens
 
     // TODO: Workshop 5.3.1 - define state using navigationStateFlow and climberProfileRepository.climberProfile
     //  Use combineStateFlow, navigationStateStateFlow, climberProfileRepository.climberProfile and getUiState
@@ -37,10 +29,6 @@ class ProfileSetupFlowViewModel(
             title = "Step #1"
         )
     )
-
-    @Suppress("UnusedParameter")
-    // TODO: Workshop 5.4.1 - implement getInitialScreensList
-    fun getInitialScreensList(step: Int): List<Screen> = listOfNotNull()
 
     fun onContinueClick() {
         // TODO: Workshop 5.2.1 - move onContinueClick from ProfileSetupFlowScreen
