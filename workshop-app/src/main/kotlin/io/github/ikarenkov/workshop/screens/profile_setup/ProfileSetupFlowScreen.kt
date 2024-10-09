@@ -58,6 +58,7 @@ class ProfileSetupFlowScreen(
         )
         ProfileSetupFlowContainerContent(
             modifier = modifier,
+            // TODO: Workshop 5.3.2 - use state from viewModel
             state = state,
             onContinueClick = {
                 // TODO: Workshop 4.3.1 - navigation based on selected screen. Use `getNextProfileSetupStepScreen`.

@@ -27,7 +27,8 @@ class ProfileSetupFlowViewModel(
         else -> 1
     }
 
-    // TODO: Workshop 5.3 - define state using navigationStateFlow and climberProfileRepository.climberProfile
+    // TODO: Workshop 5.3.1 - define state using navigationStateFlow and climberProfileRepository.climberProfile
+    //  Use combineStateFlow, navigationStateStateFlow, climberProfileRepository.climberProfile and getUiState
     val state: StateFlow<ProfileSetupContainerUiState> = MutableStateFlow(
         ProfileSetupContainerUiState(
             continueEnabled = true,
