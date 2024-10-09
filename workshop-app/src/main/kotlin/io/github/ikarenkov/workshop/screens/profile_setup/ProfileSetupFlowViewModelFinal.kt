@@ -63,12 +63,9 @@ class ProfileSetupFlowViewModelFinal(
 
     // Workshop 5.2.1 - move onContinueClick from ProfileSetupFlowScreen
     fun onContinueClick() {
-        when (profileSetupFlowScreen.navigationState.stack.size) {
-            1 -> profileSetupFlowScreen.forward(ClimbingLevelScreen(ClimbingType.Sport))
-            2 -> profileSetupFlowScreen.forward(ClimbingLevelScreen(ClimbingType.Bouldering))
-            3 -> profileSetupFlowScreen.forward(TrainingRecommendationsScreen())
-            else -> parentNavigation.back()
-        }
+        getNextProfileSetupStepScreen(profileSetupFlowScreen.navigationState.stack.size)?.let {
+            profileSetupFlowScreen.forward(it)
+        } ?: parentNavigation.back()
     }
 
     // Workshop 5.2.2 - move onCancelClick from ProfileSetupFlowScreen

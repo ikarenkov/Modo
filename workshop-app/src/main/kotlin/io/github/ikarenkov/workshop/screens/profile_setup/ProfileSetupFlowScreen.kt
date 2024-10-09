@@ -59,7 +59,7 @@ class ProfileSetupFlowScreen(
             modifier = modifier,
             state = state,
             onContinueClick = {
-                // TODO: Workshop 4.3.1 - navigation based on selected screen
+                // TODO: Workshop 4.3.1 - navigation based on selected screen. Use `getNextProfileSetupStepScreen`.
                 // TODO: 5.2.1 - move to VM
             },
             onCancelClick = {
