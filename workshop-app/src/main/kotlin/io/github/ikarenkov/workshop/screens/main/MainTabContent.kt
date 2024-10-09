@@ -38,12 +38,10 @@ fun MainTabContent(
                     IconButton(
                         modifier = Modifier.weight(1f),
                         onClick = {
-                            // TODO: Workshop 3.3 - navigate between tabs
                             onTabClick(pos)
                         },
                     ) {
                         val contentColor = LocalContentColor.current
-                        // TODO: Workshop 3.4 - use navigation state to define UI
                         val color by animateColorAsState(
                             contentColor.copy(
                                 alpha = if (pos == selectedTabPos) contentColor.alpha else 0.5f

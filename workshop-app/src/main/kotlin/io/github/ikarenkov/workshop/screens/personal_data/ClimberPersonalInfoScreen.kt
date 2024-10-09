@@ -16,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -30,13 +29,12 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import io.github.ikarenkov.workshop.screens.profile_setup.SetupStepScreen
 import io.github.ikarenkov.workshop.ui.InputNumRow
 import io.github.ikarenkov.workshop.ui.TitleCell
+import io.github.ikarenkov.workshop.utils.OnLifecycleEvent
 import kotlinx.parcelize.Parcelize
 import org.koin.androidx.compose.koinViewModel
 import java.util.Date
@@ -55,18 +53,16 @@ class ClimberPersonalInfoScreen(
         val viewModel = koinViewModel<ClimberPersonalInfoViewModel>()
         val state by viewModel.state.collectAsState()
         val focusRequester = remember { FocusRequester() }
-        val lifecycleOwner = LocalLifecycleOwner.current
-        // TODO: Workshop 6.1 - use ON_RESUME and ON_PAUSE events to show and hide the keyboard
+        // TODO: Workshop 6.1.1 - get keyboard controller
 //        val keyboardController = LocalSoftwareKeyboardController.current
-        DisposableEffect(lifecycleOwner) {
-            val observer = LifecycleEventObserver { _, event ->
-                // TODO: Workshop 6.1 - use ON_RESUME and ON_PAUSE events to show and hide the keyboard
+        OnLifecycleEvent(
+            onResume = {
+                // TODO: Workshop 6.1.2 - show the keyboard
+            },
+            onPause = {
+                // TODO: Workshop 6.1.3 - hide the keyboard
             }
-            lifecycleOwner.lifecycle.addObserver(observer)
-            onDispose {
-                lifecycleOwner.lifecycle.removeObserver(observer)
-            }
-        }
+        )
         ClimberProfileSetupScreenContent(
             modifier = modifier,
             heightTextFieldModifier = Modifier.focusRequester(focusRequester),

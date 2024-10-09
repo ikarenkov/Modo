@@ -48,7 +48,9 @@ class ProfileSetupFlowScreen(
     override fun Content(modifier: Modifier) {
         // TODO: Workshop 4.4 - use navigation state to retrieve current step and title
         val state = ProfileSetupContainerUiState(
+            // TODO: Workshop 4.4.1 - retrieve title from last screen when it is SetupStepScreen
             title = "Step #1",
+            // TODO: Workshop 4.4.2 - set current step based on size of stack
             currentStep = 1,
             stepsCount = 4,
             continueEnabled = true
