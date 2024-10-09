@@ -46,6 +46,7 @@ class ProfileSetupFlowScreen(
 
     @Composable
     override fun Content(modifier: Modifier) {
+        // TODO: Workshop 5.1.2 - retrieve viewModel using koinViewModel
         // TODO: Workshop 4.4 - use navigation state to retrieve current step and title
         val state = ProfileSetupContainerUiState(
             // TODO: Workshop 4.4.1 - retrieve title from last screen when it is SetupStepScreen

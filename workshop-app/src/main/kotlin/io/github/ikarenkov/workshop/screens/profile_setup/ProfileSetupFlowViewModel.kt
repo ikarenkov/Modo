@@ -8,10 +8,11 @@ import io.github.ikarenkov.workshop.domain.ClimberProfile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-// TODO: Workshop 5.1 - create VM
+// TODO: Workshop 5.1 - use VM
 class ProfileSetupFlowViewModel(
-    // TODO: Workshop 5.1.1 - pass ProfileSetupFlowScreen as parameter
-    // TODO: Workshop 5.1.2 - pass parent stack navigation as parameter
+    // TODO: Workshop 5.1.3 - pass ProfileSetupFlowScreen and parent stack navigation as parameters
+//    private val profileSetupFlowScreen: ProfileSetupFlowScreen,
+//    private val parentNavigation: StackNavContainer,
     @Suppress("UnusedPrivateProperty")
     private val climberProfileRepository: ClimberProfileRepository,
 ) : ViewModel() {
@@ -42,12 +43,7 @@ class ProfileSetupFlowViewModel(
 
     fun onContinueClick() {
         // TODO: Workshop 5.2.1 - move onContinueClick from ProfileSetupFlowScreen
-//        when (profileSetupFlowScreen.navigationState.stack.size) {
-//            1 -> ClimbingLevelScreen(ClimbingType.Sport)
-//            2 -> ClimbingLevelScreen(ClimbingType.Bouldering)
-//            3 -> TrainingRecommendationsScreen()
-//            else -> null
-//        }
+//        getNextProfileSetupStepScreen(profileSetupFlowScreen.navigationState.stack.size)
 //            ?.let { profileSetupFlowScreen.forward(it) }
 //            ?: parentNavigation.back()
     }
