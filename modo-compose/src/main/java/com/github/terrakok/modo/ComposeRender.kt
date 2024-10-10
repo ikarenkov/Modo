@@ -137,6 +137,9 @@ internal class ComposeRenderer<State : NavigationState>(
         }
         lastState = this.state
         this.state = state
+        // Handling a case when updating state doesn't cause UI to update. But if some screens was removed, we need to move them to destroy state.
+        // F.e. removing previous screen causes this case.
+        onPreDispose()
     }
 
     @Suppress("UnusedPrivateProperty", "SpreadOperator")
@@ -198,7 +201,7 @@ internal class ComposeRenderer<State : NavigationState>(
     }
 
     /**
-     * Called onPreDispose for removed screens
+     * Called onPreDispose for removed screens, that are not presented in [displayingScreensAfterScreenContent] (not displayed on screen).
      * @param clearAll - forces to call onPreDispose on all children screen states that renderer holds (removed and "displayed")
      */
     private fun onPreDispose(clearAll: Boolean = false) {
