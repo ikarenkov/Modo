@@ -49,7 +49,6 @@ internal class StackActionsScreen(
         ButtonsScreenContent(
             modifier = modifier,
             screenName = "StackActionsScreen",
-            screenKey = screenKey,
             screenIndex = screenIndex,
             state = rememberButtons(
                 LocalStackNavigation.current,
@@ -105,6 +104,9 @@ private fun rememberButtons(
             },
             ModoButtonSpec("Back to '3'") {
                 navigation.backTo { pos, _ -> pos == 2 }
+            },
+            ModoButtonSpec("Back 3 screens") {
+                navigation.back(3)
             },
             ModoButtonSpec("Back 2 screens + Forward") {
                 navigation.dispatch(

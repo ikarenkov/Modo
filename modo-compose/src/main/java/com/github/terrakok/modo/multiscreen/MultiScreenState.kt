@@ -12,9 +12,14 @@ typealias MultiScreenNavModel = NavModel<MultiScreenState, MultiScreenAction>
 interface MultiScreenNavContainer : NavigationContainer<MultiScreenState, MultiScreenAction>
 
 fun MultiScreenNavModel(
-    containers: List<Screen>,
-    selected: Int
-) = MultiScreenNavModel(MultiScreenState(containers, selected))
+    screens: List<Screen>,
+    selected: Int = 0
+) = MultiScreenNavModel(MultiScreenState(screens, selected))
+
+fun MultiScreenNavModel(
+    vararg screens: Screen,
+    selected: Int = 0
+) = MultiScreenNavModel(MultiScreenState(screens.toList(), selected))
 
 @Parcelize
 data class MultiScreenState(

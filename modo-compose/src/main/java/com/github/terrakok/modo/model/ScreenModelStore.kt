@@ -9,12 +9,15 @@ import org.jetbrains.annotations.VisibleForTesting
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
-internal typealias DependencyKey = String
+typealias DependencyKey = String
 
 private typealias ScreenModelKey = String
-private typealias DependencyInstance = Any
 private typealias DependencyOnDispose = (Any) -> Unit
-private typealias Dependency = Pair<DependencyInstance, DependencyOnDispose>
+
+data class Dependency(
+    val dependencyInstance: Any,
+    val onDispose: DependencyOnDispose,
+)
 
 /**
  * Class that stores remove priority for a dependency with a dependency it-selves.
@@ -53,6 +56,97 @@ object ScreenModelStore {
     private val Screen.isRemoved: Boolean get() = screenKey.isRemoved
     private val ScreenKey.isRemoved: Boolean get() = removedScreenKeys[this] != null
 
+    inline fun <reified T : Any> getOrPutDependency(
+        screen: Screen,
+        name: String,
+        tag: String? = null,
+        noinline onDispose: @DisallowComposableCalls (T) -> Unit = {},
+        factory: @DisallowComposableCalls (DependencyKey) -> T
+    ): T {
+        val key = getDependencyKey(screen, name, tag)
+        return getOrPutDependency(key, factory, onDispose)
+    }
+
+    inline fun <reified T : Any> getOrPutDependency(
+        screenModel: ScreenModel,
+        name: String,
+        noinline onDispose: @DisallowComposableCalls (T) -> Unit = {},
+        factory: @DisallowComposableCalls (DependencyKey) -> T
+    ): T {
+        val key = getDependencyKey(screenModel, name)
+        return getOrPutDependency<T>(key, factory, onDispose)
+    }
+
+    @PublishedApi
+    internal inline fun <reified T : Any> getOrPutDependency(
+        key: DependencyKey,
+        factory: @DisallowComposableCalls (DependencyKey) -> T,
+        noinline onDispose: @DisallowComposableCalls (T) -> Unit
+    ): T {
+        assertGetOrPutDependencyCorrect(key, dependencies[key])
+        return dependencies
+            .getOrPut(key) {
+                DependencyWithRemoveOrder(
+                    dependencyCounter.getAndIncrement(),
+                    Dependency(
+                        dependencyInstance = factory(key),
+                        onDispose = { onDispose(it as T) }
+                    )
+                )
+            }
+            .dependency
+            .dependencyInstance as T
+    }
+
+    inline fun <reified T : Any> getDependencyOrNull(
+        screen: Screen,
+        name: String,
+        tag: String? = null,
+    ): T? = getDependencyOrNull(getDependencyKey(screen, name, tag))
+
+    @PublishedApi
+    internal inline fun <reified T : Any> getDependencyOrNull(
+        key: DependencyKey,
+    ): T? = dependencies[key]
+        ?.dependency
+        ?.dependencyInstance as? T
+
+    fun getDependencyKey(screen: Screen, name: String, tag: String? = null) =
+        "${screen.screenKey.value}:$name${if (tag != null) ":$tag" else ""}"
+
+    fun remove(screen: Screen) {
+        if (removedScreenKeys[screen.screenKey] != null) {
+            ModoDevOptions.onIllegalScreenModelStoreAccess.validationFailed(
+                IllegalStateException("Trying to remove screen $screen ${screen::class} the second time.")
+            )
+        }
+        screenModels.onEach(screen) { key ->
+            screenModels[key]?.onDispose()
+            screenModels -= key
+        }
+
+        screenDependenciesSortedByRemovePriorityWithKey(screen).forEach { (key, dependency) ->
+            val (instance, onDispose) = dependency
+            onDispose(instance)
+            dependencies -= key
+        }
+        removedScreenKeys[screen.screenKey] = Unit
+    }
+
+    fun screenDependenciesSortedByRemovePriorityWithKey(screen: Screen): Sequence<Pair<DependencyKey, Dependency>> =
+        screenDependenciesInternal(screen)
+            .sortedBy { it.value.removePriority }
+            .map { (key, dependencyWithRemoveOrder) -> key to dependencyWithRemoveOrder.dependency }
+
+    fun screenDependenciesSortedByRemovePriority(screen: Screen): Sequence<Any> =
+        screenDependenciesInternal(screen).sortedBy { it.value.removePriority }.map { it.value.dependency.dependencyInstance }
+
+    internal fun screenDependenciesInternal(screen: Screen): Sequence<Map.Entry<DependencyKey, DependencyWithRemoveOrder>> =
+        dependencies.asSequence().filter { it.key.startsWith(screen.screenKey.value) }
+
+    /**
+     * Generates a key based on input parameters.
+     */
     @PublishedApi
     internal inline fun <reified T : ScreenModel> getKey(screen: Screen, tag: String?): ScreenModelKey =
         "${screen.screenKey.value}:${T::class.qualifiedName}:${tag ?: "default"}"
@@ -77,66 +171,6 @@ object ScreenModelStore {
         lastScreenModelKey.value = key
         assertGetOrPutScreenModelsCorrect(screen, screenModels[key])
         return screenModels.getOrPut(key, factory) as T
-    }
-
-    inline fun <reified T : Any> getOrPutDependency(
-        screenModel: ScreenModel,
-        name: String,
-        noinline onDispose: @DisallowComposableCalls (T) -> Unit = {},
-        factory: @DisallowComposableCalls (DependencyKey) -> T
-    ): T {
-        val key = getDependencyKey(screenModel, name)
-        return getOrPutDependency<T>(key, factory, onDispose)
-    }
-
-    inline fun <reified T : Any> getOrPutDependency(
-        key: DependencyKey,
-        factory: @DisallowComposableCalls (DependencyKey) -> T,
-        noinline onDispose: @DisallowComposableCalls (T) -> Unit
-    ): T {
-        assertGetOrPutDependencyCorrect(key, dependencies[key])
-        return dependencies
-            .getOrPut(key) {
-                DependencyWithRemoveOrder(dependencyCounter.getAndIncrement(), (factory(key) to onDispose) as Dependency)
-            }
-            .dependency
-            .first as T
-    }
-
-    inline fun <reified T : Any> getOrPutDependency(
-        screen: Screen,
-        name: String,
-        tag: String? = null,
-        noinline onDispose: @DisallowComposableCalls (T) -> Unit = {},
-        factory: @DisallowComposableCalls (DependencyKey) -> T
-    ): T {
-        val key = getDependencyKey(screen, name, tag)
-        return getOrPutDependency(key, factory, onDispose)
-    }
-
-    fun getDependencyKey(screen: Screen, name: String, tag: String? = null) =
-        "${screen.screenKey.value}:$name${if (tag != null) ":$tag" else ""}"
-
-    fun remove(screen: Screen) {
-        if (removedScreenKeys[screen.screenKey] != null) {
-            ModoDevOptions.onIllegalScreenModelStoreAccess.validationFailed(
-                IllegalStateException("Trying to remove screen $screen ${screen::class} the second time.")
-            )
-        }
-        screenModels.onEach(screen) { key ->
-            screenModels[key]?.onDispose()
-            screenModels -= key
-        }
-
-        val screenDependencies = dependencies
-            .screenDependencies(screen)
-            .toList()
-        screenDependencies.sortedBy { it.value.removePriority }.forEach { (key, value) ->
-            val (instance, onDispose) = value.dependency
-            onDispose(instance)
-            dependencies -= key
-        }
-        removedScreenKeys[screen.screenKey] = Unit
     }
 
     @PublishedApi
@@ -180,9 +214,6 @@ object ScreenModelStore {
             )
         }
     }
-
-    private fun <T> Map<String, T>.screenDependencies(screen: Screen): Sequence<Map.Entry<String, T>> =
-        asSequence().filter { it.key.startsWith(screen.screenKey.value) }
 
     private fun <T> Map<String, T>.onEach(screen: Screen, block: (String) -> Unit) =
         asSequence()

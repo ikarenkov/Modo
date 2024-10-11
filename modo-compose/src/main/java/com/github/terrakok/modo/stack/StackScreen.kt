@@ -19,7 +19,6 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogWindowProvider
 import androidx.core.view.WindowCompat
-import com.github.terrakok.modo.ComposeRenderer
 import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
@@ -73,6 +72,7 @@ abstract class StackScreen(
         dialogModifier: Modifier = Modifier,
         content: RendererContent<StackState> = defaultRendererContent
     ) {
+        StackBackHandler()
         val screensToRender: ScreensToRender by rememberScreensToRender()
         screensToRender.screen?.let { screen ->
             Content(screen, modifier, content)
@@ -133,6 +133,18 @@ abstract class StackScreen(
     }
 
     @Composable
+    private fun StackBackHandler() {
+        val isBackHandlerEnabled by remember {
+            derivedStateOf {
+                defaultBackHandler && navigationState.getChildScreens().size > 1
+            }
+        }
+        BackHandler(enabled = isBackHandlerEnabled) {
+            back()
+        }
+    }
+
+    @Composable
     @OptIn(ExperimentalModoApi::class)
     private fun StackScreen.RenderDialog(
         dialog: DialogScreen,
@@ -148,11 +160,6 @@ abstract class StackScreen(
                     onDismissRequest = { back() },
                     properties = dialogConfig.dialogProperties
                 ) {
-                    DisposableEffect(Unit) {
-                        onDispose {
-                            (renderer as ComposeRenderer).transitionCompleteChannel.trySend(Unit)
-                        }
-                    }
                     val parent = LocalView.current.parent
                     DisposableEffect(parent) {
                         (parent as? DialogWindowProvider)?.window?.let { window ->
@@ -180,14 +187,6 @@ abstract class StackScreen(
         modifier: Modifier = Modifier,
         content: RendererContent<StackState> = defaultRendererContent
     ) {
-        val isBackHandlerEnabled by remember {
-            derivedStateOf {
-                defaultBackHandler && navigationState.getChildScreens().size > 1
-            }
-        }
-        BackHandler(enabled = isBackHandlerEnabled) {
-            back()
-        }
         super.InternalContent(screen, modifier, content)
     }
 
@@ -227,7 +226,7 @@ data class DialogPlaceHolder(
     override fun Content(modifier: Modifier) {
         Box(
             // ignore modifier, because it is just invisible placeholder
-            Modifier.fillMaxSize()
+            modifier
         )
     }
 

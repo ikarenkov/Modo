@@ -2,6 +2,12 @@ package com.github.terrakok.modo
 
 import android.os.Parcelable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.snapshotFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 
 /**
  * State of navigation used in [NavigationContainer]. Can be any type.
@@ -37,6 +43,15 @@ interface NavigationContainer<State : NavigationState, in Action : NavigationAct
     fun dispatch(action: Action, vararg actions: Action)
 
 }
+
+fun <State : NavigationState, Action : NavigationAction<State>> NavigationContainer<State, Action>.navigationStateFlow(): Flow<State> =
+    snapshotFlow { navigationState }
+
+fun <State : NavigationState, Action : NavigationAction<State>> NavigationContainer<State, Action>.navigationStateStateFlow(
+    coroutineScope: CoroutineScope,
+): StateFlow<State> =
+    snapshotFlow { navigationState }
+        .stateIn(coroutineScope, started = SharingStarted.WhileSubscribed(), initialValue = navigationState)
 
 interface NavigationRenderer<State : NavigationState> {
     fun render(state: State)

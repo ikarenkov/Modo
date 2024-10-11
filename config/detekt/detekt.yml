@@ -707,6 +707,7 @@ style:
     ignoreEnums: false
     ignoreRanges: false
     ignoreExtensionFunctions: true
+    ignoreAnnotated: ['Preview']
   MandatoryBracesLoops:
     active: false
   MaxChainedCallsOnSameLine:
@@ -882,7 +883,7 @@ Compose:
   CompositionLocalAllowlist:
     active: true
     # -- You can optionally define a list of CompositionLocals that are allowed here
-    allowedCompositionLocals: LocalContainerScreen,LocalMultiScreenNavigation,LocalSaveableStateHolder,LocalTransitionCompleteChannel,LocalStackNavigation,
+    allowedCompositionLocals: LocalContainerScreen,LocalMultiScreenNavigation,LocalSaveableStateHolder,LocalBeforeScreenContentOnDispose,LocalAfterScreenContentOnDispose,LocalStackNavigation,
   CompositionLocalNaming:
     active: true
   ContentEmitterReturningValues:

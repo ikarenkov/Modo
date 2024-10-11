@@ -142,4 +142,3 @@ fun NavigationContainer<ListNavigationState, ListNavigationAction>.setScreens(va
 
 fun NavigationContainer<ListNavigationState, ListNavigationAction>.removeAllScreens() =
     dispatch(ListNavigationAction.SetScreens())
-

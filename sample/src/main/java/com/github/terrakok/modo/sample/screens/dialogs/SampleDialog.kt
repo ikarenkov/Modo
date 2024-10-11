@@ -74,7 +74,7 @@ class SampleDialog(
                     .background(Color.White)
             ) {
                 if (dialogsPlayground) {
-                    DialogsPlaygroundContent(screenIndex, screenKey)
+                    DialogsPlaygroundContent(screenIndex)
                 } else {
                     MainScreenContent(screenIndex, screenKey, navigation)
                 }
@@ -84,7 +84,6 @@ class SampleDialog(
                 ButtonsScreenContent(
                     screenIndex = screenIndex,
                     screenName = "SampleDialog",
-                    screenKey = screenKey,
                     state = rememberDialogsButtons(LocalContainerScreen.current as StackScreen, screenIndex),
                     modifier = modifier
                         .align(Alignment.Center)
