@@ -8,10 +8,10 @@ import io.github.ikarenkov.workshop.screens.personal_data.ClimberPersonalInfoScr
 
 @Suppress("MagicNumber")
 fun getNextProfileSetupStepScreen(step: Int): SetupStepScreen? = when (step) {
-        1 -> ClimbingLevelScreen(ClimbingType.Sport)
-        2 -> ClimbingLevelScreen(ClimbingType.Bouldering)
-        3 -> TrainingRecommendationsScreen()
-        else -> null
+    1 -> ClimbingLevelScreen(ClimbingType.Sport)
+    2 -> ClimbingLevelScreen(ClimbingType.Bouldering)
+    3 -> TrainingRecommendationsScreen()
+    else -> null
 }
 
 @Suppress("MagicNumber")
