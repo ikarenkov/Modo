@@ -1,7 +1,7 @@
 [versions]
 composeWheelPicker = "1.0.0-beta05"
 leakcanaryAndroid = "2.14"
-modo = "0.10.0-alpha3"
+modo = "0.10.0"
 androidGradlePlugin = "8.4.0"
 detektComposeVersion = "0.3.20"
 detektVersion = "1.23.6"

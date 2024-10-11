@@ -8,46 +8,30 @@ import io.github.ikarenkov.workshop.domain.ClimberProfile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-// TODO: Workshop 5.1 - create VM
+// TODO: Workshop 5.1 - use VM
 class ProfileSetupFlowViewModel(
-    // TODO: Workshop 5.1.1 - pass ProfileSetupFlowScreen as parameter
-    // TODO: Workshop 5.1.2 - pass parent stack navigation as parameter
+    // TODO: Workshop 5.1.3 - pass ProfileSetupFlowScreen and parent stack navigation as parameters
+//    private val profileSetupFlowScreen: ProfileSetupFlowScreen,
+//    private val parentNavigation: StackNavContainer,
     @Suppress("UnusedPrivateProperty")
     private val climberProfileRepository: ClimberProfileRepository,
 ) : ViewModel() {
 
-    // TODO: Workshop 5.4.2 - get starting step based on filled data and set a state to the navigation using getInitialScreensList
+    // TODO: Workshop 5.4 - set navigation initial state using getProfileSetupStartingStep and getProfileSetupInitialScreens
 
-    @Suppress("MagicNumber", "UnusedPrivateMember")
-    private fun getStartingStep(profile: ClimberProfile) = when {
-        profile.boulderLevel.hasAllGrades() -> 4
-        profile.sportLevel.hasAllGrades() -> 3
-        profile.dateOfBirth != null && profile.heightSm != null && profile.weightKg != null -> 2
-        else -> 1
-    }
-
-    // TODO: Workshop 5.3 - define state using navigationStateFlow and climberProfileRepository.climberProfile
-    val state: StateFlow<ProfileSetupContainerUiState> = MutableStateFlow(
-        ProfileSetupContainerUiState(
-            continueEnabled = true,
-            currentStep = 1,
-            stepsCount = 4,
-            title = "Step #1"
-        )
-    )
-
-    @Suppress("UnusedParameter")
-    // TODO: Workshop 5.4.1 - implement getInitialScreensList
-    fun getInitialScreensList(step: Int): List<Screen> = listOfNotNull()
+    // TODO: Workshop 5.3.1 - define state using navigationStateFlow and climberProfileRepository.climberProfile
+    //  Use combineStateFlow, navigationStateStateFlow, climberProfileRepository.climberProfile and getUiState
+//    val state: StateFlow<ProfileSetupContainerUiState> = combineStateFlow(
+//        profileSetupFlowScreen.navigationStateStateFlow(viewModelScope),
+//        climberProfileRepository.climberProfile,
+//        viewModelScope
+//    ) { navigationState, profile ->
+//        getUiState(navigationState, profile)
+//    }
 
     fun onContinueClick() {
         // TODO: Workshop 5.2.1 - move onContinueClick from ProfileSetupFlowScreen
-//        when (profileSetupFlowScreen.navigationState.stack.size) {
-//            1 -> ClimbingLevelScreen(ClimbingType.Sport)
-//            2 -> ClimbingLevelScreen(ClimbingType.Bouldering)
-//            3 -> TrainingRecommendationsScreen()
-//            else -> null
-//        }
+//        getNextProfileSetupStepScreen(profileSetupFlowScreen.navigationState.stack.size)
 //            ?.let { profileSetupFlowScreen.forward(it) }
 //            ?: parentNavigation.back()
     }

@@ -40,24 +40,29 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class ProfileSetupFlowScreen(
-// TODO: Workshop 4.1 - implement navModel in constructor and pass it to StackScreen, use ClimberPersonalInfoScreen as initial screen
+// TODO: Workshop 4.1.1 - implement navModel in constructor and pass it to StackScreen, use ClimberPersonalInfoScreen as initial screen
     override val screenKey: ScreenKey = generateScreenKey()
 ) : Screen {
 
     @Composable
     override fun Content(modifier: Modifier) {
+        // TODO: Workshop 5.1.2 - retrieve viewModel using koinViewModel
+        // TODO: Workshop 5.1.5 - pass parameters to viewModel
         // TODO: Workshop 4.4 - use navigation state to retrieve current step and title
         val state = ProfileSetupContainerUiState(
+            // TODO: Workshop 4.4.1 - retrieve title from last screen when it is SetupStepScreen
             title = "Step #1",
+            // TODO: Workshop 4.4.2 - set current step based on size of stack
             currentStep = 1,
             stepsCount = 4,
             continueEnabled = true
         )
         ProfileSetupFlowContainerContent(
             modifier = modifier,
+            // TODO: Workshop 5.3.2 - use state from viewModel
             state = state,
             onContinueClick = {
-                // TODO: Workshop 4.3.1 - navigation based on selected screen
+                // TODO: Workshop 4.3.1 - navigation based on selected screen. Use `getNextProfileSetupStepScreen`.
                 // TODO: 5.2.1 - move to VM
             },
             onCancelClick = {
@@ -69,7 +74,7 @@ class ProfileSetupFlowScreen(
                 // TODO: 5.2.3 - move to VM
             },
         ) { modifier ->
-            // TODO: Workshop 4.1.3 - display content
+            // TODO: Workshop 4.1.2 - display content
             // TODO: Workshop 4.5 - custom animation
         }
     }
