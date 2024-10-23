@@ -1,4 +1,4 @@
-name: Build documentation
+name: Build and Deploy Writerside + CodeLabs
 
 on:
   push:
@@ -23,6 +23,17 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Step to Install claat
+      - name: Install claat tool
+        run: go install github.com/googlecodelabs/tools/claat@latest
+
+      # Step to Generate CodeLab HTML Files
+      - name: Generate CodeLabs content
+        run: |
+          mkdir -p codelabs
+          claat export codelabs/workshop/workshop-codelab.md -o codelabs-generated
+
+      # Writerside build step
       - name: Build docs using Writerside Docker builder
         uses: JetBrains/writerside-github-action@v4
         with:
@@ -52,8 +63,12 @@ jobs:
         with:
           name: docs
 
-      - name: Unzip artifact
+      - name: Unzip Writerside artifact
         run: unzip -O UTF-8 -qq ${{ env.ARTIFACT }} -d dir
+
+      # Inject CodeLab HTML into Writerside docs
+      - name: Copy CodeLabs to Writerside output
+        run: cp -R codelabs-generated/* dir/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4.0.0
