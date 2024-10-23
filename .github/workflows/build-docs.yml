@@ -37,7 +37,7 @@ jobs:
       - name: Generate CodeLabs content
         run: |
           mkdir -p codelabs-generated
-          claat export codelabs/workshop/workshop-codelab.md -o codelabs-generated
+          claat export -o codelabs-generated codelabs/workshop/workshop-codelab.md
 
       # Writerside build step
       - name: Build docs using Writerside Docker builder
