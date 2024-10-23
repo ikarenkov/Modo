@@ -2,7 +2,7 @@ name: Build and Deploy Writerside + CodeLabs
 
 on:
   push:
-    branches: ["dev"]
+    branches: [ "dev" ]
   workflow_dispatch:
 
 permissions:
@@ -91,6 +91,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    # Requires build job results
     needs: build
     runs-on: ubuntu-latest
 
@@ -113,11 +114,11 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4.0.0
 
-      # Upload to GitHub Pages
-      - name: Upload artifact
+      # Upload the CONTENTS of the 'dir' folder to GitHub Pages ROOT
+      - name: Upload to GitHub Pages
         uses: actions/upload-pages-artifact@v3.0.1
         with:
-          path: dir
+          path: dir/**   # This uploads all the contents of 'dir/' to the root
 
       - name: Deploy to GitHub Pages
         id: deployment
