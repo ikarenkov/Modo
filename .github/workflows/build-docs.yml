@@ -23,14 +23,20 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Step to Install claat
+      # Install claat tool
       - name: Install claat tool
         run: go install github.com/googlecodelabs/tools/claat@latest
+        env:
+          GOPATH: ${{ runner.temp }}/go
+
+      # Ensure claat is in PATH
+      - name: Add claat to PATH
+        run: echo "${{ runner.temp }}/go/bin" >> $GITHUB_PATH
 
       # Step to Generate CodeLab HTML Files
       - name: Generate CodeLabs content
         run: |
-          mkdir -p codelabs
+          mkdir -p codelabs-generated
           claat export codelabs/workshop/workshop-codelab.md -o codelabs-generated
 
       # Writerside build step
