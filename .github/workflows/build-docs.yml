@@ -37,7 +37,7 @@ jobs:
       - name: Generate CodeLabs content
         run: |
           mkdir -p codelabs-generated
-          claat export -o codelabs-generated codelabs/workshop/workshop-codelab.md
+          claat export -o codelabs-generated codelabs/workshop/workshop-codelab.md || exit 1
 
       # Verify that CodeLabs files were generated
       - name: List generated CodeLabs files
@@ -53,7 +53,13 @@ jobs:
 
       # Unzip the Writerside artifact
       - name: Unzip Writerside artifact
-        run: unzip -O UTF-8 -qq artifacts/${{ env.ARTIFACT }} -d dir
+        run: |
+          mkdir -p dir
+          unzip -O UTF-8 -qq artifacts/${{ env.ARTIFACT }} -d dir
+
+      # Verify Writerside files were unzipped correctly
+      - name: Verify unzipped Writerside content
+        run: ls -la dir
 
       # Combine CodeLabs and Writerside output
       - name: Copy CodeLabs to Writerside output
@@ -64,6 +70,10 @@ jobs:
             echo "No CodeLabs content generated."
             exit 1
           fi
+
+      # Verify CodeLabs content was copied into Writerside output
+      - name: Verify combined content in Writerside output
+        run: ls -la dir
 
       # Save combined Writerside + CodeLabs artifact
       - name: Save combined artifact with Writerside and CodeLabs
