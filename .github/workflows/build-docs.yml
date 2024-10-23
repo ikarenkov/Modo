@@ -2,7 +2,7 @@ name: Build and Deploy Writerside + CodeLabs
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: ["dev"]
   workflow_dispatch:
 
 permissions:
@@ -77,7 +77,7 @@ jobs:
 
       # Zip the combined Writerside + CodeLabs content
       - name: Zip combined content
-        run: zip -r combined-docs.zip dir
+        run: cd dir && zip -r ../combined-docs.zip .
 
       # Save the ZIP artifact with combined Writerside + CodeLabs content
       - name: Save combined artifact with Writerside and CodeLabs
@@ -91,7 +91,6 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    # Requires build job results
     needs: build
     runs-on: ubuntu-latest
 
@@ -114,11 +113,11 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4.0.0
 
-      # Upload the CONTENTS of the 'dir' folder to GitHub Pages ROOT
-      - name: Upload to GitHub Pages
+      # Upload to GitHub Pages
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3.0.1
         with:
-          path: dir/**   # This uploads all the contents of 'dir/' to the root
+          path: dir
 
       - name: Deploy to GitHub Pages
         id: deployment
