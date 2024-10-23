@@ -75,27 +75,39 @@ jobs:
       - name: Verify combined content in Writerside output
         run: ls -la dir
 
-      # Save combined Writerside + CodeLabs artifact
+      # Zip the combined Writerside + CodeLabs content
+      - name: Zip combined content
+        run: zip -r combined-docs.zip dir
+
+      # Save the ZIP artifact with combined Writerside + CodeLabs content
       - name: Save combined artifact with Writerside and CodeLabs
         uses: actions/upload-artifact@v4
         with:
           name: docs
-          path: dir
+          path: combined-docs.zip
           retention-days: 7
 
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    # Requires build job results
     needs: build
     runs-on: ubuntu-latest
 
     steps:
+      # Download the artifact (ZIP file)
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: docs
+
+      # Unzip the artifact
+      - name: Unzip artifact
+        run: unzip combined-docs.zip -d dir
+
+      # Verify the unzipped content
+      - name: Verify unzipped content
+        run: ls -la dir
 
       # Set up for GitHub Pages deployment
       - name: Setup Pages
