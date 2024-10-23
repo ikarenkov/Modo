@@ -39,6 +39,10 @@ jobs:
           mkdir -p codelabs-generated
           claat export -o codelabs-generated codelabs/workshop/workshop-codelab.md
 
+      # Verify that CodeLabs files were generated
+      - name: List generated CodeLabs files
+        run: ls -la codelabs-generated
+
       # Writerside build step
       - name: Build docs using Writerside Docker builder
         uses: JetBrains/writerside-github-action@v4
@@ -47,12 +51,26 @@ jobs:
           artifact: ${{ env.ARTIFACT }}
           docker-version: ${{ env.DOCKER_VERSION }}
 
-      - name: Save artifact with build results
+      # Unzip the Writerside artifact
+      - name: Unzip Writerside artifact
+        run: unzip -O UTF-8 -qq artifacts/${{ env.ARTIFACT }} -d dir
+
+      # Combine CodeLabs and Writerside output
+      - name: Copy CodeLabs to Writerside output
+        run: |
+          if [ -d "codelabs-generated" ] && [ "$(ls -A codelabs-generated)" ]; then
+            cp -R codelabs-generated/* dir/
+          else
+            echo "No CodeLabs content generated."
+            exit 1
+          fi
+
+      # Save combined Writerside + CodeLabs artifact
+      - name: Save combined artifact with Writerside and CodeLabs
         uses: actions/upload-artifact@v4
         with:
           name: docs
-          path: |
-            artifacts/${{ env.ARTIFACT }}
+          path: dir
           retention-days: 7
 
   deploy:
@@ -69,16 +87,11 @@ jobs:
         with:
           name: docs
 
-      - name: Unzip Writerside artifact
-        run: unzip -O UTF-8 -qq ${{ env.ARTIFACT }} -d dir
-
-      # Inject CodeLab HTML into Writerside docs
-      - name: Copy CodeLabs to Writerside output
-        run: cp -R codelabs-generated/* dir/
-
+      # Set up for GitHub Pages deployment
       - name: Setup Pages
         uses: actions/configure-pages@v4.0.0
 
+      # Upload to GitHub Pages
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3.0.1
         with:
