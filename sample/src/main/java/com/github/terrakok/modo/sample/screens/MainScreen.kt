@@ -32,6 +32,7 @@ import com.github.terrakok.modo.sample.screens.stack.StackActionsScreen
 import com.github.terrakok.modo.sample.screens.viewmodel.AndroidViewModelSampleScreen
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.StackNavContainer
+import com.github.terrakok.modo.stack.StackNavModel
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.forward
 import com.github.terrakok.modo.util.getActivity
@@ -164,6 +165,25 @@ private fun rememberButtons(
                     buttons = listOf(
                         ModoButtonSpec("Screen Lifecycle") { navigation?.forward(LifecycleSampleScreen(i + 1)) },
                         ModoButtonSpec("Keyboard + Lifecycle") { navigation?.forward(KeyboardWithLifecycleScreen()) },
+                        ModoButtonSpec("Open predefined flow") {
+                            navigation?.forward(
+                                CustomStackSample(
+                                    i + 1,
+                                    StackNavModel(
+                                        MainScreen(i + 2),
+                                        MainScreen(i + 3),
+                                        KeyboardWithLifecycleScreen(),
+                                        CustomStackSample(
+                                            i = i + 4,
+                                            navModel = StackNavModel(
+                                                MainScreen(i + 5),
+                                                KeyboardWithLifecycleScreen(),
+                                            ),
+                                        ),
+                                    )
+                                )
+                            )
+                        },
                     )
                 ),
                 GroupedButtonsState.Group(

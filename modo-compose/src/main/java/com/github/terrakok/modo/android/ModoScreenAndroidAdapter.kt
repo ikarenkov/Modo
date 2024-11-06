@@ -100,6 +100,12 @@ class ModoScreenAndroidAdapter private constructor(
     private val atomicParentLifecycleOwner = AtomicReference<LifecycleOwner>()
     private val application: Application? get() = atomicContext.get()?.applicationContext?.getApplication()
 
+    /**
+     * Indicates that lifecycle should be moved to RESUMED state as soon as parent will be RESUMED.
+     */
+    @Volatile
+    private var isResumePostponed: Boolean = false
+
     init {
         controller.performAttach()
         enableSavedStateHandles()
@@ -135,7 +141,15 @@ class ModoScreenAndroidAdapter private constructor(
     }
 
     override fun onResume() {
-        safeHandleLifecycleEvent(ON_RESUME)
+        val parentState = atomicParentLifecycleOwner.get()?.lifecycle?.currentState
+        if (parentState == null || parentState != Lifecycle.State.RESUMED) {
+            // We need to do so, because child is ready to move to resumed state, when parent is not.
+            // It can happen when we display this screen as a first screen inside container, that is animating.
+            // So we need to wait until parent will be resumed and execute ON_RESUME event after it.
+            isResumePostponed = true
+        } else {
+            safeHandleLifecycleEvent(ON_RESUME)
+        }
     }
 
     override fun toString(): String = "${ModoScreenAndroidAdapter::class.simpleName}, screenKey: ${screen.screenKey}"
@@ -239,10 +253,15 @@ class ModoScreenAndroidAdapter private constructor(
                     if (
                         needPropagateLifecycleEventFromParent(
                             event,
+                            isResumePostponed = isResumePostponed,
                             isActivityFinishing = activity?.isFinishing,
                             isChangingConfigurations = activity?.isChangingConfigurations
                         )
                     ) {
+                        // reset postpone resume flag because we moved state to resumed
+                        if (event == ON_RESUME) {
+                            isResumePostponed = false
+                        }
                         safeHandleLifecycleEvent(event)
                     }
                 }
@@ -298,6 +317,7 @@ class ModoScreenAndroidAdapter private constructor(
         @JvmStatic
         fun needPropagateLifecycleEventFromParent(
             event: Lifecycle.Event,
+            isResumePostponed: Boolean,
             isActivityFinishing: Boolean?,
             isChangingConfigurations: Boolean?
         ) =
@@ -312,11 +332,17 @@ class ModoScreenAndroidAdapter private constructor(
              *
              * In the case of Fragments, we unsubscribe before ON_DESTROY event, so there is no problem with this.
              */
-            if (event == ON_DESTROY && (isActivityFinishing == false || isChangingConfigurations == true)) {
-                false
-            } else {
-                // Parent can only move lifecycle state down. Because parent cant be already resumed, but child is not, because of running animation.
-                event !in moveLifecycleStateUpEvents
+            when {
+                event == ON_DESTROY && (isActivityFinishing == false || isChangingConfigurations == true) -> {
+                    false
+                }
+                isResumePostponed && event == ON_RESUME -> {
+                    true
+                }
+                else -> {
+                    // Parent can only move lifecycle state down. Because parent cant be already resumed, but child is not, because of running animation.
+                    event !in moveLifecycleStateUpEvents
+                }
             }
 
         @JvmStatic

@@ -24,6 +24,7 @@ import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.sample.screens.ModoButton
 import com.github.terrakok.modo.sample.screens.ModoButtonSpec
+import com.github.terrakok.modo.sample.screens.base.LogLifecycle
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.util.getActivity
@@ -39,6 +40,7 @@ class KeyboardWithLifecycleScreen(
 ) : Screen {
     @Composable
     override fun Content(modifier: Modifier) {
+        LogLifecycle()
         Column(modifier.windowInsetsPadding(WindowInsets.systemBars)) {
             val stackNavigation = LocalStackNavigation.current
             ModoButton(ModoButtonSpec("Back") { stackNavigation.back() })
