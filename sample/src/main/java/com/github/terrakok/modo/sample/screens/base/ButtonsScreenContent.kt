@@ -1,5 +1,6 @@
 package com.github.terrakok.modo.sample.screens.base
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
@@ -28,7 +29,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
-import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
 import com.github.terrakok.modo.sample.SampleAppConfig
 import com.github.terrakok.modo.sample.randomBackground
 import com.github.terrakok.modo.sample.screens.ButtonsState
@@ -120,11 +120,11 @@ fun Screen.LogLifecycle() {
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
-    LifecycleScreenEffect {
-        LifecycleEventObserver { source, event ->
-            logcat(tag = "LifecycleDebug") { "$screenKey LifecycleScreenEffect $event" }
-        }
-    }
+//    LifecycleScreenEffect {
+//        LifecycleEventObserver { source, event ->
+//            logcat(tag = "LifecycleDebug") { "$screenKey LifecycleScreenEffect $event" }
+//        }
+//    }
 }
 
 @Composable
@@ -136,29 +136,32 @@ internal fun SampleScreenContent(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Column(
+    Box(
         modifier = modifier
             .randomBackground()
             .windowInsetsPadding(WindowInsets.systemBars)
             .padding(8.dp),
     ) {
-        Text(
-            text = counter.toString()
-        )
-        Text(
-            text = "$screenName $screenIndex",
-            style = MaterialTheme.typography.h5,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = "ScreenKey: ${screenKey.value}",
-            style = MaterialTheme.typography.body1,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.size(16.dp))
-        content()
+        Column {
+            Text(
+                text = counter.toString()
+            )
+            Text(
+                text = "$screenName $screenIndex",
+                style = MaterialTheme.typography.h5,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = "ScreenKey: ${screenKey.value}",
+                style = MaterialTheme.typography.body1,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.size(16.dp))
+            content()
+        }
+        LifecycleEventsHistory()
     }
 }
 

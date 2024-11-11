@@ -26,49 +26,57 @@ class DetektPlugin : Plugin<Project> {
 
 fun Project.setupDetektTask() {
     tasks.register<Detekt>("detektAll") {
-        reports {
-            sarif.required = true
-        }
-        // The directories where detekt looks for source files.
-        // Defaults to `files("src/main/java", "src/test/java", "src/main/kotlin", "src/test/kotlin")`.
-        setSource(projectDir)
+        configureDetekt(this)
+    }
+    tasks.register<Detekt>("detektFormat") {
+        configureDetekt(this)
+        autoCorrect = true
+    }
+}
 
-        include("**/*.kt")
-        include("**/*.kts")
-        exclude("**/resources/")
-        exclude("**/build/")
-        exclude("Writerside/codeSnippets/")
+private fun Project.configureDetekt(detekt: Detekt) {
+    detekt.reports {
+        sarif.required = true
+    }
+    // The directories where detekt looks for source files.
+    // Defaults to `files("src/main/java", "src/test/java", "src/main/kotlin", "src/test/kotlin")`.
+    detekt.setSource(project.projectDir)
 
-        // Builds the AST in parallel. Rules are always executed in parallel.
-        // Can lead to speedups in larger projects. `false` by default.
-        parallel = true
+    detekt.include("**/*.kt")
+    detekt.include("**/*.kts")
+    detekt.exclude("**/resources/")
+    detekt.exclude("**/build/")
+    detekt.exclude("Writerside/codeSnippets/")
 
-        // Define the detekt configuration(s) you want to use.
-        // Defaults to the default detekt configuration.
-        config.setFrom("config/detekt/detekt.yml")
+    // Builds the AST in parallel. Rules are always executed in parallel.
+    // Can lead to speedups in larger projects. `false` by default.
+    detekt.parallel = true
 
-        // Applies the config files on top of detekt's default config file. `false` by default.
-        buildUponDefaultConfig = false
+    // Define the detekt configuration(s) you want to use.
+    // Defaults to the default detekt configuration.
+    detekt.config.setFrom("config/detekt/detekt.yml")
 
-        // Turns on all the rules. `false` by default.
-        allRules = false
+    // Applies the config files on top of detekt's default config file. `false` by default.
+    detekt.buildUponDefaultConfig = false
 
-        // Specifying a baseline file. All findings stored in this file in subsequent runs of detekt.
+    // Turns on all the rules. `false` by default.
+    detekt.allRules = false
+
+    // Specifying a baseline file. All findings stored in this file in subsequent runs of detekt.
 //    baseline = file("path/to/baseline.xml")
 
-        // Disables all default detekt rulesets and will only run detekt with custom rules
-        // defined in plugins passed in with `detektPlugins` configuration. `false` by default.
-        disableDefaultRuleSets = false
+    // Disables all default detekt rulesets and will only run detekt with custom rules
+    // defined in plugins passed in with `detektPlugins` configuration. `false` by default.
+    detekt.disableDefaultRuleSets = false
 
-        // Adds debug output during task execution. `false` by default.
-        debug = false
+    // Adds debug output during task execution. `false` by default.
+    detekt.debug = false
 
-        // If set to `true` the build does not fail when the
-        // maxIssues count was reached. Defaults to `false`.
-        ignoreFailures = true
+    // If set to `true` the build does not fail when the
+    // maxIssues count was reached. Defaults to `false`.
+    detekt.ignoreFailures = true
 
-        // Specify the base path for file paths in the formatted reports.
-        // If not set, all file paths reported will be absolute file path.
-        basePath = rootProject.projectDir.absolutePath
-    }
+    // Specify the base path for file paths in the formatted reports.
+    // If not set, all file paths reported will be absolute file path.
+    detekt.basePath = project.rootProject.projectDir.absolutePath
 }

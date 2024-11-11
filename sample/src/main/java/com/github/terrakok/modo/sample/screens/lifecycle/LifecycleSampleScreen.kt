@@ -1,19 +1,13 @@
 package com.github.terrakok.modo.sample.screens.lifecycle
 
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.Lifecycle
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.eventFlow
@@ -22,11 +16,12 @@ import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.lifecycle.LaunchedScreenEffect
-import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
 import com.github.terrakok.modo.sample.screens.ButtonsState
 import com.github.terrakok.modo.sample.screens.GroupedButtonsList
 import com.github.terrakok.modo.sample.screens.MainScreen
 import com.github.terrakok.modo.sample.screens.ModoButtonSpec
+import com.github.terrakok.modo.sample.screens.PauseButtonSpec
+import com.github.terrakok.modo.sample.screens.base.LifecycleEventsHistory
 import com.github.terrakok.modo.sample.screens.base.SampleScreenContent
 import com.github.terrakok.modo.sample.screens.base.rememberCounterState
 import com.github.terrakok.modo.stack.LocalStackNavigation
@@ -51,11 +46,21 @@ class LifecycleSampleScreen(
     @OptIn(ExperimentalModoApi::class, ExperimentalStdlibApi::class)
     @Composable
     override fun Content(modifier: Modifier) {
-        var lifecycleEventsHistory by rememberSaveable {
-            mutableStateOf(listOf<Lifecycle.Event>())
-        }
-        val scaffoldState = rememberScaffoldState()
         val counter by rememberCounterState()
+        val lifecycleOwner = LocalLifecycleOwner.current
+
+        DisposableEffect(this) {
+            val observer = LifecycleEventObserver { _, event ->
+                logcat(TAG) { "DisposableEffect: event $event. Counter: $counter." }
+            }
+            lifecycleOwner.lifecycle.addObserver(observer)
+            onDispose {
+                logcat(TAG) { "DisposableEffect: on dispose" }
+                lifecycleOwner.lifecycle.removeObserver(observer)
+            }
+        }
+
+        val scaffoldState = rememberScaffoldState()
 
         // This effect is going to be launched once per screen an triggered even if screen left composition!
         // So be careful with passing any data to lambda which lifecycle is shorter than screen lifecycle.
@@ -64,7 +69,6 @@ class LifecycleSampleScreen(
             // Doing so will cause a leak of the scaffoldState.
             scaffoldState.snackbarHostState.showSnackbar("LaunchedScreenEffect! Counter: $counter.")
         }
-        val lifecycleOwner = LocalLifecycleOwner.current
         LaunchedEffect(Unit) {
             // Use Dispatchers.Main.immediate, otherwise you will lose ON_PAUSE, ON_STOP, ON_DESTROY events,
             // because of peculiarities of coroutines - it removes lifecycle observer before handling effects
@@ -77,23 +81,8 @@ class LifecycleSampleScreen(
                 }
             }
         }
-        DisposableEffect(this) {
-            val observer = LifecycleEventObserver { _, event ->
-                logcat(TAG) { "DisposableEffect: event $event. Counter: $counter." }
-            }
-            lifecycleOwner.lifecycle.addObserver(observer)
-            onDispose {
-                logcat(TAG) { "DisposableEffect: on dispose" }
-                lifecycleOwner.lifecycle.removeObserver(observer)
-            }
-        }
-        LifecycleScreenEffect {
-            LifecycleEventObserver { _, event ->
-                lifecycleEventsHistory += event
-                logcat(TAG) { "LifecycleScreenEffect: event $event. Counter: $counter." }
-            }
-        }
         val navigation = LocalStackNavigation.current
+        val context = LocalContext.current
         SampleScreenContent(
             screenIndex = screenIndex,
             screenName = "ScreenEffectsSampleScreen",
@@ -102,20 +91,18 @@ class LifecycleSampleScreen(
             modifier = modifier,
         ) {
             GroupedButtonsList(
-                state = remember {
+                state = rememberUpdatedState(
                     listOf(
+                        ModoButtonSpec("Back") { navigation.back() },
                         ModoButtonSpec("Forward") { navigation.forward(MainScreen(screenIndex + 1)) },
-                        ModoButtonSpec("Back") { navigation.back() }
+                        PauseButtonSpec(context),
                     ).let {
                         ButtonsState(it)
                     }
-                }
+                ).value
             )
-            LazyColumn {
-                items(lifecycleEventsHistory) {
-                    Text(text = it.name)
-                }
-            }
+
+            LifecycleEventsHistory(key = screenKey.value, enabled = true)
         }
     }
 }

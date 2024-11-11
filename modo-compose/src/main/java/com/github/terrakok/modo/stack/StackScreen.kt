@@ -174,7 +174,7 @@ abstract class StackScreen(
                 }
             }
             DialogScreen.DialogConfig.Custom -> {
-                DecorateCustomDialog(dialog, modifier) {
+                DecorateCustomDialog(dialog, modifier) { modifier ->
                     Content(dialog, modifier, content)
                 }
             }

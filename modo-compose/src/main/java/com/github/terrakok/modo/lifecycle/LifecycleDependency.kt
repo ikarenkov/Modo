@@ -12,13 +12,13 @@ interface LifecycleDependency {
      * Should be called when associated screen is ready to be moved to ON_RESUME state.
      * F.e. when screen appearance animation is finished and screen is fully visible.
      */
-    fun onResume()
+    fun showTransitionFinished()
 
     /**
      * Should be called when associated screen is ready to be moved to ON_PAUSE state.
      * F.e. when screen hide animation is started and screen is not fully visible.
      */
-    fun onPause()
+    fun hideTransitionStarted()
 
     fun onPreDispose()
 

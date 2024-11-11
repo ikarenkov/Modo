@@ -12,12 +12,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.sample.SlideTransition
+import com.github.terrakok.modo.sample.screens.base.LifecycleEventsHistory
 import com.github.terrakok.modo.sample.screens.base.LogLifecycle
 import com.github.terrakok.modo.sample.screens.dialogs.SampleBottomSheet
 import com.github.terrakok.modo.sample.screens.dialogs.SampleBottomSheetStack
@@ -52,16 +55,24 @@ open class SampleStack(
 
     constructor(rootScreen: Screen) : this(StackNavModel(rootScreen))
 
-    @OptIn(ExperimentalModoApi::class)
     @Composable
     override fun Content(modifier: Modifier) {
         LogLifecycle()
-        TopScreenContent(
-            modifier,
-            dialogModifier = modifier.fillMaxSize()
-        ) { modifier ->
-            SlideTransition(modifier)
+        Box(modifier.fillMaxSize()) {
+            TopScreenContent(
+                modifier = Modifier.fillMaxSize(),
+                dialogModifier = Modifier.fillMaxSize()
+            ) { contentModifier ->
+                SlideTransition(contentModifier)
+            }
+            LifecycleEventsHistory(
+                fontSize = 8.sp,
+                modifier = Modifier
+                    .background(Color.White.copy(alpha = 0.5f))
+                    .align(Alignment.TopEnd)
+            )
         }
+
     }
 
     @OptIn(ExperimentalModoApi::class)

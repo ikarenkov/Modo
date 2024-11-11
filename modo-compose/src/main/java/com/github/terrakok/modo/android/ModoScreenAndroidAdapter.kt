@@ -50,15 +50,15 @@ import com.github.terrakok.modo.util.getApplication
 import java.util.concurrent.atomic.AtomicReference
 
 /**
- * Adapter for Screem, to support android-related features using Modo, such as:
- * 1. ViewModel support
- * 2. Lifecycle support
- * 3. SavedState support
+ * Adapter for Screen that provides android-related features support using Modo, such as:
+ * 1. ViewModel
+ * 2. Lifecycle
+ * 3. SavedState
  *
  * It the single instance of [ModoScreenAndroidAdapter] per Screen.
  */
 class ModoScreenAndroidAdapter private constructor(
-//    just for debug purpose.
+    // For debugging purposes
     internal val screen: Screen
 ) :
     LifecycleOwner,
@@ -101,10 +101,11 @@ class ModoScreenAndroidAdapter private constructor(
     private val application: Application? get() = atomicContext.get()?.applicationContext?.getApplication()
 
     /**
-     * Indicates that lifecycle should be moved to RESUMED state as soon as parent will be RESUMED.
+     * Holding transition state of the screen to be able to handle lifecycle events from parent properly.
+     * Check out [needPropagateLifecycleEventFromParent] for more details.
      */
     @Volatile
-    private var isResumePostponed: Boolean = false
+    private var screenTransitionState: ScreenTransitionState = ScreenTransitionState.HIDDEN
 
     init {
         controller.performAttach()
@@ -136,18 +137,18 @@ class ModoScreenAndroidAdapter private constructor(
         safeHandleLifecycleEvent(ON_DESTROY)
     }
 
-    override fun onPause() {
+    override fun hideTransitionStarted() {
+        screenTransitionState = ScreenTransitionState.HIDING
         safeHandleLifecycleEvent(ON_PAUSE)
     }
 
-    override fun onResume() {
+    override fun showTransitionFinished() {
+        screenTransitionState = ScreenTransitionState.SHOWN
         val parentState = atomicParentLifecycleOwner.get()?.lifecycle?.currentState
-        if (parentState == null || parentState != Lifecycle.State.RESUMED) {
-            // We need to do so, because child is ready to move to resumed state, when parent is not.
-            // It can happen when we display this screen as a first screen inside container, that is animating.
-            // So we need to wait until parent will be resumed and execute ON_RESUME event after it.
-            isResumePostponed = true
-        } else {
+        // It's crucial to check parent state, because our state can't be greater than a parent state.
+        // If this condition is not met, resuming will be done when parent will be resumed and screenTransitionState == ScreenTransitionState.SHOWN.
+        // It can happen when we display this screen as a first screen inside container, that is animating.
+        if (parentState != null && parentState == Lifecycle.State.RESUMED) {
             safeHandleLifecycleEvent(ON_RESUME)
         }
     }
@@ -253,15 +254,11 @@ class ModoScreenAndroidAdapter private constructor(
                     if (
                         needPropagateLifecycleEventFromParent(
                             event,
-                            isResumePostponed = isResumePostponed,
+                            screenTransitionState = screenTransitionState,
                             isActivityFinishing = activity?.isFinishing,
                             isChangingConfigurations = activity?.isChangingConfigurations
                         )
                     ) {
-                        // reset postpone resume flag because we moved state to resumed
-                        if (event == ON_RESUME) {
-                            isResumePostponed = false
-                        }
                         safeHandleLifecycleEvent(event)
                     }
                 }
@@ -285,8 +282,29 @@ class ModoScreenAndroidAdapter private constructor(
         val skippEvent = needSkipEvent(lifecycle.currentState, event)
         if (!skippEvent) {
 //            Log.d("ModoScreenAndroidAdapter", "${screen.screenKey} handleLifecycleEvent $event")
+            screenTransitionState = when {
+                // Whenever we receive ON_RESUME event, we need to move screen to SHOWN state to indicate that there is no transition of this screen.
+                event == Lifecycle.Event.ON_RESUME -> ScreenTransitionState.SHOWN
+                // Whe need to check transition state to distinguish between
+                // 1. finishing screen hiding transition. In this case, we need to move screen to hidden state.
+                // 2. hiding screen, because of lifecycle event. In this case we don't need to change animation state.
+                event == Lifecycle.Event.ON_STOP && screenTransitionState == ScreenTransitionState.HIDING -> ScreenTransitionState.HIDDEN
+                // Pause by itself doesn't mean that screen is hidden, it can be visible, but not active. F.e. when system dialog is shown.
+                else -> screenTransitionState
+            }
             lifecycle.handleLifecycleEvent(event)
         }
+    }
+
+    /**
+     * Enum that represents
+     */
+    private enum class ScreenTransitionState {
+        HIDING,
+        HIDDEN,
+        SHOWN
+        // There is no SHOWING state, because we cannot distinguish it by using lifecycle events and
+        // [hideTransitionStarted] and [showTransitionFinished] methods.
     }
 
     companion object {
@@ -315,9 +333,9 @@ class ModoScreenAndroidAdapter private constructor(
             ) { ModoScreenAndroidAdapter(screen) }
 
         @JvmStatic
-        fun needPropagateLifecycleEventFromParent(
+        private fun needPropagateLifecycleEventFromParent(
             event: Lifecycle.Event,
-            isResumePostponed: Boolean,
+            screenTransitionState: ScreenTransitionState,
             isActivityFinishing: Boolean?,
             isChangingConfigurations: Boolean?
         ) =
@@ -336,12 +354,13 @@ class ModoScreenAndroidAdapter private constructor(
                 event == ON_DESTROY && (isActivityFinishing == false || isChangingConfigurations == true) -> {
                     false
                 }
-                isResumePostponed && event == ON_RESUME -> {
+                screenTransitionState == ScreenTransitionState.SHOWN && event == ON_RESUME -> {
                     true
                 }
                 else -> {
-                    // Parent can only move lifecycle state down. Because parent cant be already resumed, but child is not, because of running animation.
-                    event !in moveLifecycleStateUpEvents
+                    // Except previous condition, parent can only move lifecycle state down.
+                    // Because parent cant be already resumed, but child is not, because of running animation.
+                    event in moveLifecycleStateDownEvents
                 }
             }
 

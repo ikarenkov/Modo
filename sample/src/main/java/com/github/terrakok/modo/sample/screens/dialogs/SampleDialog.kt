@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,7 +58,7 @@ class SampleDialog(
         DialogScreen.DialogConfig.Custom
     }
 
-    @Suppress("ModifierNotUsedAtRoot")
+    @Suppress("MagicNumber", "ModifierNotUsedAtRoot")
     @Composable
     override fun Content(modifier: Modifier) {
         SetupSystemBar()
@@ -68,15 +69,16 @@ class SampleDialog(
         }
         val navigation = LocalStackNavigation.current
         if (systemDialog) {
-            Box(
-                modifier
+            Box(modifier) {
+                val contentModifier = Modifier
                     .clip(RoundedCornerShape(16.dp))
+                    .fillMaxHeight(0.6f)
                     .background(Color.White)
-            ) {
+                    .align(Alignment.Center)
                 if (dialogsPlayground) {
-                    DialogsPlaygroundContent(screenIndex)
+                    DialogsPlaygroundContent(screenIndex, contentModifier)
                 } else {
-                    MainScreenContent(screenIndex, screenKey, navigation)
+                    MainScreenContent(screenIndex, screenKey, navigation, contentModifier)
                 }
             }
         } else {
@@ -86,9 +88,11 @@ class SampleDialog(
                     screenName = "SampleDialog",
                     state = rememberDialogsButtons(LocalContainerScreen.current as StackScreen, screenIndex),
                     modifier = modifier
-                        .align(Alignment.Center)
+                        .fillMaxHeight(0.6f)
                         .padding(horizontal = 50.dp)
                         .clip(RoundedCornerShape(16.dp))
+                        .background(Color.White)
+                        .align(Alignment.Center)
                         // TODO: deal with A11Y and remove it from A11Y tree
                         .clickable(
                             enabled = false,

@@ -109,7 +109,7 @@ internal fun Screen.MainScreenContent(
     )
 }
 
-@Suppress("LongMethod")
+@Suppress("LongMethod", "MagicNumber")
 @Composable
 private fun rememberButtons(
     screenKey: ScreenKey,
