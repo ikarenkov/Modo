@@ -1,17 +1,19 @@
 # Lifecycle
 
-This article covers the lifetime of screen instances and their integration with Android Lifecycle.
+This article covers the lifetime of screen instances and their integration with the Android Lifecycle.
 
-## Screen instance lifecycle
+## Screen Instance Lifecycle
 
-It is guaranteed that the screen instance lifetime is equal to application (process) lifetime, when you provide Modo integration using built-in
-function from `Modo`, such as`Modo.rememberRootScreen`. No matter how many times a screen is recomposed, activity or/and fragment is recreated etc.
+The lifetime of a screen instance is guaranteed to match the application (process) lifetime when you integrate Modo using built-in functions such as
+`Modo.rememberRootScreen`. Regardless of how many times a screen is recomposed, or whether the activity and/or fragment is recreated, the screen
+instance remains consistent. This allows you to safely inject the screen instance into your DI container.
 
-## Android Lifecycle
+## Android Lifecycle Integration
 
-Modo provides Android Lifecycle integration for your screens.
-You can use `LocalLifecycleOwner` inside  `Screen.Content` to access the lifecycle of a screen.
-It will return the nearest Screen's lifecycle owner.
+Modo provides seamless [integration](%github_code_url%/modo-compose/src/main/java/com/github/terrakok/modo/android/ModoScreenAndroidAdapter.kt)
+with a Android Lifecycle for your screens.
+
+You can use `LocalLifecycleOwner` inside `Screen.Content` to access the lifecycle of a screen. This will return the nearest screen's lifecycle owner.
 
 ```kotlin
 class SampleScreen : Screen {
@@ -22,98 +24,46 @@ class SampleScreen : Screen {
 }
 ```
 
-### Lifecycle states and events
+### Lifecycle States and Events
 
-Let's take a look at what specific lifecycle states mean in the context of Screen Lifecycle:
+Here’s an overview of lifecycle states and their meanings in the context of the screen lifecycle:
 
-<table>
-    <tr>
-        <th>State</th>
-        <th>Meaning</th>
-    </tr>
-    <tr>
-        <td><b>INITIALIZED</b></td>
-        <td>Screen is constructed (instance created), but it has never been displayed.</td>
-    </tr>
-    <tr>
-        <td><b>CREATED</b></td>
-        <td>
+| **State**       | **Meaning**                                                                                                                 |
+|-----------------|-----------------------------------------------------------------------------------------------------------------------------|
+| **INITIALIZED** | The screen is constructed (instance created) but has never been displayed.                                                  |
+| **CREATED**     | The screen is in the navigation hierarchy and can be reached from the `RootScreen` integrated with an Activity or Fragment. |
+| **STARTED**     | `Screen.Content` is in composition.                                                                                         |
+| **RESUMED**     | The screen is **STARTED**, and there are no unfinished transitions for this screen or its parent.                           |
+| **DESTROYED**   | The screen is removed from the navigation graph.                                                                            |
 
-Screen is in navigation hierarchy, it can be reached from RootScreen, that is integrated to Activity/Fragment. With other words, it was displayed at
-least once.
+> `ON_CREATE` and `ON_DESTROY` are dispatched once per screen instance.
 
-</td>
-    </tr>
-    <tr>
-        <td><b>STARTED</b></td>
-        <td>
+### Screen Transitions and Lifecycle
 
-`Screen.Content` is in composition.
+Modo provides a convenient way to track when screen transitions start and finish. These events are tied to the `ON_RESUME` and `ON_PAUSE` lifecycle
+events. Here’s a summary:
 
-</td>
-    </tr>
-    <tr>
-        <td><b>RESUMED</b></td>
-        <td>
+| **Event**     | **With Transition**                                                                            | **Without Transition**                      |
+|---------------|------------------------------------------------------------------------------------------------|---------------------------------------------|
+| **ON_RESUME** | Dispatched when there are no unfinished transitions, and the parent is in the `RESUMED` state. | Dispatched when the parent is in `RESUMED`. |
+| **ON_PAUSE**  | Dispatched when a hiding transition starts.                                                    | Dispatched immediately before `ON_STOP`.    |
 
-**STARTED** and there is no unfinished transitions for this screen or it's parent.
-</td>
-    </tr>
-    <tr>
-        <td><b>DESTROYED</b></td>
-        <td>Screen is removed from the navigation graph.</td>
-    </tr>
-</table>
+### Parent-Child Lifecycle Propagation
 
-To clarify, let's take a look at the lifecycle events:
+The lifecycle of parent and child screens follows a set of rules, ensuring consistency and predictability:
 
-* `ON_CREATE` and `ON_DESTROY` are dispatched once per screen instance.
+1. A screen's `Lifecycle.State` is always less than or equal to (`<=`) its parent's state.
+2. A child screen is not moved to the `RESUMED` state until its parent is also in the `RESUMED` state.
+3. When a screen's lifecycle state is downgraded, its child screens are also moved to the same state.
+4. When a screen reaches the `RESUMED` state and its child screens are ready to resume, the children's lifecycles are also moved to `RESUMED`.
 
-### Screen transitions and lifecycle
+### Practical Example: Keyboard Management
 
-Modo provides convenient way to determine whenever screen's appearing/disappearing transitions are started or finished. To observe these events, you
-can rely on `ON_RESUME` and `ON_PAUSE` lifecycle events, check out the table
+A practical use case for these lifecycle events is managing the keyboard. For example, you can show and hide the keyboard using `ON_RESUME` and
+`ON_PAUSE` events:
 
-<table>
-    <tr>
-        <th>Event</th>
-        <th>With transition</th>
-        <th>Without transition</th>
-    </tr>
-    <tr>
-        <td><b>ON_RESUME</b></td>
-        <td>
-
-Dispatched when as soon as there are no unfinished transitions for this screen and parent is in `State.RESUMED`.
-</td>
-        <td>
-
-Parent is `RESUMED`
-</td>
-    </tr>
-    <tr>
-        <td><b>ON_PAUSE</b></td>
-        <td>
-Dispatched when hiding transition is started.
-</td>
-        <td>
-
-Dispatched right before `ON_STOP`.
-</td>
-    </tr>
-</table>
-
-### Parent-Child Lifecycle propagation
-
-There is a set of rules between lifecycle of parent and child screens, which allows you to relay on your screen's lifecycle and don't worry about
-parent's lifecycle:
-
-1. Screen's `Lifecycle.State` is always lower or equal (<=) than the state of its parent.
-2. If child's lifecycle is ready to be in `RESUMED` state, it is not resumed until parent's lifecycle is `RESUMED` too.
-3. When screen`s lifecycle is moved down, it also moves children lifecycle to the same state.
-4. When screen's lifecycle is `RESUMED` and children's lifecycle is ready to be resumed, children's lifecycle is resumed too.
-
-Practical example of this is using events `ON_RESUME` and `ON_PAUSE` to show and hide keyboard:
+* `ON_RESUME` indicates that the screen is ready for user input (transitions are finished)
+* `ON_PAUSE` indicates that the screen is not ready for user input (transitions are starting)
 
 ```kotlin
 val lifecycleOwner = LocalLifecycleOwner.current
