@@ -33,7 +33,6 @@ import com.github.terrakok.modo.sample.screens.base.LifecycleEventsHistory
 import com.github.terrakok.modo.sample.screens.base.LogLifecycle
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
-import com.github.terrakok.modo.util.getActivity
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -70,10 +69,8 @@ class KeyboardWithLifecycleScreen(
                             focusRequester.requestFocus()
                         }
                         Lifecycle.Event.ON_PAUSE -> {
-                            if (context.getActivity()?.isChangingConfigurations != true) {
-                                focusRequester.freeFocus()
-                                keyboardController?.hide()
-                            }
+                            focusRequester.freeFocus()
+                            keyboardController?.hide()
                         }
                         else -> {}
                     }
