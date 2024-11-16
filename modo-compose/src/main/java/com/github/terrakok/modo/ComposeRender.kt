@@ -50,7 +50,7 @@ private val LocalAfterScreenContentOnDispose = staticCompositionLocalOf<() -> Un
  * 3. Handles lifecycle of [Screen] by adding [DisposableEffect] before and after content, in order to notify [ComposeRenderer]
  *    when [Screen.Content] is about to leave composition and when it has left composition.
  * @param modifier is a modifier that will be passed into [Screen.Content]
- * @param manualResumePause define whenever we are going to manually call [LifecycleDependency.onResume] and [LifecycleDependency.onPause]
+ * @param manualResumePause define whenever we are going to manually call [LifecycleDependency.showTransitionFinished] and [LifecycleDependency.hideTransitionStarted]
  * to emmit [ON_RESUME] and [ON_PAUSE]. Otherwise, [ON_RESUME] will be called straight after [ON_START] and [ON_PAUSE] will be called straight
  * before [ON_STOP].
  *

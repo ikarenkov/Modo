@@ -9,6 +9,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.IntOffset
 import com.github.terrakok.modo.ComposeRendererScope
 import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
@@ -30,21 +31,23 @@ fun ComposeRendererScope<StackState>.SlideTransition(
             val transitionType = calculateStackTransitionType(oldState, newState)
             when {
                 transitionType == StackTransitionType.Replace -> {
-                    scaleIn(initialScale = 2f) + fadeIn() togetherWith fadeOut()
+                    val animationSpec = tween<Float>(durationMillis = SampleAppConfig.animationDurationMs)
+                    scaleIn(initialScale = 2f, animationSpec = animationSpec) + fadeIn(animationSpec) togetherWith
+                        fadeOut(animationSpec)
                 }
-                oldState?.stack?.last() is DialogScreen -> {
-                    fadeIn() togetherWith fadeOut()
-                }
-                oldState?.stack?.last() !is DialogScreen && newState?.stack?.last() is DialogScreen -> {
-                    fadeIn() togetherWith fadeOut()
+                oldState?.stack?.last() is DialogScreen ||
+                    oldState?.stack?.last() !is DialogScreen && newState?.stack?.last() is DialogScreen -> {
+                    val animationSpec = tween<Float>(durationMillis = SampleAppConfig.animationDurationMs)
+                    fadeIn(animationSpec) togetherWith fadeOut(animationSpec)
                 }
                 else -> {
                     val (initialOffset, targetOffset) = when (transitionType) {
                         StackTransitionType.Pop -> ({ size: Int -> -size }) to ({ size: Int -> size })
                         else -> ({ size: Int -> size }) to ({ size: Int -> -size })
                     }
-                    slideInHorizontally(initialOffsetX = initialOffset, animationSpec = tween(durationMillis = 1000)) togetherWith
-                        slideOutHorizontally(targetOffsetX = targetOffset, animationSpec = tween(durationMillis = 1000))
+                    val animationSpec = tween<IntOffset>(durationMillis = SampleAppConfig.animationDurationMs)
+                    slideInHorizontally(initialOffsetX = initialOffset, animationSpec = animationSpec) togetherWith
+                        slideOutHorizontally(targetOffsetX = targetOffset, animationSpec = animationSpec)
                 }
             }
         }

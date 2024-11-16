@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -59,40 +58,40 @@ class SampleDialogWithStack(
                 logcat(tag = "SampleDialog") { "$screenKey $event" }
             }
         }
-        if (systemDialog) {
-            Box(
-                modifier
-                    .fillMaxHeight(0.6f)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color.White)
-            ) {
-                TopScreenContent { screenModifier ->
-                    SlideTransition(
-                        Modifier,
-                        screenModifier = screenModifier
-                            .fillMaxSize()
-                            .background(Color.Black)
-                    )
+        Box(modifier) {
+            if (systemDialog) {
+                TopScreenContent(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .fillMaxHeight(0.6f)
+                        .background(Color.White)
+                        .align(Alignment.Center),
+                    dialogModifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .fillMaxHeight(0.6f)
+                        .align(Alignment.Center)
+                ) { contentModifier ->
+                    SlideTransition(contentModifier)
                 }
-            }
-        } else {
-            Box(modifier = modifier.fillMaxSize()) {
-                TopScreenContent { transitionModifier ->
+            } else {
+                TopScreenContent(
+                    modifier = Modifier
+                        .fillMaxHeight(0.6f)
+                        .padding(horizontal = 50.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color.White)
+                        .align(Alignment.Center)
+                        // TODO: deal with A11Y and remove it from A11Y tree
+                        .clickable(
+                            enabled = false,
+                            interactionSource = remember {
+                                MutableInteractionSource()
+                            },
+                            indication = null
+                        ) {}
+                ) { transitionModifier ->
                     SlideTransition(
-                        modifier = transitionModifier
-                            .align(Alignment.Center)
-                            .padding(horizontal = 50.dp)
-                            .clip(RoundedCornerShape(16.dp)),
-                        screenModifier = Modifier
-                            .background(Color.White)
-                            // TODO: deal with A11Y and remove it from A11Y tree
-                            .clickable(
-                                enabled = false,
-                                interactionSource = remember {
-                                    MutableInteractionSource()
-                                },
-                                indication = null
-                            ) {}
+                        modifier = transitionModifier,
                     )
                 }
             }

@@ -25,7 +25,7 @@ class DialogsPlayground(
 ) : Screen {
     @Composable
     override fun Content(modifier: Modifier) {
-        DialogsPlaygroundContent(screenIndex)
+        DialogsPlaygroundContent(screenIndex, modifier)
     }
 }
 

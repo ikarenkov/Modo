@@ -1,12 +1,9 @@
 package io.github.ikarenkov.workshop.screens.profile_setup
 
 import androidx.lifecycle.ViewModel
-import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.stack.StackState
 import io.github.ikarenkov.workshop.data.ClimberProfileRepository
 import io.github.ikarenkov.workshop.domain.ClimberProfile
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 // TODO: Workshop 5.1 - use VM
 class ProfileSetupFlowViewModel(

@@ -22,7 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-fun ButtonsState(buttons: List<ModoButtonSpec>) = GroupedButtonsState(
+fun ButtonsState(buttons: List<ModoButtonSpec>): GroupedButtonsState = GroupedButtonsState(
     listOf(GroupedButtonsState.Group(null, buttons))
 )
 
