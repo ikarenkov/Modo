@@ -1,8 +1,11 @@
 package com.github.terrakok.modo.sample.screens.lifecycle
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -16,6 +19,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -24,9 +28,11 @@ import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.sample.screens.ModoButton
 import com.github.terrakok.modo.sample.screens.ModoButtonSpec
+import com.github.terrakok.modo.sample.screens.PauseButtonSpec
+import com.github.terrakok.modo.sample.screens.base.LifecycleEventsHistory
+import com.github.terrakok.modo.sample.screens.base.LogLifecycle
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
-import com.github.terrakok.modo.util.getActivity
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -39,9 +45,16 @@ class KeyboardWithLifecycleScreen(
 ) : Screen {
     @Composable
     override fun Content(modifier: Modifier) {
+        LogLifecycle()
         Column(modifier.windowInsetsPadding(WindowInsets.systemBars)) {
             val stackNavigation = LocalStackNavigation.current
-            ModoButton(ModoButtonSpec("Back") { stackNavigation.back() })
+            val context = LocalContext.current
+
+            Row {
+                ModoButton(ModoButtonSpec("Back") { stackNavigation.back() })
+                Spacer(Modifier.width(8.dp))
+                ModoButton(PauseButtonSpec(context))
+            }
 
             Text("Show ON_RESUME, hide ON_PAUSE")
 
@@ -49,7 +62,6 @@ class KeyboardWithLifecycleScreen(
             val focusRequester = remember { FocusRequester() }
             val lifecycleOwner = LocalLifecycleOwner.current
             val keyboardController = LocalSoftwareKeyboardController.current
-            val context = LocalContext.current
             DisposableEffect(this) {
                 val observer = LifecycleEventObserver { _, event ->
                     when (event) {
@@ -57,10 +69,8 @@ class KeyboardWithLifecycleScreen(
                             focusRequester.requestFocus()
                         }
                         Lifecycle.Event.ON_PAUSE -> {
-                            if (context.getActivity()?.isChangingConfigurations != true) {
-                                focusRequester.freeFocus()
-                                keyboardController?.hide()
-                            }
+                            focusRequester.freeFocus()
+                            keyboardController?.hide()
                         }
                         else -> {}
                     }
@@ -71,6 +81,7 @@ class KeyboardWithLifecycleScreen(
                 }
             }
             TextField(text, setText, modifier = Modifier.focusRequester(focusRequester))
+            LifecycleEventsHistory()
         }
     }
 }

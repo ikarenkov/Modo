@@ -10,8 +10,9 @@ import kotlinx.parcelize.Parcelize
 
 typealias StackNavModel = NavModel<StackState, StackAction>
 
-fun StackNavModel(stack: List<Screen>) = StackNavModel(StackState(stack))
-fun StackNavModel(screen: Screen) = StackNavModel(listOf(screen))
+fun StackNavModel(stack: List<Screen>): StackNavModel = StackNavModel(StackState(stack))
+fun StackNavModel(screen: Screen): StackNavModel = StackNavModel(listOf(screen))
+fun StackNavModel(vararg screens: Screen): StackNavModel = StackNavModel(screens.toList())
 
 @Stable
 interface StackNavContainer : NavigationContainer<StackState, StackAction>

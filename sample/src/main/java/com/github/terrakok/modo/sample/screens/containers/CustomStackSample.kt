@@ -48,18 +48,20 @@ class CustomStackSample(
             logcat { "Screen $screenKey was removed" }
         }
         val navigation = LocalStackNavigation.current
-        Box {
+        Box(modifier) {
             SampleScreenContent(
                 screenIndex = i,
                 screenName = "SampleContainerScreen",
                 screenKey = screenKey
             ) {
-                TopScreenContent(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(RoundedCornerShape(16.dp))
-                ) { modifier ->
-                    SlideTransition(modifier)
+                Box {
+                    TopScreenContent(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(16.dp)),
+                    ) { modifier ->
+                        SlideTransition(modifier)
+                    }
                 }
             }
             CancelButton(
