@@ -4,6 +4,12 @@ plugins {
     alias(libs.plugins.modo.android.library)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.modo.publishing)
+    alias(libs.plugins.dependencyGuard)
+}
+
+dependencyGuard {
+    configuration("debugCompileClasspath")
+    configuration("debugRuntimeClasspath")
 }
 
 android {
