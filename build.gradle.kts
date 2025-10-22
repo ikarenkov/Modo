@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.parcelize) apply false
     alias(libs.plugins.detekt) apply false
+    alias(libs.plugins.dependencyGuard) apply false
     alias(libs.plugins.modo.android.library) apply false
     alias(libs.plugins.modo.android.app) apply false
     alias(libs.plugins.modo.publishing) apply false
