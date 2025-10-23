@@ -93,6 +93,7 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: dependency-guard
+          recreate: true
           message: |
             ## 🚨 Dependency Guard Check Failed
 
@@ -113,6 +114,13 @@ jobs:
             - Always review dependency updates for security and compatibility implications
 
             Please address these issues before merging this PR.
+
+      - name: Remove dependency guard comment if check passes
+        if: steps.dependency-guard.conclusion == 'success'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: dependency-guard
+          delete: true
 
       - name: Fail job if Dependency Guard failed
         if: steps.dependency-guard.conclusion == 'failure'
