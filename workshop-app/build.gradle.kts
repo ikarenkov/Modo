@@ -1,16 +1,11 @@
-import com.github.terrakok.configureJetpackCompose
-import com.github.terrakok.configureKotlinAndroid
-
 plugins {
     alias(libs.plugins.modo.android.app)
+    alias(libs.plugins.modo.compose.app)
     alias(libs.plugins.kotlin.parcelize)
 }
 
 android {
     namespace = "io.github.ikarenkov.workshop"
-
-    configureKotlinAndroid(this)
-    configureJetpackCompose(this)
 
     defaultConfig {
         applicationId = "io.github.ikarenkov.workshopapp"

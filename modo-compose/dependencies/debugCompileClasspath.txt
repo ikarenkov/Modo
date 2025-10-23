@@ -55,12 +55,12 @@ androidx.savedstate:savedstate-ktx:1.2.1
 androidx.savedstate:savedstate:1.2.1
 androidx.versionedparcelable:versionedparcelable:1.1.1
 androidx.viewpager:viewpager:1.0.0
-org.jetbrains.kotlin:kotlin-android-extensions-runtime:1.9.23
-org.jetbrains.kotlin:kotlin-parcelize-runtime:1.9.23
-org.jetbrains.kotlin:kotlin-stdlib-common:1.9.23
+org.jetbrains.kotlin:kotlin-android-extensions-runtime:2.0.21
+org.jetbrains.kotlin:kotlin-parcelize-runtime:2.0.21
+org.jetbrains.kotlin:kotlin-stdlib-common:2.0.21
 org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.20
 org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.20
-org.jetbrains.kotlin:kotlin-stdlib:1.9.23
+org.jetbrains.kotlin:kotlin-stdlib:2.0.21
 org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1
 org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.7.1
 org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.7.1

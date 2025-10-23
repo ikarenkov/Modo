@@ -2,7 +2,7 @@
 composeWheelPicker = "1.0.0-beta05"
 leakcanaryAndroid = "2.14"
 modo = "0.10.1"
-androidGradlePlugin = "8.4.0"
+androidGradlePlugin = "8.13.0"
 detektComposeVersion = "0.3.20"
 detektVersion = "1.23.6"
 junit = "4.13.2"
@@ -15,7 +15,7 @@ androidxFragment = "1.5.7"
 androidxAppCompat = "1.6.1"
 androidxJunit = "1.1.5"
 androidTools = "31.4.0"
-kotlin = "1.9.23"
+kotlin = "2.0.21"
 kotlinCompilerExtension = "1.5.12"
 minSdk = "21"
 compileSdk = "34"
@@ -56,19 +56,23 @@ android-tools-common = { group = "com.android.tools", name = "common", version.r
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxJunit" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 detektPlugin = { group = "io.gitlab.arturbosch.detekt", name = "detekt-gradle-plugin", version.ref = "detektVersion" }
+compose-compile-gradlePlugin = { group = "org.jetbrains.kotlin.plugin.compose", name = "org.jetbrains.kotlin.plugin.compose.gradle.plugin", version.ref = "kotlin" }
 
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
 [plugins]
-modo-detekt = { id = "modo-detekt", version = "unspecified" }
-modo-android-library = { id = "modo-android-library", version = "unspecified" }
-modo-android-app = { id = "modo-android-app", version = "unspecified" }
-modo-publishing = { id = "modo-publishing", version = "unspecified" }
-modo-collectSarif = { id = "modo-collect-sarif", version = "unspecified" }
+modo-detekt = { id = "modo-detekt" }
+modo-android-library = { id = "modo-android-library" }
+modo-android-app = { id = "modo-android-app" }
+modo-publishing = { id = "modo-publishing" }
+modo-compose-app = { id = "modo-jetpack-compose-app" }
+modo-compose-library = { id = "modo-jetpack-compose-library" }
+modo-collectSarif = { id = "modo-collect-sarif" }
 
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detektVersion" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 dependencyGuard = { id = "com.dropbox.dependency-guard", version = "0.5.0" }

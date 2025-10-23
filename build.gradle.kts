@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.parcelize) apply false
     alias(libs.plugins.detekt) apply false
@@ -14,7 +15,7 @@ plugins {
 
 tasks.named<Wrapper>("wrapper") {
     distributionType = Wrapper.DistributionType.ALL
-    gradleVersion = "8.7"
+    gradleVersion = "9.1.0"
 }
 
 // PUBLISHING './gradlew clean modo-compose:bundleReleaseAar modo-compose:publishAllPublicationsToSonatypeRepository'

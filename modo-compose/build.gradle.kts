@@ -1,7 +1,6 @@
-import com.github.terrakok.configureJetpackCompose
-
 plugins {
     alias(libs.plugins.modo.android.library)
+    alias(libs.plugins.modo.compose.library)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.modo.publishing)
     alias(libs.plugins.dependencyGuard)
@@ -14,8 +13,6 @@ dependencyGuard {
 
 android {
     namespace = "com.github.terrakok.modo.android.compose"
-
-    configureJetpackCompose(this)
 }
 
 dependencies {

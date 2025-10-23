@@ -7,14 +7,18 @@ import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-private val JAVA_VERSION = JavaVersion.VERSION_1_8
+private val JAVA_VERSION = JavaVersion.VERSION_11
+private val JVM_TARGET = JvmTarget.JVM_11
 
 /**
  * Configure base Kotlin with Android options
  */
-fun Project.configureKotlinAndroid(
+internal fun Project.configureKotlinAndroid(
     commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
     commonExtension.apply {
@@ -36,23 +40,14 @@ fun Project.configureKotlinAndroid(
     configureKotlin()
 }
 
-fun Project.configureJetpackCompose(
+internal fun Project.configureJetpackCompose(
     commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
     commonExtension.apply {
         buildFeatures.compose = true
-        withVersionCatalog {
-            composeOptions.kotlinCompilerExtensionVersion = libs.versions.kotlinCompilerExtension.get()
-        }
     }
-    tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions {
-            freeCompilerArgs = freeCompilerArgs + listOf(
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
-                    "${rootProject.projectDir.absoluteFile}/config/compose/compose_compiler_config.conf"
-            )
-        }
+    configure<ComposeCompilerGradlePluginExtension> {
+        stabilityConfigurationFile.set(rootProject.layout.projectDirectory.file("config/compose/compose_compiler_config.conf"))
     }
 }
 
@@ -75,15 +70,15 @@ internal fun Project.configureKotlinJvm() {
  */
 private fun Project.configureKotlin() {
     // Use withType to workaround https://youtrack.jetbrains.com/issue/KT-55947
-    tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions {
+    configure<KotlinAndroidProjectExtension>() {
+        compilerOptions {
             // Set JVM target to 8
-            jvmTarget = JAVA_VERSION.toString()
+            jvmTarget.set(JVM_TARGET)
             // Treat all Kotlin warnings as errors (disabled by default)
             // Override by setting warningsAsErrors=true in your ~/.gradle/gradle.properties
             val warningsAsErrors: String? by project
-            allWarningsAsErrors = warningsAsErrors.toBoolean()
-            freeCompilerArgs = freeCompilerArgs + listOf(
+            allWarningsAsErrors.set(warningsAsErrors.toBoolean())
+            freeCompilerArgs.addAll(
                 "-opt-in=kotlin.RequiresOptIn",
                 // Enable experimental coroutines APIs, including Flow
                 "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
