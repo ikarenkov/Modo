@@ -14,7 +14,7 @@ plugins {
 
 tasks.named<Wrapper>("wrapper") {
     distributionType = Wrapper.DistributionType.ALL
-    gradleVersion = "8.7"
+    gradleVersion = "8.13"
 }
 
 // PUBLISHING './gradlew clean modo-compose:bundleReleaseAar modo-compose:publishAllPublicationsToSonatypeRepository'

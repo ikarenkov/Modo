@@ -2,7 +2,7 @@
 composeWheelPicker = "1.0.0-beta05"
 leakcanaryAndroid = "2.14"
 modo = "0.10.1"
-androidGradlePlugin = "8.4.0"
+androidGradlePlugin = "8.13.0"
 detektComposeVersion = "0.3.20"
 detektVersion = "1.23.6"
 junit = "4.13.2"
@@ -60,11 +60,11 @@ detektPlugin = { group = "io.gitlab.arturbosch.detekt", name = "detekt-gradle-pl
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
 [plugins]
-modo-detekt = { id = "modo-detekt", version = "unspecified" }
-modo-android-library = { id = "modo-android-library", version = "unspecified" }
-modo-android-app = { id = "modo-android-app", version = "unspecified" }
-modo-publishing = { id = "modo-publishing", version = "unspecified" }
-modo-collectSarif = { id = "modo-collect-sarif", version = "unspecified" }
+modo-detekt = { id = "modo-detekt" }
+modo-android-library = { id = "modo-android-library" }
+modo-android-app = { id = "modo-android-app" }
+modo-publishing = { id = "modo-publishing" }
+modo-collectSarif = { id = "modo-collect-sarif" }
 
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detektVersion" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
