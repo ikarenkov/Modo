@@ -1,9 +1,6 @@
 name: PR checks
 run-name: Running static code analysis and unit tests
 on:
-  push:
-    branches:
-      - "dev"
   pull_request:
     branches:
       - "dev"
@@ -66,3 +63,63 @@ jobs:
         if: always()
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'
+
+  dependency-guard-check:
+    name: Dependency Guard Check
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up JDK 17"
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Run Dependency Guard
+        id: dependency-guard
+        run: |
+          if ./gradlew modo-compose:dependencyGuard; then
+            echo "dependency_guard_success=true" >> $GITHUB_OUTPUT
+          else
+            echo "dependency_guard_success=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+        continue-on-error: true
+
+      - name: Comment on PR if Dependency Guard fails
+        if: steps.dependency-guard.outputs.dependency_guard_success == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 🚨 Dependency Guard Check Failed
+
+            The dependency guard check has detected changes in your dependencies that need review.
+
+            ### What to do:
+            1. **Review the dependency changes**: Check what dependencies were added, updated, or removed
+            2. **Check release notes**: For any updated dependencies, review their release notes for breaking changes, security fixes, or important updates
+            3. **Test thoroughly**: Ensure the dependency changes don't break existing functionality
+            4. **Update the baseline**: If the dependency changes are intentional and safe, update the dependency guard baseline by running:
+               \`\`\`bash
+               ./gradlew modo-compose:dependencyGuardBaseline
+               \`\`\`
+
+            ### More information:
+            - View the full dependency guard report in the workflow logs
+            - The dependency guard plugin helps prevent unintended dependency changes
+            - Always review dependency updates for security and compatibility implications
+
+            Please address these issues before merging this PR.`
+            })
