@@ -85,25 +85,15 @@ jobs:
 
       - name: Run Dependency Guard
         id: dependency-guard
-        run: |
-          if ./gradlew modo-compose:dependencyGuard; then
-            echo "dependency_guard_success=true" >> $GITHUB_OUTPUT
-          else
-            echo "dependency_guard_success=false" >> $GITHUB_OUTPUT
-            exit 1
-          fi
+        run: ./gradlew modo-compose:dependencyGuard
         continue-on-error: true
 
       - name: Comment on PR if Dependency Guard fails
-        if: steps.dependency-guard.outputs.dependency_guard_success == 'false'
+        if: failure() && steps.dependency-guard.conclusion == 'failure'
         uses: actions/github-script@v7
         with:
           script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `## 🚨 Dependency Guard Check Failed
+            const commentBody = `## 🚨 Dependency Guard Check Failed
 
             The dependency guard check has detected changes in your dependencies that need review.
 
@@ -121,5 +111,38 @@ jobs:
             - The dependency guard plugin helps prevent unintended dependency changes
             - Always review dependency updates for security and compatibility implications
 
-            Please address these issues before merging this PR.`
-            })
+            Please address these issues before merging this PR.`;
+
+            // Check for existing dependency guard comments
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existingComment = comments.data.find(comment => 
+              comment.body.includes('🚨 Dependency Guard Check Failed') && 
+              comment.user.type === 'Bot'
+            );
+
+            if (existingComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: commentBody
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }
+
+      - name: Fail job if Dependency Guard failed
+        if: steps.dependency-guard.conclusion == 'failure'
+        run: exit 1
