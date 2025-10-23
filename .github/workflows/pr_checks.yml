@@ -90,10 +90,11 @@ jobs:
 
       - name: Comment on PR if Dependency Guard fails
         if: failure() && steps.dependency-guard.conclusion == 'failure'
-        uses: actions/github-script@v7
+        uses: marocchino/sticky-pull-request-comment@v2
         with:
-          script: |
-            const commentBody = `## 🚨 Dependency Guard Check Failed
+          header: dependency-guard
+          message: |
+            ## 🚨 Dependency Guard Check Failed
 
             The dependency guard check has detected changes in your dependencies that need review.
 
@@ -102,46 +103,16 @@ jobs:
             2. **Check release notes**: For any updated dependencies, review their release notes for breaking changes, security fixes, or important updates
             3. **Test thoroughly**: Ensure the dependency changes don't break existing functionality
             4. **Update the baseline**: If the dependency changes are intentional and safe, update the dependency guard baseline by running:
-               \`\`\`bash
+               ```bash
                ./gradlew modo-compose:dependencyGuardBaseline
-               \`\`\`
+               ```
 
             ### More information:
             - View the full dependency guard report in the workflow logs
             - The dependency guard plugin helps prevent unintended dependency changes
             - Always review dependency updates for security and compatibility implications
 
-            Please address these issues before merging this PR.`;
-
-            // Check for existing dependency guard comments
-            const comments = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
-
-            const existingComment = comments.data.find(comment => 
-              comment.body.includes('🚨 Dependency Guard Check Failed') && 
-              comment.user.type === 'Bot'
-            );
-
-            if (existingComment) {
-              // Update existing comment
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existingComment.id,
-                body: commentBody
-              });
-            } else {
-              // Create new comment
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: commentBody
-              });
-            }
+            Please address these issues before merging this PR.
 
       - name: Fail job if Dependency Guard failed
         if: steps.dependency-guard.conclusion == 'failure'
