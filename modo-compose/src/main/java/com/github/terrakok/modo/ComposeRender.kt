@@ -19,8 +19,8 @@ import androidx.lifecycle.Lifecycle.Event.ON_START
 import androidx.lifecycle.Lifecycle.Event.ON_STOP
 import com.github.terrakok.modo.android.ModoScreenAndroidAdapter
 import com.github.terrakok.modo.animation.ScreenTransition
-import com.github.terrakok.modo.animation.displayingScreensAfterScreenContent
-import com.github.terrakok.modo.animation.displayingScreensBeforeScreenContent
+import com.github.terrakok.modo.animation.preDisposeProtectedScreens
+import com.github.terrakok.modo.animation.cleanupProtectedScreens
 import com.github.terrakok.modo.lifecycle.LifecycleDependency
 import com.github.terrakok.modo.model.ScreenModelStore
 import com.github.terrakok.modo.model.dependenciesSortedByRemovePriority
@@ -35,12 +35,12 @@ val defaultRendererContent: (@Composable ComposeRendererScope<*>.(screenModifier
 
 val LocalSaveableStateHolder = staticCompositionLocalOf<SaveableStateHolder?> { null }
 
-private val LocalBeforeScreenContentOnDispose = staticCompositionLocalOf<() -> Unit> {
-    error("No LocalBeforeScreenContentOnDispose provided!")
+private val LocalClearScreens = staticCompositionLocalOf<() -> Unit> {
+    error("No LocalClearScreens provided!")
 }
 
-private val LocalAfterScreenContentOnDispose = staticCompositionLocalOf<() -> Unit> {
-    error("No LocalAfterScreenContentOnDispose provided!")
+private val LocalPreDispose = staticCompositionLocalOf<() -> Unit> {
+    error("No LocalPreDispose provided!")
 }
 
 /**
@@ -65,39 +65,62 @@ fun Screen.SaveableContent(
 ) {
     LocalSaveableStateHolder.currentOrThrow.SaveableStateProvider(key = screenKey) {
         ModoScreenAndroidAdapter.get(this).ProvideAndroidIntegration(manualResumePause) {
-            BeforeScreenContent()
+            SetupScreenCleanup()
             Content(modifier)
-            AfterScreenContent()
+            SetupLifecycleDisposal()
         }
     }
 }
 
 /**
- * This function responsible for correct cleaning [Screen]'s when it already has left composition and some clean up can be made.
- * It's not always clean [Screen] when it lives composition, but adds extra logic of tracking displaying [Screen]'s and triggering
- * function provided by [LocalBeforeScreenContentOnDispose] in order to try clean removed screens that are not visible for user.
+ * Sets up safe screen cleanup management for this screen.
+ *
+ *  CRITICAL: Must be called BEFORE user content to ensure cleanup happens AFTER user content is gone.
+ *
+ * While this screen is in composition:
+ * - Protects the screen from being prematurely cleaned by adding it to [cleanupProtectedScreens]
+ * - Acts as a safety gate - [clearScreens] will skip this screen while it's tracked here
+ *
+ * When this screen leaves composition:
+ * - Removes protection by removing it from [cleanupProtectedScreens]
+ * - Triggers immediate cleanup of screen resources (ScreenModelStore, SavedState) via [LocalClearScreens]
+ *
+ * @see ComposeRenderer.clearScreens for the cleanup logic that respects this protection
  */
 @Composable
-private inline fun Screen.BeforeScreenContent() {
-    val onDisposed = LocalBeforeScreenContentOnDispose.current
+internal inline fun Screen.SetupScreenCleanup() {
+    val onDisposed = LocalClearScreens.current
     DisposableEffect(this) {
-        displayingScreensBeforeScreenContent[this@BeforeScreenContent] = Unit
+        cleanupProtectedScreens[this@SetupScreenCleanup] = Unit
         onDispose {
-            displayingScreensBeforeScreenContent -= this@BeforeScreenContent
-//            Log.d("LifecycleDebug", "BeforeScreenContent $screenKey onDispose")
+            cleanupProtectedScreens -= this@SetupScreenCleanup
+//            Log.d("LifecycleDebug", "SetupScreenCleanup $screenKey onDispose")
             onDisposed.invoke()
         }
     }
 }
 
+/**
+ * Sets up protection for this screen during disposal phase to prevent premature lifecycle cleanup.
+ *
+ * While this screen is in composition:
+ * - Protects the screen from being prematurely disposed by adding it to [preDisposeProtectedScreens]
+ * - Acts as a safety gate - [ComposeRenderer.onPreDispose] will skip this screen while it's tracked here
+ *
+ * When this screen leaves composition:
+ * - Removes protection by removing it from [preDisposeProtectedScreens]
+ * - Triggers pre-disposal lifecycle callback via [LocalPreDispose]
+ *
+ * @see ComposeRenderer.onPreDispose for the pre-disposal logic that respects this protection
+ */
 @Composable
-private inline fun Screen.AfterScreenContent() {
-    val onPreDispose = LocalAfterScreenContentOnDispose.current
+private inline fun Screen.SetupLifecycleDisposal() {
+    val onPreDispose = LocalPreDispose.current
     DisposableEffect(this) {
-        displayingScreensAfterScreenContent[this@AfterScreenContent] = Unit
+        preDisposeProtectedScreens[this@SetupLifecycleDisposal] = Unit
         onDispose {
-            displayingScreensAfterScreenContent -= this@AfterScreenContent
-//            Log.d("LifecycleDebug", "AfterScreenContent $screenKey onDispose")
+            preDisposeProtectedScreens -= this@SetupLifecycleDisposal
+//            Log.d("LifecycleDebug", "SetupLifecycleDisposal $screenKey onDispose")
             onPreDispose()
         }
     }
@@ -152,7 +175,7 @@ internal class ComposeRenderer<State : NavigationState>(
     ) {
         val stateHolder: SaveableStateHolder = LocalSaveableStateHolder.currentOrThrow
 
-        val beforeScreenContentOnDispose = remember {
+        val clearScreens = remember {
             {
                 clearScreens(stateHolder)
             }
@@ -160,7 +183,7 @@ internal class ComposeRenderer<State : NavigationState>(
 
         // pre dispose means that we can send ON_DISPOSE if screen is removing,
         // to let Screen.Content to handle ON_DISPOSE by using functions like DisposableEffect
-        val afterScreenContentOnDispose = remember {
+        val preDispose = remember {
             {
                 onPreDispose()
             }
@@ -168,8 +191,8 @@ internal class ComposeRenderer<State : NavigationState>(
 
         CompositionLocalProvider(
             LocalContainerScreen provides containerScreen,
-            LocalBeforeScreenContentOnDispose provides beforeScreenContentOnDispose,
-            LocalAfterScreenContentOnDispose provides afterScreenContentOnDispose,
+            LocalClearScreens provides clearScreens,
+            LocalPreDispose provides preDispose,
             *provideCompositionLocal
         ) {
             ComposeRendererScope(lastState, state, screen).content(modifier)
@@ -191,7 +214,7 @@ internal class ComposeRenderer<State : NavigationState>(
         }
         // There can be several transition of different screens on the screen,
         // so it is important properly clear screens that are not visible for user.
-        val safeToRemove = removedScreens.filter { it !in displayingScreensBeforeScreenContent }
+        val safeToRemove = removedScreens.filter { it !in cleanupProtectedScreens }
         safeToRemove.clearStates(stateHolder)
         if (removedScreens.isNotEmpty()) {
             safeToRemove.forEach {
@@ -201,7 +224,7 @@ internal class ComposeRenderer<State : NavigationState>(
     }
 
     /**
-     * Called onPreDispose for removed screens, that are not presented in [displayingScreensAfterScreenContent] (not displayed on screen).
+     * Called onPreDispose for removed screens, that are not presented in [preDisposeProtectedScreens] (not displayed on screen).
      * @param clearAll - forces to call onPreDispose on all children screen states that renderer holds (removed and "displayed")
      */
     private fun onPreDispose(clearAll: Boolean = false) {
@@ -214,14 +237,14 @@ internal class ComposeRenderer<State : NavigationState>(
         }
         // There can be several transition of different screens on the screen,
         // so it is important properly clear screens that are not visible for user.
-        val safeToRemove = removedScreens.filter { it !in displayingScreensAfterScreenContent }
+        val safeToRemove = removedScreens.filter { it !in preDisposeProtectedScreens }
         safeToRemove.onPreDispose()
     }
 
     private fun Screen.clearState(stateHolder: SaveableStateHolder) {
         // It's important to do this check for debug purpose, because we must guaranty that Screen is cleaned only if it is not displaying anymore.
         // But it seems like it is not working with movable content, so this one is going to be triggered.
-        if (this in displayingScreensBeforeScreenContent) {
+        if (this in cleanupProtectedScreens) {
             ModoDevOptions.onIllegalClearState.validationFailed(
                 IllegalStateException(
                     "Trying to remove clean state of the screen $this, why this screen still is visible for User."
@@ -236,11 +259,11 @@ internal class ComposeRenderer<State : NavigationState>(
 
     // need for correct handling lifecycle
     private fun Screen.onPreDispose() {
-//        Log.d("LifecycleDebug", "afterScreenContentOnDispose $screenKey")
+//        Log.d("LifecycleDebug", "onPreDispose $screenKey")
         dependenciesSortedByRemovePriority()
             .filterIsInstance<LifecycleDependency>()
             .forEach { it.onPreDispose() }
-        // send afterScreenContentOnDispose to nested screens
+        // send onPreDispose to nested screens
         ((this as? ContainerScreen<*, *>)?.renderer as? ComposeRenderer<*>)?.onPreDispose(clearAll = true)
     }
 

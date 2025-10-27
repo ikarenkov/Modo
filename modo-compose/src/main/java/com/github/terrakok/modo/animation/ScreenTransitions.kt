@@ -19,8 +19,8 @@ import com.github.terrakok.modo.SaveableContent
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.model.lifecycleDependency
 
-val displayingScreensBeforeScreenContent = mutableStateMapOf<Screen, Unit>()
-val displayingScreensAfterScreenContent = mutableStateMapOf<Screen, Unit>()
+val cleanupProtectedScreens = mutableStateMapOf<Screen, Unit>()
+val preDisposeProtectedScreens = mutableStateMapOf<Screen, Unit>()
 
 typealias ScreenTransitionContent = @Composable AnimatedVisibilityScope.(Screen) -> Unit
 
