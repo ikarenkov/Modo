@@ -105,18 +105,18 @@ internal fun Screen.SampleScreenContent(
 
 @OptIn(ExperimentalModoApi::class)
 @Composable
-fun Screen.LogLifecycle() {
+fun Screen.LogLifecycle(prefix: String = this::class.simpleName.orEmpty()) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
     // You will not be able to observe updates of lifecycleOwner when this content is not in the composition
     DisposableEffect(lifecycleOwner) {
-        logcat(tag = "LifecycleDebug") { "$screenKey DisposableEffect" }
+        logcat(tag = "LifecycleDebug") { "$prefix $screenKey DisposableEffect".trim() }
         val observer = LifecycleEventObserver { _, event ->
-            logcat(tag = "LifecycleDebug") { "$screenKey DisposableEffect $event" }
+            logcat(tag = "LifecycleDebug") { "$prefix $screenKey DisposableEffect $event".trim() }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
-            logcat(tag = "LifecycleDebug") { "$screenKey DisposableEffect onDispose" }
+            logcat(tag = "LifecycleDebug") { "$prefix $screenKey DisposableEffect onDispose" }
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
