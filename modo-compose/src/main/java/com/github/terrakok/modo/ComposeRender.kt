@@ -175,7 +175,7 @@ internal class ComposeRenderer<State : NavigationState>(
     ) {
         val stateHolder: SaveableStateHolder = LocalSaveableStateHolder.currentOrThrow
 
-        val clearScreens = remember {
+        val clearScreens = remember(stateHolder) {
             {
                 clearScreens(stateHolder)
             }
