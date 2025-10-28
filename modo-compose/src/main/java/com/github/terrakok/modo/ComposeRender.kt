@@ -19,8 +19,8 @@ import androidx.lifecycle.Lifecycle.Event.ON_START
 import androidx.lifecycle.Lifecycle.Event.ON_STOP
 import com.github.terrakok.modo.android.ModoScreenAndroidAdapter
 import com.github.terrakok.modo.animation.ScreenTransition
-import com.github.terrakok.modo.animation.preDisposeProtectedScreens
 import com.github.terrakok.modo.animation.cleanupProtectedScreens
+import com.github.terrakok.modo.animation.preDisposeProtectedScreens
 import com.github.terrakok.modo.lifecycle.LifecycleDependency
 import com.github.terrakok.modo.model.ScreenModelStore
 import com.github.terrakok.modo.model.dependenciesSortedByRemovePriority
@@ -91,10 +91,11 @@ fun Screen.SaveableContent(
 internal inline fun Screen.SetupScreenCleanup() {
     val onDisposed = LocalClearScreens.current
     DisposableEffect(this) {
+//        log("SetupScreenCleanup DisposableEffect")
         cleanupProtectedScreens[this@SetupScreenCleanup] = Unit
         onDispose {
             cleanupProtectedScreens -= this@SetupScreenCleanup
-//            Log.d("LifecycleDebug", "SetupScreenCleanup $screenKey onDispose")
+//            log("SetupScreenCleanup DisposableEffect.onDispose")
             onDisposed.invoke()
         }
     }
@@ -117,10 +118,11 @@ internal inline fun Screen.SetupScreenCleanup() {
 private inline fun Screen.SetupLifecycleDisposal() {
     val onPreDispose = LocalPreDispose.current
     DisposableEffect(this) {
+//        log("SetupLifecycleDisposal DisposableEffect")
         preDisposeProtectedScreens[this@SetupLifecycleDisposal] = Unit
         onDispose {
             preDisposeProtectedScreens -= this@SetupLifecycleDisposal
-//            Log.d("LifecycleDebug", "SetupLifecycleDisposal $screenKey onDispose")
+//            log("SetupLifecycleDisposal DisposableEffect.onDispose")
             onPreDispose()
         }
     }
@@ -253,13 +255,15 @@ internal class ComposeRenderer<State : NavigationState>(
         }
         ScreenModelStore.remove(this)
         stateHolder.removeState(screenKey)
+
+        ModoDevOptions.onScreenDisposeListener?.invoke(this)
         // clear nested screens using recursion
         ((this as? ContainerScreen<*, *>)?.renderer as? ComposeRenderer<*>)?.clearScreens(stateHolder, clearAll = true)
     }
 
     // need for correct handling lifecycle
     private fun Screen.onPreDispose() {
-//        Log.d("LifecycleDebug", "onPreDispose $screenKey")
+//        log("onPreDispose $screenKey")
         dependenciesSortedByRemovePriority()
             .filterIsInstance<LifecycleDependency>()
             .forEach { it.onPreDispose() }

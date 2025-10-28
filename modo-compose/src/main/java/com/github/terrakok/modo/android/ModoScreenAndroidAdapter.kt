@@ -41,7 +41,10 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
+import com.github.terrakok.modo.ModoDevOptions
 import com.github.terrakok.modo.Screen
+import com.github.terrakok.modo.SetupLifecycleDisposal
+import com.github.terrakok.modo.android.ModoScreenAndroidAdapter.Companion.needPropagateLifecycleEventFromParent
 import com.github.terrakok.modo.lifecycle.LifecycleDependency
 import com.github.terrakok.modo.model.ScreenModelStore
 import com.github.terrakok.modo.model.ScreenModelStore.remove
@@ -133,7 +136,7 @@ class ModoScreenAndroidAdapter private constructor(
      * F.e. to be able to collect ON_DISPOSE lifecycle event.
      */
     override fun onPreDispose() {
-//        Log.d("LifecycleDebug", "${screen.screenKey} ModoScreenAndroidAdapter.onPreDispose, emit ON_DESTROY event.")
+        ModoDevOptions.onScreenPreDisposeListener?.invoke(screen)
         safeHandleLifecycleEvent(ON_DESTROY)
     }
 
@@ -157,7 +160,7 @@ class ModoScreenAndroidAdapter private constructor(
 
     @Suppress("UnusedParameter")
     private fun onDispose() {
-//        Log.d("LifecycleDebug", "${screen.screenKey} ModoScreenAndroidAdapter.onDispose. Clear ViewModelStore.")
+//        screen.log("ModoScreenAndroidAdapter.onDispose. Clear ViewModelStore.")
         viewModelStore.clear()
     }
 
@@ -263,9 +266,10 @@ class ModoScreenAndroidAdapter private constructor(
                     }
                 }
             }
+//            screen.log("LifecycleDisposableEffect after content DisposableEffect")
 
             onDispose {
-//                Log.d("LifecycleDebug", "ModoScreenAndroidAdapter registerParentLifecycleListener onDispose ${screen.screenKey}")
+//                screen.log("LifecycleDisposableEffect after content DisposableEffect.onDispose")
                 unregisterLifecycle()
                 // when the screen goes to stack, perform save
                 performSave(savedState)

@@ -31,7 +31,6 @@ class DialogsPlayground(
 
 @Composable
 internal fun Screen.DialogsPlaygroundContent(screenIndex: Int, modifier: Modifier = Modifier) {
-    LogLifecycle()
     ButtonsScreenContent(
         screenIndex = screenIndex,
         screenName = "DialogsPlayground",

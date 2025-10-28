@@ -55,6 +55,7 @@
       <option name="ALIGN_MULTILINE_ANNOTATION_PARAMETERS" value="true" />
       <option name="IMPORT_LAYOUT_TABLE">
         <value>
+          <package name="" withSubpackages="true" static="false" module="true" />
           <package name="android" withSubpackages="true" static="false" />
           <emptyLine />
           <package name="com" withSubpackages="true" static="false" />
