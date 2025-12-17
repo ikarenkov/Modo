@@ -18,7 +18,6 @@ import androidx.lifecycle.Lifecycle.Event.ON_RESUME
 import androidx.lifecycle.Lifecycle.Event.ON_START
 import androidx.lifecycle.Lifecycle.Event.ON_STOP
 import com.github.terrakok.modo.android.ModoScreenAndroidAdapter
-import com.github.terrakok.modo.android.dialogSaveableStateKey
 import com.github.terrakok.modo.animation.ScreenTransition
 import com.github.terrakok.modo.animation.cleanupProtectedScreens
 import com.github.terrakok.modo.animation.preDisposeProtectedScreens
