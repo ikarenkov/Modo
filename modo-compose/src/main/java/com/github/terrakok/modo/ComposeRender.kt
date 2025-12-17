@@ -18,6 +18,7 @@ import androidx.lifecycle.Lifecycle.Event.ON_RESUME
 import androidx.lifecycle.Lifecycle.Event.ON_START
 import androidx.lifecycle.Lifecycle.Event.ON_STOP
 import com.github.terrakok.modo.android.ModoScreenAndroidAdapter
+import com.github.terrakok.modo.android.dialogSaveableStateKey
 import com.github.terrakok.modo.animation.ScreenTransition
 import com.github.terrakok.modo.animation.cleanupProtectedScreens
 import com.github.terrakok.modo.animation.preDisposeProtectedScreens
@@ -46,6 +47,8 @@ private val LocalPreDispose = staticCompositionLocalOf<() -> Unit> {
 
 private const val TAG = "ComposeRenderer"
 
+private inline val Screen.saveableStateKey: String get() = screenKey.value
+
 /**
  * Provides integration of [Screen] to Modo's navigation system:
  * 1. Adds support of [rememberSaveable] by using [SaveableStateHolder.SaveableStateProvider] to store [Screen]'s state.
@@ -66,11 +69,10 @@ fun Screen.SaveableContent(
     modifier: Modifier = Modifier,
     manualResumePause: Boolean = false
 ) {
-    LocalSaveableStateHolder.currentOrThrow.SaveableStateProvider(key = screenKey) {
+    LocalSaveableStateHolder.currentOrThrow.SaveableStateProvider(key = saveableStateKey) {
+        SetupScreenCleanup()
         ModoScreenAndroidAdapter.get(this).ProvideAndroidIntegration(manualResumePause) {
-            SetupScreenCleanup()
             Content(modifier)
-            SetupLifecycleDisposal()
         }
     }
 }
@@ -118,14 +120,14 @@ internal inline fun Screen.SetupScreenCleanup() {
  * @see ComposeRenderer.onPreDispose for the pre-disposal logic that respects this protection
  */
 @Composable
-private inline fun Screen.SetupLifecycleDisposal() {
+internal inline fun Screen.SetupPreDispose() {
     val onPreDispose = LocalPreDispose.current
     DisposableEffect(this) {
-//        log("SetupLifecycleDisposal DisposableEffect")
-        preDisposeProtectedScreens[this@SetupLifecycleDisposal] = Unit
+        devLogV(TAG) { "SetupLifecycleDisposal DisposableEffect" }
+        preDisposeProtectedScreens[this@SetupPreDispose] = Unit
         onDispose {
-            preDisposeProtectedScreens -= this@SetupLifecycleDisposal
-//            log("SetupLifecycleDisposal DisposableEffect.onDispose")
+            devLogV(TAG) { "SetupLifecycleDisposal DisposableEffect.onDispose" }
+            preDisposeProtectedScreens -= this@SetupPreDispose
             onPreDispose()
         }
     }
@@ -252,6 +254,7 @@ internal class ComposeRenderer<State : NavigationState>(
         }
         ScreenModelStore.remove(this)
         stateHolder.removeState(screenKey)
+        stateHolder.removeState(saveableStateKey)
 
         ModoDevOptions.onScreenDisposeListener?.invoke(this)
         // clear nested screens using recursion

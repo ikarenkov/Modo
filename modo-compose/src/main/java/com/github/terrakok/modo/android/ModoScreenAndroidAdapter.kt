@@ -42,7 +42,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.compose.LocalSavedStateRegistryOwner
 import com.github.terrakok.modo.ModoDevOptions
 import com.github.terrakok.modo.Screen
-import com.github.terrakok.modo.SetupLifecycleDisposal
+import com.github.terrakok.modo.SetupPreDispose
 import com.github.terrakok.modo.android.ModoScreenAndroidAdapter.Companion.needPropagateLifecycleEventFromParent
 import com.github.terrakok.modo.lifecycle.LifecycleDependency
 import com.github.terrakok.modo.logs.devLogD
@@ -125,10 +125,9 @@ class ModoScreenAndroidAdapter private constructor(
         val context: Context = LocalContext.current
         val parentLifecycleOwner = LocalLifecycleOwner.current
         LifecycleDisposableEffect(context, parentLifecycleOwner, manualResumePause) {
-            @Suppress("SpreadOperator")
-            CompositionLocalProvider(*getProviders()) {
-                content()
-            }
+            DisposableAtomicReference(LocalContext, atomicContext)
+            DisposableAtomicReference(LocalLifecycleOwner, atomicParentLifecycleOwner)
+            ProvideCompositionLocals(content)
         }
     }
 
@@ -178,18 +177,24 @@ class ModoScreenAndroidAdapter private constructor(
         controller.performSave(outState)
     }
 
+    /**
+     * Provides essential Android Lifecycle and ViewModel composition locals for the screen:
+     * - [LocalLifecycleOwner]
+     * - [LocalViewModelStoreOwner]
+     * - [LocalSavedStateRegistryOwner]
+     *
+     * This enables Jetpack Compose features that depend on these locals to work properly within the screen's scope.
+     *
+     * @param content The composable content that will have access to these composition locals
+     */
     @Composable
-    private fun getProviders(): Array<ProvidedValue<*>> {
-        DisposableAtomicReference(LocalContext, atomicContext)
-        DisposableAtomicReference(LocalLifecycleOwner, atomicParentLifecycleOwner)
-
-        return remember(this) {
-            arrayOf(
-                LocalLifecycleOwner provides this,
-                LocalViewModelStoreOwner provides this,
-                LocalSavedStateRegistryOwner provides this
-            )
-        }
+    internal fun ProvideCompositionLocals(content: @Composable () -> Unit) {
+        CompositionLocalProvider(
+            LocalLifecycleOwner provides this,
+            LocalViewModelStoreOwner provides this,
+            LocalSavedStateRegistryOwner provides this,
+            content = content
+        )
     }
 
     /**
@@ -249,6 +254,8 @@ class ModoScreenAndroidAdapter private constructor(
         }
 
         content()
+
+        screen.SetupPreDispose()
 
         DisposableEffect(this) {
             screen.devLogV(TAG) { "LifecycleDisposableEffect parentLifecycleOwner: $parentLifecycleOwner" }
@@ -341,6 +348,13 @@ class ModoScreenAndroidAdapter private constructor(
                 name = LifecycleDependency.KEY,
                 onDispose = { it.onDispose() },
             ) { ModoScreenAndroidAdapter(screen) }
+
+        @JvmStatic
+        fun getOrNull(screen: Screen): ModoScreenAndroidAdapter? =
+            ScreenModelStore.getDependencyOrNull(
+                screen = screen,
+                name = LifecycleDependency.KEY,
+            )
 
         @JvmStatic
         private fun needPropagateLifecycleEventFromParent(
