@@ -66,12 +66,10 @@ fun ComposeRendererScope<*>.ScreenTransition(
 //            )
             if (screen == transition.currentState && screen != transition.targetState) {
                 // Start of animation that hides this screen, so we should pause lifecycle
-//                screen.log("ON_PAUSE!")
                 screen.lifecycleDependency()?.hideTransitionStarted()
             }
             if (transition.currentState == transition.targetState && screen == transition.currentState) {
                 // Finish of animation that shows this screen, so we should resume lifecycle
-//                screen.log("ON_RESUME!")
                 screen.lifecycleDependency()?.showTransitionFinished()
             }
             onDispose { }

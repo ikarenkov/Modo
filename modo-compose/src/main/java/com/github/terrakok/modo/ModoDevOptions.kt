@@ -16,7 +16,7 @@ object ModoDevOptions {
     var onScreenDisposeListener: ((Screen) -> Unit)? = null
     var onScreenPreDisposeListener: ((Screen) -> Unit)? = null
 
-    internal const val REPORT_ISSUE_URL = "You can report issue here https://github.com/terrakok/Modo/issues"
+    internal const val REPORT_ISSUE_URL = "https://github.com/ikarenkov/Modo/issues"
 
     fun interface ValidationFailedStrategy {
         fun validationFailed(throwable: Throwable)

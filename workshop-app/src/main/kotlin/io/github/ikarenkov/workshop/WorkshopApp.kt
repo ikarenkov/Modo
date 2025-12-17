@@ -2,7 +2,6 @@ package io.github.ikarenkov.workshop
 
 import android.app.Application
 import com.github.terrakok.modo.ModoDevOptions
-import com.github.terrakok.modo.util.log
 import io.github.ikarenkov.workshop.di.rootModule
 import logcat.AndroidLogcatLogger
 import logcat.LogPriority
@@ -21,12 +20,6 @@ class WorkshopApp : Application() {
         }
         ModoDevOptions.onIllegalClearState = ModoDevOptions.ValidationFailedStrategy { throwable ->
             logcat(priority = LogPriority.ERROR) { "Cleaning state of composable, which still can be visible for user." }
-        }
-        ModoDevOptions.onScreenDisposeListener = {
-            it.log("Screen disposed")
-        }
-        ModoDevOptions.onScreenPreDisposeListener = {
-            it.log("Screen preDisposed")
         }
 
         startKoin {

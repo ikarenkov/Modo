@@ -2,10 +2,9 @@ package com.github.terrakok.modo.sample
 
 import android.app.Application
 import com.github.terrakok.modo.ModoDevOptions
-import com.github.terrakok.modo.util.log
+import com.github.terrakok.modo.sample.logs.logcat
 import logcat.AndroidLogcatLogger
 import logcat.LogPriority
-import logcat.logcat
 
 class ModoSampleApplication : Application() {
 
@@ -19,10 +18,10 @@ class ModoSampleApplication : Application() {
             throw throwable
         }
         ModoDevOptions.onScreenDisposeListener = {
-            it.log("Screen disposed")
+            it.logcat { "Screen disposed" }
         }
         ModoDevOptions.onScreenPreDisposeListener = {
-            it.log("Screen preDisposed")
+            it.logcat { "Screen preDisposed" }
         }
     }
 }

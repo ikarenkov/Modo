@@ -22,10 +22,11 @@ import com.github.terrakok.modo.animation.ScreenTransition
 import com.github.terrakok.modo.animation.cleanupProtectedScreens
 import com.github.terrakok.modo.animation.preDisposeProtectedScreens
 import com.github.terrakok.modo.lifecycle.LifecycleDependency
+import com.github.terrakok.modo.logs.devLogI
+import com.github.terrakok.modo.logs.devLogV
 import com.github.terrakok.modo.model.ScreenModelStore
 import com.github.terrakok.modo.model.dependenciesSortedByRemovePriority
 import com.github.terrakok.modo.util.currentOrThrow
-import kotlinx.coroutines.channels.Channel
 
 typealias RendererContent<State> = @Composable ComposeRendererScope<State>.(Modifier) -> Unit
 
@@ -42,6 +43,8 @@ private val LocalClearScreens = staticCompositionLocalOf<() -> Unit> {
 private val LocalPreDispose = staticCompositionLocalOf<() -> Unit> {
     error("No LocalPreDispose provided!")
 }
+
+private const val TAG = "ComposeRenderer"
 
 /**
  * Provides integration of [Screen] to Modo's navigation system:
@@ -79,7 +82,7 @@ fun Screen.SaveableContent(
  *
  * While this screen is in composition:
  * - Protects the screen from being prematurely cleaned by adding it to [cleanupProtectedScreens]
- * - Acts as a safety gate - [clearScreens] will skip this screen while it's tracked here
+ * - Acts as a safety gate - [ComposeRenderer.clearScreens] will skip this screen while it's tracked here
  *
  * When this screen leaves composition:
  * - Removes protection by removing it from [cleanupProtectedScreens]
@@ -89,20 +92,20 @@ fun Screen.SaveableContent(
  */
 @Composable
 internal inline fun Screen.SetupScreenCleanup() {
-    val onDisposed = LocalClearScreens.current
+    val clearScreens = LocalClearScreens.current
     DisposableEffect(this) {
-//        log("SetupScreenCleanup DisposableEffect")
+        devLogV(TAG) { "SetupScreenCleanup DisposableEffect" }
         cleanupProtectedScreens[this@SetupScreenCleanup] = Unit
         onDispose {
             cleanupProtectedScreens -= this@SetupScreenCleanup
-//            log("SetupScreenCleanup DisposableEffect.onDispose")
-            onDisposed.invoke()
+            devLogV(TAG) { "SetupScreenCleanup DisposableEffect.onDispose" }
+            clearScreens.invoke()
         }
     }
 }
 
 /**
- * Sets up protection for this screen during disposal phase to prevent premature lifecycle cleanup.
+ * Sets up protection for this screen during the disposal phase to prevent premature lifecycle cleanup.
  *
  * While this screen is in composition:
  * - Protects the screen from being prematurely disposed by adding it to [preDisposeProtectedScreens]
@@ -142,12 +145,6 @@ class ComposeRendererScope<State : NavigationState>(
 internal class ComposeRenderer<State : NavigationState>(
     private val containerScreen: ContainerScreen<*, *>,
 ) : NavigationRenderer<State> {
-
-    /**
-     * A channel that is used to notify about completing of screen transition, so we can dispose
-     * screen that is removed out of the backstack properly.
-     */
-    val transitionCompleteChannel: Channel<Unit> = Channel(Channel.UNLIMITED)
 
     private var lastState: State? = null
     var state: State? by mutableStateOf(null, neverEqualPolicy())
@@ -263,7 +260,7 @@ internal class ComposeRenderer<State : NavigationState>(
 
     // need for correct handling lifecycle
     private fun Screen.onPreDispose() {
-//        log("onPreDispose $screenKey")
+        devLogI(TAG) { "onPreDispose $screenKey" }
         dependenciesSortedByRemovePriority()
             .filterIsInstance<LifecycleDependency>()
             .forEach { it.onPreDispose() }

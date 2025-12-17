@@ -195,7 +195,7 @@ object ScreenModelStore {
     }
 
     /**
-     * If screen is already removed, and we don't have value in map means,
+     * If the screen is already removed, and we don't have value in the map means
      * that we are going initialize value for removed screen and the error must be reported.
      */
     private fun assertGetOrPutCorrect(isScreenRemoved: Boolean, hasScreenAssociatedValue: Boolean, screenKey: ScreenKey, screen: Screen?) {
