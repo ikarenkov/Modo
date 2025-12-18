@@ -7,15 +7,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocal
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.lifecycle.HasDefaultViewModelProviderFactory
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.Event.ON_CREATE
@@ -34,6 +31,7 @@ import androidx.lifecycle.VIEW_MODEL_STORE_OWNER_KEY
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.enableSavedStateHandles
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.MutableCreationExtras
@@ -41,8 +39,15 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
+import androidx.savedstate.compose.LocalSavedStateRegistryOwner
+import com.github.terrakok.modo.ModoDevOptions
 import com.github.terrakok.modo.Screen
+import com.github.terrakok.modo.SetupPreDispose
+import com.github.terrakok.modo.android.ModoScreenAndroidAdapter.Companion.needPropagateLifecycleEventFromParent
 import com.github.terrakok.modo.lifecycle.LifecycleDependency
+import com.github.terrakok.modo.logs.devLogD
+import com.github.terrakok.modo.logs.devLogI
+import com.github.terrakok.modo.logs.devLogV
 import com.github.terrakok.modo.model.ScreenModelStore
 import com.github.terrakok.modo.model.ScreenModelStore.remove
 import com.github.terrakok.modo.util.getActivity
@@ -120,10 +125,9 @@ class ModoScreenAndroidAdapter private constructor(
         val context: Context = LocalContext.current
         val parentLifecycleOwner = LocalLifecycleOwner.current
         LifecycleDisposableEffect(context, parentLifecycleOwner, manualResumePause) {
-            @Suppress("SpreadOperator")
-            CompositionLocalProvider(*getProviders()) {
-                content()
-            }
+            DisposableAtomicReference(LocalContext, atomicContext)
+            DisposableAtomicReference(LocalLifecycleOwner, atomicParentLifecycleOwner)
+            ProvideCompositionLocals(content)
         }
     }
 
@@ -133,16 +137,18 @@ class ModoScreenAndroidAdapter private constructor(
      * F.e. to be able to collect ON_DISPOSE lifecycle event.
      */
     override fun onPreDispose() {
-//        Log.d("LifecycleDebug", "${screen.screenKey} ModoScreenAndroidAdapter.onPreDispose, emit ON_DESTROY event.")
+        ModoDevOptions.onScreenPreDisposeListener?.invoke(screen)
         safeHandleLifecycleEvent(ON_DESTROY)
     }
 
     override fun hideTransitionStarted() {
+        screen.devLogD(TAG) { "hideTransitionStarted ${lifecycle.currentState}" }
         screenTransitionState = ScreenTransitionState.HIDING
         safeHandleLifecycleEvent(ON_PAUSE)
     }
 
     override fun showTransitionFinished() {
+        screen.devLogD(TAG) { "showTransitionFinished ${lifecycle.currentState}" }
         screenTransitionState = ScreenTransitionState.SHOWN
         val parentState = atomicParentLifecycleOwner.get()?.lifecycle?.currentState
         // It's crucial to check parent state, because our state can't be greater than a parent state.
@@ -155,9 +161,8 @@ class ModoScreenAndroidAdapter private constructor(
 
     override fun toString(): String = "${ModoScreenAndroidAdapter::class.simpleName}, screenKey: ${screen.screenKey}"
 
-    @Suppress("UnusedParameter")
     private fun onDispose() {
-//        Log.d("LifecycleDebug", "${screen.screenKey} ModoScreenAndroidAdapter.onDispose. Clear ViewModelStore.")
+        screen.devLogI(TAG) { "onDispose. Clear ViewModelStore." }
         viewModelStore.clear()
     }
 
@@ -172,18 +177,24 @@ class ModoScreenAndroidAdapter private constructor(
         controller.performSave(outState)
     }
 
+    /**
+     * Provides essential Android Lifecycle and ViewModel composition locals for the screen:
+     * - [LocalLifecycleOwner]
+     * - [LocalViewModelStoreOwner]
+     * - [LocalSavedStateRegistryOwner]
+     *
+     * This enables Jetpack Compose features that depend on these locals to work properly within the screen's scope.
+     *
+     * @param content The composable content that will have access to these composition locals
+     */
     @Composable
-    private fun getProviders(): Array<ProvidedValue<*>> {
-        DisposableAtomicReference(LocalContext, atomicContext)
-        DisposableAtomicReference(LocalLifecycleOwner, atomicParentLifecycleOwner)
-
-        return remember(this) {
-            arrayOf(
-                LocalLifecycleOwner provides this,
-                LocalViewModelStoreOwner provides this,
-                LocalSavedStateRegistryOwner provides this
-            )
-        }
+    internal fun ProvideCompositionLocals(content: @Composable () -> Unit) {
+        CompositionLocalProvider(
+            LocalLifecycleOwner provides this,
+            LocalViewModelStoreOwner provides this,
+            LocalSavedStateRegistryOwner provides this,
+            content = content
+        )
     }
 
     /**
@@ -244,7 +255,11 @@ class ModoScreenAndroidAdapter private constructor(
 
         content()
 
+        screen.SetupPreDispose()
+
         DisposableEffect(this) {
+            screen.devLogV(TAG) { "LifecycleDisposableEffect parentLifecycleOwner: $parentLifecycleOwner" }
+
             val unregisterLifecycle = registerParentLifecycleListener(parentLifecycleOwner) {
                 LifecycleEventObserver { _, event ->
                     // when the Application goes to background, perform save
@@ -265,7 +280,7 @@ class ModoScreenAndroidAdapter private constructor(
             }
 
             onDispose {
-//                Log.d("LifecycleDebug", "ModoScreenAndroidAdapter registerParentLifecycleListener onDispose ${screen.screenKey}")
+                screen.devLogD(TAG) { "LifecycleDisposableEffect after content DisposableEffect.onDispose ${lifecycle.currentState}" }
                 unregisterLifecycle()
                 // when the screen goes to stack, perform save
                 performSave(savedState)
@@ -281,14 +296,14 @@ class ModoScreenAndroidAdapter private constructor(
     private fun safeHandleLifecycleEvent(event: Lifecycle.Event) {
         val skippEvent = needSkipEvent(lifecycle.currentState, event)
         if (!skippEvent) {
-//            Log.d("ModoScreenAndroidAdapter", "${screen.screenKey} handleLifecycleEvent $event")
+            screen.devLogD(TAG) { "safeHandleLifecycleEvent send $event" }
             screenTransitionState = when {
                 // Whenever we receive ON_RESUME event, we need to move screen to SHOWN state to indicate that there is no transition of this screen.
-                event == Lifecycle.Event.ON_RESUME -> ScreenTransitionState.SHOWN
+                event == ON_RESUME -> ScreenTransitionState.SHOWN
                 // Whe need to check transition state to distinguish between
                 // 1. finishing screen hiding transition. In this case, we need to move screen to hidden state.
                 // 2. hiding screen, because of lifecycle event. In this case we don't need to change animation state.
-                event == Lifecycle.Event.ON_STOP && screenTransitionState == ScreenTransitionState.HIDING -> ScreenTransitionState.HIDDEN
+                event == ON_STOP && screenTransitionState == ScreenTransitionState.HIDING -> ScreenTransitionState.HIDDEN
                 // Pause by itself doesn't mean that screen is hidden, it can be visible, but not active. F.e. when system dialog is shown.
                 else -> screenTransitionState
             }
@@ -321,6 +336,8 @@ class ModoScreenAndroidAdapter private constructor(
             ON_DESTROY
         )
 
+        private val TAG = ModoScreenAndroidAdapter::class.simpleName
+
         /**
          * Creates delegate for integration with android for the given [screen] or returns existed from cache.
          */
@@ -331,6 +348,13 @@ class ModoScreenAndroidAdapter private constructor(
                 name = LifecycleDependency.KEY,
                 onDispose = { it.onDispose() },
             ) { ModoScreenAndroidAdapter(screen) }
+
+        @JvmStatic
+        fun getOrNull(screen: Screen): ModoScreenAndroidAdapter? =
+            ScreenModelStore.getDependencyOrNull(
+                screen = screen,
+                name = LifecycleDependency.KEY,
+            )
 
         @JvmStatic
         private fun needPropagateLifecycleEventFromParent(

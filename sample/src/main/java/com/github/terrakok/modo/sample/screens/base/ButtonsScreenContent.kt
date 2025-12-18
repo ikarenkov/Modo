@@ -3,6 +3,7 @@ package com.github.terrakok.modo.sample.screens.base
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,7 +21,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,11 +33,14 @@ import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.sample.SampleAppConfig
+import com.github.terrakok.modo.sample.components.BackButton
 import com.github.terrakok.modo.sample.randomBackground
 import com.github.terrakok.modo.sample.screens.ButtonsState
 import com.github.terrakok.modo.sample.screens.GroupedButtonsList
 import com.github.terrakok.modo.sample.screens.GroupedButtonsState
 import com.github.terrakok.modo.sample.screens.ModoButtonSpec
+import com.github.terrakok.modo.stack.LocalStackNavigation
+import com.github.terrakok.modo.stack.back
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import logcat.logcat
@@ -105,18 +111,18 @@ internal fun Screen.SampleScreenContent(
 
 @OptIn(ExperimentalModoApi::class)
 @Composable
-fun Screen.LogLifecycle() {
+fun Screen.LogLifecycle(prefix: String = this::class.simpleName.orEmpty()) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
     // You will not be able to observe updates of lifecycleOwner when this content is not in the composition
     DisposableEffect(lifecycleOwner) {
-        logcat(tag = "LifecycleDebug") { "$screenKey DisposableEffect" }
+        logcat(tag = "LifecycleDebug") { "$prefix $screenKey DisposableEffect".trim() }
         val observer = LifecycleEventObserver { _, event ->
-            logcat(tag = "LifecycleDebug") { "$screenKey DisposableEffect $event" }
+            logcat(tag = "LifecycleDebug") { "$prefix $screenKey DisposableEffect $event".trim() }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
-            logcat(tag = "LifecycleDebug") { "$screenKey DisposableEffect onDispose" }
+            logcat(tag = "LifecycleDebug") { "$prefix $screenKey DisposableEffect onDispose" }
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
@@ -139,13 +145,20 @@ internal fun SampleScreenContent(
     Box(
         modifier = modifier
             .randomBackground()
-            .windowInsetsPadding(WindowInsets.systemBars)
-            .padding(8.dp),
+            .windowInsetsPadding(WindowInsets.systemBars),
     ) {
-        Column {
-            Text(
-                text = counter.toString()
-            )
+        Column(Modifier.padding(8.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val stackNavigation = if (LocalInspectionMode.current) null else LocalStackNavigation.current
+                BackButton(
+                    onClick = { stackNavigation?.back() },
+                )
+                Text(
+                    text = counter.toString()
+                )
+            }
             Text(
                 text = "$screenName $screenIndex",
                 style = MaterialTheme.typography.h5,

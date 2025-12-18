@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
@@ -28,7 +29,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.terrakok.modo.sample.SampleAppConfig
@@ -40,13 +40,11 @@ fun LifecycleEventsHistory(
     modifier: Modifier = Modifier,
     key: String? = null,
     enabled: Boolean = SampleAppConfig.displayLifecycleEvents,
-    lifecycleEventsHistory: SnapshotStateList<Lifecycle.Event> =
-        viewModel(key = key) {
-            LifecycleEventsViewModel(createSavedStateHandle())
-        }.lifecycleEventsHistory,
+    lifecycleEventsHistory: SnapshotStateList<Lifecycle.Event>? = null,
     fontSize: TextUnit = 16.sp,
 ) {
-    if (enabled) {
+    if (enabled && !LocalInspectionMode.current) {
+        val lifecycleEventsHistory = lifecycleEventsHistory ?: viewModel<LifecycleEventsViewModel>(key = key).lifecycleEventsHistory
         val lifecycleOwner = LocalLifecycleOwner.current
         val context = LocalContext.current
 

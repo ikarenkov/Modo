@@ -81,7 +81,7 @@ open class SampleStack(
         val isDialogPlaceHolder = remember(dialog) {
             dialog is DialogPlaceHolder
         }
-        val isBottomSheet = remember {
+        val isBottomSheet = remember(dialog) {
             dialog is SampleBottomSheet || dialog is SampleBottomSheetStack
         }
         val background by animateColorAsState(
