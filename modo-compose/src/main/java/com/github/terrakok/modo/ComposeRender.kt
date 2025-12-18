@@ -46,7 +46,7 @@ private val LocalPreDispose = staticCompositionLocalOf<() -> Unit> {
 
 private const val TAG = "ComposeRenderer"
 
-private inline val Screen.saveableStateKey: String get() = screenKey.value
+internal inline val Screen.saveableStateKey: String get() = screenKey.value
 
 /**
  * Provides integration of [Screen] to Modo's navigation system:
@@ -252,7 +252,6 @@ internal class ComposeRenderer<State : NavigationState>(
             )
         }
         ScreenModelStore.remove(this)
-        stateHolder.removeState(screenKey)
         stateHolder.removeState(saveableStateKey)
 
         ModoDevOptions.onScreenDisposeListener?.invoke(this)
