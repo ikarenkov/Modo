@@ -1,5 +1,6 @@
 package com.github.terrakok.modo.logs
 
+@Suppress("UnusedParameter")
 internal object DevLog {
 
     inline fun v(tag: String? = null, message: () -> String) = Unit

@@ -29,7 +29,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.terrakok.modo.sample.SampleAppConfig

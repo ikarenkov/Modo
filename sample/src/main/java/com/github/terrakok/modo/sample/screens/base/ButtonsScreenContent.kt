@@ -41,7 +41,6 @@ import com.github.terrakok.modo.sample.screens.GroupedButtonsState
 import com.github.terrakok.modo.sample.screens.ModoButtonSpec
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
-import com.github.terrakok.modo.stack.backToRoot
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import logcat.logcat
