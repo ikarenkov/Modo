@@ -2,7 +2,6 @@ package com.github.terrakok
 
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.internal.lint.AndroidLintTask
-import io.gitlab.arturbosch.detekt.report.ReportMergeTask
 import org.gradle.api.Project
 
 fun Project.configureLintAndroid(
@@ -17,14 +16,20 @@ fun Project.configureLintAndroid(
         htmlReport = true
         lintConfig = rootProject.file("config/lint/lint.xml")
     }
-    rootProject.tasks.named(
-        CollectSarifPlugin.MERGE_LINT_SARIF,
-        ReportMergeTask::class.java,
-    ) {
-        input.from(
-            tasks
-                .named("lintReportDebug", AndroidLintTask::class.java)
-                .flatMap { it.sarifReportOutputFile }
-        )
+
+    // Use afterEvaluate to ensure the lintReportDebug task exists
+    afterEvaluate {
+        tasks.matching { it.name == "lintReportDebug" && it is AndroidLintTask }.configureEach {
+            val lintTask = this as AndroidLintTask
+            val lintSarifFile = lintTask.sarifReportOutputFile
+
+            // Add lint SARIF files to the fix task
+            rootProject.tasks.named(
+                CollectSarifPlugin.FIX_LINT_SARIF,
+                FixLintSarifTask::class.java,
+            ) {
+                inputFiles.from(lintSarifFile)
+            }
+        }
     }
 }
