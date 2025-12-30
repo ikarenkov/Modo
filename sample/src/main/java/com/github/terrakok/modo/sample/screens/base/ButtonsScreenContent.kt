@@ -12,8 +12,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.IntState
@@ -23,6 +27,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,6 +39,7 @@ import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.sample.SampleAppConfig
 import com.github.terrakok.modo.sample.components.BackButton
+import com.github.terrakok.modo.sample.logs.logcat
 import com.github.terrakok.modo.sample.randomBackground
 import com.github.terrakok.modo.sample.screens.ButtonsState
 import com.github.terrakok.modo.sample.screens.GroupedButtonsList
@@ -43,7 +49,6 @@ import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import logcat.logcat
 
 internal const val COUNTER_DELAY_MS = 100L
 
@@ -53,10 +58,25 @@ internal fun Screen.ButtonsScreenContent(
     screenName: String,
     state: GroupedButtonsState,
     modifier: Modifier = Modifier,
+    windowInsets: WindowInsets = WindowInsets.systemBars,
+    topRightButtonSlot: @Composable () -> Unit = {},
+    logLifecycle: Boolean = true,
+    enableCounter: Boolean = true,
 ) {
-    LogLifecycle()
+    if (logLifecycle) {
+        LogLifecycle()
+    }
     val counter by rememberCounterState()
-    ButtonsScreenContent(screenIndex, screenName, counter, screenKey, state, modifier)
+    ButtonsScreenContent(
+        screenIndex = screenIndex,
+        screenName = screenName,
+        counter = if (enableCounter) counter else 0,
+        screenKey = screenKey,
+        state = state,
+        topRightButtonSlot = topRightButtonSlot,
+        windowInsets = windowInsets,
+        modifier = modifier
+    )
 }
 
 @Composable
@@ -81,12 +101,16 @@ internal fun ButtonsScreenContent(
     screenKey: ScreenKey,
     state: GroupedButtonsState,
     modifier: Modifier = Modifier,
+    topRightButtonSlot: @Composable () -> Unit = {},
+    windowInsets: WindowInsets = WindowInsets.systemBars,
 ) {
     SampleScreenContent(
         screenIndex = screenIndex,
         screenName = screenName,
         counter = counter,
         screenKey = screenKey,
+        topRightButtonSlot = topRightButtonSlot,
+        windowInsets = windowInsets,
         modifier = modifier,
     ) {
         GroupedButtonsList(
@@ -102,27 +126,36 @@ internal fun Screen.SampleScreenContent(
     screenName: String,
     screenKey: ScreenKey,
     modifier: Modifier = Modifier,
+    windowInsets: WindowInsets = WindowInsets.systemBars,
     content: @Composable ColumnScope.() -> Unit
 ) {
     LogLifecycle()
     val counter by rememberCounterState()
-    SampleScreenContent(screenIndex, screenName, counter, screenKey, modifier, content)
+    SampleScreenContent(
+        screenIndex = screenIndex,
+        screenName = screenName,
+        counter = counter,
+        screenKey = screenKey,
+        modifier = modifier,
+        windowInsets = windowInsets,
+        content = content
+    )
 }
 
 @OptIn(ExperimentalModoApi::class)
 @Composable
-fun Screen.LogLifecycle(prefix: String = this::class.simpleName.orEmpty()) {
+fun Screen.LogLifecycle(prefix: String = "") {
     val lifecycleOwner = LocalLifecycleOwner.current
 
     // You will not be able to observe updates of lifecycleOwner when this content is not in the composition
     DisposableEffect(lifecycleOwner) {
-        logcat(tag = "LifecycleDebug") { "$prefix $screenKey DisposableEffect".trim() }
+        logcat("LogLifecycle") { "$prefix DisposableEffect $lifecycleOwner".trim() }
         val observer = LifecycleEventObserver { _, event ->
-            logcat(tag = "LifecycleDebug") { "$prefix $screenKey DisposableEffect $event".trim() }
+            logcat("LogLifecycle") { "$prefix DisposableEffect $event $lifecycleOwner".trim() }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
-            logcat(tag = "LifecycleDebug") { "$prefix $screenKey DisposableEffect onDispose" }
+            logcat("LogLifecycle") { "$prefix DisposableEffect.onDispose $lifecycleOwner".trim() }
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
@@ -140,12 +173,14 @@ internal fun SampleScreenContent(
     counter: Int,
     screenKey: ScreenKey,
     modifier: Modifier = Modifier,
+    windowInsets: WindowInsets = WindowInsets.systemBars,
+    topRightButtonSlot: @Composable () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit
 ) {
     Box(
         modifier = modifier
             .randomBackground()
-            .windowInsetsPadding(WindowInsets.systemBars),
+            .windowInsetsPadding(windowInsets),
     ) {
         Column(Modifier.padding(8.dp)) {
             Row(
@@ -156,8 +191,10 @@ internal fun SampleScreenContent(
                     onClick = { stackNavigation?.back() },
                 )
                 Text(
-                    text = counter.toString()
+                    text = counter.toString(),
+                    modifier = Modifier.weight(1f)
                 )
+                topRightButtonSlot()
             }
             Text(
                 text = "$screenName $screenIndex",
@@ -194,6 +231,14 @@ private fun ButtonsPreview() {
                 ModoButtonSpec("Button with a very long text") {},
             )
         ),
+        topRightButtonSlot = {
+            IconButton(onClick = {}) {
+                Icon(
+                    painter = rememberVectorPainter(image = Icons.Filled.ArrowDropDown),
+                    contentDescription = null
+                )
+            }
+        },
         modifier = Modifier.fillMaxSize()
     )
 }
