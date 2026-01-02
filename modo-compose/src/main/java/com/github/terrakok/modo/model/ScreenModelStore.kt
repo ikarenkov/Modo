@@ -30,6 +30,16 @@ internal data class DependencyWithRemoveOrder(
     val dependency: Dependency
 )
 
+/**
+ * Internal store for screen models and dependencies.
+ *
+ * Thread Safety:
+ * While the store uses thread-safe collections, it is primarily designed for use from the UI thread.
+ * Race conditions may occur only when multiple threads attempt to initialize a dependency or
+ * screen model for the same key simultaneously for the first time.
+ * Since these models are typically created and accessed within the Compose runtime,
+ * they generally benefit from the sequential execution guaranteed by Compose effects.
+ */
 object ScreenModelStore {
 
     @PublishedApi
@@ -111,9 +121,6 @@ object ScreenModelStore {
         ?.dependency
         ?.dependencyInstance as? T
 
-    fun getDependencyKey(screen: Screen, name: String, tag: String? = null) =
-        "${screen.screenKey.value}:$name${if (tag != null) ":$tag" else ""}"
-
     fun remove(screen: Screen) {
         if (removedScreenKeys[screen.screenKey] != null) {
             ModoDevOptions.onIllegalScreenModelStoreAccess.validationFailed(
@@ -142,14 +149,23 @@ object ScreenModelStore {
         screenDependenciesInternal(screen).sortedBy { it.value.removePriority }.map { it.value.dependency.dependencyInstance }
 
     internal fun screenDependenciesInternal(screen: Screen): Sequence<Map.Entry<DependencyKey, DependencyWithRemoveOrder>> =
-        dependencies.asSequence().filter { it.key.startsWith(screen.screenKey.value) }
+        dependencies.asSequence().filter { isKeyOfScreen(it.key, screen) }
 
     /**
-     * Generates a key based on input parameters.
+     * Generates a screen model key based on screen, type, and tag.
+     * Format: "screenKey:ScreenModelClassName:tag"
      */
     @PublishedApi
-    internal inline fun <reified T : ScreenModel> getKey(screen: Screen, tag: String?): ScreenModelKey =
+    internal inline fun <reified T : ScreenModel> getScreenModelKey(screen: Screen, tag: String?): ScreenModelKey =
         "${screen.screenKey.value}:${T::class.qualifiedName}:${tag ?: "default"}"
+
+    /**
+     * Generates a dependency key based on screen, name, and optional tag.
+     * Format: "screenKey:name" or "screenKey:name:tag"
+     */
+    @PublishedApi
+    internal fun getDependencyKey(screen: Screen, name: String, tag: String? = null) =
+        "${screen.screenKey.value}:$name${if (tag != null) ":$tag" else ""}"
 
     @PublishedApi
     internal fun getDependencyKey(screenModel: ScreenModel, name: String): DependencyKey =
@@ -167,7 +183,7 @@ object ScreenModelStore {
         tag: String?,
         factory: @DisallowComposableCalls () -> T
     ): T {
-        val key = getKey<T>(screen, tag)
+        val key = getScreenModelKey<T>(screen, tag)
         lastScreenModelKey.value = key
         assertGetOrPutScreenModelsCorrect(screen, screenModels[key])
         return screenModels.getOrPut(key, factory) as T
@@ -217,7 +233,19 @@ object ScreenModelStore {
 
     private fun <T> Map<String, T>.onEach(screen: Screen, block: (String) -> Unit) =
         asSequence()
-            .filter { it.key.startsWith(screen.screenKey.value) }
+            .filter { isKeyOfScreen(it.key, screen) }
             .map { it.key }
             .forEach(block)
+
+    /**
+     * Checks if the given key (dependency or screen model) belongs to the specified screen.
+     *
+     * Works with keys created by:
+     * - [getDependencyKey]: "screenKey:name" or "screenKey:name:tag"
+     * - [getScreenModelKey]: "screenKey:ClassName:tag"
+     *
+     * All keys follow the format "screenKey:...", so we check for the prefix.
+     */
+    private fun isKeyOfScreen(key: String, screen: Screen): Boolean =
+        key.startsWith("${screen.screenKey.value}:")
 }
