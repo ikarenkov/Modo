@@ -49,6 +49,7 @@ class M3BottomSheet(
     override fun provideDialogConfig(): DialogScreen.DialogConfig = DialogScreen.DialogConfig.Custom
 
     @OptIn(ExperimentalMaterial3Api::class)
+    @Suppress("MagicNumber")
     @Composable
     override fun Content(modifier: Modifier) {
         val stackScreen = LocalStackNavigation.current
