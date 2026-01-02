@@ -59,9 +59,10 @@ internal fun Screen.ButtonsScreenContent(
     state: GroupedButtonsState,
     modifier: Modifier = Modifier,
     windowInsets: WindowInsets = WindowInsets.systemBars,
-    topRightButtonSlot: @Composable () -> Unit = {},
     logLifecycle: Boolean = true,
     enableCounter: Boolean = true,
+    @Suppress("ComposableLambdaParameterNaming")
+    topRightButtonSlot: @Composable () -> Unit = {},
 ) {
     if (logLifecycle) {
         LogLifecycle()
@@ -101,8 +102,9 @@ internal fun ButtonsScreenContent(
     screenKey: ScreenKey,
     state: GroupedButtonsState,
     modifier: Modifier = Modifier,
-    topRightButtonSlot: @Composable () -> Unit = {},
     windowInsets: WindowInsets = WindowInsets.systemBars,
+    @Suppress("ComposableLambdaParameterNaming")
+    topRightButtonSlot: @Composable () -> Unit = {}
 ) {
     SampleScreenContent(
         screenIndex = screenIndex,

@@ -16,7 +16,8 @@ import com.github.terrakok.modo.util.currentOrThrow
  * Wrap your window-based overlay content with this function if:
  * - Your code inside uses composition locals: [LocalLifecycleOwner], [LocalSavedStateRegistryOwner],
  *   [LocalSaveableStateRegistry].
- * - You need [rememberSaveable] state to survive navigation inside overlay (e.g., overlay hidden on forward navigation, restored with saved state on back navigation).
+ * - You need [rememberSaveable] state to survive navigation inside overlay (e.g., overlay hidden on forward navigation,
+ *   restored with saved state on back navigation).
  *
  * ## Why you need this
  *
