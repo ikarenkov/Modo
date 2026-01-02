@@ -4,6 +4,8 @@ import androidx.compose.runtime.DisallowComposableCalls
 import com.github.terrakok.modo.ModoDevOptions
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
+import com.github.terrakok.modo.model.ScreenModelStore.getDependencyKey
+import com.github.terrakok.modo.model.ScreenModelStore.getScreenModelKey
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.jetbrains.annotations.VisibleForTesting
 import java.util.concurrent.ConcurrentHashMap
@@ -187,6 +189,15 @@ object ScreenModelStore {
         lastScreenModelKey.value = key
         assertGetOrPutScreenModelsCorrect(screen, screenModels[key])
         return screenModels.getOrPut(key, factory) as T
+    }
+
+    @VisibleForTesting
+    internal inline fun <reified T : ScreenModel> getOrNull(
+        screen: Screen,
+        tag: String?,
+    ): T? {
+        val key = getScreenModelKey<T>(screen, tag)
+        return screenModels.get(key) as T?
     }
 
     @PublishedApi
