@@ -35,8 +35,7 @@ fun ComposeRendererScope<StackState>.SlideTransition(
                     scaleIn(initialScale = 2f, animationSpec = animationSpec) + fadeIn(animationSpec) togetherWith
                         fadeOut(animationSpec)
                 }
-                oldState?.stack?.last() is DialogScreen ||
-                    oldState?.stack?.last() !is DialogScreen && newState?.stack?.last() is DialogScreen -> {
+                screen is DialogScreen -> {
                     val animationSpec = tween<Float>(durationMillis = SampleAppConfig.animationDurationMs)
                     fadeIn(animationSpec) togetherWith fadeOut(animationSpec)
                 }

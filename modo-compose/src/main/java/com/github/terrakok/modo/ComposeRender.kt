@@ -18,6 +18,7 @@ import androidx.lifecycle.Lifecycle.Event.ON_RESUME
 import androidx.lifecycle.Lifecycle.Event.ON_START
 import androidx.lifecycle.Lifecycle.Event.ON_STOP
 import com.github.terrakok.modo.android.ModoScreenAndroidAdapter
+import com.github.terrakok.modo.android.overlaySaveableStateKey
 import com.github.terrakok.modo.animation.ScreenTransition
 import com.github.terrakok.modo.animation.cleanupProtectedScreens
 import com.github.terrakok.modo.animation.preDisposeProtectedScreens
@@ -253,6 +254,7 @@ internal class ComposeRenderer<State : NavigationState>(
         }
         ScreenModelStore.remove(this)
         stateHolder.removeState(saveableStateKey)
+        stateHolder.removeState(overlaySaveableStateKey)
 
         ModoDevOptions.onScreenDisposeListener?.invoke(this)
         // clear nested screens using recursion
