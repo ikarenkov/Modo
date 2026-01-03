@@ -30,7 +30,7 @@ inline fun <reified T : ScreenModel> Screen.rememberScreenModel(
     tag: String? = null,
     crossinline factory: @DisallowComposableCalls () -> T
 ): T =
-    remember(ScreenModelStore.getKey<T>(this, tag)) {
+    remember(ScreenModelStore.getScreenModelKey<T>(this, tag)) {
         ScreenModelStore.getOrPut(this, tag, factory)
     }
 
