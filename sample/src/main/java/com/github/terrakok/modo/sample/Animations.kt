@@ -28,7 +28,7 @@ fun ComposeRendererScope<StackState>.SlideTransition(
         modifier = modifier,
         screenModifier = screenModifier,
         transitionSpec = {
-            val transitionType = calculateStackTransitionType(oldState, newState)
+            val transitionType = calculateStackTransitionType()
             when {
                 transitionType == StackTransitionType.Replace -> {
                     val animationSpec = tween<Float>(durationMillis = SampleAppConfig.animationDurationMs)

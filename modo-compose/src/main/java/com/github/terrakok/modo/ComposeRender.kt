@@ -31,6 +31,8 @@ import com.github.terrakok.modo.util.currentOrThrow
 
 typealias RendererContent<State> = @Composable ComposeRendererScope<State>.(Modifier) -> Unit
 
+typealias ContainerContent<State> = @Composable State.(Modifier) -> Unit
+
 val defaultRendererContent: (@Composable ComposeRendererScope<*>.(screenModifier: Modifier) -> Unit) = { screenModifier ->
     screen.SaveableContent(screenModifier)
 }
@@ -133,6 +135,7 @@ internal inline fun Screen.SetupPreDispose() {
     }
 }
 
+@Deprecated("Is going to be removed in 0.12.0")
 class ComposeRendererScope<State : NavigationState>(
     val oldState: State?,
     val newState: State?,
@@ -197,6 +200,39 @@ internal class ComposeRenderer<State : NavigationState>(
             *provideCompositionLocal
         ) {
             ComposeRendererScope(lastState, state, screen).content(modifier)
+        }
+    }
+
+    @Suppress("UnusedPrivateProperty", "SpreadOperator")
+    @Composable
+    fun ContentNew(
+        modifier: Modifier = Modifier,
+        provideCompositionLocal: Array<ProvidedValue<*>> = emptyArray(),
+        content: ContainerContent<State>
+    ) {
+        val stateHolder: SaveableStateHolder = LocalSaveableStateHolder.currentOrThrow
+
+        val clearScreens = remember(stateHolder) {
+            {
+                clearScreens(stateHolder)
+            }
+        }
+
+        // pre dispose means that we can send ON_DISPOSE if screen is removing,
+        // to let Screen.Content to handle ON_DISPOSE by using functions like DisposableEffect
+        val preDispose = remember {
+            {
+                onPreDispose()
+            }
+        }
+
+        CompositionLocalProvider(
+            LocalContainerScreen provides containerScreen,
+            LocalClearScreens provides clearScreens,
+            LocalPreDispose provides preDispose,
+            *provideCompositionLocal
+        ) {
+            state?.content(modifier)
         }
     }
 

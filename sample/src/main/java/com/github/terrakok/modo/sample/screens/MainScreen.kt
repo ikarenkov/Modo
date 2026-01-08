@@ -14,6 +14,8 @@ import com.github.terrakok.modo.sample.ModoLegacyIntegrationActivity
 import com.github.terrakok.modo.sample.ModoSampleActivity
 import com.github.terrakok.modo.sample.fragment.ModoFragment
 import com.github.terrakok.modo.sample.fragment.ModoFragmentIntegrationActivity
+import com.github.terrakok.modo.sample.playground.AnimationsPlaygroundScreen
+import com.github.terrakok.modo.sample.playground.NewAnimationStackScreen
 import com.github.terrakok.modo.sample.quickstart.QuickStartActivity
 import com.github.terrakok.modo.sample.screens.base.ButtonsScreenContent
 import com.github.terrakok.modo.sample.screens.containers.CustomStackSample
@@ -223,6 +225,12 @@ private fun rememberButtons(
                         },
                         ModoButtonSpec("Animation Playground") {
                             navigation?.forward(AnimationPlaygroundScreen())
+                        },
+                        ModoButtonSpec("NewAnimationStackScreen") {
+                            navigation?.forward(NewAnimationStackScreen())
+                        },
+                        ModoButtonSpec("AnimationsPlaygroundScreen") {
+                            navigation?.forward(AnimationsPlaygroundScreen())
                         },
                     )
                 ),

@@ -6,6 +6,7 @@
     <application
         android:name=".ModoSampleApplication"
         android:theme="@style/Theme.Modo"
+        android:enableOnBackInvokedCallback="true"
         tools:ignore="MissingApplicationIcon">
         <activity
             android:name=".ModoSampleActivity"

@@ -27,7 +27,7 @@ import com.github.terrakok.modo.lifecycle.LifecycleScreenEffect
 import com.github.terrakok.modo.sample.screens.MainScreenContent
 import com.github.terrakok.modo.sample.screens.base.ButtonsScreenContent
 import com.github.terrakok.modo.stack.LocalStackNavigation
-import com.github.terrakok.modo.stack.StackScreen
+import com.github.terrakok.modo.stack.StackNavContainer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.parcelize.Parcelize
@@ -86,7 +86,7 @@ class SampleDialog(
                 ButtonsScreenContent(
                     screenIndex = screenIndex,
                     screenName = "SampleDialog",
-                    state = rememberDialogsButtons(LocalContainerScreen.current as StackScreen, screenIndex),
+                    state = rememberDialogsButtons(LocalContainerScreen.current as StackNavContainer, screenIndex),
                     modifier = modifier
                         .fillMaxHeight(0.6f)
                         .padding(horizontal = 50.dp)

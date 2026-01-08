@@ -1,0 +1,536 @@
+package com.github.terrakok.modo.sample.playground.animation
+
+import androidx.compose.animation.core.AnimationState
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.animateTo
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import com.github.terrakok.modo.DialogScreen
+import com.github.terrakok.modo.ExperimentalModoApi
+import com.github.terrakok.modo.SaveableContent
+import com.github.terrakok.modo.Screen
+import com.github.terrakok.modo.ScreenKey
+import com.github.terrakok.modo.animation.StackTransitionType
+import com.github.terrakok.modo.animation.calculateStackTransitionType
+import com.github.terrakok.modo.model.lifecycleDependency
+import com.github.terrakok.modo.stack.StackState
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.job
+
+/**
+ * Stack animation composable that renders screens with customizable animations.
+ *
+ * ## Animation Queueing
+ *
+ * By default, navigation changes during an ongoing animation are queued and batched to prevent
+ * animation interruptions and ensure smooth transitions.
+ *
+ * **Example:**
+ * 1. Initial state: (A)
+ * 2. Navigation to (A, B) starts → animation (A) → (A, B) begins
+ * 3. During animation, stack changes to (A, B, C) → queued
+ * 4. Stack changes again to (A, B, C, D) → latest state queued
+ * 5. Animation (A) → (A, B) completes
+ * 6. System animates directly from (A, B) → (A, B, C, D), skipping intermediate state (A, B, C)
+ *
+ * @param modifier the modifier to apply to the animation container.
+ * @param animator the [StackAnimator] to use for animating screen transitions. Default is fade + slide.
+ * @param animationSpec the animation spec to control duration and easing. Default is tween(300ms).
+ * @param waitForAnimationCompletion if true, queues navigation changes during animation (default);
+ * if false, immediately processes changes, potentially interrupting the current animation.
+ * @param content the content to render for each screen. Default uses SaveableContent with manual resume/pause.
+ */
+@OptIn(ExperimentalModoApi::class)
+@Composable
+fun StackState.StackAnimation(
+    modifier: Modifier = Modifier,
+    animator: StackAnimator = fade() + slide(),
+    animationSpec: FiniteAnimationSpec<Float> = tween(durationMillis = 300),
+    waitForAnimationCompletion: Boolean = true,
+    content: @Composable (Screen) -> Unit = { it.SaveableContent(manualResumePause = true) }
+) {
+    var animationScreens by rememberAnimationItems(isDialogs = false, waitForAnimationCompletion = waitForAnimationCompletion)
+    var animationDialogs by rememberAnimationItems(isDialogs = true, waitForAnimationCompletion = waitForAnimationCompletion)
+
+    // Render all animation items
+    Box(modifier = modifier) {
+        animationScreens.forEach { (screenKey, item) ->
+            key(screenKey) {
+                AnimatedScreen(
+                    item = item,
+                    animator = animator,
+                    animationSpec = animationSpec,
+                    onStarted = {
+                        val lifecycleDependency = item.screen.lifecycleDependency()
+                        when (item.animationPhase) {
+                            ScreenAnimationPhase.EXIT -> lifecycleDependency?.hideTransitionStarted()
+                            ScreenAnimationPhase.ENTER -> {}
+                            ScreenAnimationPhase.IDLE -> lifecycleDependency?.showTransitionFinished()
+                        }
+                    },
+                    onFinished = {
+                        val lifecycleDependency = item.screen.lifecycleDependency()
+                        when (item.animationPhase) {
+                            ScreenAnimationPhase.ENTER -> lifecycleDependency?.showTransitionFinished()
+                            ScreenAnimationPhase.EXIT -> {}
+                            ScreenAnimationPhase.IDLE -> lifecycleDependency?.showTransitionFinished()
+                        }
+                        // Remove exiting screens, update entering screens
+                        animationScreens = if (item.animationPhase.isExit) {
+                            animationScreens - screenKey
+                        } else {
+                            animationScreens + (screenKey to item.copy(isAnimating = false, oldStack = emptyList()))
+                        }
+                    },
+                    content = { screen ->
+                        content(screen)
+                    }
+                )
+            }
+        }
+        animationDialogs.forEach { (screenKey, item) ->
+            key(screenKey) {
+                AnimatedScreen(
+                    item = item,
+                    animator = animator,
+                    animationSpec = animationSpec,
+                    onFinished = {
+                        // Remove exiting screens, update entering screens
+                        animationDialogs = if (item.animationPhase.isExit) {
+                            animationDialogs - screenKey
+                        } else {
+                            animationDialogs + (screenKey to item.copy(isAnimating = false))
+                        }
+                    },
+                    content = { screen ->
+                        content(screen)
+                    }
+                )
+            }
+        }
+    }
+}
+
+//@OptIn(ExperimentalModoApi::class)
+//@Composable
+//fun ComposeRendererScope<StackState>.rememberAnimationItems(): MutableState<Map<ScreenKey, AnimationItem>> {
+//    val currentScreen = screen
+//
+//    // Track animation items (screens currently being rendered/animated)
+//    var animationItems = remember { mutableStateOf<Map<ScreenKey, AnimationItem>>(emptyMap()) }
+//    var currentStackState by remember { mutableStateOf<StackState?>(null) }
+//
+//    // Detect stack changes and update animation items
+//    if (newState != currentStackState) {
+//        assert(oldState == this.oldState)
+//        val oldState = currentStackState
+//        currentStackState = newState
+//
+//        // Calculate transition type using Modo's existing logic
+//        val transitionType = calculateStackTransitionType()
+//
+//        val newItems = calculateAnimationItems(
+//            transitionType = transitionType,
+//            oldScreen = oldState?.stack?.dropLastWhile { it is DialogScreen }?.lastOrNull(),
+//            newScreen = currentScreen
+//        )
+//
+//        // Update animation items (simplified - can be enhanced to queue animations)
+//        animationItems.value = newItems
+//    }
+//    return animationItems
+//}
+
+/**
+ * Helper function to process stack transition and generate animation items.
+ * Extracted to avoid code duplication.
+ */
+@OptIn(ExperimentalModoApi::class)
+private fun processStackTransition(
+    oldStack: List<Screen>,
+    newStack: List<Screen>,
+    isDialogs: Boolean
+): Map<ScreenKey, AnimationItem> {
+    val transitionType = calculateStackTransitionType(
+        oldStack = oldStack,
+        newStack = newStack,
+        firstScreenIdle = !isDialogs
+    )
+
+    return calculateAnimationItems(
+        transitionType = transitionType,
+        oldStack = oldStack,
+        newStack = newStack,
+        oldScreen = oldStack.lastOrNull(),
+        newScreen = newStack.lastOrNull()
+    )
+}
+
+/**
+ * Remembers animation items without queueing - allows overlapping animations.
+ * When navigation happens during animation, immediately starts new animation.
+ */
+@OptIn(ExperimentalModoApi::class)
+@Composable
+private fun StackState.rememberAnimationItemsSimple(
+    isDialogs: Boolean = false
+): MutableState<Map<ScreenKey, AnimationItem>> {
+    val filteredNewStack = remember(this) {
+        if (isDialogs) {
+            stack.takeLastWhile { it is DialogScreen }
+        } else {
+            stack.dropLastWhile { it is DialogScreen }
+        }
+    }
+
+    val animationItems = remember { mutableStateOf<Map<ScreenKey, AnimationItem>>(emptyMap()) }
+    var currentStack by remember { mutableStateOf<List<Screen>>(emptyList()) }
+
+    // Detect stack changes and update animation items immediately
+    if (filteredNewStack != currentStack) {
+        val oldStack = currentStack
+        currentStack = filteredNewStack
+
+        animationItems.value = processStackTransition(
+            oldStack = oldStack,
+            newStack = filteredNewStack,
+            isDialogs = isDialogs
+        )
+    }
+
+    return animationItems
+}
+
+/**
+ * Remembers animation items with queueing - prevents overlapping animations.
+ *
+ * When navigation happens during animation, queues the change until current animation finishes.
+ * This ensures smooth transitions by batching rapid navigation changes. For example:
+ * - Stack changes: A → (A,B) → (A,B,C) → (A,B,C,D)
+ * - If animation A→B is running when changes to (A,B,C) and (A,B,C,D) occur
+ * - The system completes A→B animation first
+ * - Then animates from final state of A→B directly to (A,B,C,D)
+ * - Intermediate state (A,B,C) is skipped, avoiding animation interruption
+ */
+@OptIn(ExperimentalModoApi::class)
+@Composable
+private fun StackState.rememberAnimationItemsQueued(
+    isDialogs: Boolean = false
+): MutableState<Map<ScreenKey, AnimationItem>> {
+    val filteredNewStack = remember(this) {
+        if (isDialogs) {
+            stack.takeLastWhile { it is DialogScreen }
+        } else {
+            stack.dropLastWhile { it is DialogScreen }
+        }
+    }
+
+    val animationItems = remember { mutableStateOf<Map<ScreenKey, AnimationItem>>(emptyMap()) }
+    var currentStack by remember { mutableStateOf<List<Screen>>(emptyList()) }
+    var visibleStack by remember { mutableStateOf<List<Screen>>(emptyList()) }
+    var pendingStack by remember { mutableStateOf<List<Screen>?>(null) }
+
+    val hasAnimatingScreens = animationItems.value.values.any { it.isAnimating }
+
+    // Detect stack changes
+    if (filteredNewStack != currentStack) {
+        if (hasAnimatingScreens) {
+            // Animation in progress - queue this change
+            pendingStack = filteredNewStack
+            currentStack = filteredNewStack
+        } else {
+            // No animation - process immediately
+            val oldStack = visibleStack
+            currentStack = filteredNewStack
+            visibleStack = filteredNewStack
+
+            animationItems.value = processStackTransition(
+                oldStack = oldStack,
+                newStack = filteredNewStack,
+                isDialogs = isDialogs
+            )
+        }
+    }
+
+    // Process queued stack change when animations finish
+    LaunchedEffect(hasAnimatingScreens, pendingStack) {
+        if (!hasAnimatingScreens && pendingStack != null) {
+            val queuedStack = pendingStack!!
+            pendingStack = null
+
+            val oldStack = visibleStack
+            visibleStack = queuedStack
+
+            animationItems.value = processStackTransition(
+                oldStack = oldStack,
+                newStack = queuedStack,
+                isDialogs = isDialogs
+            )
+        }
+    }
+
+    return animationItems
+}
+
+/**
+ * Remembers animation items with optional queueing.
+ * Delegates to either simple or queued implementation based on parameter.
+ *
+ * @param isDialogs whether to track dialog screens or regular screens
+ * @param waitForAnimationCompletion if true, queues navigation changes during animation;
+ * if false, immediately processes changes (may interrupt current animation)
+ */
+@OptIn(ExperimentalModoApi::class)
+@Composable
+fun StackState.rememberAnimationItems(
+    isDialogs: Boolean = false,
+    waitForAnimationCompletion: Boolean = true
+): MutableState<Map<ScreenKey, AnimationItem>> {
+    return if (waitForAnimationCompletion) {
+        rememberAnimationItemsQueued(isDialogs)
+    } else {
+        rememberAnimationItemsSimple(isDialogs)
+    }
+}
+
+@OptIn(ExperimentalModoApi::class)
+@Composable
+fun StackState.rememberDialogsAnimationItems(): MutableState<Map<ScreenKey, AnimationItem>> {
+    val filteredNewStack = remember(this) {
+        stack.takeLastWhile { it is DialogScreen }
+    }
+    val currentScreen = filteredNewStack.lastOrNull()
+
+    // Track animation items (screens currently being rendered/animated)
+    val animationItems = remember { mutableStateOf<Map<ScreenKey, AnimationItem>>(emptyMap()) }
+    var currentStack by remember { mutableStateOf<List<Screen>>(emptyList()) }
+
+    // Detect stack changes and update animation items
+    if (filteredNewStack != currentStack) {
+        val oldStack = currentStack
+        currentStack = filteredNewStack
+
+        // Calculate transition type using Modo's existing logic
+        val transitionType = calculateStackTransitionType(
+            oldStack = oldStack,
+            newStack = filteredNewStack,
+        )
+
+        val newItems = calculateAnimationItems(
+            transitionType = transitionType,
+            oldStack = oldStack,
+            newStack = filteredNewStack,
+            oldScreen = oldStack.lastOrNull(),
+            newScreen = currentScreen
+        )
+
+        // Update animation items (simplified - can be enhanced to queue animations)
+        animationItems.value = newItems
+    }
+    return animationItems
+}
+
+/**
+ * Renders a single animated screen using the provided animator.
+ * Manages AnimationState and passes progress to the animator.
+ */
+@Composable
+private fun AnimatedScreen(
+    item: AnimationItem,
+    animator: StackAnimator,
+    animationSpec: FiniteAnimationSpec<Float> = tween(durationMillis = 300),
+    onStarted: () -> Unit = {},
+    onFinished: () -> Unit,
+    onCancelled: () -> Unit = {},
+    content: @Composable (Screen) -> Unit
+) {
+    val context = StackAnimationContext(
+        screen = item.screen,
+        oldStack = item.oldStack,
+        newStack = item.newStack,
+        direction = item.animationPhase,
+        isInitial = item.isInitial
+    )
+
+    // Manage animation state
+    val animationState = remember(context.direction) {
+        AnimationState(initialValue = if (context.isInitial) 1f else 0f)
+    }
+
+    LaunchedEffect(animationState) {
+        try {
+            onStarted()
+            if (!context.isInitial) {
+                animationState.animateTo(
+                    targetValue = 1f,
+                    animationSpec = animationSpec
+                )
+            }
+            onFinished()
+        } finally {
+            // Check if coroutine was cancelled (e.g., screen removed from composition early)
+            if (currentCoroutineContext().job.isCancelled) {
+                onCancelled()
+            }
+        }
+    }
+
+    // TODO: think about custom animation per screen by using some interface-marker for screen
+    animator(
+        progress = animationState.value,
+        context = context
+    ) { modifier ->
+        Box(modifier = modifier) {
+            content(item.screen)
+        }
+    }
+}
+
+/**
+ * Calculate animation items based on transition type
+ */
+@OptIn(ExperimentalModoApi::class)
+private fun calculateAnimationItems(
+    transitionType: StackTransitionType,
+    oldStack: List<Screen>,
+    newStack: List<Screen>,
+    oldScreen: Screen?,
+    newScreen: Screen?,
+): Map<ScreenKey, AnimationItem> {
+    if (newScreen == null) {
+        return if (oldScreen == null) {
+            emptyMap()
+        } else {
+            mapOf(
+                oldScreen.screenKey to
+                    AnimationItem(
+                        screen = oldScreen,
+                        oldStack = emptyList(),
+                        newStack = newStack,
+                        animationPhase = ScreenAnimationPhase.EXIT,
+                        isInitial = false,
+                        isAnimating = true
+                    )
+            )
+        }
+    }
+
+    return when (transitionType) {
+        StackTransitionType.Idle -> {
+            // No animation or initial render
+            mapOf(
+                newScreen.screenKey to AnimationItem(
+                    screen = newScreen,
+                    oldStack = oldStack,
+                    newStack = newStack,
+                    animationPhase = ScreenAnimationPhase.IDLE,
+                    isInitial = oldScreen == null,
+                    isAnimating = false
+                )
+            )
+        }
+
+        StackTransitionType.Pop -> {
+            // Going back: previous screen enters from back, current exits to front
+            buildMap {
+                put(
+                    newScreen.screenKey,
+                    AnimationItem(
+                        screen = newScreen,
+                        oldStack = oldStack,
+                        newStack = newStack,
+                        animationPhase = ScreenAnimationPhase.ENTER,
+                        isInitial = false,
+                        isAnimating = true
+                    )
+                )
+                if (oldScreen != null) {
+                    put(
+                        oldScreen.screenKey,
+                        AnimationItem(
+                            screen = oldScreen,
+                            oldStack = oldStack,
+                            newStack = newStack,
+                            animationPhase = ScreenAnimationPhase.EXIT,
+                            isInitial = false,
+                            isAnimating = true
+                        )
+                    )
+                }
+            }
+        }
+
+        StackTransitionType.Push,
+        StackTransitionType.Replace -> {
+            // Going forward: new screen enters from front, old exits to back
+            buildMap {
+                if (oldScreen != null && oldScreen.screenKey != newScreen.screenKey) {
+                    put(
+                        oldScreen.screenKey,
+                        AnimationItem(
+                            screen = oldScreen,
+                            oldStack = oldStack,
+                            newStack = newStack,
+                            animationPhase = ScreenAnimationPhase.EXIT,
+                            isInitial = false,
+                            isAnimating = true
+                        )
+                    )
+                }
+                put(
+                    newScreen.screenKey,
+                    AnimationItem(
+                        screen = newScreen,
+                        oldStack = oldStack,
+                        newStack = newStack,
+                        animationPhase = ScreenAnimationPhase.ENTER,
+                        isInitial = false,
+                        isAnimating = true
+                    )
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Represents the lifecycle state of a screen during transition.
+ * Defines what is happening to THIS specific screen.
+ */
+enum class ScreenAnimationPhase {
+    /** Screen is appearing/entering composition */
+    ENTER,
+
+    /** Screen is disappearing/exiting composition */
+    EXIT,
+
+    /** No animation - screen is static */
+    IDLE;
+
+    val isExit: Boolean
+        get() = this == EXIT
+
+    val isEnter: Boolean
+        get() = this == ENTER
+}
+
+/**
+ * Represents a screen with its animation state
+ */
+data class AnimationItem(
+    val screen: Screen,
+    val oldStack: List<Screen>,
+    val newStack: List<Screen>,
+    val animationPhase: ScreenAnimationPhase,
+    val isInitial: Boolean,
+    val isAnimating: Boolean
+)

@@ -142,13 +142,13 @@ class ModoScreenAndroidAdapter private constructor(
     }
 
     override fun hideTransitionStarted() {
-        screen.devLogD(TAG) { "hideTransitionStarted ${lifecycle.currentState}" }
+        screen.devLogD(TAG) { "hideTransitionStarted, current state ${lifecycle.currentState}" }
         screenTransitionState = ScreenTransitionState.HIDING
         safeHandleLifecycleEvent(ON_PAUSE)
     }
 
     override fun showTransitionFinished() {
-        screen.devLogD(TAG) { "showTransitionFinished ${lifecycle.currentState}" }
+        screen.devLogD(TAG) { "showTransitionFinished, current state ${lifecycle.currentState}" }
         screenTransitionState = ScreenTransitionState.SHOWN
         val parentState = atomicParentLifecycleOwner.get()?.lifecycle?.currentState
         // It's crucial to check parent state, because our state can't be greater than a parent state.

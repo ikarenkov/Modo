@@ -12,3 +12,13 @@ class MockScreen(
     @Composable
     override fun Content(modifier: Modifier) = Unit
 }
+
+@Parcelize
+class MockDialogScreen(
+    override val screenKey: ScreenKey = generateScreenKey()
+) : Screen {
+
+    @Composable
+    override fun Content(modifier: Modifier) = Unit
+}
+

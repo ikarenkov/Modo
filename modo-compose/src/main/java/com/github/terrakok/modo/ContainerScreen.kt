@@ -69,6 +69,15 @@ abstract class ContainerScreen<State : NavigationState, Action : NavigationActio
         composeRenderer.Content(screen, modifier, provideCompositionLocals(), content)
     }
 
+    @Composable
+    protected fun InternalContentNew(
+        modifier: Modifier = Modifier,
+        content: ContainerContent<State>
+    ) {
+        val composeRenderer = renderer as ComposeRenderer
+        composeRenderer.ContentNew(modifier, provideCompositionLocals(), content)
+    }
+
     override fun toString(): String = this::class.java.simpleName + "(navModel: $navModel)"
 
 }

@@ -1,6 +1,8 @@
 package com.github.terrakok.modo.animation
 
 import com.github.terrakok.modo.ComposeRendererScope
+import com.github.terrakok.modo.ExperimentalModoApi
+import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.stack.StackState
 
 /**
@@ -32,7 +34,8 @@ enum class StackTransitionType {
  * Culculates the transition type for the given [oldState] and [newState].
  * It can be used with a combination with [ScreenTransitionContent] to culculate transitionSpec based on [StackTransitionType].
  */
-fun calculateStackTransitionType(oldState: StackState?, newState: StackState?): StackTransitionType =
+@OptIn(ExperimentalModoApi::class)
+fun ComposeRendererScope<StackState>.calculateStackTransitionType(): StackTransitionType =
     if (oldState != null && newState != null) {
         val oldStack = oldState.stack
         val newStack = newState.stack
@@ -46,7 +49,15 @@ fun calculateStackTransitionType(oldState: StackState?, newState: StackState?): 
         StackTransitionType.Idle
     }
 
-/**
- * @see calculateStackTransitionType
- */
-fun ComposeRendererScope<StackState>.calculateStackTransitionType(): StackTransitionType = calculateStackTransitionType(oldState, newState)
+fun calculateStackTransitionType(
+    oldStack: List<Screen>,
+    newStack: List<Screen>,
+    firstScreenIdle: Boolean = true
+): StackTransitionType {
+    return when {
+        firstScreenIdle && oldStack.isEmpty() || oldStack.lastOrNull() == newStack.lastOrNull() -> StackTransitionType.Idle
+        newStack.isEmpty() || newStack.lastOrNull() in oldStack -> StackTransitionType.Pop
+        oldStack.isEmpty() || oldStack.lastOrNull() in newStack -> StackTransitionType.Push
+        else -> StackTransitionType.Replace
+    }
+}
