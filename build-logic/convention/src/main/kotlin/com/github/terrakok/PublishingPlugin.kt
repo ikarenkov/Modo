@@ -13,14 +13,23 @@ import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.get
-import org.gradle.kotlin.dsl.maven
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.Sign
 import org.gradle.plugins.signing.SigningExtension
 import java.util.Properties
 
-// PUBLISHING './gradlew clean bundleReleaseAar publishAllPublicationsToSonatypeRepository'
+/**
+ * Configures Maven publishing for library modules.
+ *
+ * Sets up:
+ * - AAR, sources, and javadoc artifacts
+ * - POM metadata (name, description, developers, licenses)
+ * - GPG artifact signing
+ *
+ * Repository configuration is in root build.gradle.kts (nexus-publish plugin).
+ * See PUBLISHING.md for publishing instructions.
+ */
 class PublishingPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
@@ -68,16 +77,8 @@ private fun Project.configurePublishingToSunatype(
     }
 
     configure<PublishingExtension> {
-        // Configure maven central repository
-        repositories {
-            maven("https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                name = "sonatype"
-                credentials {
-                    username = getExtraString("ossrhUsername")
-                    password = getExtraString("ossrhPassword")
-                }
-            }
-        }
+        // Repository configuration is handled by nexus-publish plugin in root build.gradle.kts
+        // This plugin only configures the publication artifacts and metadata
         // Configure all publications
         publications.register<MavenPublication>("release") {
             groupId = publicationGroupId
@@ -87,9 +88,9 @@ private fun Project.configurePublishingToSunatype(
             pom {
                 name = "Modo"
                 description = "Navigation library for Jetpack Compose based on UDF principles"
-                url = "https://github.com/terrakok/Modo"
+                url = "https://github.com/ikarenkov/Modo"
                 scm {
-                    url = "https://github.com/terrakok/Modo"
+                    url = "https://github.com/ikarenkov/Modo"
                 }
                 setupLicense()
                 setupDevelopers()
@@ -133,28 +134,35 @@ private fun MavenPom.setupLicense() {
 }
 
 private fun Project.readEnvironmentVariables() {
-    extra["signing.keyId"] = null
-    extra["signing.password"] = null
-    extra["signing.secretKeyRingFile"] = null
-    extra["sonatypeUsername"] = null
-    extra["sonatypePassword"] = null
+    // Read credentials from local.properties or environment variables
+    // Set them on rootProject.extra so they're accessible from root build.gradle.kts
+    rootProject.extra["signing.keyId"] = null
+    rootProject.extra["signing.password"] = null
+    rootProject.extra["signing.secretKeyRingFile"] = null
+    rootProject.extra["sonatypeUsername"] = null
+    rootProject.extra["sonatypePassword"] = null
 
-// Grabbing secrets from local.properties file or from environment variables, which could be used on CI
     val secretPropsFile = project.rootProject.file("local.properties")
     if (secretPropsFile.exists()) {
+        // Read all properties from local.properties
         secretPropsFile.reader().use {
             Properties().apply { load(it) }
         }.onEach { (name, value) ->
-            extra[name.toString()] = value
+            rootProject.extra[name.toString()] = value
         }
-        extra["signing.secretKeyRingFile"] = project.rootProject.layout.projectDirectory.file(extra["signing.secretKeyRingFile"].toString())
+        // Convert relative path to absolute for signing key file
+        if (rootProject.extra.has("signing.secretKeyRingFile")) {
+            rootProject.extra["signing.secretKeyRingFile"] = project.rootProject.layout.projectDirectory
+                .file(rootProject.extra["signing.secretKeyRingFile"].toString())
+        }
     } else {
-        extra["signing.keyId"] = System.getenv("SIGNING_KEY_ID")
-        extra["signing.password"] = System.getenv("SIGNING_PASSWORD")
-        extra["signing.secretKeyRingFile"] = System.getenv("SIGNING_SECRET_KEY_RING_FILE")
-        extra["sonatypeUsername"] = System.getenv("SONATYPE_USERNAME")
-        extra["sonatypePassword"] = System.getenv("SONATYPE_PASSWORD")
+        // Read from environment variables (for CI)
+        rootProject.extra["signing.keyId"] = System.getenv("SIGNING_KEY_ID")
+        rootProject.extra["signing.password"] = System.getenv("SIGNING_PASSWORD")
+        rootProject.extra["signing.secretKeyRingFile"] = System.getenv("SIGNING_SECRET_KEY_RING_FILE")
+        rootProject.extra["sonatypeUsername"] = System.getenv("SONATYPE_USERNAME")
+        rootProject.extra["sonatypePassword"] = System.getenv("SONATYPE_PASSWORD")
     }
 }
 
-private fun Project.getExtraString(name: String): String? = if (extra.has(name)) extra[name]?.toString() else null
+private fun Project.getExtraString(name: String): String? = if (rootProject.extra.has(name)) rootProject.extra[name]?.toString() else null
