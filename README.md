@@ -43,6 +43,10 @@ Each integration of Modo is a
     * There are some built-in implementations of `ContainerScreen` like `StackScreen` and `MultiScreen`.
 * You can easily create custom `Action` by extending `Action` or `ReducerAction`.
 
+# For Maintainers
+
+See [PUBLISHING.md](PUBLISHING.md) for instructions on publishing new versions to Maven Central.
+
 # License
 
 ```
