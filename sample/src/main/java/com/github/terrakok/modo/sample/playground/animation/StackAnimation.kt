@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -61,6 +62,60 @@ fun StackState.StackAnimation(
     var animationScreens by rememberAnimationItems(isDialogs = false, waitForAnimationCompletion = waitForAnimationCompletion)
     var animationDialogs by rememberAnimationItems(isDialogs = true, waitForAnimationCompletion = waitForAnimationCompletion)
 
+    // Single animation state for all screens in the transition
+    val hasAnimatingScreens by remember {
+        derivedStateOf {
+            animationScreens.values.any { it.isAnimating } ||
+                animationDialogs.values.any { it.isAnimating }
+        }
+    }
+    val animationState = remember(hasAnimatingScreens) {
+        AnimationState(initialValue = if (hasAnimatingScreens) 0f else 1f)
+    }
+
+    // TODO: make a sample of stack where multiple items, stack is Idle and dialog is entering
+
+    // FIXME: when stack initial state is set there is no callback for screen shown for initial idle state
+
+    // Single LaunchedEffect to drive the animation for all screens
+    LaunchedEffect(hasAnimatingScreens) {
+        if (hasAnimatingScreens) {
+            try {
+                // Notify all screens that animation started
+                animationScreens.values.handleAnimationStart()
+                animationDialogs.values.handleAnimationStart()
+
+                // Animate from 0f to 1f
+                animationState.animateTo(
+                    targetValue = 1f,
+                    animationSpec = animationSpec
+                )
+
+                // Animation finished - notify screens and cleanup
+                animationScreens.values.handleAnimationFinish()
+                animationDialogs.values.handleAnimationFinish()
+
+                // Update animation items: remove exiting, mark others as not animating
+                animationScreens = animationScreens.removeExitingAndMarkIdle()
+                animationDialogs = animationDialogs.removeExitingAndMarkIdle()
+            } finally {
+                // Handle cancellation if needed
+                if (currentCoroutineContext().job.isCancelled) {
+                    // TODO: test interruption. Maybe we needt it in case of running animation and rotation of screen, we need to mark screen as shown
+//                    animationScreens.values.handleAnimationFinish()
+//                    animationDialogs.values.handleAnimationFinish()
+                }
+            }
+        } else {
+            animationScreens.values.forEach { item ->
+                if (item.isInitial) {
+                    // It is okay to call it multiple times, f.e. if rotate screen
+                    item.screen.lifecycleDependency()?.showTransitionFinished()
+                }
+            }
+        }
+    }
+
     // Render all animation items
     Box(modifier = modifier) {
         animationScreens.forEach { (screenKey, item) ->
@@ -68,29 +123,7 @@ fun StackState.StackAnimation(
                 AnimatedScreen(
                     item = item,
                     animator = animator,
-                    animationSpec = animationSpec,
-                    onStarted = {
-                        val lifecycleDependency = item.screen.lifecycleDependency()
-                        when (item.animationPhase) {
-                            ScreenAnimationPhase.EXIT -> lifecycleDependency?.hideTransitionStarted()
-                            ScreenAnimationPhase.ENTER -> {}
-                            ScreenAnimationPhase.IDLE -> lifecycleDependency?.showTransitionFinished()
-                        }
-                    },
-                    onFinished = {
-                        val lifecycleDependency = item.screen.lifecycleDependency()
-                        when (item.animationPhase) {
-                            ScreenAnimationPhase.ENTER -> lifecycleDependency?.showTransitionFinished()
-                            ScreenAnimationPhase.EXIT -> {}
-                            ScreenAnimationPhase.IDLE -> lifecycleDependency?.showTransitionFinished()
-                        }
-                        // Remove exiting screens, update entering screens
-                        animationScreens = if (item.animationPhase.isExit) {
-                            animationScreens - screenKey
-                        } else {
-                            animationScreens + (screenKey to item.copy(isAnimating = false, oldStack = emptyList()))
-                        }
-                    },
+                    progress = animationState.value,
                     content = { screen ->
                         content(screen)
                     }
@@ -102,15 +135,7 @@ fun StackState.StackAnimation(
                 AnimatedScreen(
                     item = item,
                     animator = animator,
-                    animationSpec = animationSpec,
-                    onFinished = {
-                        // Remove exiting screens, update entering screens
-                        animationDialogs = if (item.animationPhase.isExit) {
-                            animationDialogs - screenKey
-                        } else {
-                            animationDialogs + (screenKey to item.copy(isAnimating = false))
-                        }
-                    },
+                    progress = animationState.value,
                     content = { screen ->
                         content(screen)
                     }
@@ -118,6 +143,50 @@ fun StackState.StackAnimation(
             }
         }
     }
+}
+
+private fun Collection<AnimationItem>.handleAnimationStart() {
+    forEach(::handleAnimationStart)
+}
+
+private fun handleAnimationStart(item: AnimationItem) {
+    val lifecycleDependency = item.screen.lifecycleDependency()
+    when (item.animationPhase) {
+        ScreenAnimationPhase.EXIT -> lifecycleDependency?.hideTransitionStarted()
+        ScreenAnimationPhase.IDLE -> lifecycleDependency?.showTransitionFinished()
+        ScreenAnimationPhase.ENTER -> {}
+    }
+}
+
+private fun Collection<AnimationItem>.handleAnimationFinish() {
+    forEach(::handleAnimationFinish)
+}
+
+private fun handleAnimationFinish(item: AnimationItem) {
+    val lifecycleDependency = item.screen.lifecycleDependency()
+    when (item.animationPhase) {
+        ScreenAnimationPhase.ENTER -> lifecycleDependency?.showTransitionFinished()
+        ScreenAnimationPhase.EXIT, ScreenAnimationPhase.IDLE -> {}
+    }
+}
+
+/**
+ * Removes exiting screens and marks remaining screens as idle (not animating).
+ * Also clears oldStack to prevent memory leaks.
+ */
+private fun Map<ScreenKey, AnimationItem>.removeExitingAndMarkIdle(): Map<ScreenKey, AnimationItem> {
+    return mapNotNull { (screenKey, item) ->
+        if (item.animationPhase.isExit) {
+            null // Remove exiting screens
+        } else {
+            screenKey to item.copy(
+                animationPhase = ScreenAnimationPhase.IDLE,
+                isAnimating = false,
+//                isInitial = false,
+                oldStack = emptyList() // Clear to prevent memory leaks
+            )
+        }
+    }.toMap()
 }
 
 //@OptIn(ExperimentalModoApi::class)
@@ -341,16 +410,13 @@ fun StackState.rememberDialogsAnimationItems(): MutableState<Map<ScreenKey, Anim
 
 /**
  * Renders a single animated screen using the provided animator.
- * Manages AnimationState and passes progress to the animator.
+ * Receives animation progress from the parent StackAnimation.
  */
 @Composable
 private fun AnimatedScreen(
     item: AnimationItem,
     animator: StackAnimator,
-    animationSpec: FiniteAnimationSpec<Float> = tween(durationMillis = 300),
-    onStarted: () -> Unit = {},
-    onFinished: () -> Unit,
-    onCancelled: () -> Unit = {},
+    progress: Float,
     content: @Composable (Screen) -> Unit
 ) {
     val context = StackAnimationContext(
@@ -361,32 +427,16 @@ private fun AnimatedScreen(
         isInitial = item.isInitial
     )
 
-    // Manage animation state
-    val animationState = remember(context.direction) {
-        AnimationState(initialValue = if (context.isInitial) 1f else 0f)
-    }
-
-    LaunchedEffect(animationState) {
-        try {
-            onStarted()
-            if (!context.isInitial) {
-                animationState.animateTo(
-                    targetValue = 1f,
-                    animationSpec = animationSpec
-                )
-            }
-            onFinished()
-        } finally {
-            // Check if coroutine was cancelled (e.g., screen removed from composition early)
-            if (currentCoroutineContext().job.isCancelled) {
-                onCancelled()
-            }
-        }
+    // Use provided progress (1f for initial/idle, 0f-1f for animating)
+    val effectiveProgress = if (context.isInitial || item.animationPhase == ScreenAnimationPhase.IDLE) {
+        1f
+    } else {
+        progress
     }
 
     // TODO: think about custom animation per screen by using some interface-marker for screen
     animator(
-        progress = animationState.value,
+        progress = effectiveProgress,
         context = context
     ) { modifier ->
         Box(modifier = modifier) {
@@ -531,6 +581,12 @@ data class AnimationItem(
     val oldStack: List<Screen>,
     val newStack: List<Screen>,
     val animationPhase: ScreenAnimationPhase,
+    // True when this item is shown
     val isInitial: Boolean,
     val isAnimating: Boolean
-)
+) {
+    init {
+        assert(!(animationPhase == ScreenAnimationPhase.IDLE && isAnimating))
+        assert(!(isInitial && animationPhase != ScreenAnimationPhase.IDLE))
+    }
+}

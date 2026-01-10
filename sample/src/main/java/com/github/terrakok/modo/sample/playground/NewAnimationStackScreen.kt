@@ -46,7 +46,6 @@ class NewAnimationStackScreen(
                 modifier = modifier,
                 animator = animator,
                 animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
-                queueNavigationChanges = true,
                 content = { screen ->
                     screen.SaveableContent(manualResumePause = true)
                 }
