@@ -124,9 +124,7 @@ fun StackState.StackAnimation(
                     item = item,
                     animator = animator,
                     progress = animationState.value,
-                    content = { screen ->
-                        content(screen)
-                    }
+                    content = content
                 )
             }
         }
@@ -136,9 +134,7 @@ fun StackState.StackAnimation(
                     item = item,
                     animator = animator,
                     progress = animationState.value,
-                    content = { screen ->
-                        content(screen)
-                    }
+                    content = content
                 )
             }
         }
@@ -168,18 +164,21 @@ private fun handleAnimationFinish(item: AnimationItem) {
  * Also clears oldStack to prevent memory leaks.
  */
 private fun Map<ScreenKey, AnimationItem>.removeExitingAndMarkIdle(): Map<ScreenKey, AnimationItem> {
-    return mapNotNull { (screenKey, item) ->
-        if (item.animationPhase.isExit) {
-            null // Remove exiting screens
-        } else {
-            screenKey to item.copy(
-                animationPhase = ScreenAnimationPhase.IDLE,
-                isAnimating = false,
-//                isInitial = false,
-                oldStack = emptyList() // Clear to prevent memory leaks
-            )
+    return buildMap(size) {
+        this@removeExitingAndMarkIdle.forEach { (screenKey, item) ->
+            if (!item.animationPhase.isExit) {
+                put(
+                    screenKey,
+                    item.copy(
+                        animationPhase = ScreenAnimationPhase.IDLE,
+                        isAnimating = false,
+                        // Clear to prevent memory leaks
+                        oldStack = emptyList()
+                    )
+                )
+            }
         }
-    }.toMap()
+    }
 }
 
 //@OptIn(ExperimentalModoApi::class)
