@@ -65,8 +65,8 @@ fun StackState.StackAnimation(
     // Single animation state for all screens in the transition
     val hasAnimatingScreens by remember {
         derivedStateOf {
-            animationScreens.values.any { it.isAnimating } ||
-                animationDialogs.values.any { it.isAnimating }
+            animationScreens.any { it.value.isAnimating } ||
+                animationDialogs.any { it.value.isAnimating }
         }
     }
     val animationState = remember(hasAnimatingScreens) {
@@ -82,8 +82,8 @@ fun StackState.StackAnimation(
         if (hasAnimatingScreens) {
             try {
                 // Notify all screens that animation started
-                animationScreens.values.handleAnimationStart()
-                animationDialogs.values.handleAnimationStart()
+                animationScreens.forEach { handleAnimationStart(it.value) }
+                animationDialogs.forEach { handleAnimationStart(it.value) }
 
                 // Animate from 0f to 1f
                 animationState.animateTo(
@@ -92,8 +92,8 @@ fun StackState.StackAnimation(
                 )
 
                 // Animation finished - notify screens and cleanup
-                animationScreens.values.handleAnimationFinish()
-                animationDialogs.values.handleAnimationFinish()
+                animationScreens.forEach { handleAnimationFinish(it.value) }
+                animationDialogs.forEach { handleAnimationFinish(it.value) }
 
                 // Update animation items: remove exiting, mark others as not animating
                 animationScreens = animationScreens.removeExitingAndMarkIdle()
@@ -145,21 +145,14 @@ fun StackState.StackAnimation(
     }
 }
 
-private fun Collection<AnimationItem>.handleAnimationStart() {
-    forEach(::handleAnimationStart)
-}
-
 private fun handleAnimationStart(item: AnimationItem) {
     val lifecycleDependency = item.screen.lifecycleDependency()
     when (item.animationPhase) {
         ScreenAnimationPhase.EXIT -> lifecycleDependency?.hideTransitionStarted()
+        // Trigger it as soon as animation start because it already visible
         ScreenAnimationPhase.IDLE -> lifecycleDependency?.showTransitionFinished()
         ScreenAnimationPhase.ENTER -> {}
     }
-}
-
-private fun Collection<AnimationItem>.handleAnimationFinish() {
-    forEach(::handleAnimationFinish)
 }
 
 private fun handleAnimationFinish(item: AnimationItem) {
@@ -253,7 +246,7 @@ private fun processStackTransition(
 private fun StackState.rememberAnimationItemsSimple(
     isDialogs: Boolean = false
 ): MutableState<Map<ScreenKey, AnimationItem>> {
-    val filteredNewStack = remember(this) {
+    val filteredNewStack = remember(stack) {
         if (isDialogs) {
             stack.takeLastWhile { it is DialogScreen }
         } else {
@@ -295,7 +288,7 @@ private fun StackState.rememberAnimationItemsSimple(
 private fun StackState.rememberAnimationItemsQueued(
     isDialogs: Boolean = false
 ): MutableState<Map<ScreenKey, AnimationItem>> {
-    val filteredNewStack = remember(this) {
+    val filteredNewStack = remember(stack) {
         if (isDialogs) {
             stack.takeLastWhile { it is DialogScreen }
         } else {
@@ -308,7 +301,11 @@ private fun StackState.rememberAnimationItemsQueued(
     var visibleStack by remember { mutableStateOf<List<Screen>>(emptyList()) }
     var pendingStack by remember { mutableStateOf<List<Screen>?>(null) }
 
-    val hasAnimatingScreens = animationItems.value.values.any { it.isAnimating }
+    val hasAnimatingScreens by remember {
+        derivedStateOf {
+            animationItems.value.any { it.value.isAnimating }
+        }
+    }
 
     // Detect stack changes
     if (filteredNewStack != currentStack) {
@@ -419,13 +416,15 @@ private fun AnimatedScreen(
     progress: Float,
     content: @Composable (Screen) -> Unit
 ) {
-    val context = StackAnimationContext(
-        screen = item.screen,
-        oldStack = item.oldStack,
-        newStack = item.newStack,
-        direction = item.animationPhase,
-        isInitial = item.isInitial
-    )
+    val context = remember(item) {
+        StackAnimationContext(
+            screen = item.screen,
+            oldStack = item.oldStack,
+            newStack = item.newStack,
+            direction = item.animationPhase,
+            isInitial = item.isInitial
+        )
+    }
 
     // Use provided progress (1f for initial/idle, 0f-1f for animating)
     val effectiveProgress = if (context.isInitial || item.animationPhase == ScreenAnimationPhase.IDLE) {
