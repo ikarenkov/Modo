@@ -1,8 +1,7 @@
 package com.github.terrakok.modo.sample.playground.animation
 
-import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.FiniteAnimationSpec
-import androidx.compose.animation.core.animateTo
+import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
@@ -11,6 +10,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -69,8 +69,14 @@ fun StackState.StackAnimation(
                 animationDialogs.any { it.value.isAnimating }
         }
     }
-    val animationState = remember(hasAnimatingScreens) {
-        AnimationState(initialValue = if (hasAnimatingScreens) 0f else 1f)
+    // Shared animation progress reused by every screen rendered in this StackAnimation
+    var animationProgress by remember { mutableFloatStateOf(1f) }
+    // Tracks whether a coroutine-driven animation is currently running
+    var animationRunning by remember { mutableStateOf(false) }
+    if (hasAnimatingScreens && !animationRunning) {
+        // Next composition should render the new screens at the start of the animation
+        animationProgress = 0f
+        animationRunning = true
     }
 
     // TODO: make a sample of stack where multiple items, stack is Idle and dialog is entering
@@ -85,11 +91,15 @@ fun StackState.StackAnimation(
                 animationScreens.forEach { handleAnimationStart(it.value) }
                 animationDialogs.forEach { handleAnimationStart(it.value) }
 
-                // Animate from 0f to 1f
-                animationState.animateTo(
+                // Drive a single transition coroutine that updates shared progress 0f -> 1f
+                animate(
+                    initialValue = 0f,
                     targetValue = 1f,
                     animationSpec = animationSpec
-                )
+                ) { value, _ ->
+                    animationProgress = value
+                }
+                animationProgress = 1f
 
                 // Animation finished - notify screens and cleanup
                 animationScreens.forEach { handleAnimationFinish(it.value) }
@@ -105,6 +115,7 @@ fun StackState.StackAnimation(
 //                    animationScreens.values.handleAnimationFinish()
 //                    animationDialogs.values.handleAnimationFinish()
                 }
+                animationRunning = false
             }
         } else {
             animationScreens.values.forEach { item ->
@@ -113,6 +124,9 @@ fun StackState.StackAnimation(
                     item.screen.lifecycleDependency()?.showTransitionFinished()
                 }
             }
+            // Idle state renders as fully visible
+            animationProgress = 1f
+            animationRunning = false
         }
     }
 
@@ -123,7 +137,7 @@ fun StackState.StackAnimation(
                 AnimatedScreen(
                     item = item,
                     animator = animator,
-                    progress = animationState.value,
+                    progress = animationProgress,
                     content = content
                 )
             }
@@ -133,7 +147,7 @@ fun StackState.StackAnimation(
                 AnimatedScreen(
                     item = item,
                     animator = animator,
-                    progress = animationState.value,
+                    progress = animationProgress,
                     content = content
                 )
             }
