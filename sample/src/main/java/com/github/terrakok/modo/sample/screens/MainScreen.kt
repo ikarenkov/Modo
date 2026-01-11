@@ -227,7 +227,10 @@ private fun rememberButtons(
                             navigation?.forward(AnimationPlaygroundScreen())
                         },
                         ModoButtonSpec("NewAnimationStackScreen") {
-                            navigation?.forward(NewAnimationStackScreen())
+                            navigation?.forward(NewAnimationStackScreen(predictiveBack = false))
+                        },
+                        ModoButtonSpec("Predictive Back") {
+                            navigation?.forward(NewAnimationStackScreen(predictiveBack = true))
                         },
                         ModoButtonSpec("AnimationsPlaygroundScreen") {
                             navigation?.forward(AnimationsPlaygroundScreen())
