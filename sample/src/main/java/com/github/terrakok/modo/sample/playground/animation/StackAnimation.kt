@@ -1,5 +1,6 @@
 package com.github.terrakok.modo.sample.playground.animation
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
@@ -15,6 +16,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.github.terrakok.modo.DialogScreen
@@ -185,7 +187,11 @@ fun StackScreenNew.PredictiveBackStackAnimationPOCV2(
 ) {
     val stack = navigationState.stack
     val predictiveBackDesiredStack: MutableState<List<Screen>?> = remember { mutableStateOf(null) }
-    val predictiveProgressState = remember { mutableFloatStateOf(0f) }
+    val predictiveProgressState = remember {
+        Animatable(0f).apply {
+            updateBounds(0f, 1f)
+        }
+    }
     val predictiveBackItemsState = remember { mutableStateOf<List<AnimationItem>?>(null) }
 
     var predictiveAnimationJob: Job? by remember { mutableStateOf(null) }
@@ -202,31 +208,29 @@ fun StackScreenNew.PredictiveBackStackAnimationPOCV2(
                     stack = newStack
                 )
             }
-            predictiveProgressState.floatValue = it.progress
+            coroutineScope.launch {
+                predictiveProgressState.snapTo(it.progress)
+            }
         },
         onBackProgressed = {
             predictiveAnimationJob?.cancel()
             logcat("PredictiveBackCallbacks") { "onBackProgressed, $it" }
-            predictiveProgressState.floatValue = it.progress
+            coroutineScope.launch {
+                predictiveProgressState.snapTo(it.progress)
+            }
         },
         onBackPressed = {
             logcat("PredictiveBackCallbacks") { "onBackPressed" }
             predictiveAnimationJob = coroutineScope.launch {
-                try {
-                    // Doing back before to let autoanimation recalculate items
-                    onBack?.invoke()
-                    animate(
-                        initialValue = predictiveProgressState.floatValue,
-                        targetValue = 1f,
-                        animationSpec = animationSpec
-                    ) { value, _ ->
-                        predictiveProgressState.floatValue = value
-                    }
-                } finally {
-                    predictiveBackDesiredStack.value = null
-                    predictiveBackItemsState.value = null
-                    // TODO: cancel autoanimation. Test it by running autoanimation for 3s, and this animation for 1 seccond
-                }
+                // Doing back before to let autoanimation recalculate items
+                onBack?.invoke()
+                predictiveProgressState.animateTo(
+                    targetValue = 1f,
+                    animationSpec = animationSpec
+                )
+                predictiveBackDesiredStack.value = null
+                predictiveBackItemsState.value = null
+                // TODO: cancel autoanimation. Test it by running autoanimation for 3s, and this animation for 1 seccond
             }
             // TODO: can simply use predictiveBackDesiredStack to calculete desired idle stack
 //            predictiveBackAnimationItems.value = predictiveBackAnimationItems.value!!.removeExitingAndMarkIdle()
@@ -235,24 +239,13 @@ fun StackScreenNew.PredictiveBackStackAnimationPOCV2(
         onBackCancelled = {
             logcat("PredictiveBackCallbacks") { "onBackCancelled" }
             predictiveAnimationJob = coroutineScope.launch {
-                try {
-                    animate(
-                        initialValue = predictiveProgressState.floatValue,
-                        targetValue = 0f,
-                        animationSpec = animationSpec
-                    ) { value, _ ->
-                        logcat("PredictiveBackCallbacks") { "close animation progressed $value" }
-                        predictiveProgressState.floatValue = value
-                    }
-                } catch (e: CancellationException) {
-                    logcat("PredictiveBackCallbacks") { "Animation cancelled" }
-                    throw e
-                } finally {
-                    logcat("PredictiveBackCallbacks") { "Animation finally block - clearing state" }
-                    predictiveProgressState.floatValue = 0f
-//                    predictiveBackDesiredStack.value = null
-//                    predictiveBackItemsState.value = null
-                }
+                predictiveProgressState.animateTo(
+                    targetValue = 0f,
+                    animationSpec = animationSpec
+                )
+                logcat("PredictiveBackCallbacks") { "Animation finally block - clearing state" }
+                predictiveBackDesiredStack.value = null
+                predictiveBackItemsState.value = null
             }
         }
     )
@@ -264,7 +257,7 @@ fun StackScreenNew.PredictiveBackStackAnimationPOCV2(
 
     val predictiveBackItems = predictiveBackItemsState.value
     val (screenItems, progress) = if (predictiveBackItems != null) {
-        predictiveBackItems to predictiveProgressState.floatValue
+        predictiveBackItems to predictiveProgressState.value
     } else {
         // We keep default behavior for case when we are not in predictive back.
         // Putting it into different if branch also helps to display current state without any animation,
@@ -332,7 +325,14 @@ fun StackState.StackAnimation(
 private fun autoLaunchAnimation(
     animationScreenItems: MutableState<List<AnimationItem>>,
     animationSpec: FiniteAnimationSpec<Float>,
+    onAnimationFinish: () -> Unit = {
+        // Animation finished - notify screens and cleanup
+        animationScreenItems.value.forEach { handleAnimationFinish(it) }
+        // Update animation items: remove exiting, mark others as not animating
+        animationScreenItems.value = animationScreenItems.value.removeExitingAndMarkIdle()
+    },
 ): FloatState {
+    val actualOnAnimationFinished by rememberUpdatedState(onAnimationFinish)
     // Single animation state for all screens in the transition
     val hasAnimatingScreens by remember {
         derivedStateOf {
@@ -366,12 +366,7 @@ private fun autoLaunchAnimation(
                     animationProgressState.floatValue = value
                 }
                 animationProgressState.floatValue = 1f
-
-                // Animation finished - notify screens and cleanup
-                animationScreenItems.value.forEach { handleAnimationFinish(it) }
-
-                // Update animation items: remove exiting, mark others as not animating
-                animationScreenItems.value = animationScreenItems.value.removeExitingAndMarkIdle()
+                actualOnAnimationFinished.invoke()
             } finally {
                 // Handle cancellation if needed
                 if (currentCoroutineContext().job.isCancelled) {

@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.SaveableContent
-import com.github.terrakok.modo.sample.playground.animation.PredictiveBackStackAnimationPOC
+import com.github.terrakok.modo.sample.playground.animation.PredictiveBackStackAnimationPOCV2
 import com.github.terrakok.modo.sample.playground.animation.StackAnimation
 import com.github.terrakok.modo.sample.playground.animation.StackAnimator
 import com.github.terrakok.modo.sample.playground.animation.slide
@@ -46,7 +46,7 @@ class NewAnimationStackScreen(
         StackBackHandler()
         Content(modifier) {
             if (predictiveBack) {
-                PredictiveBackStackAnimationPOC(
+                PredictiveBackStackAnimationPOCV2(
                     modifier = modifier,
                     animator = animator,
                     animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
