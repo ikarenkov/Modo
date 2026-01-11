@@ -21,7 +21,6 @@ import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.SaveableContent
 import com.github.terrakok.modo.Screen
-import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.animation.StackTransitionType
 import com.github.terrakok.modo.animation.calculateStackTransitionType
 import com.github.terrakok.modo.model.lifecycleDependency
@@ -59,7 +58,7 @@ fun StackScreenNew.PredictiveBackStackAnimationPOC(
     val stack = navigationState.stack
     val predictiveBackDesiredStack: MutableState<List<Screen>?> = remember { mutableStateOf(null) }
     val predictiveProgressState = remember { mutableFloatStateOf(0f) }
-    val predictiveBackAnimationItems = remember { mutableStateOf<Map<ScreenKey, AnimationItem>?>(null) }
+    val predictiveBackAnimationItems = remember { mutableStateOf<List<AnimationItem>?>(null) }
 
     val autoAnimationScreensState = rememberAnimationItems(
         navigationState.stack,
@@ -187,7 +186,7 @@ fun StackScreenNew.PredictiveBackStackAnimationPOCV2(
     val stack = navigationState.stack
     val predictiveBackDesiredStack: MutableState<List<Screen>?> = remember { mutableStateOf(null) }
     val predictiveProgressState = remember { mutableFloatStateOf(0f) }
-    val predictiveBackItemsState = remember { mutableStateOf<Map<ScreenKey, AnimationItem>?>(null) }
+    val predictiveBackItemsState = remember { mutableStateOf<List<AnimationItem>?>(null) }
 
     var predictiveAnimationJob: Job? by remember { mutableStateOf(null) }
     val coroutineScope = rememberCoroutineScope()
@@ -331,13 +330,13 @@ fun StackState.StackAnimation(
 
 @Composable
 private fun autoLaunchAnimation(
-    animationScreenItems: MutableState<Map<ScreenKey, AnimationItem>>,
+    animationScreenItems: MutableState<List<AnimationItem>>,
     animationSpec: FiniteAnimationSpec<Float>,
 ): FloatState {
     // Single animation state for all screens in the transition
     val hasAnimatingScreens by remember {
         derivedStateOf {
-            animationScreenItems.value.any { it.value.isAnimating }
+            animationScreenItems.value.any { it.isAnimating }
         }
     }
     // Shared animation progress reused by every screen rendered in this StackAnimation
@@ -356,7 +355,7 @@ private fun autoLaunchAnimation(
         if (hasAnimatingScreens) {
             try {
                 // Notify all screens that animation started
-                animationScreenItems.value.forEach { handleAnimationStart(it.value) }
+                animationScreenItems.value.forEach { handleAnimationStart(it) }
 
                 // Drive a single transition coroutine that updates shared progress 0f -> 1f
                 animate(
@@ -369,7 +368,7 @@ private fun autoLaunchAnimation(
                 animationProgressState.floatValue = 1f
 
                 // Animation finished - notify screens and cleanup
-                animationScreenItems.value.forEach { handleAnimationFinish(it.value) }
+                animationScreenItems.value.forEach { handleAnimationFinish(it) }
 
                 // Update animation items: remove exiting, mark others as not animating
                 animationScreenItems.value = animationScreenItems.value.removeExitingAndMarkIdle()
@@ -383,7 +382,7 @@ private fun autoLaunchAnimation(
                 animationRunningState.value = false
             }
         } else {
-            animationScreenItems.value.values.forEach { item ->
+            animationScreenItems.value.forEach { item ->
                 if (item.isInitial) {
                     // It is okay to call it multiple times, f.e. if rotate screen
                     item.screen.lifecycleDependency()?.showTransitionFinished()
@@ -400,14 +399,14 @@ private fun autoLaunchAnimation(
 @Composable
 private fun RenderAnimationItems(
     modifier: Modifier,
-    animationScreens: Map<ScreenKey, AnimationItem>,
+    animationScreens: List<AnimationItem>,
     animator: StackAnimator,
     animationProgress: Float,
     content: @Composable ((Screen) -> Unit)
 ) {
     Box(modifier = modifier) {
-        animationScreens.forEach { (screenKey, item) ->
-            key(screenKey) {
+        animationScreens.forEach { item ->
+            key(item.screen.screenKey) {
                 AnimatedScreen(
                     item = item,
                     animator = animator,
@@ -441,12 +440,11 @@ private fun handleAnimationFinish(item: AnimationItem) {
  * Removes exiting screens and marks remaining screens as idle (not animating).
  * Also clears oldStack to prevent memory leaks.
  */
-private fun Map<ScreenKey, AnimationItem>.removeExitingAndMarkIdle(): Map<ScreenKey, AnimationItem> {
-    return buildMap(size) {
-        this@removeExitingAndMarkIdle.forEach { (screenKey, item) ->
+private fun List<AnimationItem>.removeExitingAndMarkIdle(): List<AnimationItem> {
+    return buildList(size) {
+        this@removeExitingAndMarkIdle.forEach { item ->
             if (!item.animationPhase.isExit) {
-                put(
-                    screenKey,
+                add(
                     item.copy(
                         animationPhase = ScreenAnimationPhase.IDLE,
                         isAnimating = false,
@@ -464,12 +462,11 @@ private fun Map<ScreenKey, AnimationItem>.removeExitingAndMarkIdle(): Map<Screen
  * Removes entering screens and marks remaining screens as idle (not animating).
  * Also clears oldStack to prevent memory leaks.
  */
-private fun Map<ScreenKey, AnimationItem>.removeEnteringAndMarkIdle(): Map<ScreenKey, AnimationItem> {
-    return buildMap(size) {
-        this@removeEnteringAndMarkIdle.forEach { (screenKey, item) ->
+private fun List<AnimationItem>.removeEnteringAndMarkIdle(): List<AnimationItem> {
+    return buildList(size) {
+        this@removeEnteringAndMarkIdle.forEach { item ->
             if (item.animationPhase.isExit) {
-                put(
-                    screenKey,
+                add(
                     item.copy(
                         animationPhase = ScreenAnimationPhase.IDLE,
                         isAnimating = false,
@@ -521,7 +518,7 @@ private fun processStackTransition(
     oldStack: List<Screen>,
     newStack: List<Screen>,
     isDialogs: Boolean
-): Map<ScreenKey, AnimationItem> {
+): List<AnimationItem> {
     val transitionType = calculateStackTransitionType(
         oldStack = oldStack,
         newStack = newStack,
@@ -545,8 +542,8 @@ private fun processStackTransition(
 @Composable
 private fun rememberAnimationItemsSimple(
     stack: List<Screen>
-): MutableState<Map<ScreenKey, AnimationItem>> {
-    val animationItems = remember { mutableStateOf<Map<ScreenKey, AnimationItem>>(emptyMap()) }
+): MutableState<List<AnimationItem>> {
+    val animationItems = remember { mutableStateOf<List<AnimationItem>>(emptyList()) }
     var currentStack by remember { mutableStateOf<List<Screen>>(emptyList()) }
 
     // Detect stack changes and update animation items immediately
@@ -564,7 +561,7 @@ private fun rememberAnimationItemsSimple(
 private fun calculateStackAnimationItems(
     oldStack: List<Screen>,
     stack: List<Screen>
-): Map<ScreenKey, AnimationItem> {
+): List<AnimationItem> {
     val oldDialogsStack = oldStack.takeLastWhile { it is DialogScreen }
     val oldScreensStack = oldStack.subList(0, oldStack.size - oldDialogsStack.size)
 
@@ -600,15 +597,15 @@ private fun calculateStackAnimationItems(
 @Composable
 private fun rememberAnimationItemsQueued(
     stack: List<Screen>,
-): MutableState<Map<ScreenKey, AnimationItem>> {
-    val animationItems = remember { mutableStateOf<Map<ScreenKey, AnimationItem>>(emptyMap()) }
+): MutableState<List<AnimationItem>> {
+    val animationItems = remember { mutableStateOf<List<AnimationItem>>(emptyList()) }
     var currentStack by remember { mutableStateOf<List<Screen>>(emptyList()) }
     var visibleStack by remember { mutableStateOf<List<Screen>>(emptyList()) }
     var pendingStack by remember { mutableStateOf<List<Screen>?>(null) }
 
     val hasAnimatingScreens by remember {
         derivedStateOf {
-            animationItems.value.any { it.value.isAnimating }
+            animationItems.value.any { it.isAnimating }
         }
     }
 
@@ -659,7 +656,7 @@ private fun rememberAnimationItemsQueued(
 fun rememberAnimationItems(
     stack: List<Screen>,
     waitForAnimationCompletion: Boolean = true
-): MutableState<Map<ScreenKey, AnimationItem>> {
+): MutableState<List<AnimationItem>> {
     return if (waitForAnimationCompletion) {
         rememberAnimationItemsQueued(stack = stack)
     } else {
@@ -671,14 +668,14 @@ fun rememberAnimationItems(
 @Composable
 fun StackState.rememberDialogsAnimationItems(
     isPredictiveBack: Boolean = false
-): MutableState<Map<ScreenKey, AnimationItem>> {
+): MutableState<List<AnimationItem>> {
     val filteredNewStack = remember(this) {
         stack.takeLastWhile { it is DialogScreen }
     }
     val currentScreen = filteredNewStack.lastOrNull()
 
     // Track animation items (screens currently being rendered/animated)
-    val animationItems = remember { mutableStateOf<Map<ScreenKey, AnimationItem>>(emptyMap()) }
+    val animationItems = remember { mutableStateOf<List<AnimationItem>>(emptyList()) }
     var currentStack by remember { mutableStateOf<List<Screen>>(emptyList()) }
 
     // Detect stack changes and update animation items
@@ -755,21 +752,20 @@ private fun calculateAnimationItems(
     newStack: List<Screen>,
     oldScreen: Screen?,
     newScreen: Screen?,
-): Map<ScreenKey, AnimationItem> {
+): List<AnimationItem> {
     if (newScreen == null) {
         return if (oldScreen == null) {
-            emptyMap()
+            emptyList()
         } else {
-            mapOf(
-                oldScreen.screenKey to
-                    AnimationItem(
-                        screen = oldScreen,
-                        oldStack = emptyList(),
-                        newStack = newStack,
-                        animationPhase = ScreenAnimationPhase.EXIT,
-                        isInitial = false,
-                        isAnimating = true,
-                    )
+            listOf(
+                AnimationItem(
+                    screen = oldScreen,
+                    oldStack = emptyList(),
+                    newStack = newStack,
+                    animationPhase = ScreenAnimationPhase.EXIT,
+                    isInitial = false,
+                    isAnimating = true,
+                )
             )
         }
     }
@@ -777,8 +773,8 @@ private fun calculateAnimationItems(
     return when (transitionType) {
         StackTransitionType.Idle -> {
             // No animation or initial render
-            mapOf(
-                newScreen.screenKey to AnimationItem(
+            listOf(
+                AnimationItem(
                     screen = newScreen,
                     oldStack = oldStack,
                     newStack = newStack,
@@ -791,9 +787,8 @@ private fun calculateAnimationItems(
 
         StackTransitionType.Pop -> {
             // Going back: previous screen enters from back, current exits to front
-            buildMap {
-                put(
-                    newScreen.screenKey,
+            buildList {
+                add(
                     AnimationItem(
                         screen = newScreen,
                         oldStack = oldStack,
@@ -804,8 +799,7 @@ private fun calculateAnimationItems(
                     )
                 )
                 if (oldScreen != null) {
-                    put(
-                        oldScreen.screenKey,
+                    add(
                         AnimationItem(
                             screen = oldScreen,
                             oldStack = oldStack,
@@ -822,10 +816,9 @@ private fun calculateAnimationItems(
         StackTransitionType.Push,
         StackTransitionType.Replace -> {
             // Going forward: new screen enters from front, old exits to back
-            buildMap {
+            buildList {
                 if (oldScreen != null && oldScreen.screenKey != newScreen.screenKey) {
-                    put(
-                        oldScreen.screenKey,
+                    add(
                         AnimationItem(
                             screen = oldScreen,
                             oldStack = oldStack,
@@ -836,8 +829,7 @@ private fun calculateAnimationItems(
                         )
                     )
                 }
-                put(
-                    newScreen.screenKey,
+                add(
                     AnimationItem(
                         screen = newScreen,
                         oldStack = oldStack,
