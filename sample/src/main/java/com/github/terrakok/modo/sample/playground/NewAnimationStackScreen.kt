@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.SaveableContent
+import com.github.terrakok.modo.sample.playground.animation.PredictiveBackStackAnimationPOC
 import com.github.terrakok.modo.sample.playground.animation.StackAnimation
 import com.github.terrakok.modo.sample.playground.animation.StackAnimator
 import com.github.terrakok.modo.sample.playground.animation.slide
@@ -13,6 +14,7 @@ import com.github.terrakok.modo.sample.screens.MainScreen
 import com.github.terrakok.modo.stack.StackBackHandler
 import com.github.terrakok.modo.stack.StackNavModel
 import com.github.terrakok.modo.stack.StackScreenNew
+import com.github.terrakok.modo.stack.back
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -23,7 +25,8 @@ import kotlinx.parcelize.Parcelize
  */
 @Parcelize
 class NewAnimationStackScreen(
-    private val navModel: StackNavModel = StackNavModel(MainScreen(0))
+    private val navModel: StackNavModel = StackNavModel(MainScreen(0)),
+    private val predictiveBack: Boolean = true
 ) : StackScreenNew(navModel) {
 
     /**
@@ -42,14 +45,26 @@ class NewAnimationStackScreen(
     override fun Content(modifier: Modifier) {
         StackBackHandler()
         Content(modifier) {
-            navigationState.StackAnimation(
-                modifier = modifier,
-                animator = animator,
-                animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
-                content = { screen ->
-                    screen.SaveableContent(manualResumePause = true)
-                }
-            )
+            if (predictiveBack) {
+                PredictiveBackStackAnimationPOC(
+                    modifier = modifier,
+                    animator = animator,
+                    animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
+                    onBack = { navModel.back() },
+                    content = { screen ->
+                        screen.SaveableContent(manualResumePause = true)
+                    }
+                )
+            } else {
+                navigationState.StackAnimation(
+                    modifier = modifier,
+                    animator = animator,
+                    animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
+                    content = { screen ->
+                        screen.SaveableContent(manualResumePause = true)
+                    }
+                )
+            }
         }
     }
 

@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -13,6 +14,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.github.terrakok.modo.DialogScreen
@@ -23,9 +25,147 @@ import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.animation.StackTransitionType
 import com.github.terrakok.modo.animation.calculateStackTransitionType
 import com.github.terrakok.modo.model.lifecycleDependency
+import com.github.terrakok.modo.sample.logs.logcat
+import com.github.terrakok.modo.stack.StackScreenNew
 import com.github.terrakok.modo.stack.StackState
+import com.github.terrakok.modo.stack.dispatch
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.job
+import kotlinx.coroutines.launch
+
+/**
+ * Implementation that relies on rememberAnimationItems and changes input stack.
+ * There are no problem when back executed, but there are bugs when back is cancelled several times (blank screen, ignoring input and so on).
+ */
+@OptIn(ExperimentalModoApi::class)
+@Composable
+fun StackScreenNew.PredictiveBackStackAnimationPOC(
+    modifier: Modifier = Modifier,
+    animator: StackAnimator = fade() + slide(),
+    animationSpec: FiniteAnimationSpec<Float> = tween(durationMillis = 300),
+    waitForAnimationCompletion: Boolean = true,
+    predictiveBackDesiredStack: (List<Screen>) -> List<Screen> = {
+        it.dropLast(1)
+    },
+    onBack: (() -> Unit)? = {
+        dispatch { StackState(predictiveBackDesiredStack(it.stack)) }
+    },
+    content: @Composable (Screen) -> Unit = { it.SaveableContent(manualResumePause = true) }
+) {
+    val predictiveBackStack: MutableState<List<Screen>?> = remember { mutableStateOf(null) }
+    val predictiveBackRunning: Boolean by remember {
+        derivedStateOf {
+            predictiveBackStack.value != null
+        }
+    }
+    val afterProgressiveBackCancellation = remember { mutableStateOf(false) }
+    val stack = navigationState.stack
+    val newStack = predictiveBackStack.value ?: stack
+    val autoAnimationScreensState = rememberAnimationItems(
+        newStack,
+        isDialogs = false,
+        waitForAnimationCompletion = waitForAnimationCompletion,
+    )
+    val animationScreensState = remember {
+        derivedStateOf {
+            if (afterProgressiveBackCancellation.value) {
+                autoAnimationScreensState.value.removeExitingAndMarkIdle()
+            } else {
+                autoAnimationScreensState.value
+            }
+        }
+    }
+    LaunchedEffect(afterProgressiveBackCancellation.value) {
+        if (afterProgressiveBackCancellation.value) {
+            afterProgressiveBackCancellation.value = false
+            autoAnimationScreensState.value = autoAnimationScreensState.value.removeExitingAndMarkIdle()
+        }
+    }
+    val animationDialogsState = rememberAnimationItems(
+        newStack,
+        isDialogs = true,
+        waitForAnimationCompletion = waitForAnimationCompletion,
+    )
+
+    // Single animation state for all screens in the transition
+    val hasAnimatingScreens by remember {
+        derivedStateOf {
+            animationScreensState.value.any { it.value.isAnimating } ||
+                animationDialogsState.value.any { it.value.isAnimating }
+        }
+    }
+    // Shared animation progress reused by every screen rendered in this StackAnimation
+    val animationProgressState = remember { mutableFloatStateOf(1f) }
+    // Tracks whether a coroutine-driven animation is currently running
+    val animationRunningState = remember { mutableStateOf(false) }
+    if (hasAnimatingScreens && !animationRunningState.value && !predictiveBackRunning) {
+        // Next composition should render the new screens at the start of the animation
+        animationProgressState.floatValue = 0f
+        animationRunningState.value = true
+    }
+
+    val coroutineScope = rememberCoroutineScope()
+    PredictiveBackCallbacks(
+        enabled = stack.size > 1,
+        onBackStarted = {
+            logcat("PredictiveBackCallbacks") { "onBackStarted, $it" }
+            predictiveBackStack.value = predictiveBackDesiredStack(stack)
+        },
+        onBackProgressed = {
+            logcat("PredictiveBackCallbacks") { "onBackProgressed, $it" }
+            animationProgressState.floatValue = it.progress
+        },
+        onBackPressed = {
+            logcat("PredictiveBackCallbacks") { "onBackPressed" }
+            coroutineScope.launch {
+                animate(
+                    initialValue = animationProgressState.floatValue,
+                    targetValue = 1f,
+                    animationSpec = animationSpec
+                ) { value, _ ->
+                    animationProgressState.floatValue = value
+                }
+                autoAnimationScreensState.value = animationScreensState.value.removeExitingAndMarkIdle()
+                animationDialogsState.value = animationDialogsState.value.removeExitingAndMarkIdle()
+                onBack?.invoke()
+                predictiveBackStack.value = null
+            }
+        },
+        onBackCancelled = {
+            logcat("PredictiveBackCallbacks") { "onBackCancelled" }
+            coroutineScope.launch {
+                animate(
+                    initialValue = animationProgressState.floatValue,
+                    targetValue = 0f,
+                    animationSpec = animationSpec
+                ) { value, _ ->
+                    animationProgressState.floatValue = value
+                }
+                autoAnimationScreensState.value = animationScreensState.value.removeEnteringAndMarkIdle()
+                animationDialogsState.value = animationDialogsState.value.removeEnteringAndMarkIdle()
+                predictiveBackStack.value = null
+                afterProgressiveBackCancellation.value = true
+            }
+        }
+    )
+    // TODO: make a sample of stack where multiple items, stack is Idle and dialog is entering
+
+    // FIXME: when stack initial state is set there is no callback for screen shown for initial idle state
+
+    // Single LaunchedEffect to drive the animation for all screens
+    if (!predictiveBackRunning) {
+        LaunchAnimation(
+            hasAnimatingScreens = hasAnimatingScreens,
+            animationScreensState = autoAnimationScreensState,
+            animationDialogsState = animationDialogsState,
+            animationSpec = animationSpec,
+            animationProgressState = animationProgressState,
+            animationRunningState = animationRunningState
+        )
+    }
+
+    RenderAnimationItems(modifier, animationScreensState.value, animationDialogsState.value, animator, animationProgressState.floatValue, content)
+}
 
 /**
  * Stack animation composable that renders screens with customizable animations.
@@ -59,24 +199,32 @@ fun StackState.StackAnimation(
     waitForAnimationCompletion: Boolean = true,
     content: @Composable (Screen) -> Unit = { it.SaveableContent(manualResumePause = true) }
 ) {
-    var animationScreens by rememberAnimationItems(isDialogs = false, waitForAnimationCompletion = waitForAnimationCompletion)
-    var animationDialogs by rememberAnimationItems(isDialogs = true, waitForAnimationCompletion = waitForAnimationCompletion)
+    val animationScreensState = rememberAnimationItems(
+        stack = stack,
+        isDialogs = false,
+        waitForAnimationCompletion = waitForAnimationCompletion,
+    )
+    val animationDialogsState = rememberAnimationItems(
+        stack = stack,
+        isDialogs = true,
+        waitForAnimationCompletion = waitForAnimationCompletion,
+    )
 
     // Single animation state for all screens in the transition
     val hasAnimatingScreens by remember {
         derivedStateOf {
-            animationScreens.any { it.value.isAnimating } ||
-                animationDialogs.any { it.value.isAnimating }
+            animationScreensState.value.any { it.value.isAnimating } ||
+                animationDialogsState.value.any { it.value.isAnimating }
         }
     }
     // Shared animation progress reused by every screen rendered in this StackAnimation
-    var animationProgress by remember { mutableFloatStateOf(1f) }
+    val animationProgressState = remember { mutableFloatStateOf(1f) }
     // Tracks whether a coroutine-driven animation is currently running
-    var animationRunning by remember { mutableStateOf(false) }
-    if (hasAnimatingScreens && !animationRunning) {
+    val animationRunningState = remember { mutableStateOf(false) }
+    if (hasAnimatingScreens && !animationRunningState.value) {
         // Next composition should render the new screens at the start of the animation
-        animationProgress = 0f
-        animationRunning = true
+        animationProgressState.floatValue = 0f
+        animationRunningState.value = true
     }
 
     // TODO: make a sample of stack where multiple items, stack is Idle and dialog is entering
@@ -84,12 +232,33 @@ fun StackState.StackAnimation(
     // FIXME: when stack initial state is set there is no callback for screen shown for initial idle state
 
     // Single LaunchedEffect to drive the animation for all screens
+    LaunchAnimation(
+        hasAnimatingScreens = hasAnimatingScreens,
+        animationScreensState = animationScreensState,
+        animationDialogsState = animationDialogsState,
+        animationSpec = animationSpec,
+        animationProgressState = animationProgressState,
+        animationRunningState = animationRunningState
+    )
+
+    RenderAnimationItems(modifier, animationScreensState.value, animationDialogsState.value, animator, animationProgressState.floatValue, content)
+}
+
+@Composable
+private fun LaunchAnimation(
+    hasAnimatingScreens: Boolean,
+    animationScreensState: MutableState<Map<ScreenKey, AnimationItem>>,
+    animationDialogsState: MutableState<Map<ScreenKey, AnimationItem>>,
+    animationSpec: FiniteAnimationSpec<Float>,
+    animationProgressState: MutableFloatState,
+    animationRunningState: MutableState<Boolean>
+) {
     LaunchedEffect(hasAnimatingScreens) {
         if (hasAnimatingScreens) {
             try {
                 // Notify all screens that animation started
-                animationScreens.forEach { handleAnimationStart(it.value) }
-                animationDialogs.forEach { handleAnimationStart(it.value) }
+                animationScreensState.value.forEach { handleAnimationStart(it.value) }
+                animationDialogsState.value.forEach { handleAnimationStart(it.value) }
 
                 // Drive a single transition coroutine that updates shared progress 0f -> 1f
                 animate(
@@ -97,17 +266,17 @@ fun StackState.StackAnimation(
                     targetValue = 1f,
                     animationSpec = animationSpec
                 ) { value, _ ->
-                    animationProgress = value
+                    animationProgressState.floatValue = value
                 }
-                animationProgress = 1f
+                animationProgressState.floatValue = 1f
 
                 // Animation finished - notify screens and cleanup
-                animationScreens.forEach { handleAnimationFinish(it.value) }
-                animationDialogs.forEach { handleAnimationFinish(it.value) }
+                animationScreensState.value.forEach { handleAnimationFinish(it.value) }
+                animationDialogsState.value.forEach { handleAnimationFinish(it.value) }
 
                 // Update animation items: remove exiting, mark others as not animating
-                animationScreens = animationScreens.removeExitingAndMarkIdle()
-                animationDialogs = animationDialogs.removeExitingAndMarkIdle()
+                animationScreensState.value = animationScreensState.value.removeExitingAndMarkIdle()
+                animationDialogsState.value = animationDialogsState.value.removeExitingAndMarkIdle()
             } finally {
                 // Handle cancellation if needed
                 if (currentCoroutineContext().job.isCancelled) {
@@ -115,22 +284,31 @@ fun StackState.StackAnimation(
 //                    animationScreens.values.handleAnimationFinish()
 //                    animationDialogs.values.handleAnimationFinish()
                 }
-                animationRunning = false
+                animationRunningState.value = false
             }
         } else {
-            animationScreens.values.forEach { item ->
+            animationScreensState.value.values.forEach { item ->
                 if (item.isInitial) {
                     // It is okay to call it multiple times, f.e. if rotate screen
                     item.screen.lifecycleDependency()?.showTransitionFinished()
                 }
             }
             // Idle state renders as fully visible
-            animationProgress = 1f
-            animationRunning = false
+            animationProgressState.floatValue = 1f
+            animationRunningState.value = false
         }
     }
+}
 
-    // Render all animation items
+@Composable
+private fun RenderAnimationItems(
+    modifier: Modifier,
+    animationScreens: Map<ScreenKey, AnimationItem>,
+    animationDialogs: Map<ScreenKey, AnimationItem>,
+    animator: StackAnimator,
+    animationProgress: Float,
+    content: @Composable ((Screen) -> Unit)
+) {
     Box(modifier = modifier) {
         animationScreens.forEach { (screenKey, item) ->
             key(screenKey) {
@@ -181,6 +359,29 @@ private fun Map<ScreenKey, AnimationItem>.removeExitingAndMarkIdle(): Map<Screen
     return buildMap(size) {
         this@removeExitingAndMarkIdle.forEach { (screenKey, item) ->
             if (!item.animationPhase.isExit) {
+                put(
+                    screenKey,
+                    item.copy(
+                        animationPhase = ScreenAnimationPhase.IDLE,
+                        isAnimating = false,
+                        // Clear to prevent memory leaks
+                        oldStack = emptyList()
+                    )
+                )
+            }
+        }
+    }
+}
+
+/**
+ * For cases when we cancel back navigation during predictive back.
+ * Removes entering screens and marks remaining screens as idle (not animating).
+ * Also clears oldStack to prevent memory leaks.
+ */
+private fun Map<ScreenKey, AnimationItem>.removeEnteringAndMarkIdle(): Map<ScreenKey, AnimationItem> {
+    return buildMap(size) {
+        this@removeEnteringAndMarkIdle.forEach { (screenKey, item) ->
+            if (item.animationPhase.isExit) {
                 put(
                     screenKey,
                     item.copy(
@@ -256,7 +457,8 @@ private fun processStackTransition(
  */
 @OptIn(ExperimentalModoApi::class)
 @Composable
-private fun StackState.rememberAnimationItemsSimple(
+private fun rememberAnimationItemsSimple(
+    stack: List<Screen>,
     isDialogs: Boolean = false
 ): MutableState<Map<ScreenKey, AnimationItem>> {
     val filteredNewStack = remember(stack) {
@@ -298,7 +500,8 @@ private fun StackState.rememberAnimationItemsSimple(
  */
 @OptIn(ExperimentalModoApi::class)
 @Composable
-private fun StackState.rememberAnimationItemsQueued(
+private fun rememberAnimationItemsQueued(
+    stack: List<Screen>,
     isDialogs: Boolean = false
 ): MutableState<Map<ScreenKey, AnimationItem>> {
     val filteredNewStack = remember(stack) {
@@ -370,20 +573,23 @@ private fun StackState.rememberAnimationItemsQueued(
  */
 @OptIn(ExperimentalModoApi::class)
 @Composable
-fun StackState.rememberAnimationItems(
+fun rememberAnimationItems(
+    stack: List<Screen>,
     isDialogs: Boolean = false,
     waitForAnimationCompletion: Boolean = true
 ): MutableState<Map<ScreenKey, AnimationItem>> {
     return if (waitForAnimationCompletion) {
-        rememberAnimationItemsQueued(isDialogs)
+        rememberAnimationItemsQueued(stack = stack, isDialogs = isDialogs)
     } else {
-        rememberAnimationItemsSimple(isDialogs)
+        rememberAnimationItemsSimple(stack = stack, isDialogs = isDialogs)
     }
 }
 
 @OptIn(ExperimentalModoApi::class)
 @Composable
-fun StackState.rememberDialogsAnimationItems(): MutableState<Map<ScreenKey, AnimationItem>> {
+fun StackState.rememberDialogsAnimationItems(
+    isPredictiveBack: Boolean = false
+): MutableState<Map<ScreenKey, AnimationItem>> {
     val filteredNewStack = remember(this) {
         stack.takeLastWhile { it is DialogScreen }
     }
@@ -409,7 +615,7 @@ fun StackState.rememberDialogsAnimationItems(): MutableState<Map<ScreenKey, Anim
             oldStack = oldStack,
             newStack = filteredNewStack,
             oldScreen = oldStack.lastOrNull(),
-            newScreen = currentScreen
+            newScreen = currentScreen,
         )
 
         // Update animation items (simplified - can be enhanced to queue animations)
@@ -480,7 +686,7 @@ private fun calculateAnimationItems(
                         newStack = newStack,
                         animationPhase = ScreenAnimationPhase.EXIT,
                         isInitial = false,
-                        isAnimating = true
+                        isAnimating = true,
                     )
             )
         }
@@ -496,7 +702,7 @@ private fun calculateAnimationItems(
                     newStack = newStack,
                     animationPhase = ScreenAnimationPhase.IDLE,
                     isInitial = oldScreen == null,
-                    isAnimating = false
+                    isAnimating = false,
                 )
             )
         }
@@ -512,7 +718,7 @@ private fun calculateAnimationItems(
                         newStack = newStack,
                         animationPhase = ScreenAnimationPhase.ENTER,
                         isInitial = false,
-                        isAnimating = true
+                        isAnimating = true,
                     )
                 )
                 if (oldScreen != null) {
@@ -524,7 +730,7 @@ private fun calculateAnimationItems(
                             newStack = newStack,
                             animationPhase = ScreenAnimationPhase.EXIT,
                             isInitial = false,
-                            isAnimating = true
+                            isAnimating = true,
                         )
                     )
                 }
@@ -544,7 +750,7 @@ private fun calculateAnimationItems(
                             newStack = newStack,
                             animationPhase = ScreenAnimationPhase.EXIT,
                             isInitial = false,
-                            isAnimating = true
+                            isAnimating = true,
                         )
                     )
                 }
@@ -556,7 +762,7 @@ private fun calculateAnimationItems(
                         newStack = newStack,
                         animationPhase = ScreenAnimationPhase.ENTER,
                         isInitial = false,
-                        isAnimating = true
+                        isAnimating = true,
                     )
                 )
             }
@@ -595,7 +801,7 @@ data class AnimationItem(
     val animationPhase: ScreenAnimationPhase,
     // True when this item is shown
     val isInitial: Boolean,
-    val isAnimating: Boolean
+    val isAnimating: Boolean,
 ) {
     init {
         assert(!(animationPhase == ScreenAnimationPhase.IDLE && isAnimating))
