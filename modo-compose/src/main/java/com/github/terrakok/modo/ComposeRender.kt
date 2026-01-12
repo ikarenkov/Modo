@@ -3,6 +3,7 @@ package com.github.terrakok.modo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,7 +32,7 @@ import com.github.terrakok.modo.util.currentOrThrow
 
 typealias RendererContent<State> = @Composable ComposeRendererScope<State>.(Modifier) -> Unit
 
-typealias ContainerContent<State> = @Composable State.(Modifier) -> Unit
+typealias ContainerContent<State> = @Composable (Modifier) -> Unit
 
 val defaultRendererContent: (@Composable ComposeRendererScope<*>.(screenModifier: Modifier) -> Unit) = { screenModifier ->
     screen.SaveableContent(screenModifier)
@@ -149,17 +150,21 @@ class ComposeRendererScope<State : NavigationState>(
  */
 internal class ComposeRenderer<State : NavigationState>(
     private val containerScreen: ContainerScreen<*, *>,
+    initialState: State
 ) : NavigationRenderer<State> {
 
+    val _composeState: MutableState<State> = mutableStateOf(initialState, neverEqualPolicy())
+    val composeState: androidx.compose.runtime.State<State> get() = _composeState
     private var lastState: State? = null
-    var state: State? by mutableStateOf(null, neverEqualPolicy())
+    var state: State by _composeState
         private set
 
     // TODO: share removed screen for whole structure?
     private val removedScreens = mutableSetOf<Screen>()
 
+    // TODO: move logic if updating state to navModel. For removedScreens just subscribe to it from here.
     override fun render(state: State) {
-        this.state?.let { currentState ->
+        this.state.let { currentState ->
             removedScreens.addAll(calculateRemovedScreens(currentState, state))
         }
         lastState = this.state
@@ -232,7 +237,7 @@ internal class ComposeRenderer<State : NavigationState>(
             LocalPreDispose provides preDispose,
             *provideCompositionLocal
         ) {
-            state?.content(modifier)
+            content(modifier)
         }
     }
 

@@ -56,7 +56,7 @@ class NewAnimationStackScreen(
                     }
                 )
             } else {
-                navigationState.StackAnimation(
+                StackAnimation(
                     modifier = modifier,
                     animator = animator,
                     animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing),

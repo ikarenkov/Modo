@@ -34,7 +34,7 @@ abstract class ContainerScreen<State : NavigationState, Action : NavigationActio
     init {
         navModel.init(
             reducerProvider = { reducer },
-            renderer = ComposeRenderer(this)
+            containerScreen = this
         )
     }
 
@@ -93,6 +93,9 @@ class NavModel<State : NavigationState, Action : NavigationAction<State>>(
     val screenKey: ScreenKey = generateScreenKey()
 ) : NavigationContainer<State, Action>, Parcelable {
 
+    override val composeState: androidx.compose.runtime.State<State>
+        get() = (renderer?.composeState) ?: error("Renderer is not initialized")
+
     override var navigationState: State = initialState
         get() = renderer?.state ?: field
         set(value) {
@@ -106,13 +109,13 @@ class NavModel<State : NavigationState, Action : NavigationAction<State>>(
 
     internal fun init(
         reducerProvider: ReducerProvider<State, Action>,
-        renderer: ComposeRenderer<State>
+        containerScreen: ContainerScreen<State, Action>
     ) {
         assert(this.reducerProvider == null && this.renderer == null) {
             "Trying to initialize navigation model again"
         }
         this.reducerProvider = reducerProvider
-        this.renderer = renderer.also { it.render(navigationState) }
+        this.renderer = ComposeRenderer(containerScreen, navigationState)
     }
 
     override fun dispatch(action: Action, vararg actions: Action) {

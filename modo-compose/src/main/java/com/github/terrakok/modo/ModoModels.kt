@@ -38,6 +38,8 @@ fun interface NavigationReducer<State : NavigationState, Action : NavigationActi
  */
 @Stable
 interface NavigationContainer<State : NavigationState, in Action : NavigationAction<State>> {
+
+    val composeState: androidx.compose.runtime.State<State>
     val navigationState: State
 
     fun dispatch(action: Action, vararg actions: Action)

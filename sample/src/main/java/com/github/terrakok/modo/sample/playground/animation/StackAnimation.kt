@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.FloatState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -57,13 +58,14 @@ fun StackScreenNew.PredictiveBackStackAnimationPOC(
     },
     content: @Composable (Screen) -> Unit = { it.SaveableContent(manualResumePause = true) }
 ) {
-    val stack = navigationState.stack
+    val navigationStateState = rememberUpdatedState(navigationState)
+    val stack by remember { derivedStateOf { navigationStateState.value.stack } }
     val predictiveBackDesiredStack: MutableState<List<Screen>?> = remember { mutableStateOf(null) }
     val predictiveProgressState = remember { mutableFloatStateOf(0f) }
     val predictiveBackAnimationItems = remember { mutableStateOf<List<AnimationItem>?>(null) }
 
     val autoAnimationScreensState = rememberAnimationItems(
-        navigationState.stack,
+        stackStateState = navigationStateState,
         waitForAnimationCompletion = waitForAnimationCompletion,
     )
     val autoAnimationState = autoLaunchAnimation(
@@ -78,7 +80,7 @@ fun StackScreenNew.PredictiveBackStackAnimationPOC(
         onBackStarted = {
             logcat("PredictiveBackCallbacks") { "onBackStarted, $it" }
             predictiveAnimationJob?.cancel()
-            predictiveBackDesiredStack.value = predictiveBackDesiredStack(navigationState.stack)
+            predictiveBackDesiredStack.value = predictiveBackDesiredStack(navigationStateState.value.stack)
             predictiveBackAnimationItems.value = predictiveBackDesiredStack.value?.let { newStack ->
                 calculateStackAnimationItems(
                     oldStack = stack,
@@ -109,7 +111,7 @@ fun StackScreenNew.PredictiveBackStackAnimationPOC(
                     predictiveBackDesiredStack.value = null
                     predictiveBackAnimationItems.value = null
                     // TODO: cancel autoanimation. Test it by running autoanimation for 3s, and this animation for 1 seccond
-                    autoAnimationScreensState.value = calculateStackAnimationItems(navigationState.stack, navigationState.stack)
+                    autoAnimationScreensState.value = calculateStackAnimationItems(navigationStateState.value.stack, navigationStateState.value.stack)
                 }
             }
             // TODO: can simply use predictiveBackDesiredStack to calculete desired idle stack
@@ -185,7 +187,6 @@ fun StackScreenNew.PredictiveBackStackAnimationPOCV2(
     },
     content: @Composable (Screen) -> Unit = { it.SaveableContent(manualResumePause = true) }
 ) {
-    val stack = navigationState.stack
     val predictiveBackDesiredStack: MutableState<List<Screen>?> = remember { mutableStateOf(null) }
     val predictiveProgressState = remember {
         Animatable(0f).apply {
@@ -197,14 +198,14 @@ fun StackScreenNew.PredictiveBackStackAnimationPOCV2(
     var predictiveAnimationJob: Job? by remember { mutableStateOf(null) }
     val coroutineScope = rememberCoroutineScope()
     PredictiveBackCallbacks(
-        enabled = stack.size > 1,
+        enabled = navigationState.stack.size > 1,
         onBackStarted = {
             logcat("PredictiveBackCallbacks") { "onBackStarted, $it" }
             predictiveAnimationJob?.cancel()
             predictiveBackDesiredStack.value = predictiveBackDesiredStack(navigationState.stack)
             predictiveBackItemsState.value = predictiveBackDesiredStack.value?.let { newStack ->
                 calculateStackAnimationItems(
-                    oldStack = stack,
+                    oldStack = navigationState.stack,
                     stack = newStack
                 )
             }
@@ -263,7 +264,7 @@ fun StackScreenNew.PredictiveBackStackAnimationPOCV2(
         // Putting it into different if branch also helps to display current state without any animation,
         // because it resets since it leaves composition.
         val autoAnimationScreensState = rememberAnimationItems(
-            navigationState.stack,
+            stackStateState = composeState,
             waitForAnimationCompletion = waitForAnimationCompletion,
         )
         val animationProgressState = autoLaunchAnimation(
@@ -301,7 +302,7 @@ fun StackScreenNew.PredictiveBackStackAnimationPOCV2(
  */
 @OptIn(ExperimentalModoApi::class)
 @Composable
-fun StackState.StackAnimation(
+fun StackScreenNew.StackAnimation(
     modifier: Modifier = Modifier,
     animator: StackAnimator = fade() + slide(),
     animationSpec: FiniteAnimationSpec<Float> = tween(durationMillis = 300),
@@ -309,7 +310,7 @@ fun StackState.StackAnimation(
     content: @Composable (Screen) -> Unit = { it.SaveableContent(manualResumePause = true) }
 ) {
     val animationScreenItems = rememberAnimationItems(
-        stack = stack,
+        stackStateState = composeState,
         waitForAnimationCompletion = waitForAnimationCompletion,
     )
 
@@ -536,15 +537,16 @@ private fun processStackTransition(
 @OptIn(ExperimentalModoApi::class)
 @Composable
 private fun rememberAnimationItemsSimple(
-    stack: List<Screen>
+    state: State<StackState>
 ): MutableState<List<AnimationItem>> {
     val animationItems = remember { mutableStateOf<List<AnimationItem>>(emptyList()) }
-    var currentStack by remember { mutableStateOf<List<Screen>>(emptyList()) }
+    var latestStack by remember { mutableStateOf<List<Screen>>(emptyList()) }
+    val stack = state.value.stack
 
     // Detect stack changes and update animation items immediately
-    if (stack != currentStack) {
-        val oldStack = currentStack
-        currentStack = stack
+    if (stack != latestStack) {
+        val oldStack = latestStack
+        latestStack = stack
 
         animationItems.value = calculateStackAnimationItems(oldStack, stack)
     }
@@ -591,7 +593,7 @@ private fun calculateStackAnimationItems(
 @OptIn(ExperimentalModoApi::class)
 @Composable
 private fun rememberAnimationItemsQueued(
-    stack: List<Screen>,
+    stackStateState: State<StackState>,
 ): MutableState<List<AnimationItem>> {
     val animationItems = remember { mutableStateOf<List<AnimationItem>>(emptyList()) }
     var currentStack by remember { mutableStateOf<List<Screen>>(emptyList()) }
@@ -603,6 +605,8 @@ private fun rememberAnimationItemsQueued(
             animationItems.value.any { it.isAnimating }
         }
     }
+
+    val stack by remember { derivedStateOf { stackStateState.value.stack } }
 
     // Detect stack changes
     if (stack != currentStack) {
@@ -643,19 +647,20 @@ private fun rememberAnimationItemsQueued(
  * Remembers animation items with optional queueing.
  * Delegates to either simple or queued implementation based on parameter.
  *
+ * @param stackStateState the State containing StackState
  * @param waitForAnimationCompletion if true, queues navigation changes during animation;
  * if false, immediately processes changes (may interrupt current animation)
  */
 @OptIn(ExperimentalModoApi::class)
 @Composable
 fun rememberAnimationItems(
-    stack: List<Screen>,
+    stackStateState: State<StackState>,
     waitForAnimationCompletion: Boolean = true
 ): MutableState<List<AnimationItem>> {
     return if (waitForAnimationCompletion) {
-        rememberAnimationItemsQueued(stack = stack)
+        rememberAnimationItemsQueued(stackStateState)
     } else {
-        rememberAnimationItemsSimple(stack = stack)
+        rememberAnimationItemsSimple(stackStateState)
     }
 }
 
