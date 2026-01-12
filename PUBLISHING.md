@@ -35,9 +35,7 @@ modo = "x.y.z"  # Update this
 This workflow publishes to a staging repository and validates artifacts, but requires manual approval before releasing to Maven Central.
 
 ```bash
-./gradlew clean modo-compose:bundleReleaseAar \
-  publishAllPublicationsToSonatypeRepository \
-  closeSonatypeStagingRepository
+./gradlew clean modo-compose:bundleReleaseAar publishAllPublicationsToSonatypeRepository closeSonatypeStagingRepository
 ```
 
 **What happens:**
