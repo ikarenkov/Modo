@@ -553,39 +553,6 @@ private fun processStackTransition(
  */
 @OptIn(ExperimentalModoApi::class)
 @Composable
-private fun rememberAnimationItemsSimple2(
-    state: State<StackState>
-): MutableState<List<AnimationItem>> {
-    val animationItems = remember { mutableStateOf<List<AnimationItem>>(emptyList()) }
-    var latestStack by remember { mutableStateOf<List<Screen>>(emptyList()) }
-    var latestScreensToRender: ScreensToRender? by remember { mutableStateOf(null) }
-    val stackState by state
-
-    val screensToRender by remember {
-        derivedStateOf {
-            getStackScreensToRender(stackState.stack)
-        }
-    }
-
-    // Detect stack changes and update animation items immediately
-    if (screensToRender != latestScreensToRender) {
-        val oldScreens = latestScreensToRender
-        val oldStack = latestStack
-        latestStack = stackState.stack
-        latestScreensToRender = screensToRender
-
-        animationItems.value = calculateStackAnimationItems(oldScreens, screensToRender, oldStack, stackState.stack)
-    }
-
-    return animationItems
-}
-
-/**
- * Remembers animation items without queueing - allows overlapping animations.
- * When navigation happens during animation, immediately starts new animation.
- */
-@OptIn(ExperimentalModoApi::class)
-@Composable
 private fun rememberStackAnimationItemsSimple(
     state: State<StackState>
 ): MutableState<List<AnimationItem>> = rememberAnimationItemsSimple<StackState, ScreensToRender>(
@@ -809,6 +776,7 @@ private fun calculateStackAnimationItems(
 
 /**
  * Remembers animation items with queueing - prevents overlapping animations.
+ * Stack-specific wrapper that uses [getStackScreensToRender] to determine visible screens.
  *
  * When navigation happens during animation, queues the change until current animation finishes.
  * This ensures smooth transitions by batching rapid navigation changes. For example:
@@ -820,55 +788,96 @@ private fun calculateStackAnimationItems(
  */
 @OptIn(ExperimentalModoApi::class)
 @Composable
-private fun rememberAnimationItemsQueued(
-    stackStateState: State<StackState>,
+private fun rememberStackAnimationItemsQueued(
+    state: State<StackState>,
+): MutableState<List<AnimationItem>> = rememberAnimationItemsQueued<StackState, ScreensToRender>(
+    state = state,
+    getScreensToRender = { stackState: StackState -> getStackScreensToRender(stackState.stack) },
+    calculateAnimationItems = { oldScreens: ScreensToRender?, screens: ScreensToRender, oldState: StackState?, stackState: StackState ->
+        calculateStackAnimationItems(oldScreens, screens, oldState?.stack.orEmpty(), stackState.stack)
+    }
+)
+
+/**
+ * Remembers animation items with queueing - prevents overlapping animations.
+ * Generic implementation that works for any navigation state type.
+ *
+ * When navigation happens during animation, queues the change until current animation finishes.
+ * This ensures smooth transitions by batching rapid navigation changes.
+ *
+ * @param S Navigation state type (e.g., StackState)
+ * @param R Screens to render type - determines what screens are visible
+ * @param state The navigation state
+ * @param getScreensToRender Function to extract visible screens from state
+ * @param calculateAnimationItems Function to calculate animation items from old and new screens
+ */
+@Composable
+private fun <S : NavigationState, R : Any> rememberAnimationItemsQueued(
+    state: State<S>,
+    getScreensToRender: (S) -> R,
+    calculateAnimationItems: (oldScreens: R?, screens: R, oldState: S?, state: S) -> List<AnimationItem>
 ): MutableState<List<AnimationItem>> {
-    val animationItems = remember { mutableStateOf<List<AnimationItem>>(emptyList()) }
-    var currentStack by remember { mutableStateOf<List<Screen>>(emptyList()) }
-    var visibleStack by remember { mutableStateOf<List<Screen>>(emptyList()) }
-    var pendingStack by remember { mutableStateOf<List<Screen>?>(null) }
+    val animationItemsState: MutableState<List<AnimationItem>> = remember { mutableStateOf(emptyList()) }
+    var animationItems: List<AnimationItem> by animationItemsState
+
+    var latestState: S? by remember { mutableStateOf(null) }
+    var latestScreensToRender: R? by remember { mutableStateOf(null) }
+
+    var targetState: S? by remember { mutableStateOf(null) }
+    var targetScreensToRender: R? by remember { mutableStateOf(null) }
 
     val hasAnimatingScreens by remember {
+        derivedStateOf { animationItemsState.value.any { it.isAnimating } }
+    }
+
+    // Derived: there's a pending change if latest differs from visible
+    val hasPendingChange by remember {
         derivedStateOf {
-            animationItems.value.any { it.isAnimating }
+            latestScreensToRender != null && latestScreensToRender != targetScreensToRender
         }
     }
 
-    val stack by remember { derivedStateOf { stackStateState.value.stack } }
+    val currentNavState by state
+    val currentScreensToRender by remember {
+        derivedStateOf { getScreensToRender(currentNavState) }
+    }
 
-    // Detect stack changes
-    if (stack != currentStack) {
-        if (hasAnimatingScreens) {
-            // Animation in progress - queue this change
-            pendingStack = stack
-            currentStack = stack
-        } else {
+    // Detect changes - always update latest, conditionally update visible
+    if (currentScreensToRender != latestScreensToRender) {
+        latestState = currentNavState
+        latestScreensToRender = currentScreensToRender
+
+        if (!hasAnimatingScreens) {
             // No animation - process immediately
-            val oldStack = visibleStack
-            currentStack = stack
-            visibleStack = stack
-
-            animationItems.value = calculateStackAnimationItems(oldStack, stack)
-        }
-    }
-
-    // Process queued stack change when animations finish
-    LaunchedEffect(hasAnimatingScreens, pendingStack) {
-        if (!hasAnimatingScreens && pendingStack != null) {
-            val queuedStack = pendingStack!!
-            pendingStack = null
-
-            val oldStack = visibleStack
-            visibleStack = queuedStack
-
-            animationItems.value = calculateStackAnimationItems(
-                oldStack = oldStack,
-                stack = queuedStack,
+            val oldScreens = targetScreensToRender
+            val oldState = targetState
+            targetState = currentNavState
+            targetScreensToRender = currentScreensToRender
+            animationItems = calculateAnimationItems(
+                oldScreens,
+                currentScreensToRender,
+                oldState,
+                currentNavState
             )
         }
+        // If animating, change is implicitly queued (latest != visible)
     }
 
-    return animationItems
+    // Process queued change when animations finish
+    LaunchedEffect(hasAnimatingScreens, hasPendingChange) {
+        if (!hasAnimatingScreens && hasPendingChange) {
+            val queuedScreens = latestScreensToRender!!
+            val queuedState = latestState!!
+            val oldScreens = targetScreensToRender
+            val oldState = targetState
+            targetScreensToRender = queuedScreens
+            targetState = queuedState
+            animationItems = calculateAnimationItems(oldScreens, queuedScreens, oldState, queuedState)
+            // hasPendingChange automatically becomes false (visible now equals latest)
+        }
+    }
+
+    return animationItemsState
 }
 
 /**
@@ -886,7 +895,7 @@ fun rememberAnimationItems(
     waitForAnimationCompletion: Boolean = true
 ): MutableState<List<AnimationItem>> {
     return if (waitForAnimationCompletion) {
-        rememberAnimationItemsQueued(stackStateState)
+        rememberStackAnimationItemsQueued(stackStateState)
     } else {
         rememberStackAnimationItemsSimple(stackStateState)
     }
