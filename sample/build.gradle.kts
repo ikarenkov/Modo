@@ -39,4 +39,14 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
 
     debugImplementation(libs.leakcanary.android)
+
+    testImplementation(libs.test.junit.jupiter)
+    testImplementation(kotlin("test"))
+}
+
+tasks.withType(Test::class) {
+    useJUnitPlatform()
+    reports {
+        junitXml.required = true
+    }
 }
