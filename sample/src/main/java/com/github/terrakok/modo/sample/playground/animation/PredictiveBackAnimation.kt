@@ -3,10 +3,14 @@ package com.github.terrakok.modo.sample.playground.animation
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -21,6 +25,7 @@ import com.github.terrakok.modo.stack.StackState
 import com.github.terrakok.modo.stack.dispatch
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import logcat.logcat
 
 //// FIXME: when navigate forward while predictive back is running there is no animation, just jump to current state
 ///**
@@ -236,26 +241,83 @@ fun StackScreenNew.PredictiveBackStackAnimationPOCV2(
     )
     // TODO: make a sample of stack where multiple items, stack is Idle and dialog is entering
 
+    RenderAnimationScreens(
+        predictiveBackItemsState = predictiveBackItemsState,
+        predictiveProgressAnimatable = predictiveProgressState,
+        state = composeState,
+        waitForAnimationCompletion = waitForAnimationCompletion,
+        animationSpec = animationSpec,
+        animator = animator,
+        modifier = modifier,
+        content = content
+    )
+}
+
+@Composable
+private fun RenderAnimationScreens(
+    predictiveBackItemsState: MutableState<List<AnimationItem>?>,
+    predictiveProgressAnimatable: Animatable<Float, *>,
+    state: State<StackState>,
+    waitForAnimationCompletion: Boolean,
+    animationSpec: FiniteAnimationSpec<Float>,
+    animator: StackAnimator,
+    modifier: Modifier = Modifier,
+    content: @Composable (Screen) -> Unit = { it.SaveableContent(manualResumePause = true) }
+) {
     LaunchedEffect(predictiveBackItemsState.value) {
         logcat("StackAnimation") { "predictiveBackAnimationItems: ${predictiveBackItemsState.value}" }
     }
 
+    // Always call at stable composition positions
+    val autoAnimationScreensState = rememberAnimationItems(
+        stackStateState = state,
+        waitForAnimationCompletion = waitForAnimationCompletion,
+    )
+    val autoAnimationProgressState = autoLaunchScreensAnimation(
+        animationScreenItems = autoAnimationScreensState,
+        animationSpec = animationSpec,
+    )
+
+    // Select items and progress based on predictive back state
     val predictiveBackItems = predictiveBackItemsState.value
-    val (screenItems, progress) = if (predictiveBackItems != null) {
-        predictiveBackItems to predictiveProgressState.value
+    val isPredictiveBack = predictiveBackItems != null
+    val screenItems = predictiveBackItems ?: autoAnimationScreensState.value
+    val progress = if (isPredictiveBack) {
+        predictiveProgressAnimatable.value
     } else {
-        // We keep default behavior for case when we are not in predictive back.
-        // Putting it into different if branch also helps to display current state without any animation,
-        // because it resets since it leaves composition.
-        val autoAnimationScreensState = rememberAnimationItems(
-            stackStateState = composeState,
-            waitForAnimationCompletion = waitForAnimationCompletion,
-        )
-        val animationProgressState = autoLaunchScreensAnimation(
-            animationScreenItems = autoAnimationScreensState,
-            animationSpec = animationSpec,
-        )
-        autoAnimationScreensState.value to animationProgressState.value
+        autoAnimationProgressState.value
     }
-    RenderAnimationItems(modifier, screenItems, animator, progress, content)
+
+    Box(modifier = modifier) {
+        screenItems.forEach { item ->
+            key(item.screen.screenKey) {
+                // Each screen gets its own movable content instance
+                // This preserves rememberSaveable state when switching between animation modes
+                val movableScreenContent = remember {
+                    movableContentOf {
+                        content(item.screen)
+                    }
+                }
+
+                if (isPredictiveBack) {
+                    // TODO: Custom predictive back animation (2-stage)
+                    AnimatedScreen(
+                        item = item,
+                        animator = animator,
+                        progress = progress,
+                    ) {
+                        movableScreenContent()
+                    }
+                } else {
+                    AnimatedScreen(
+                        item = item,
+                        animator = animator,
+                        progress = progress,
+                    ) {
+                        movableScreenContent()
+                    }
+                }
+            }
+        }
+    }
 }

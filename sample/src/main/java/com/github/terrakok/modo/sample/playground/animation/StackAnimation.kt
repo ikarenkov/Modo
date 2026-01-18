@@ -566,7 +566,7 @@ fun rememberAnimationItems(
  * Receives animation progress from the parent StackAnimation.
  */
 @Composable
-private fun AnimatedScreen(
+internal fun AnimatedScreen(
     item: AnimationItem,
     animator: StackAnimator,
     progress: Float,
