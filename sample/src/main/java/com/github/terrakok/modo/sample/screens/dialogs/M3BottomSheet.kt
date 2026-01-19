@@ -34,6 +34,7 @@ import com.github.terrakok.modo.android.ProvideOverlayIntegration
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.sample.screens.base.ButtonsScreenContent
 import com.github.terrakok.modo.stack.LocalStackNavigation
+import com.github.terrakok.modo.stack.StackNavContainer
 import com.github.terrakok.modo.stack.StackScreen
 import com.github.terrakok.modo.stack.back
 import kotlinx.coroutines.launch
@@ -81,7 +82,7 @@ class M3BottomSheet(
                 ButtonsScreenContent(
                     screenIndex = screenIndex,
                     screenName = "SampleDialog",
-                    state = rememberDialogsButtons(LocalContainerScreen.current as StackScreen, screenIndex),
+                    state = rememberDialogsButtons(LocalContainerScreen.current as StackNavContainer, screenIndex),
                     topRightButtonSlot = {
                         IconButton(
                             onClick = {

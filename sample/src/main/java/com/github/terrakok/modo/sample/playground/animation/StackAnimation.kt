@@ -337,20 +337,20 @@ internal fun calculateStackAnimationItems(
                     newStack = newStack
                 )
             } else {
-                oldScreens.screen?.let {
+                newScreens.screen?.let {
                     this += AnimationItem(
                         screen = it,
-                        animationPhase = ScreenAnimationPhase.EXIT,
+                        animationPhase = ScreenAnimationPhase.ENTER,
                         isInitial = false,
                         isAnimating = true,
                         oldStack = oldStack,
                         newStack = newStack
                     )
                 }
-                newScreens.screen?.let {
+                oldScreens.screen?.let {
                     this += AnimationItem(
                         screen = it,
-                        animationPhase = ScreenAnimationPhase.ENTER,
+                        animationPhase = ScreenAnimationPhase.EXIT,
                         isInitial = false,
                         isAnimating = true,
                         oldStack = oldStack,
