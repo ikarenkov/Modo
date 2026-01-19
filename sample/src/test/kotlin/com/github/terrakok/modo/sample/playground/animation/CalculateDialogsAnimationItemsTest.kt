@@ -79,6 +79,12 @@ class CalculateDialogsAnimationItemsTest {
                     emptyList<DialogScreen>(),
                     listOf(d1 to EXIT)
                 ),
+//                Arguments.of(
+//                    "Dialog back to previous",
+//                    listOf(d2),
+//                    listOf(d1),
+//                    listOf(d1 to ENTER, d2 to EXIT)
+//                ),
                 Arguments.of(
                     "Empty to empty",
                     emptyList<DialogScreen>(),

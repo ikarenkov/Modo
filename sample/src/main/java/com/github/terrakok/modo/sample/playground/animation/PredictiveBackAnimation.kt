@@ -1,7 +1,9 @@
 package com.github.terrakok.modo.sample.playground.animation
 
+import androidx.activity.BackEventCompat
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
@@ -16,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.SaveableContent
 import com.github.terrakok.modo.Screen
@@ -30,6 +31,43 @@ import kotlinx.coroutines.launch
 import logcat.logcat
 
 /**
+ * State of the predictive back gesture containing touch and edge information.
+ *
+ * @param touchX X coordinate of the touch point
+ * @param touchY Y coordinate of the touch point
+ * @param swipeEdge The edge from which the swipe started (EDGE_LEFT or EDGE_RIGHT)
+ */
+data class PredictiveBackState(
+    val touchX: Float,
+    val touchY: Float,
+    val swipeEdge: SwipeEdge,
+) {
+    enum class SwipeEdge {
+        LEFT,
+        RIGHT,
+        UNKNOWN
+    }
+
+    companion object {
+        val Default = PredictiveBackState(
+            touchX = 0f,
+            touchY = 0f,
+            swipeEdge = SwipeEdge.UNKNOWN
+        )
+
+        fun fromBackEvent(backEvent: BackEventCompat): PredictiveBackState = PredictiveBackState(
+            touchX = backEvent.touchX,
+            touchY = backEvent.touchY,
+            swipeEdge = when (backEvent.swipeEdge) {
+                BackEventCompat.EDGE_LEFT -> SwipeEdge.LEFT
+                BackEventCompat.EDGE_RIGHT -> SwipeEdge.RIGHT
+                else -> SwipeEdge.UNKNOWN
+            }
+        )
+    }
+}
+
+/**
  * Animator for predictive back gesture with 2-stage animation to match Material guidelines.
  *
  * Stage 1 (gesture): User drags back, [gestureProgress] moves from 0 to ~1
@@ -38,10 +76,11 @@ import logcat.logcat
 fun interface PredictiveBackAnimator {
 
     /**
-     * Animates screen content based on two progress values.
+     * Animates screen content based on two progress values and back state.
      *
      * @param gestureProgress Progress of the back gesture (0-1). Controlled by user's finger.
      * @param finishProgress Progress of the finish animation (0-1). Animates after gesture ends.
+     * @param backState State containing touch position and swipe edge information.
      * @param context Animation context containing screen info and direction.
      * @param content The composable content to animate. Receives a Modifier to apply animations.
      */
@@ -49,6 +88,7 @@ fun interface PredictiveBackAnimator {
     operator fun invoke(
         gestureProgress: Float,
         finishProgress: Float,
+        backState: PredictiveBackState,
         context: StackAnimationContext,
         content: @Composable (Modifier) -> Unit,
     )
@@ -63,6 +103,7 @@ private fun PredictiveBackAnimatedScreen(
     animator: PredictiveBackAnimator,
     gestureProgress: Float,
     finishProgress: Float,
+    backState: PredictiveBackState,
     content: @Composable () -> Unit
 ) {
     val context = remember(item) {
@@ -78,38 +119,13 @@ private fun PredictiveBackAnimatedScreen(
     animator(
         gestureProgress = gestureProgress,
         finishProgress = finishProgress,
+        backState = backState,
         context = context
     ) { modifier ->
         Box(modifier = modifier) {
             content()
         }
     }
-}
-
-/**
- * Default predictive back animator that scales and translates based on Material guidelines.
- */
-fun predictiveBackAnimator(): PredictiveBackAnimator = PredictiveBackAnimator { gestureProgress, finishProgress, context, content ->
-    // Example: during gesture, scale down slightly; during finish, complete the transition
-    val scale = when (context.direction) {
-        ScreenAnimationPhase.EXIT -> 1f - (0.1f * gestureProgress) - (0.9f * finishProgress)
-        ScreenAnimationPhase.ENTER -> 0.9f + (0.1f * gestureProgress * finishProgress)
-        ScreenAnimationPhase.IDLE -> 1f
-    }
-    val alpha = when (context.direction) {
-        ScreenAnimationPhase.EXIT -> 1f - finishProgress
-        ScreenAnimationPhase.ENTER -> gestureProgress + (1f - gestureProgress) * finishProgress
-        ScreenAnimationPhase.IDLE -> 1f
-    }
-
-    content(
-        Modifier
-            .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-                this.alpha = alpha
-            }
-    )
 }
 
 // FIXME: when navigate forward while predictive back is running there is no animation, just jump to current state
@@ -122,8 +138,10 @@ fun predictiveBackAnimator(): PredictiveBackAnimator = PredictiveBackAnimator { 
 fun StackScreenNew.PredictiveBackStackAnimationPOCV2(
     modifier: Modifier = Modifier,
     animator: StackAnimator = fade() + slide(),
-    predictiveBackAnimator: PredictiveBackAnimator = predictiveBackAnimator(),
+    predictiveBackAnimator: PredictiveBackAnimator = fullScreenSurfacePredictiveBackAnimator(),
     animationSpec: FiniteAnimationSpec<Float> = tween(durationMillis = 1500),
+    predictiveGestureAnimationSpec: FiniteAnimationSpec<Float> = spring(),
+    predictiveFinalAnimationSpec: FiniteAnimationSpec<Float> = predictiveGestureAnimationSpec,
     waitForAnimationCompletion: Boolean = true,
     predictiveBackDesiredStack: (List<Screen>) -> List<Screen> = {
         it.dropLast(1)
@@ -148,6 +166,8 @@ fun StackScreenNew.PredictiveBackStackAnimationPOCV2(
     }
     val predictiveBackItemsState = remember { mutableStateOf<List<AnimationItem>?>(null) }
 
+    val backState = remember { mutableStateOf(PredictiveBackState.Default) }
+
     var predictiveAnimationJob: Job? by remember { mutableStateOf(null) }
     val coroutineScope = rememberCoroutineScope()
     PredictiveBackCallbacks(
@@ -160,20 +180,29 @@ fun StackScreenNew.PredictiveBackStackAnimationPOCV2(
                 calculateStackAnimationItems(
                     oldStack = navigationState.stack,
                     stack = newStack
-                )
+                ).also {
+                    logcat("Predictive back animation items") { it.joinToString { (it.screen to it.animationPhase).toString() } }
+                }
             }
+            // Update back state from event
+            backState.value = PredictiveBackState.fromBackEvent(backEvent)
             coroutineScope.launch {
                 // Reset both progresses at start
-                gestureProgressAnimatable.snapTo(backEvent.progress)
+                gestureProgressAnimatable.snapTo(0f)
                 finishProgressAnimatable.snapTo(0f)
+                gestureProgressAnimatable.snapTo(backEvent.progress)
             }
         },
         onBackProgressed = { backEvent ->
             predictiveAnimationJob?.cancel()
             logcat("PredictiveBackCallbacks") { "onBackProgressed, $backEvent" }
+            // Update back state from event
+            backState.value = PredictiveBackState.fromBackEvent(backEvent)
             coroutineScope.launch {
                 // Only gesture progress updates during drag
-                gestureProgressAnimatable.snapTo(backEvent.progress)
+                gestureProgressAnimatable.snapTo(
+                    backEvent.progress,
+                )
             }
         },
         onBackPressed = {
@@ -185,13 +214,13 @@ fun StackScreenNew.PredictiveBackStackAnimationPOCV2(
                 val gestureAnimationJob = launch {
                     gestureProgressAnimatable.animateTo(
                         targetValue = 1f,
-                        animationSpec = animationSpec
+                        animationSpec = predictiveGestureAnimationSpec
                     )
                 }
                 val finishAnimationJob = launch {
                     finishProgressAnimatable.animateTo(
                         targetValue = 1f,
-                        animationSpec = animationSpec
+                        animationSpec = predictiveFinalAnimationSpec
                     )
                 }
                 joinAll(gestureAnimationJob, finishAnimationJob)
@@ -209,7 +238,7 @@ fun StackScreenNew.PredictiveBackStackAnimationPOCV2(
                 if (gestureProgressAnimatable.value > 0f) {
                     gestureProgressAnimatable.animateTo(
                         targetValue = 0f,
-                        animationSpec = animationSpec
+                        animationSpec = predictiveGestureAnimationSpec
                     )
                 }
                 logcat("PredictiveBackCallbacks") { "Animation finished - clearing state" }
@@ -223,6 +252,7 @@ fun StackScreenNew.PredictiveBackStackAnimationPOCV2(
         predictiveBackItemsState = predictiveBackItemsState,
         gestureProgressAnimatable = gestureProgressAnimatable,
         finishProgressAnimatable = finishProgressAnimatable,
+        backState = backState,
         state = composeState,
         waitForAnimationCompletion = waitForAnimationCompletion,
         animationSpec = animationSpec,
@@ -238,6 +268,7 @@ private fun RenderAnimationScreens(
     predictiveBackItemsState: MutableState<List<AnimationItem>?>,
     gestureProgressAnimatable: Animatable<Float, *>,
     finishProgressAnimatable: Animatable<Float, *>,
+    backState: State<PredictiveBackState>,
     state: State<StackState>,
     waitForAnimationCompletion: Boolean,
     animationSpec: FiniteAnimationSpec<Float>,
@@ -250,21 +281,24 @@ private fun RenderAnimationScreens(
         logcat("StackAnimation") { "predictiveBackAnimationItems: ${predictiveBackItemsState.value}" }
     }
 
-    // Always call at stable composition positions
-    val autoAnimationScreensState = rememberAnimationItems(
-        stackStateState = state,
-        waitForAnimationCompletion = waitForAnimationCompletion,
-    )
-    val autoAnimationProgressState = autoLaunchScreensAnimation(
-        animationScreenItems = autoAnimationScreensState,
-        animationSpec = animationSpec,
-    )
-
     // Select items and progress based on predictive back state
     val predictiveBackItems = predictiveBackItemsState.value
     val isPredictiveBack = predictiveBackItems != null
-    val screenItems = predictiveBackItems ?: autoAnimationScreensState.value
-    val autoProgress = autoAnimationProgressState.value
+
+    val (screenItems, autoProgress) = if (isPredictiveBack) {
+        predictiveBackItems to 0f
+    } else {
+        // Move auto detection into separate if branch to cause IDLE state and no animation when predictive back is finished or canceled.
+        val autoAnimationScreensState = rememberAnimationItems(
+            stackStateState = state,
+            waitForAnimationCompletion = waitForAnimationCompletion,
+        )
+        val autoAnimationProgressState = autoLaunchScreensAnimation(
+            animationScreenItems = autoAnimationScreensState,
+            animationSpec = animationSpec,
+        )
+        autoAnimationScreensState.value to autoAnimationProgressState.value
+    }
 
     Box(modifier = modifier) {
         screenItems.forEach { item ->
@@ -284,6 +318,7 @@ private fun RenderAnimationScreens(
                         animator = predictiveBackAnimator,
                         gestureProgress = gestureProgressAnimatable.value,
                         finishProgress = finishProgressAnimatable.value,
+                        backState = backState.value,
                     ) {
                         movableScreenContent()
                     }
