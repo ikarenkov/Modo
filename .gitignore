@@ -4,6 +4,7 @@ build/
 
 # Properties
 local.properties
+settings.xml
 
 # Idea
 .idea/

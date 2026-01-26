@@ -32,10 +32,16 @@ nexusPublishing {
             snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
 
             // Use Central Portal credentials from local.properties or environment
-            username.set(providers.environmentVariable("SONATYPE_USERNAME")
-                .orElse(provider { localProperties?.getProperty("sonatypeUsername") ?: "" }))
-            password.set(providers.environmentVariable("SONATYPE_PASSWORD")
-                .orElse(provider { localProperties?.getProperty("sonatypePassword") ?: "" }))
+            username.set(
+                providers
+                    .environmentVariable("SONATYPE_USERNAME")
+                    .orElse(provider { localProperties?.getProperty("sonatypeUsername") ?: "" })
+            )
+            password.set(
+                providers
+                    .environmentVariable("SONATYPE_PASSWORD")
+                    .orElse(provider { localProperties?.getProperty("sonatypePassword") ?: "" })
+            )
         }
     }
 
