@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.modo.publishing) apply false
     alias(libs.plugins.modo.detekt)
     alias(libs.plugins.modo.collectSarif)
+    alias(libs.plugins.nexus.publish)
 }
 
 tasks.named<Wrapper>("wrapper") {
@@ -18,4 +19,34 @@ tasks.named<Wrapper>("wrapper") {
     gradleVersion = "9.1.0"
 }
 
-// PUBLISHING './gradlew clean modo-compose:bundleReleaseAar modo-compose:publishAllPublicationsToSonatypeRepository'
+// Read credentials from local.properties for nexus-publish plugin
+val localProperties = file("local.properties").takeIf { it.exists() }?.let {
+    java.util.Properties().apply { load(it.inputStream()) }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            // OSSRH Staging API compatibility endpoint for Central Portal
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
+
+            // Use Central Portal credentials from local.properties or environment
+            username.set(
+                providers
+                    .environmentVariable("SONATYPE_USERNAME")
+                    .orElse(provider { localProperties?.getProperty("sonatypeUsername") ?: "" })
+            )
+            password.set(
+                providers
+                    .environmentVariable("SONATYPE_PASSWORD")
+                    .orElse(provider { localProperties?.getProperty("sonatypePassword") ?: "" })
+            )
+        }
+    }
+
+    this.packageGroup.set("com.github.terrakok")
+}
+
+// Publishing configuration for Central Portal (via OSSRH Staging API compatibility endpoint)
+// See PUBLISHING.md for detailed publishing instructions
