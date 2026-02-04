@@ -22,18 +22,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.IntState
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.currentStateAsState
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
@@ -49,6 +56,7 @@ import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import logcat.logcat
 
 internal const val COUNTER_DELAY_MS = 100L
 
@@ -179,9 +187,33 @@ internal fun SampleScreenContent(
     topRightButtonSlot: @Composable () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateAsState()
+    val topLineColor by remember {
+        derivedStateOf {
+            when (lifecycleState) {
+                Lifecycle.State.RESUMED -> Color.Green
+                Lifecycle.State.STARTED -> Color.Yellow
+                Lifecycle.State.CREATED,
+                Lifecycle.State.INITIALIZED,
+                Lifecycle.State.DESTROYED -> {
+                    // TODO: fing out if it is fixible. For now we start with created state.
+                    logcat("") {"Should not happen, state ${lifecycleState.name}" }
+                    Color.Black
+                }
+            }
+        }
+    }
     Box(
         modifier = modifier
             .randomBackground()
+            .drawWithContent {
+                val strokeWidth = 8.dp.toPx()
+                drawRect(
+                    color = topLineColor,
+                    size = Size(width = size.width, height = strokeWidth)
+                )
+                drawContent()
+            }
             .windowInsetsPadding(windowInsets),
     ) {
         Column(Modifier.padding(8.dp)) {
