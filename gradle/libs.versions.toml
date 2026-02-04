@@ -48,6 +48,7 @@ detekt-composeRules = { module = "io.nlopez.compose.rules:detekt", version.ref =
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detektVersion" }
 leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroid" }
 test-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version = "5.10.1" }
+test-androidx-arch-core = { group = "androidx.arch.core", name = "core-testing", version = "2.2.0" }
 
 debug-logcat = { group = "com.squareup.logcat", name = "logcat", version = "0.1" }
 
