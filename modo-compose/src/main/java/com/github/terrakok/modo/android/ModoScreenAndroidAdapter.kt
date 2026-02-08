@@ -3,6 +3,7 @@ package com.github.terrakok.modo.android
 import android.app.Application
 import android.content.Context
 import android.os.Bundle
+import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocal
 import androidx.compose.runtime.CompositionLocalProvider
@@ -102,7 +103,9 @@ class ModoScreenAndroidAdapter private constructor(
 
     // Atomic references for cases when we unable take it directly from the composition.
     private val atomicContext = AtomicReference<Context>()
-    private val atomicParentLifecycleOwner = AtomicReference<LifecycleOwner>()
+
+    @VisibleForTesting
+    internal val atomicParentLifecycleOwner = AtomicReference<LifecycleOwner>()
     private val application: Application? get() = atomicContext.get()?.applicationContext?.getApplication()
 
     /**
@@ -242,14 +245,11 @@ class ModoScreenAndroidAdapter private constructor(
         }
         val savedState = rememberSaveable { Bundle() }
         if (!isCreated) {
-            onCreate(savedState) // do this in the UI thread to force it to be called before anything else
+            onCreate(savedState)
         }
 
         DisposableEffect(this) {
-            safeHandleLifecycleEvent(ON_START)
-            if (!manualResumePause) {
-                safeHandleLifecycleEvent(ON_RESUME)
-            }
+            handleLifecycleOnCompositionEnter(manualResumePause)
             onDispose { }
         }
 
@@ -260,40 +260,64 @@ class ModoScreenAndroidAdapter private constructor(
         DisposableEffect(this) {
             screen.devLogV(TAG) { "LifecycleDisposableEffect parentLifecycleOwner: $parentLifecycleOwner" }
 
-            val unregisterLifecycle = registerParentLifecycleListener(parentLifecycleOwner) {
-                LifecycleEventObserver { _, event ->
-                    // when the Application goes to background, perform save
-                    if (event == ON_STOP) {
-                        performSave(savedState)
-                    }
-                    if (
-                        needPropagateLifecycleEventFromParent(
-                            event,
-                            screenTransitionState = screenTransitionState,
-                            isActivityFinishing = activity?.isFinishing,
-                            isChangingConfigurations = activity?.isChangingConfigurations
-                        )
-                    ) {
-                        safeHandleLifecycleEvent(event)
-                    }
-                }
-            }
+            val unregisterLifecycle = subscribeToParentLifecycle(
+                parentLifecycleOwner = parentLifecycleOwner,
+                savedState = savedState,
+                isActivityFinishing = { activity?.isFinishing },
+                isChangingConfigurations = { activity?.isChangingConfigurations }
+            )
 
             onDispose {
                 screen.devLogD(TAG) { "LifecycleDisposableEffect after content DisposableEffect.onDispose ${lifecycle.currentState}" }
                 unregisterLifecycle()
-                // when the screen goes to stack, perform save
                 performSave(savedState)
-                // notify lifecycle screen listeners
-                if (!manualResumePause) {
-                    safeHandleLifecycleEvent(ON_PAUSE)
-                }
-                safeHandleLifecycleEvent(ON_STOP)
+                handleLifecycleOnCompositionExit(manualResumePause)
             }
         }
     }
 
-    private fun safeHandleLifecycleEvent(event: Lifecycle.Event) {
+    @VisibleForTesting
+    internal fun handleLifecycleOnCompositionEnter(manualResumePause: Boolean) {
+        safeHandleLifecycleEvent(ON_START)
+        if (!manualResumePause) {
+            safeHandleLifecycleEvent(ON_RESUME)
+        }
+    }
+
+    @VisibleForTesting
+    internal fun handleLifecycleOnCompositionExit(manualResumePause: Boolean) {
+        if (!manualResumePause) {
+            safeHandleLifecycleEvent(ON_PAUSE)
+        }
+        safeHandleLifecycleEvent(ON_STOP)
+    }
+
+    @VisibleForTesting
+    internal fun subscribeToParentLifecycle(
+        parentLifecycleOwner: LifecycleOwner,
+        savedState: Bundle? = null,
+        isActivityFinishing: () -> Boolean? = { null },
+        isChangingConfigurations: () -> Boolean? = { null }
+    ): () -> Unit = registerParentLifecycleListener(parentLifecycleOwner) {
+        LifecycleEventObserver { _, event ->
+            if (event == ON_STOP && savedState != null) {
+                performSave(savedState)
+            }
+            if (
+                needPropagateLifecycleEventFromParent(
+                    event,
+                    screenTransitionState = screenTransitionState,
+                    isActivityFinishing = isActivityFinishing(),
+                    isChangingConfigurations = isChangingConfigurations()
+                )
+            ) {
+                safeHandleLifecycleEvent(event)
+            }
+        }
+    }
+
+    @VisibleForTesting
+    internal fun safeHandleLifecycleEvent(event: Lifecycle.Event) {
         val skippEvent = needSkipEvent(lifecycle.currentState, event)
         if (!skippEvent) {
             screen.devLogD(TAG) { "safeHandleLifecycleEvent send $event" }

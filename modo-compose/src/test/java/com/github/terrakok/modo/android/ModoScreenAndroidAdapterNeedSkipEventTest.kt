@@ -1,8 +1,17 @@
 package com.github.terrakok.modo.android
 
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Lifecycle.Event.*
-import androidx.lifecycle.Lifecycle.State.*
+import androidx.lifecycle.Lifecycle.Event.ON_CREATE
+import androidx.lifecycle.Lifecycle.Event.ON_DESTROY
+import androidx.lifecycle.Lifecycle.Event.ON_PAUSE
+import androidx.lifecycle.Lifecycle.Event.ON_RESUME
+import androidx.lifecycle.Lifecycle.Event.ON_START
+import androidx.lifecycle.Lifecycle.Event.ON_STOP
+import androidx.lifecycle.Lifecycle.State.CREATED
+import androidx.lifecycle.Lifecycle.State.DESTROYED
+import androidx.lifecycle.Lifecycle.State.INITIALIZED
+import androidx.lifecycle.Lifecycle.State.RESUMED
+import androidx.lifecycle.Lifecycle.State.STARTED
 import com.github.terrakok.modo.android.ModoScreenAndroidAdapter.Companion.needSkipEvent
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments

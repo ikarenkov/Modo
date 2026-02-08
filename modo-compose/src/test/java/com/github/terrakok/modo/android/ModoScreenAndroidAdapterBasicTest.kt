@@ -36,11 +36,6 @@ class ModoScreenAndroidAdapterBasicTest {
         assertEquals(Lifecycle.State.INITIALIZED, adapter.lifecycle.currentState)
     }
 
-    // TODO: Add ModoScreenAndroidAdapterLifecycleTest for integration tests requiring Compose initialization:
-    //  - showTransitionFinished, hideTransitionStarted, onPreDispose
-    //  - parent lifecycle propagation
-    //  - manualResumePause mode
-
     @Test
     fun `When adapter is created - Then viewModelStore is available`() {
         assertDoesNotThrow { adapter.viewModelStore }
