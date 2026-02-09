@@ -60,7 +60,11 @@ class CompositionLifecycleEmulator(
         adapter.atomicParentLifecycleOwner.set(parentLifecycleOwner)
     }
 
-    fun enterComposition(manualResumePause: Boolean = false) {
+    fun enterComposition(
+        manualResumePause: Boolean = false,
+        isActivityFinishing: () -> Boolean? = { false },
+        isChangingConfigurations: () -> Boolean? = { false }
+    ) {
         check(!isInComposition) { "Already in composition" }
         isInComposition = true
 
@@ -71,8 +75,8 @@ class CompositionLifecycleEmulator(
         unsubscribeFromParent = adapter.subscribeToParentLifecycle(
             parentLifecycleOwner = parentLifecycleOwner,
             savedState = savedState,
-            isActivityFinishing = { false },
-            isChangingConfigurations = { false }
+            isActivityFinishing = isActivityFinishing,
+            isChangingConfigurations = isChangingConfigurations
         )
     }
 

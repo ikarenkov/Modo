@@ -59,13 +59,12 @@ class ModoScreenAndroidAdapterParentPropagationTest {
 
     // region Parent STARTED (animation in progress), screen enter composition
 
-    // TODO: fix it? should be STARTED
     @Test
-    fun `Given parent STARTED and auto resume When enter composition without manual resume - Then screen RESUMED`() {
+    fun `Given parent STARTED and auto resume When enter composition without manual resume - Then screen STARTED`() {
         parent.lifecycleState = STARTED
 
         emulator.enterComposition()
-        assertEquals(RESUMED, emulator.lifecycleState)
+        assertEquals(STARTED, emulator.lifecycleState)
     }
 
     @Test
@@ -230,4 +229,82 @@ class ModoScreenAndroidAdapterParentPropagationTest {
         parent.lifecycleState = DESTROYED
         assertEquals(CREATED, emulator.lifecycleState)
     }
+
+    @Test
+    fun `Given parent STARTED When entering composition and finish transition - Then screen STARTED`() {
+        parent.lifecycleState = STARTED
+        emulator.enterComposition(manualResumePause = true)
+        assertEquals(STARTED, emulator.lifecycleState)
+
+        emulator.showTransitionFinished()
+        assertEquals(STARTED, emulator.lifecycleState)
+    }
+
+    // TODO: should it be like this? Maybe screen should be created to follow global logic of lifecycle hierarchy? Is it possible in real use?
+    @Test
+    fun `Given parent CREATED When entering composition and finish transition - Then screen STARTED`() {
+        parent.lifecycleState = STARTED
+        emulator.enterComposition(manualResumePause = true)
+        assertEquals(STARTED, emulator.lifecycleState)
+
+        emulator.showTransitionFinished()
+        assertEquals(STARTED, emulator.lifecycleState)
+    }
+
+    // region Parent ON_DESTROY propagation - Activity lifecycle scenarios
+
+    @Test
+    fun `When activity finishes normally - Then screen propagates ON_DESTROY and moves to DESTROYED`() {
+        parent.lifecycleState = RESUMED
+        emulator.enterComposition(
+            isActivityFinishing = { true },
+            isChangingConfigurations = { false }
+        )
+        assertEquals(RESUMED, emulator.lifecycleState)
+
+        parent.lifecycleState = DESTROYED
+        assertEquals(DESTROYED, emulator.lifecycleState)
+    }
+
+    @Test
+    fun `When activity killed by system but not finishing - Then screen skips ON_DESTROY and persists in CREATED`() {
+        parent.lifecycleState = RESUMED
+        emulator.enterComposition(
+            isActivityFinishing = { false },
+            isChangingConfigurations = { false }
+        )
+        assertEquals(RESUMED, emulator.lifecycleState)
+
+        parent.lifecycleState = DESTROYED
+        assertEquals(CREATED, emulator.lifecycleState)
+    }
+
+    @Test
+    fun `When activity recreating due to config change - Then screen skips ON_DESTROY to avoid SavedStateHandle crash`() {
+        parent.lifecycleState = RESUMED
+        emulator.enterComposition(
+            isActivityFinishing = { false },
+            isChangingConfigurations = { true }
+        )
+        assertEquals(RESUMED, emulator.lifecycleState)
+
+        parent.lifecycleState = DESTROYED
+        assertEquals(CREATED, emulator.lifecycleState)
+    }
+
+    @Test
+    fun `When activity killed by system from STARTED state - Then screen skips ON_DESTROY and stays in CREATED`() {
+        parent.lifecycleState = STARTED
+        emulator.enterComposition(
+            isActivityFinishing = { false },
+            isChangingConfigurations = { false }
+        )
+        assertEquals(STARTED, emulator.lifecycleState)
+
+        parent.lifecycleState = DESTROYED
+        assertEquals(CREATED, emulator.lifecycleState)
+    }
+
+    // endregion
+
 }

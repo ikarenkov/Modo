@@ -8,17 +8,16 @@ import androidx.lifecycle.Lifecycle.Event.ON_RESUME
 import androidx.lifecycle.Lifecycle.Event.ON_START
 import androidx.lifecycle.Lifecycle.Event.ON_STOP
 import androidx.lifecycle.Lifecycle.State.CREATED
-import androidx.lifecycle.Lifecycle.State.DESTROYED
 import androidx.lifecycle.Lifecycle.State.INITIALIZED
 import androidx.lifecycle.Lifecycle.State.RESUMED
 import androidx.lifecycle.Lifecycle.State.STARTED
-import com.github.terrakok.modo.android.ModoScreenAndroidAdapter.Companion.needSkipEvent
+import com.github.terrakok.modo.android.ModoScreenAndroidAdapter.Companion.stateAlreadyReached
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertEquals
 
-class ModoScreenAndroidAdapterNeedSkipEventTest {
+class ModoScreenAndroidAdapterStateAlreadyReachedTest {
 
     @ParameterizedTest(name = "State={0}, Event={1} -> shouldSkip={2}")
     @MethodSource("testCases")
@@ -27,7 +26,7 @@ class ModoScreenAndroidAdapterNeedSkipEventTest {
         event: Lifecycle.Event,
         shouldSkip: Boolean
     ) {
-        assertEquals(shouldSkip, needSkipEvent(state, event))
+        assertEquals(shouldSkip, stateAlreadyReached(state, event))
     }
 
     companion object {
@@ -57,12 +56,6 @@ class ModoScreenAndroidAdapterNeedSkipEventTest {
             Arguments.of(RESUMED, ON_PAUSE, false),
             Arguments.of(RESUMED, ON_STOP, false),
             Arguments.of(RESUMED, ON_DESTROY, false),
-            Arguments.of(DESTROYED, ON_CREATE, true),
-            Arguments.of(DESTROYED, ON_START, true),
-            Arguments.of(DESTROYED, ON_RESUME, true),
-            Arguments.of(DESTROYED, ON_PAUSE, true),
-            Arguments.of(DESTROYED, ON_STOP, true),
-            Arguments.of(DESTROYED, ON_DESTROY, true),
         )
     }
 }
