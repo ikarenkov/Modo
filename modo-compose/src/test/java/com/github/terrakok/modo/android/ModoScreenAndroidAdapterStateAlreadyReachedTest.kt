@@ -11,7 +11,6 @@ import androidx.lifecycle.Lifecycle.State.CREATED
 import androidx.lifecycle.Lifecycle.State.INITIALIZED
 import androidx.lifecycle.Lifecycle.State.RESUMED
 import androidx.lifecycle.Lifecycle.State.STARTED
-import com.github.terrakok.modo.android.ModoScreenAndroidAdapter.Companion.stateAlreadyReached
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -26,7 +25,7 @@ class ModoScreenAndroidAdapterStateAlreadyReachedTest {
         event: Lifecycle.Event,
         shouldSkip: Boolean
     ) {
-        assertEquals(shouldSkip, stateAlreadyReached(state, event))
+        assertEquals(shouldSkip, ScreenLifecycleManager.stateAlreadyReached(state, event))
     }
 
     companion object {

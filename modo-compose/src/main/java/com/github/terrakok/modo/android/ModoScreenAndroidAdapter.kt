@@ -16,18 +16,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.HasDefaultViewModelProviderFactory
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Lifecycle.Event.ON_CREATE
-import androidx.lifecycle.Lifecycle.Event.ON_DESTROY
-import androidx.lifecycle.Lifecycle.Event.ON_PAUSE
-import androidx.lifecycle.Lifecycle.Event.ON_RESUME
-import androidx.lifecycle.Lifecycle.Event.ON_START
 import androidx.lifecycle.Lifecycle.Event.ON_STOP
-import androidx.lifecycle.Lifecycle.State.CREATED
-import androidx.lifecycle.Lifecycle.State.DESTROYED
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.SAVED_STATE_REGISTRY_OWNER_KEY
 import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.VIEW_MODEL_STORE_OWNER_KEY
@@ -46,7 +36,6 @@ import androidx.savedstate.compose.LocalSavedStateRegistryOwner
 import com.github.terrakok.modo.ModoDevOptions
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.SetupPreDispose
-import com.github.terrakok.modo.android.ModoScreenAndroidAdapter.Companion.needPropagateLifecycleEventFromParent
 import com.github.terrakok.modo.lifecycle.LifecycleDependency
 import com.github.terrakok.modo.logs.devLogD
 import com.github.terrakok.modo.logs.devLogI
@@ -56,7 +45,6 @@ import com.github.terrakok.modo.model.ScreenModelStore.remove
 import com.github.terrakok.modo.util.getActivity
 import com.github.terrakok.modo.util.getApplication
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.math.abs
 
 /**
  * Adapter for Screen that provides android-related features support using Modo, such as:
@@ -76,7 +64,10 @@ class ModoScreenAndroidAdapter private constructor(
     HasDefaultViewModelProviderFactory,
     LifecycleDependency {
 
-    override val lifecycle: LifecycleRegistry = LifecycleRegistry(this)
+    @VisibleForTesting
+    internal val lifecycleManager = ScreenLifecycleManager(this)
+
+    override val lifecycle get() = lifecycleManager.lifecycle
 
     override val viewModelStore: ViewModelStore = ViewModelStore()
 
@@ -106,16 +97,7 @@ class ModoScreenAndroidAdapter private constructor(
 
     // Atomic references for cases when we unable take it directly from the composition.
     private val atomicContext = AtomicReference<Context>()
-
-    @VisibleForTesting
-    internal val atomicParentLifecycleOwner = AtomicReference<LifecycleOwner>()
     private val application: Application? get() = atomicContext.get()?.applicationContext?.getApplication()
-
-    /**
-     * Holding transition state of the screen to be able to handle lifecycle events from parent properly.
-     * Check out [needPropagateLifecycleEventFromParent] for more details.
-     */
-    private val screenTransitionState: ScreenTransitionState = ScreenTransitionState(readyToBeResumed = false)
 
     init {
         controller.performAttach()
@@ -130,7 +112,7 @@ class ModoScreenAndroidAdapter private constructor(
         val context: Context = LocalContext.current
         val parentLifecycleOwner = LocalLifecycleOwner.current
         DisposableAtomicReference(LocalContext, atomicContext)
-        DisposableAtomicReference(LocalLifecycleOwner, atomicParentLifecycleOwner)
+        DisposableAtomicReference(LocalLifecycleOwner, lifecycleManager.parentLifecycleOwner)
         LifecycleDisposableEffect(context, parentLifecycleOwner, manualResumePause) {
             ProvideCompositionLocals(content)
         }
@@ -143,19 +125,17 @@ class ModoScreenAndroidAdapter private constructor(
      */
     override fun onPreDispose() {
         ModoDevOptions.onScreenPreDisposeListener?.invoke(screen)
-        updateLifecycleIfNeed(ON_DESTROY)
+        lifecycleManager.updateLifecycleIfNeeded(Lifecycle.Event.ON_DESTROY)
     }
 
     override fun hideTransitionStarted() {
         screen.devLogD(TAG) { "hideTransitionStarted ${lifecycle.currentState}" }
-        screenTransitionState.readyToBeResumed = false
-        updateLifecycleIfNeed(ON_PAUSE)
+        lifecycleManager.hideTransitionStarted()
     }
 
     override fun showTransitionFinished() {
         screen.devLogD(TAG) { "showTransitionFinished ${lifecycle.currentState}" }
-        screenTransitionState.readyToBeResumed = true
-        updateLifecycleIfNeed(ON_RESUME)
+        lifecycleManager.showTransitionFinished()
     }
 
     override fun toString(): String = "${ModoScreenAndroidAdapter::class.simpleName}, screenKey: ${screen.screenKey}"
@@ -169,7 +149,7 @@ class ModoScreenAndroidAdapter private constructor(
         check(!isCreated) { "onCreate already called" }
         isCreated = true
         controller.performRestore(savedState)
-        updateLifecycleIfNeed(ON_CREATE)
+        lifecycleManager.updateLifecycleIfNeeded(Lifecycle.Event.ON_CREATE)
     }
 
     private fun performSave(outState: Bundle) {
@@ -210,25 +190,6 @@ class ModoScreenAndroidAdapter private constructor(
         }
     }
 
-    /**
-     * Returns a unregister callback
-     */
-    private fun registerParentLifecycleListener(
-        lifecycleOwner: LifecycleOwner?,
-        observerFactory: () -> LifecycleObserver
-    ): () -> Unit {
-        if (lifecycleOwner != null) {
-            val parentLifecycleObserver = observerFactory()
-            val lifecycle = lifecycleOwner.lifecycle
-            lifecycle.addObserver(parentLifecycleObserver)
-            return {
-                lifecycle.removeObserver(parentLifecycleObserver)
-            }
-        } else {
-            return { }
-        }
-    }
-
     @Composable
     private fun LifecycleDisposableEffect(
         context: Context,
@@ -245,7 +206,7 @@ class ModoScreenAndroidAdapter private constructor(
         }
 
         DisposableEffect(this) {
-            handleLifecycleOnCompositionEnter(manualResumePause)
+            lifecycleManager.handleCompositionEnter(manualResumePause)
             onDispose { }
         }
 
@@ -267,26 +228,9 @@ class ModoScreenAndroidAdapter private constructor(
                 screen.devLogD(TAG) { "LifecycleDisposableEffect after content DisposableEffect.onDispose ${lifecycle.currentState}" }
                 unregisterLifecycle()
                 performSave(savedState)
-                handleLifecycleOnCompositionExit(manualResumePause)
+                lifecycleManager.handleCompositionExit(manualResumePause)
             }
         }
-    }
-
-    @VisibleForTesting
-    internal fun handleLifecycleOnCompositionEnter(manualResumePause: Boolean) {
-        updateLifecycleIfNeed(ON_START)
-        if (!manualResumePause) {
-            screenTransitionState.readyToBeResumed = true
-            updateLifecycleIfNeed(ON_RESUME)
-        }
-    }
-
-    @VisibleForTesting
-    internal fun handleLifecycleOnCompositionExit(manualResumePause: Boolean) {
-        if (!manualResumePause) {
-            updateLifecycleIfNeed(ON_PAUSE)
-        }
-        updateLifecycleIfNeed(ON_STOP)
     }
 
     @VisibleForTesting
@@ -295,76 +239,19 @@ class ModoScreenAndroidAdapter private constructor(
         savedState: Bundle? = null,
         isActivityFinishing: () -> Boolean? = { null },
         isChangingConfigurations: () -> Boolean? = { null }
-    ): () -> Unit = registerParentLifecycleListener(parentLifecycleOwner) {
-        // If we still subscribed to parent lifecycle, then we in composition and content is visible
-        LifecycleEventObserver { _, event ->
+    ): () -> Unit = lifecycleManager.subscribeToParentLifecycle(
+        parentLifecycleOwner = parentLifecycleOwner,
+        isActivityFinishing = isActivityFinishing,
+        isChangingConfigurations = isChangingConfigurations,
+        onEventBeforePropagation = { event ->
+            // Handle SavedState side-effect (adapter's responsibility)
             if (event == ON_STOP && savedState != null) {
                 performSave(savedState)
             }
-            if (
-                needPropagateLifecycleEventFromParent(
-                    event,
-                    isActivityFinishing = isActivityFinishing(),
-                    isChangingConfigurations = isChangingConfigurations()
-                )
-            ) {
-                updateLifecycleIfNeed(event)
-            }
         }
-    }
-
-    /**
-     * Attempts to update the screen's lifecycle state with the given event if all conditions are met.
-     *
-     * This method enforces several rules to ensure lifecycle integrity:
-     * 1. **No resurrection**: Once DESTROYED, the lifecycle cannot move to any other state
-     * 2. **No redundant events**: Events that would lead to an already-reached state are skipped
-     * 3. **Transition readiness**: ON_RESUME requires [ScreenTransitionState.readyToBeResumed] to be true
-     * 4. **Parent constraints**: Child state cannot exceed parent state (enforced by [parentStateAllowMove])
-     * 5. **Single-step transitions**: State changes must be sequential (except CREATED -> DESTROYED)
-     *
-     * @param event The lifecycle event to potentially dispatch
-     */
-    @VisibleForTesting
-    internal fun updateLifecycleIfNeed(event: Lifecycle.Event) {
-        val parentState = atomicParentLifecycleOwner.get()?.lifecycle?.currentState
-        if (
-        // ignore any state updates if already destroyed, it cannot be moved up
-            lifecycle.currentState != DESTROYED &&
-            !stateAlreadyReached(lifecycle.currentState, event) &&
-            // if ON_RESUME, then should be ready for it
-            (event != ON_RESUME || screenTransitionState.readyToBeResumed) &&
-            parentStateAllowMove(parentState, event)
-        ) {
-            assert(
-                abs(lifecycle.currentState.ordinal - event.targetState.ordinal) == 1 ||
-                    lifecycle.currentState == CREATED && event == ON_DESTROY
-            ) {
-                "Lifecycle state transition must be one step, but was ${lifecycle.currentState} -> $event"
-            }
-            screen.devLogD(TAG) { "safeHandleLifecycleEvent send $event" }
-            lifecycle.handleLifecycleEvent(event)
-        }
-    }
-
-    private data class ScreenTransitionState(
-        @Volatile
-        var readyToBeResumed: Boolean
     )
 
     companion object {
-
-        private val moveLifecycleStateUpEvents = setOf(
-            ON_CREATE,
-            ON_START,
-            ON_RESUME
-        )
-
-        private val moveLifecycleStateDownEvents = setOf(
-            ON_STOP,
-            ON_PAUSE,
-            ON_DESTROY
-        )
 
         private val TAG = ModoScreenAndroidAdapter::class.simpleName
 
@@ -385,87 +272,5 @@ class ModoScreenAndroidAdapter private constructor(
                 screen = screen,
                 name = LifecycleDependency.KEY,
             )
-
-        /**
-         * Determines whether a lifecycle event from the parent should be propagated to the screen.
-         *
-         * Rules for propagation:
-         * - **ON_DESTROY**: Only propagate when the activity is truly finishing, not during:
-         *   - Configuration changes (isChangingConfigurations = true)
-         *   - System-initiated process death (isActivityFinishing = false)
-         *   This prevents SavedStateHandle crashes when the screen will be restored.
-         *
-         * - **ON_START**: Always propagate - if we're in composition, we should be at least STARTED
-         *
-         * - **ON_RESUME**: Always propagate to parent subscription, but [updateLifecycleIfNeed]
-         *   makes the final decision based on [ScreenTransitionState.readyToBeResumed]
-         *
-         * - **Downward events** (ON_PAUSE, ON_STOP): Always propagate to ensure child state
-         *   never exceeds parent state
-         *
-         * @param event The lifecycle event from the parent
-         * @param isActivityFinishing True if the activity is finishing (user navigation back, finish() called)
-         * @param isChangingConfigurations True if the activity is being recreated due to config change
-         * @return true if the event should be propagated to the screen's lifecycle
-         */
-        @JvmStatic
-        private fun needPropagateLifecycleEventFromParent(
-            event: Lifecycle.Event,
-            isActivityFinishing: Boolean?,
-            isChangingConfigurations: Boolean?
-        ) =
-            // Propagate ON_DESTROY only when finishing happening.
-            (event != ON_DESTROY || (isActivityFinishing != false && isChangingConfigurations != true)) &&
-                // We can propagate ON_START because we are in composition, meaning we should be at least started
-                (event == ON_START ||
-                    // propagate ON_RESUME, but the final decision is up to updateLifecycleIfNeed
-                    event == ON_RESUME ||
-                    // Parent can always move down lifecycle to ensure children state is never greater than parent.
-                    event in moveLifecycleStateDownEvents)
-
-        /**
-         * Checks if the target state of the given event has already been reached by the current state.
-         *
-         * This prevents redundant lifecycle events from being dispatched:
-         * - For upward transitions (ON_CREATE, ON_START, ON_RESUME): Skip if target state <= current state
-         *   Example: Skip ON_START when currentState is RESUMED
-         * - For downward transitions (ON_PAUSE, ON_STOP, ON_DESTROY): Skip if target state >= current state
-         *   Example: Skip ON_PAUSE when currentState is CREATED
-         *
-         * @param currentState The current lifecycle state
-         * @param event The lifecycle event to check
-         * @return true if the event's target state has already been reached and should be skipped
-         */
-        @JvmStatic
-        internal fun stateAlreadyReached(currentState: Lifecycle.State, event: Lifecycle.Event) =
-            // Skipping events that move the lifecycle state up, but this state is already reached.
-            (event in moveLifecycleStateUpEvents && event.targetState <= currentState) ||
-                // Skipping events that move the lifecycle state down, but this state is already reached.
-                (event in moveLifecycleStateDownEvents && event.targetState >= currentState)
-
-        /**
-         * Validates that the parent's lifecycle state permits the requested state transition.
-         *
-         * Ensures the fundamental rule: **child state <= parent state**
-         *
-         * Always allows:
-         * - Downward transitions (ON_PAUSE, ON_STOP): Parent can always downgrade children
-         * - Transitions to CREATED or below: Initial states before parent dependency matters
-         *
-         * For upward transitions beyond CREATED (ON_START, ON_RESUME):
-         * - Requires parent state >= target state
-         * - Example: Cannot move to RESUMED if parent is only STARTED
-         *
-         * @param parentState The current state of the parent lifecycle owner, or null if not in composition
-         * @param event The lifecycle event requesting a state change
-         * @return true if the parent's state allows this transition
-         */
-        private fun parentStateAllowMove(
-            parentState: Lifecycle.State?,
-            event: Lifecycle.Event,
-        ) =
-            event in moveLifecycleStateDownEvents ||
-                event.targetState <= CREATED ||
-                parentState != null && parentState >= event.targetState
     }
 }

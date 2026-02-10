@@ -57,7 +57,7 @@ class CompositionLifecycleEmulator(
 
     init {
         initializeAdapter()
-        adapter.atomicParentLifecycleOwner.set(parentLifecycleOwner)
+        adapter.lifecycleManager.parentLifecycleOwner.set(parentLifecycleOwner)
     }
 
     fun enterComposition(
@@ -70,7 +70,7 @@ class CompositionLifecycleEmulator(
 
         this.manualResumePause = manualResumePause
 
-        adapter.handleLifecycleOnCompositionEnter(manualResumePause)
+        adapter.lifecycleManager.handleCompositionEnter(manualResumePause)
 
         unsubscribeFromParent = adapter.subscribeToParentLifecycle(
             parentLifecycleOwner = parentLifecycleOwner,
@@ -85,7 +85,7 @@ class CompositionLifecycleEmulator(
         isInComposition = false
 
         unsubscribeFromParent?.invoke()
-        adapter.handleLifecycleOnCompositionExit(manualResumePause)
+        adapter.lifecycleManager.handleCompositionExit(manualResumePause)
     }
 
     fun showTransitionFinished() {
