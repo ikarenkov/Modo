@@ -85,7 +85,7 @@ class CompositionLifecycleEmulator(
         isInComposition = false
 
         unsubscribeFromParent?.invoke()
-        adapter.lifecycleManager.handleCompositionExit(manualResumePause)
+        adapter.lifecycleManager.handleCompositionExit()
     }
 
     fun showTransitionFinished() {

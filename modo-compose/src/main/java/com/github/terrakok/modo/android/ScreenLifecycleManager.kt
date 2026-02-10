@@ -80,10 +80,9 @@ internal class ScreenLifecycleManager(
         }
     }
 
-    fun handleCompositionExit(manualResumePause: Boolean) {
-        if (!manualResumePause) {
-            updateLifecycleIfNeeded(ON_PAUSE)
-        }
+    fun handleCompositionExit() {
+        // sending pause anyway, it will be ignored if it is already handled
+        updateLifecycleIfNeeded(ON_PAUSE)
         updateLifecycleIfNeeded(ON_STOP)
     }
 

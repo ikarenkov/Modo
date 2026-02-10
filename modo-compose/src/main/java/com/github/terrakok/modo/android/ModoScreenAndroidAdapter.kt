@@ -228,7 +228,7 @@ class ModoScreenAndroidAdapter private constructor(
                 screen.devLogD(TAG) { "LifecycleDisposableEffect after content DisposableEffect.onDispose ${lifecycle.currentState}" }
                 unregisterLifecycle()
                 performSave(savedState)
-                lifecycleManager.handleCompositionExit(manualResumePause)
+                lifecycleManager.handleCompositionExit()
             }
         }
     }
