@@ -22,7 +22,7 @@ fun ComposeRendererScope<MultiScreenState>.SlideTransition(
     screenModifier: Modifier = Modifier,
     slideAnimationSpec: FiniteAnimationSpec<IntOffset> = tween(durationMillis = 700),
     fadeAnimationSpec: FiniteAnimationSpec<Float> = tween(durationMillis = 700),
-    content: ScreenTransitionContent = { it.SaveableContent(screenModifier, manualResumePause = true) }
+    content: ScreenTransitionContent = { it.SaveableContent(screenModifier) }
 ) {
     ScreenTransition(
         modifier = modifier,

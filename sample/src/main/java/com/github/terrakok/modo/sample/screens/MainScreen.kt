@@ -141,6 +141,7 @@ private fun rememberButtons(
                         ModoButtonSpec("Stack actions") { navigation?.forward(StackActionsScreen(i + 1)) },
                         ModoButtonSpec("HorizontalPager") { navigation?.forward(HorizontalPagerScreen()) },
                         ModoButtonSpec("Custom Stack") { navigation?.forward(CustomStackSample(i + 1)) },
+                        ModoButtonSpec("No animation Stack") { navigation?.forward(CustomStackSample(i + 1, hasAnimation = false)) },
                         ModoButtonSpec("Stacks in LazyColumn") { navigation?.forward(StackInLazyColumnScreen()) },
                         ModoButtonSpec("Dialogs & BottomSheets") { navigation?.forward(DialogsPlayground(i + 1)) },
                         ModoButtonSpec("Multiscreen") { navigation?.forward(SampleMultiScreen()) },

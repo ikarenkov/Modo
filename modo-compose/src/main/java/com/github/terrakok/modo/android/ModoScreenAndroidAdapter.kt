@@ -106,14 +106,14 @@ class ModoScreenAndroidAdapter private constructor(
 
     @Composable
     fun ProvideAndroidIntegration(
-        manualResumePause: Boolean = false,
+        usesTransitionLifecycle: Boolean = false,
         content: @Composable () -> Unit,
     ) {
         val context: Context = LocalContext.current
         val parentLifecycleOwner = LocalLifecycleOwner.current
         DisposableAtomicReference(LocalContext, atomicContext)
         DisposableAtomicReference(LocalLifecycleOwner, lifecycleManager.parentLifecycleOwner)
-        LifecycleDisposableEffect(context, parentLifecycleOwner, manualResumePause) {
+        LifecycleDisposableEffect(context, parentLifecycleOwner, usesTransitionLifecycle) {
             ProvideCompositionLocals(content)
         }
     }
@@ -194,7 +194,7 @@ class ModoScreenAndroidAdapter private constructor(
     private fun LifecycleDisposableEffect(
         context: Context,
         parentLifecycleOwner: LifecycleOwner,
-        manualResumePause: Boolean,
+        usesTransitionLifecycle: Boolean,
         content: @Composable () -> Unit
     ) {
         val activity = remember(context) {
@@ -206,7 +206,7 @@ class ModoScreenAndroidAdapter private constructor(
         }
 
         DisposableEffect(this) {
-            lifecycleManager.handleCompositionEnter(manualResumePause)
+            lifecycleManager.handleCompositionEnter(usesTransitionLifecycle)
             onDispose { }
         }
 

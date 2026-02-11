@@ -49,10 +49,10 @@ import kotlin.math.abs
  *
  * Typical lifecycle flow:
  * 1. Screen created: `updateLifecycleIfNeeded(`[ON_CREATE]`)`
- * 2. Enters composition: `handleCompositionEnter(manualResumePause)`
+ * 2. Enters composition: `handleCompositionEnter(usesTransitionLifecycle)`
  * 3. Subscribe to parent: `subscribeToParentLifecycle(...)`
  * 4. Transition complete: `showTransitionFinished()` -> moves to [RESUMED]
- * 5. Exits composition: `handleCompositionExit(manualResumePause)`
+ * 5. Exits composition: `handleCompositionExit()`
  * 6. Screen destroyed: `updateLifecycleIfNeeded(`[ON_DESTROY]`)`
  */
 internal class ScreenLifecycleManager(
@@ -72,9 +72,9 @@ internal class ScreenLifecycleManager(
     private val currentParentState: Lifecycle.State?
         get() = parentLifecycleOwner.get()?.lifecycle?.currentState
 
-    fun handleCompositionEnter(manualResumePause: Boolean) {
+    fun handleCompositionEnter(usesTransitionLifecycle: Boolean) {
         updateLifecycleIfNeeded(ON_START)
-        if (!manualResumePause) {
+        if (!usesTransitionLifecycle) {
             canResumeAfterTransition = true
             updateLifecycleIfNeeded(ON_RESUME)
         }
