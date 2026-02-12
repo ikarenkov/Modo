@@ -56,7 +56,6 @@ import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import logcat.logcat
 
 internal const val COUNTER_DELAY_MS = 100L
 
@@ -195,11 +194,7 @@ internal fun SampleScreenContent(
                 Lifecycle.State.STARTED -> Color.Yellow
                 Lifecycle.State.CREATED,
                 Lifecycle.State.INITIALIZED,
-                Lifecycle.State.DESTROYED -> {
-                    // TODO: fing out if it is fixible. For now we start with created state.
-                    logcat("") {"Should not happen, state ${lifecycleState.name}" }
-                    Color.Black
-                }
+                Lifecycle.State.DESTROYED -> Color.Black
             }
         }
     }

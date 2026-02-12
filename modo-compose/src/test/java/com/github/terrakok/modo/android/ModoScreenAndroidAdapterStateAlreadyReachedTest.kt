@@ -8,6 +8,7 @@ import androidx.lifecycle.Lifecycle.Event.ON_RESUME
 import androidx.lifecycle.Lifecycle.Event.ON_START
 import androidx.lifecycle.Lifecycle.Event.ON_STOP
 import androidx.lifecycle.Lifecycle.State.CREATED
+import androidx.lifecycle.Lifecycle.State.DESTROYED
 import androidx.lifecycle.Lifecycle.State.INITIALIZED
 import androidx.lifecycle.Lifecycle.State.RESUMED
 import androidx.lifecycle.Lifecycle.State.STARTED
@@ -25,7 +26,11 @@ class ModoScreenAndroidAdapterStateAlreadyReachedTest {
         event: Lifecycle.Event,
         shouldSkip: Boolean
     ) {
-        assertEquals(shouldSkip, ScreenLifecycleManager.stateAlreadyReached(state, event))
+        assertEquals(
+            shouldSkip,
+            ScreenLifecycleManager.stateAlreadyReached(state, event),
+            "State=$state, Event=$event"
+        )
     }
 
     companion object {
@@ -55,6 +60,12 @@ class ModoScreenAndroidAdapterStateAlreadyReachedTest {
             Arguments.of(RESUMED, ON_PAUSE, false),
             Arguments.of(RESUMED, ON_STOP, false),
             Arguments.of(RESUMED, ON_DESTROY, false),
+            Arguments.of(DESTROYED, ON_CREATE, false),
+            Arguments.of(DESTROYED, ON_START, false),
+            Arguments.of(DESTROYED, ON_RESUME, false),
+            Arguments.of(DESTROYED, ON_PAUSE, true),
+            Arguments.of(DESTROYED, ON_STOP, true),
+            Arguments.of(DESTROYED, ON_DESTROY, true),
         )
     }
 }

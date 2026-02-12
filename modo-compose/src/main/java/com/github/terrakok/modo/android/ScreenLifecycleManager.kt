@@ -22,7 +22,7 @@ import kotlin.math.abs
  *
  * ## Core Contracts
  *
- * **1. Parent-Child Coordination**
+ * **Parent-Child Coordination**
  * - Child state never exceeds parent state (e.g., screen can't be [RESUMED] if parent is [STARTED])
  * - **Event propagation from parent:**
  *   - [ON_CREATE]: Never propagated (subscription happens after screen creation)
@@ -31,17 +31,17 @@ import kotlin.math.abs
  *   - [ON_PAUSE]/[ON_STOP]: Always propagated (parent going down forces child down immediately)
  *   - [ON_DESTROY]: Conditionally propagated (blocked during config changes to preserve SavedStateRegistry)
  *
- * **2. Transition Readiness ([canResumeAfterTransition])**
+ * **Transition Readiness ([canResumeAfterTransition])**
  * - [ON_RESUME] blocked until show transition completes via [showTransitionFinished]
  * - Hide transition via [hideTransitionStarted] triggers immediate pause
  * - Prevents screen from being [RESUMED] during hide animations
  *
- * **3. Sequential Progression**
+ * **Sequential Progression**
  * - Lifecycle events must be called in sequential order ([CREATED] -> [STARTED] -> [RESUMED])
  * - Single-step transitions enforced (except [CREATED] -> [DESTROYED])
  * - Redundant events skipped automatically (e.g., [ON_START] when already [RESUMED])
  *
- * **4. No Resurrection**
+ * **No Resurrection**
  * - Once [DESTROYED], no further lifecycle events accepted
  * - Ensures proper cleanup and prevents use-after-destroy bugs
  *
