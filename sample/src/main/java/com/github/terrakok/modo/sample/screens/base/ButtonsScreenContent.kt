@@ -74,11 +74,12 @@ internal fun Screen.ButtonsScreenContent(
     if (logLifecycle) {
         LogLifecycle()
     }
-    val counter by rememberCounterState()
+    val counterState = rememberCounterState()
     ButtonsScreenContent(
         screenIndex = screenIndex,
         screenName = screenName,
-        counter = if (enableCounter) counter else 0,
+        counterState = counterState,
+        enableCounter = enableCounter,
         screenKey = screenKey,
         state = state,
         topRightButtonSlot = topRightButtonSlot,
@@ -105,7 +106,8 @@ fun rememberCounterState(): IntState {
 internal fun ButtonsScreenContent(
     screenIndex: Int,
     screenName: String,
-    counter: Int,
+    counterState: IntState,
+    enableCounter: Boolean,
     screenKey: ScreenKey,
     state: GroupedButtonsState,
     modifier: Modifier = Modifier,
@@ -116,7 +118,8 @@ internal fun ButtonsScreenContent(
     SampleScreenContent(
         screenIndex = screenIndex,
         screenName = screenName,
-        counter = counter,
+        counterState = counterState,
+        enableCounter = enableCounter,
         screenKey = screenKey,
         topRightButtonSlot = topRightButtonSlot,
         windowInsets = windowInsets,
@@ -139,16 +142,31 @@ internal fun Screen.SampleScreenContent(
     content: @Composable ColumnScope.() -> Unit
 ) {
     LogLifecycle()
-    val counter by rememberCounterState()
+    val counterState = rememberCounterState()
     SampleScreenContent(
         screenIndex = screenIndex,
         screenName = screenName,
-        counter = counter,
+        counterState = counterState,
+        enableCounter = true,
         screenKey = screenKey,
         modifier = modifier,
         windowInsets = windowInsets,
         content = content
     )
+}
+
+@Composable
+private fun CounterText(
+    counterState: IntState,
+    enableCounter: Boolean,
+    modifier: Modifier = Modifier
+) {
+    if (enableCounter) {
+        Text(
+            text = counterState.intValue.toString(),
+            modifier = modifier
+        )
+    }
 }
 
 @OptIn(ExperimentalModoApi::class)
@@ -179,7 +197,8 @@ fun Screen.LogLifecycle(prefix: String = "") {
 internal fun SampleScreenContent(
     screenIndex: Int,
     screenName: String,
-    counter: Int,
+    counterState: IntState,
+    enableCounter: Boolean,
     screenKey: ScreenKey,
     modifier: Modifier = Modifier,
     windowInsets: WindowInsets = WindowInsets.systemBars,
@@ -219,8 +238,9 @@ internal fun SampleScreenContent(
                 BackButton(
                     onClick = { stackNavigation?.back() },
                 )
-                Text(
-                    text = counter.toString(),
+                CounterText(
+                    counterState = counterState,
+                    enableCounter = enableCounter,
                     modifier = Modifier.weight(1f)
                 )
                 topRightButtonSlot()
@@ -247,9 +267,11 @@ internal fun SampleScreenContent(
 @Preview
 @Composable
 private fun ButtonsPreview() {
+    val counterState = remember { mutableIntStateOf(666) }
     ButtonsScreenContent(
         screenIndex = 0,
-        counter = 666,
+        counterState = counterState,
+        enableCounter = true,
         screenName = "ButtonsPreview",
         screenKey = ScreenKey("ScreenKey"),
         state = ButtonsState(

@@ -46,7 +46,8 @@ class LifecycleSampleScreen(
     @OptIn(ExperimentalModoApi::class, ExperimentalStdlibApi::class)
     @Composable
     override fun Content(modifier: Modifier) {
-        val counter by rememberCounterState()
+        val counterState = rememberCounterState()
+        val counter by counterState
         val lifecycleOwner = LocalLifecycleOwner.current
 
         DisposableEffect(this) {
@@ -87,7 +88,8 @@ class LifecycleSampleScreen(
             screenIndex = screenIndex,
             screenName = "ScreenEffectsSampleScreen",
             screenKey = screenKey,
-            counter = counter,
+            counterState = counterState,
+            enableCounter = true,
             modifier = modifier,
         ) {
             GroupedButtonsList(
