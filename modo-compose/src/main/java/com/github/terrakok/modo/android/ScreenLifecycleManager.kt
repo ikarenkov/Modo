@@ -14,6 +14,7 @@ import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
+import com.github.terrakok.modo.ModoDevOptions
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.math.abs
 
@@ -138,12 +139,7 @@ internal class ScreenLifecycleManager(
             (event != ON_RESUME || canResumeAfterTransition) &&
             parentStateAllowsTransition(currentParentState, event)
         ) {
-            assert(
-                abs(lifecycle.currentState.ordinal - event.targetState.ordinal) == 1 ||
-                    lifecycle.currentState == CREATED && event == ON_DESTROY
-            ) {
-                "Lifecycle state transition must be one step, but was ${lifecycle.currentState} -> $event"
-            }
+            validateLifecycleUpdateOneStep(lifecycle.currentState, event)
             lifecycle.handleLifecycleEvent(event)
         }
     }
@@ -170,12 +166,25 @@ internal class ScreenLifecycleManager(
                 // Skipping events that move the lifecycle state down, but this state is already reached.
                 (event in MOVE_LIFECYCLE_STATE_DOWN_EVENTS && event.targetState >= currentState)
 
-        private fun parentStateAllowsTransition(
+        internal fun parentStateAllowsTransition(
             parentState: Lifecycle.State?,
             event: Lifecycle.Event,
         ): Boolean =
             event in MOVE_LIFECYCLE_STATE_DOWN_EVENTS ||
                 event.targetState <= CREATED ||
                 parentState != null && parentState >= event.targetState
+
+        internal fun validateLifecycleUpdateOneStep(currentState: Lifecycle.State, event: Lifecycle.Event) {
+            val isValidUpdate = abs(currentState.ordinal - event.targetState.ordinal) == 1 ||
+                currentState == CREATED && event == ON_DESTROY
+            if (!isValidUpdate) {
+                ModoDevOptions.onIllegalLifecycleUpdate.validationFailed(
+                    IllegalStateException(
+                        "Lifecycle state transition must be one step, but was $currentState -> $event. " +
+                            "Please report an issue at ${ModoDevOptions.REPORT_ISSUE_URL}"
+                    )
+                )
+            }
+        }
     }
 }

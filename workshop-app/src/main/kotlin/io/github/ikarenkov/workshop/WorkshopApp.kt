@@ -21,6 +21,9 @@ class WorkshopApp : Application() {
         ModoDevOptions.onIllegalClearState = ModoDevOptions.ValidationFailedStrategy { throwable ->
             logcat(priority = LogPriority.ERROR) { "Cleaning state of composable, which still can be visible for user." }
         }
+        ModoDevOptions.onIllegalLifecycleUpdate = ModoDevOptions.ValidationFailedStrategy { throwable ->
+            throw throwable
+        }
 
         startKoin {
             androidLogger()
