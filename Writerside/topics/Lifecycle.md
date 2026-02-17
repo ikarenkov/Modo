@@ -29,7 +29,7 @@ DisposableEffect(lifecycleOwner) {
     val observer = LifecycleEventObserver { _, event ->
         when (event) {
             Lifecycle.Event.ON_RESUME -> {
-                // Screen is redy for interactions
+                // Screen is ready for interactions
             }
             Lifecycle.Event.ON_PAUSE -> {
                 // Screen is hiding
