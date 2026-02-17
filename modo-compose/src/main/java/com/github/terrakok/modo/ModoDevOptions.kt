@@ -13,6 +13,10 @@ object ModoDevOptions {
         Log.e("Modo", "Modo internal error", throwable)
     }
 
+    var onIllegalLifecycleUpdate: ValidationFailedStrategy = ValidationFailedStrategy { throwable ->
+        Log.e("Modo", "Modo internal error", throwable)
+    }
+
     var onScreenDisposeListener: ((Screen) -> Unit)? = null
     var onScreenPreDisposeListener: ((Screen) -> Unit)? = null
 

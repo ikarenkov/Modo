@@ -30,7 +30,7 @@ fun ComposeRendererScope<StackState>.SlideTransition(
     popDirection: AnimatedContentTransitionScope.SlideDirection = pushDirection.opposite(),
     slideAnimationSpec: FiniteAnimationSpec<IntOffset> = tween(durationMillis = 700),
     fadeAnimationSpec: FiniteAnimationSpec<Float> = tween(durationMillis = 700),
-    content: ScreenTransitionContent = { it.SaveableContent(screenModifier, manualResumePause = true) }
+    content: ScreenTransitionContent = { it.SaveableContent(screenModifier) }
 ) {
     ScreenTransition(
         modifier = modifier,

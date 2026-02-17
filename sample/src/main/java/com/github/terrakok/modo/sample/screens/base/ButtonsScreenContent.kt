@@ -22,18 +22,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.IntState
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.currentStateAsState
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
@@ -67,11 +74,12 @@ internal fun Screen.ButtonsScreenContent(
     if (logLifecycle) {
         LogLifecycle()
     }
-    val counter by rememberCounterState()
+    val counterState = rememberCounterState()
     ButtonsScreenContent(
         screenIndex = screenIndex,
         screenName = screenName,
-        counter = if (enableCounter) counter else 0,
+        counterState = counterState,
+        enableCounter = enableCounter,
         screenKey = screenKey,
         state = state,
         topRightButtonSlot = topRightButtonSlot,
@@ -98,7 +106,8 @@ fun rememberCounterState(): IntState {
 internal fun ButtonsScreenContent(
     screenIndex: Int,
     screenName: String,
-    counter: Int,
+    counterState: IntState,
+    enableCounter: Boolean,
     screenKey: ScreenKey,
     state: GroupedButtonsState,
     modifier: Modifier = Modifier,
@@ -109,7 +118,8 @@ internal fun ButtonsScreenContent(
     SampleScreenContent(
         screenIndex = screenIndex,
         screenName = screenName,
-        counter = counter,
+        counterState = counterState,
+        enableCounter = enableCounter,
         screenKey = screenKey,
         topRightButtonSlot = topRightButtonSlot,
         windowInsets = windowInsets,
@@ -132,16 +142,31 @@ internal fun Screen.SampleScreenContent(
     content: @Composable ColumnScope.() -> Unit
 ) {
     LogLifecycle()
-    val counter by rememberCounterState()
+    val counterState = rememberCounterState()
     SampleScreenContent(
         screenIndex = screenIndex,
         screenName = screenName,
-        counter = counter,
+        counterState = counterState,
+        enableCounter = true,
         screenKey = screenKey,
         modifier = modifier,
         windowInsets = windowInsets,
         content = content
     )
+}
+
+@Composable
+private fun CounterText(
+    counterState: IntState,
+    enableCounter: Boolean,
+    modifier: Modifier = Modifier
+) {
+    if (enableCounter) {
+        Text(
+            text = counterState.intValue.toString(),
+            modifier = modifier
+        )
+    }
 }
 
 @OptIn(ExperimentalModoApi::class)
@@ -172,16 +197,37 @@ fun Screen.LogLifecycle(prefix: String = "") {
 internal fun SampleScreenContent(
     screenIndex: Int,
     screenName: String,
-    counter: Int,
+    counterState: IntState,
+    enableCounter: Boolean,
     screenKey: ScreenKey,
     modifier: Modifier = Modifier,
     windowInsets: WindowInsets = WindowInsets.systemBars,
     topRightButtonSlot: @Composable () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateAsState()
+    val topLineColor by remember {
+        derivedStateOf {
+            when (lifecycleState) {
+                Lifecycle.State.RESUMED -> Color.Green
+                Lifecycle.State.STARTED -> Color.Yellow
+                Lifecycle.State.CREATED,
+                Lifecycle.State.INITIALIZED,
+                Lifecycle.State.DESTROYED -> Color.Black
+            }
+        }
+    }
     Box(
         modifier = modifier
             .randomBackground()
+            .drawWithContent {
+                val strokeWidth = 8.dp.toPx()
+                drawRect(
+                    color = topLineColor,
+                    size = Size(width = size.width, height = strokeWidth)
+                )
+                drawContent()
+            }
             .windowInsetsPadding(windowInsets),
     ) {
         Column(Modifier.padding(8.dp)) {
@@ -192,8 +238,9 @@ internal fun SampleScreenContent(
                 BackButton(
                     onClick = { stackNavigation?.back() },
                 )
-                Text(
-                    text = counter.toString(),
+                CounterText(
+                    counterState = counterState,
+                    enableCounter = enableCounter,
                     modifier = Modifier.weight(1f)
                 )
                 topRightButtonSlot()
@@ -220,9 +267,11 @@ internal fun SampleScreenContent(
 @Preview
 @Composable
 private fun ButtonsPreview() {
+    val counterState = remember { mutableIntStateOf(666) }
     ButtonsScreenContent(
         screenIndex = 0,
-        counter = 666,
+        counterState = counterState,
+        enableCounter = true,
         screenName = "ButtonsPreview",
         screenKey = ScreenKey("ScreenKey"),
         state = ButtonsState(

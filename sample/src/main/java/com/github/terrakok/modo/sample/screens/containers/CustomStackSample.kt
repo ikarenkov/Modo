@@ -14,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.NavModel
+import com.github.terrakok.modo.SaveableContent
 import com.github.terrakok.modo.lifecycle.OnScreenRemoved
 import com.github.terrakok.modo.sample.SlideTransition
 import com.github.terrakok.modo.sample.components.CancelButton
@@ -32,13 +33,19 @@ import logcat.logcat
 @Parcelize
 class CustomStackSample(
     private val i: Int,
-    private val navModel: StackNavModel
+    private val navModel: StackNavModel,
+    private val hasAnimation: Boolean = true,
 ) : SampleStack(navModel) {
 
     constructor(
         i: Int,
+        hasAnimation: Boolean = true,
         sampleNavigationState: StackState = StackState(MainScreen(1))
-    ) : this(i, NavModel(sampleNavigationState))
+    ) : this(
+        i = i,
+        hasAnimation = hasAnimation,
+        navModel = NavModel(sampleNavigationState)
+    )
 
     @Suppress("ModifierNotUsedAtRoot")
     @OptIn(ExperimentalModoApi::class)
@@ -60,7 +67,11 @@ class CustomStackSample(
                             .fillMaxSize()
                             .clip(RoundedCornerShape(16.dp)),
                     ) { modifier ->
-                        SlideTransition(modifier)
+                        if (hasAnimation) {
+                            SlideTransition(modifier)
+                        } else {
+                            screen.SaveableContent(modifier)
+                        }
                     }
                 }
             }

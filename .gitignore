@@ -4,6 +4,7 @@ build/
 
 # Properties
 local.properties
+local.env
 settings.xml
 
 # Idea
