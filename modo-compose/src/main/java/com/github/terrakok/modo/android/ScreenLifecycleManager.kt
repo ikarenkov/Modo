@@ -89,7 +89,9 @@ internal class ScreenLifecycleManager(
 
     fun showTransitionFinished() {
         canResumeAfterTransition = true
-        updateLifecycleIfNeeded(ON_RESUME)
+        if (lifecycle.currentState == STARTED) {
+            updateLifecycleIfNeeded(ON_RESUME)
+        }
     }
 
     fun hideTransitionStarted() {
@@ -103,8 +105,8 @@ internal class ScreenLifecycleManager(
      */
     fun subscribeToParentLifecycle(
         parentLifecycleOwner: LifecycleOwner,
-        isActivityFinishing: () -> Boolean? = { null },
-        isChangingConfigurations: () -> Boolean? = { null },
+        isActivityFinishing: () -> Boolean = { false },
+        isChangingConfigurations: () -> Boolean = { false },
         onEventBeforePropagation: ((Lifecycle.Event) -> Unit)? = null
     ): () -> Unit {
         val observer = LifecycleEventObserver { _, event ->
@@ -113,7 +115,7 @@ internal class ScreenLifecycleManager(
 
             // Propagate lifecycle events using manager's logic
             // [ON_DESTROY] blocked during config changes to preserve SavedStateRegistry.
-            if (event != ON_DESTROY || (isActivityFinishing() != false && isChangingConfigurations() != true)) {
+            if (event != ON_DESTROY || (isActivityFinishing() && !isChangingConfigurations())) {
                 updateLifecycleIfNeeded(event)
             }
         }

@@ -221,8 +221,8 @@ class ModoScreenAndroidAdapter private constructor(
             val unregisterLifecycle = subscribeToParentLifecycle(
                 parentLifecycleOwner = parentLifecycleOwner,
                 savedState = savedState,
-                isActivityFinishing = { activity?.isFinishing },
-                isChangingConfigurations = { activity?.isChangingConfigurations }
+                isActivityFinishing = { activity?.isFinishing ?: false },
+                isChangingConfigurations = { activity?.isChangingConfigurations ?: false }
             )
 
             onDispose {
@@ -238,8 +238,8 @@ class ModoScreenAndroidAdapter private constructor(
     internal fun subscribeToParentLifecycle(
         parentLifecycleOwner: LifecycleOwner,
         savedState: Bundle,
-        isActivityFinishing: () -> Boolean? = { null },
-        isChangingConfigurations: () -> Boolean? = { null }
+        isActivityFinishing: () -> Boolean,
+        isChangingConfigurations: () -> Boolean
     ): () -> Unit = lifecycleManager.subscribeToParentLifecycle(
         parentLifecycleOwner = parentLifecycleOwner,
         isActivityFinishing = isActivityFinishing,

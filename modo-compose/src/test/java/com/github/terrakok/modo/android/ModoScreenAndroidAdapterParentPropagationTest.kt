@@ -241,14 +241,30 @@ class ModoScreenAndroidAdapterParentPropagationTest {
     }
 
     @Test
-    fun `Given parent CREATED When entering composition and finish transition - Then screen STARTED`() {
-        parent.lifecycleState = STARTED
+    fun `Given parent CREATED When entering composition and finish transition - Then screen stays CREATED`() {
+        parent.lifecycleState = CREATED
         emulator.enterComposition(usesTransitionLifecycle = true)
-        assertEquals(STARTED, emulator.lifecycleState)
+        assertEquals(CREATED, emulator.lifecycleState)
 
         emulator.showTransitionFinished()
-        assertEquals(STARTED, emulator.lifecycleState)
+        assertEquals(CREATED, emulator.lifecycleState)
     }
+
+    // region Edge cases
+
+    @Test
+    fun `When showTransitionFinished called before enterComposition - Then it has no effect`() {
+        parent.lifecycleState = RESUMED
+        // Simulate a race: showTransitionFinished fires before composition enters
+        adapter.showTransitionFinished()
+        assertEquals(CREATED, emulator.lifecycleState)
+
+        // Normal composition entry afterward still works correctly (no transition lifecycle)
+        emulator.enterComposition(usesTransitionLifecycle = false)
+        assertEquals(RESUMED, emulator.lifecycleState)
+    }
+
+    // endregion
 
     // region Parent ON_DESTROY propagation - Activity lifecycle scenarios
 

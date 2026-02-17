@@ -62,8 +62,8 @@ class CompositionLifecycleEmulator(
 
     fun enterComposition(
         usesTransitionLifecycle: Boolean = false,
-        isActivityFinishing: () -> Boolean? = { false },
-        isChangingConfigurations: () -> Boolean? = { false }
+        isActivityFinishing: () -> Boolean = { false },
+        isChangingConfigurations: () -> Boolean = { false }
     ) {
         check(!isInComposition) { "Already in composition" }
         isInComposition = true
