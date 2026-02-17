@@ -40,7 +40,7 @@ class ModoScreenAndroidAdapterParentPropagationTest {
     // region Parent RESUMED, screen enter composition
 
     @Test
-    fun `Given parent RESUMED and auto resume When enter composition - Then screen RESUMED`() {
+    fun `Given parent RESUMED and no transition When enter composition - Then screen RESUMED`() {
         parent.lifecycleState = RESUMED
         emulator.enterComposition()
 
@@ -48,7 +48,7 @@ class ModoScreenAndroidAdapterParentPropagationTest {
     }
 
     @Test
-    fun `Given parent RESUMED and manual resume When enter composition - Then screen STARTED`() {
+    fun `Given parent RESUMED and transition lifecycle When enter composition - Then screen STARTED`() {
         parent.lifecycleState = RESUMED
         emulator.enterComposition(usesTransitionLifecycle = true)
 
@@ -60,7 +60,7 @@ class ModoScreenAndroidAdapterParentPropagationTest {
     // region Parent STARTED (animation in progress), screen enter composition
 
     @Test
-    fun `Given parent STARTED and auto resume When enter composition without manual resume - Then screen STARTED`() {
+    fun `Given parent STARTED and no transition When enter composition - Then screen STARTED`() {
         parent.lifecycleState = STARTED
 
         emulator.enterComposition()
@@ -68,7 +68,7 @@ class ModoScreenAndroidAdapterParentPropagationTest {
     }
 
     @Test
-    fun `Given parent STARTED and manual resume When enter composition without manual resume - Then screen RESUMED`() {
+    fun `Given parent STARTED and transition lifecycle When enter composition - Then screen STARTED`() {
         parent.lifecycleState = STARTED
 
         emulator.enterComposition(usesTransitionLifecycle = true)
@@ -82,7 +82,7 @@ class ModoScreenAndroidAdapterParentPropagationTest {
     // region Screen is not in transition, parent changes state
 
     @Test
-    fun `Given auto resume When parent moves RESUMED to STARTED to RESUMED - Then adapter follows parent`() {
+    fun `Given no transition When parent moves RESUMED to STARTED to RESUMED - Then adapter follows parent`() {
         parent.lifecycleState = RESUMED
 
         emulator.enterComposition()
@@ -96,7 +96,7 @@ class ModoScreenAndroidAdapterParentPropagationTest {
     }
 
     @Test
-    fun `Given manual resume When parent moves RESUMED to STARTED to RESUMED - Then adapter follows parent`() {
+    fun `Given transition lifecycle When parent moves RESUMED to STARTED to RESUMED - Then adapter follows parent`() {
         parent.lifecycleState = RESUMED
 
         emulator.enterComposition(usesTransitionLifecycle = true)
@@ -113,7 +113,7 @@ class ModoScreenAndroidAdapterParentPropagationTest {
     }
 
     @Test
-    fun `Given auto resume Test parent moves from RESUMED to CREATED to RESUMED`() {
+    fun `Given no transition When parent moves from RESUMED to CREATED to RESUMED - Then adapter follows parent`() {
         parent.lifecycleState = RESUMED
 
         emulator.enterComposition()
@@ -129,7 +129,7 @@ class ModoScreenAndroidAdapterParentPropagationTest {
     // endregion
 
     @Test
-    fun `Given manual resume and parent animating Verify states When transition finished after parent moves to RESUMED`() {
+    fun `Given transition lifecycle and parent STARTED When parent moves to RESUMED then transition finishes - Then screen RESUMED`() {
         parent.lifecycleState = STARTED
 
         emulator.enterComposition(usesTransitionLifecycle = true)
@@ -143,7 +143,7 @@ class ModoScreenAndroidAdapterParentPropagationTest {
     }
 
     @Test
-    fun `Given manual resume and STARTED parent Test transition finished before parent moves to RESUMED`() {
+    fun `Given transition lifecycle and parent STARTED When transition finishes before parent moves to RESUMED - Then screen stays STARTED until parent RESUMED`() {
         parent.lifecycleState = STARTED
 
         emulator.enterComposition(usesTransitionLifecycle = true)
@@ -161,7 +161,7 @@ class ModoScreenAndroidAdapterParentPropagationTest {
     // Parent resumed all time
     // Child animating in and animating out
     @Test
-    fun `Given manual resume parent RESUMED Test screen transition showing and hiding`() {
+    fun `Given transition lifecycle and parent RESUMED When show transition finishes then hide transition starts - Then screen moves RESUMED to STARTED`() {
         parent.lifecycleState = RESUMED
 
         emulator.enterComposition(usesTransitionLifecycle = true)
@@ -182,7 +182,7 @@ class ModoScreenAndroidAdapterParentPropagationTest {
     // Parent animation finishes
     // Child animation finishes
     @Test
-    fun `Given manual resume parent STARTED Test showTransitionFinished then hideTransitionStarted`() {
+    fun `Given transition lifecycle and parent STARTED When show transition finishes then hide transition starts - Then screen stays STARTED`() {
         parent.lifecycleState = STARTED
 
         emulator.enterComposition(usesTransitionLifecycle = true)

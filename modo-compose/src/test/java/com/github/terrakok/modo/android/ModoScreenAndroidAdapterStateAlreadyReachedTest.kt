@@ -21,7 +21,7 @@ class ModoScreenAndroidAdapterStateAlreadyReachedTest {
 
     @ParameterizedTest(name = "State={0}, Event={1} -> shouldSkip={2}")
     @MethodSource("testCases")
-    fun `needSkipEvent returns correct result`(
+    fun `stateAlreadyReached returns correct result`(
         state: Lifecycle.State,
         event: Lifecycle.Event,
         shouldSkip: Boolean
