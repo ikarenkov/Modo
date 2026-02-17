@@ -145,7 +145,8 @@ class ModoScreenAndroidAdapter private constructor(
         viewModelStore.clear()
     }
 
-    private fun onCreate(savedState: Bundle?) {
+    @VisibleForTesting
+    internal fun onCreate(savedState: Bundle?) {
         check(!isCreated) { "onCreate already called" }
         isCreated = true
         controller.performRestore(savedState)
@@ -236,7 +237,7 @@ class ModoScreenAndroidAdapter private constructor(
     @VisibleForTesting
     internal fun subscribeToParentLifecycle(
         parentLifecycleOwner: LifecycleOwner,
-        savedState: Bundle? = null,
+        savedState: Bundle,
         isActivityFinishing: () -> Boolean? = { null },
         isChangingConfigurations: () -> Boolean? = { null }
     ): () -> Unit = lifecycleManager.subscribeToParentLifecycle(
@@ -245,7 +246,7 @@ class ModoScreenAndroidAdapter private constructor(
         isChangingConfigurations = isChangingConfigurations,
         onEventBeforePropagation = { event ->
             // Handle SavedState side-effect (adapter's responsibility)
-            if (event == ON_STOP && savedState != null) {
+            if (event == ON_STOP) {
                 performSave(savedState)
             }
         }

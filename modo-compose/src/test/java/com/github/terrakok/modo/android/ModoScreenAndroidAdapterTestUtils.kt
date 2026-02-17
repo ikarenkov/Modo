@@ -50,7 +50,7 @@ class CompositionLifecycleEmulator(
     private val parentLifecycleOwner: TestLifecycleOwner,
 ) {
 
-    private var manualResumePause: Boolean = false
+    private var usesTransitionLifecycle: Boolean = false
     private val savedState = Bundle()
     private var unsubscribeFromParent: (() -> Unit)? = null
     private var isInComposition = false
@@ -61,16 +61,16 @@ class CompositionLifecycleEmulator(
     }
 
     fun enterComposition(
-        manualResumePause: Boolean = false,
+        usesTransitionLifecycle: Boolean = false,
         isActivityFinishing: () -> Boolean? = { false },
         isChangingConfigurations: () -> Boolean? = { false }
     ) {
         check(!isInComposition) { "Already in composition" }
         isInComposition = true
 
-        this.manualResumePause = manualResumePause
+        this.usesTransitionLifecycle = usesTransitionLifecycle
 
-        adapter.lifecycleManager.handleCompositionEnter(manualResumePause)
+        adapter.lifecycleManager.handleCompositionEnter(usesTransitionLifecycle)
 
         unsubscribeFromParent = adapter.subscribeToParentLifecycle(
             parentLifecycleOwner = parentLifecycleOwner,
@@ -103,9 +103,6 @@ class CompositionLifecycleEmulator(
         get() = parentLifecycleOwner.lifecycle.currentState
 
     private fun initializeAdapter() {
-        val onCreate = ModoScreenAndroidAdapter::class.java
-            .getDeclaredMethod("onCreate", Bundle::class.java)
-        onCreate.isAccessible = true
-        onCreate.invoke(adapter, savedState)
+        adapter.onCreate(savedState)
     }
 }

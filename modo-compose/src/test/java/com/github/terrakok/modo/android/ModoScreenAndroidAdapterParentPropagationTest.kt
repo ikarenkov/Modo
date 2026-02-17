@@ -50,7 +50,7 @@ class ModoScreenAndroidAdapterParentPropagationTest {
     @Test
     fun `Given parent RESUMED and manual resume When enter composition - Then screen STARTED`() {
         parent.lifecycleState = RESUMED
-        emulator.enterComposition(manualResumePause = true)
+        emulator.enterComposition(usesTransitionLifecycle = true)
 
         assertEquals(STARTED, emulator.lifecycleState)
     }
@@ -71,7 +71,7 @@ class ModoScreenAndroidAdapterParentPropagationTest {
     fun `Given parent STARTED and manual resume When enter composition without manual resume - Then screen RESUMED`() {
         parent.lifecycleState = STARTED
 
-        emulator.enterComposition(manualResumePause = true)
+        emulator.enterComposition(usesTransitionLifecycle = true)
         assertEquals(STARTED, emulator.lifecycleState)
     }
 
@@ -99,7 +99,7 @@ class ModoScreenAndroidAdapterParentPropagationTest {
     fun `Given manual resume When parent moves RESUMED to STARTED to RESUMED - Then adapter follows parent`() {
         parent.lifecycleState = RESUMED
 
-        emulator.enterComposition(manualResumePause = true)
+        emulator.enterComposition(usesTransitionLifecycle = true)
         assertEquals(STARTED, emulator.lifecycleState)
 
         emulator.showTransitionFinished()
@@ -132,7 +132,7 @@ class ModoScreenAndroidAdapterParentPropagationTest {
     fun `Given manual resume and parent animating Verify states When transition finished after parent moves to RESUMED`() {
         parent.lifecycleState = STARTED
 
-        emulator.enterComposition(manualResumePause = true)
+        emulator.enterComposition(usesTransitionLifecycle = true)
         assertEquals(STARTED, emulator.lifecycleState)
 
         parent.lifecycleState = RESUMED
@@ -146,7 +146,7 @@ class ModoScreenAndroidAdapterParentPropagationTest {
     fun `Given manual resume and STARTED parent Test transition finished before parent moves to RESUMED`() {
         parent.lifecycleState = STARTED
 
-        emulator.enterComposition(manualResumePause = true)
+        emulator.enterComposition(usesTransitionLifecycle = true)
         assertEquals(STARTED, emulator.lifecycleState)
 
         adapter.showTransitionFinished()
@@ -164,7 +164,7 @@ class ModoScreenAndroidAdapterParentPropagationTest {
     fun `Given manual resume parent RESUMED Test screen transition showing and hiding`() {
         parent.lifecycleState = RESUMED
 
-        emulator.enterComposition(manualResumePause = true)
+        emulator.enterComposition(usesTransitionLifecycle = true)
         assertEquals(STARTED, emulator.lifecycleState)
 
         adapter.showTransitionFinished()
@@ -185,7 +185,7 @@ class ModoScreenAndroidAdapterParentPropagationTest {
     fun `Given manual resume parent STARTED Test showTransitionFinished then hideTransitionStarted`() {
         parent.lifecycleState = STARTED
 
-        emulator.enterComposition(manualResumePause = true)
+        emulator.enterComposition(usesTransitionLifecycle = true)
         assertEquals(STARTED, emulator.lifecycleState)
 
         adapter.showTransitionFinished()
@@ -233,18 +233,17 @@ class ModoScreenAndroidAdapterParentPropagationTest {
     @Test
     fun `Given parent STARTED When entering composition and finish transition - Then screen STARTED`() {
         parent.lifecycleState = STARTED
-        emulator.enterComposition(manualResumePause = true)
+        emulator.enterComposition(usesTransitionLifecycle = true)
         assertEquals(STARTED, emulator.lifecycleState)
 
         emulator.showTransitionFinished()
         assertEquals(STARTED, emulator.lifecycleState)
     }
 
-    // TODO: should it be like this? Maybe screen should be created to follow global logic of lifecycle hierarchy? Is it possible in real use?
     @Test
     fun `Given parent CREATED When entering composition and finish transition - Then screen STARTED`() {
         parent.lifecycleState = STARTED
-        emulator.enterComposition(manualResumePause = true)
+        emulator.enterComposition(usesTransitionLifecycle = true)
         assertEquals(STARTED, emulator.lifecycleState)
 
         emulator.showTransitionFinished()
