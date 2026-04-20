@@ -245,9 +245,6 @@ private fun rememberButtons(
                         ModoButtonSpec("Animation Playground") {
                             navigation?.forward(AnimationPlaygroundScreen())
                         },
-                        ModoButtonSpec("Self made navigation") {
-                            navigation?.forward(SelfMadeSampleScreen())
-                        },
                     )
                 ),
             )
