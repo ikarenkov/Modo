@@ -14,6 +14,7 @@ import com.github.terrakok.modo.sample.ModoLegacyIntegrationActivity
 import com.github.terrakok.modo.sample.ModoSampleActivity
 import com.github.terrakok.modo.sample.fragment.ModoFragment
 import com.github.terrakok.modo.sample.fragment.ModoFragmentIntegrationActivity
+import com.github.terrakok.modo.sample.fragment.ModoLegacyIntegrationFragment
 import com.github.terrakok.modo.sample.quickstart.QuickStartActivity
 import com.github.terrakok.modo.sample.screens.base.ButtonsScreenContent
 import com.github.terrakok.modo.sample.screens.containers.CustomStackSample
@@ -199,7 +200,10 @@ private fun rememberButtons(
                             navigation?.dispatch(OpenActivityAction<QuickStartActivity>(context))
                         },
                         ModoButtonSpec("Fragment integration") {
-                            navigation?.dispatch(OpenActivityAction<ModoFragmentIntegrationActivity>(context))
+                            context.startActivity(ModoFragmentIntegrationActivity.createIntent(context))
+                        },
+                        ModoButtonSpec("Legacy Fragment integration") {
+                            context.startActivity(ModoFragmentIntegrationActivity.createIntent(context, useLegacy = true))
                         },
                         activity?.let { activity ->
                             if (canOpenFragment) {
@@ -207,6 +211,18 @@ private fun rememberButtons(
                                     activity.supportFragmentManager.beginTransaction()
                                         .replace(android.R.id.content, ModoFragment())
                                         .addToBackStack("ModoFragment")
+                                        .commit()
+                                }
+                            } else {
+                                null
+                            }
+                        },
+                        activity?.let { activity ->
+                            if (canOpenFragment) {
+                                ModoButtonSpec("New legacy fragment") {
+                                    activity.supportFragmentManager.beginTransaction()
+                                        .replace(android.R.id.content, ModoLegacyIntegrationFragment())
+                                        .addToBackStack("ModoLegacyIntegrationFragment")
                                         .commit()
                                 }
                             } else {
@@ -223,6 +239,9 @@ private fun rememberButtons(
                         },
                         ModoButtonSpec("Animation Playground") {
                             navigation?.forward(AnimationPlaygroundScreen())
+                        },
+                        ModoButtonSpec("Self made navigation") {
+                            navigation?.forward(SelfMadeSampleScreen())
                         },
                     )
                 ),

@@ -17,7 +17,10 @@ import com.github.terrakok.modo.sample.screens.MainScreen
 import com.github.terrakok.modo.sample.screens.containers.SampleStack
 
 /**
- * Sample of integration Modo into the fragment
+ * Demonstrates the recommended way to integrate Modo into a Fragment using [rememberRootScreen].
+ *
+ * All lifecycle concerns (state saving, screen model cleanup) are handled automatically.
+ * For the manual alternative, see [ModoLegacyIntegrationFragment].
  */
 class ModoFragment : Fragment() {
 
