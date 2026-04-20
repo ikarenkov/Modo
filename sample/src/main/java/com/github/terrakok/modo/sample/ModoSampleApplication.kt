@@ -17,6 +17,9 @@ class ModoSampleApplication : Application() {
         ModoDevOptions.onIllegalClearState = ModoDevOptions.ValidationFailedStrategy { throwable ->
             throw throwable
         }
+        ModoDevOptions.onIllegalLifecycleUpdate = ModoDevOptions.ValidationFailedStrategy { throwable ->
+            throw throwable
+        }
         ModoDevOptions.onScreenDisposeListener = {
             it.logcat { "Screen disposed" }
         }

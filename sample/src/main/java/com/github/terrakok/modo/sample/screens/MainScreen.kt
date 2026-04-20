@@ -3,6 +3,7 @@ package com.github.terrakok.modo.sample.screens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -95,6 +96,8 @@ internal fun Screen.MainScreenContent(
     modifier: Modifier = Modifier,
     canOpenFragment: Boolean = false,
 ) {
+    val counterState = remember { mutableIntStateOf(0) }
+    counterState.intValue = counter
     ButtonsScreenContent(
         screenIndex = screenIndex,
         screenName = "MainScreen",
@@ -105,7 +108,8 @@ internal fun Screen.MainScreenContent(
             i = screenIndex,
             canOpenFragment = canOpenFragment
         ),
-        counter = counter,
+        counterState = counterState,
+        enableCounter = true,
         modifier = modifier
     )
 }
@@ -142,6 +146,7 @@ private fun rememberButtons(
                         ModoButtonSpec("Stack actions") { navigation?.forward(StackActionsScreen(i + 1)) },
                         ModoButtonSpec("HorizontalPager") { navigation?.forward(HorizontalPagerScreen()) },
                         ModoButtonSpec("Custom Stack") { navigation?.forward(CustomStackSample(i + 1)) },
+                        ModoButtonSpec("No animation Stack") { navigation?.forward(CustomStackSample(i + 1, hasAnimation = false)) },
                         ModoButtonSpec("Stacks in LazyColumn") { navigation?.forward(StackInLazyColumnScreen()) },
                         ModoButtonSpec("Dialogs & BottomSheets") { navigation?.forward(DialogsPlayground(i + 1)) },
                         ModoButtonSpec("Multiscreen") { navigation?.forward(SampleMultiScreen()) },

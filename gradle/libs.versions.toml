@@ -1,8 +1,10 @@
 [versions]
 composeWheelPicker = "1.0.0-beta05"
 leakcanaryAndroid = "2.14"
-modo = "0.11.0"
-androidGradlePlugin = "8.13.0"
+modo = "0.11.0-rc2"
+#noinspection AndroidGradlePluginVersion
+androidGradlePlugin = "8.13.2"
+nexusPublish = "2.0.0"
 detektComposeVersion = "0.3.20"
 detektVersion = "1.23.6"
 junit = "4.13.2"
@@ -47,6 +49,7 @@ detekt-composeRules = { module = "io.nlopez.compose.rules:detekt", version.ref =
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detektVersion" }
 leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroid" }
 test-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version = "5.10.1" }
+test-androidx-arch-core = { group = "androidx.arch.core", name = "core-testing", version = "2.2.0" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 
 debug-logcat = { group = "com.squareup.logcat", name = "logcat", version = "0.1" }
@@ -73,6 +76,7 @@ modo-compose-library = { id = "modo-jetpack-compose-library" }
 modo-collectSarif = { id = "modo-collect-sarif" }
 
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detektVersion" }
+nexus-publish = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexusPublish" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

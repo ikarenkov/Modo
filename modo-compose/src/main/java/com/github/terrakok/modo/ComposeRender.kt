@@ -13,10 +13,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.Lifecycle.Event.ON_PAUSE
-import androidx.lifecycle.Lifecycle.Event.ON_RESUME
-import androidx.lifecycle.Lifecycle.Event.ON_START
-import androidx.lifecycle.Lifecycle.Event.ON_STOP
 import com.github.terrakok.modo.android.ModoScreenAndroidAdapter
 import com.github.terrakok.modo.android.overlaySaveableStateKey
 import com.github.terrakok.modo.animation.ScreenTransition
@@ -47,6 +43,16 @@ private val LocalPreDispose = staticCompositionLocalOf<() -> Unit> {
 
 private const val TAG = "ComposeRenderer"
 
+/**
+ * Internal CompositionLocal that signals whether a screen is being rendered within a transition context.
+ * - `true`: Screen lifecycle should be manually controlled by transition (paused/resumed based on animation state)
+ * - `false`: Screen lifecycle auto-resumes immediately (no animation control needed)
+ *
+ * This is automatically provided by [ScreenTransition] and consumed by [SaveableContent].
+ * Each [SaveableContent] call resets this to `false` for its children to prevent false positives.
+ */
+internal val LocalInTransitionContext = staticCompositionLocalOf { false }
+
 internal inline val Screen.saveableStateKey: String get() = screenKey.value
 
 /**
@@ -55,24 +61,23 @@ internal inline val Screen.saveableStateKey: String get() = screenKey.value
  * 2. Adds support of Android-related features, such as ViewModel, LifeCycle and SavedStateHandle.
  * 3. Handles lifecycle of [Screen] by adding [DisposableEffect] before and after content, in order to notify [ComposeRenderer]
  *    when [Screen.Content] is about to leave composition and when it has left composition.
- * @param modifier is a modifier that will be passed into [Screen.Content]
- * @param manualResumePause define whenever we are going to manually call [LifecycleDependency.showTransitionFinished] and [LifecycleDependency.hideTransitionStarted]
- * to emmit [ON_RESUME] and [ON_PAUSE]. Otherwise, [ON_RESUME] will be called straight after [ON_START] and [ON_PAUSE] will be called straight
- * before [ON_STOP].
  *
- * F.e. it is used by [ScreenTransition]:
- * + [ON_RESUME] emitted when animation of showing screen is finished
- * + [ON_PAUSE] emitted when animation of hiding screen is started
+ * @param modifier is a modifier that will be passed into [Screen.Content]
  */
 @Composable
 fun Screen.SaveableContent(
-    modifier: Modifier = Modifier,
-    manualResumePause: Boolean = false
+    modifier: Modifier = Modifier
 ) {
-    LocalSaveableStateHolder.currentOrThrow.SaveableStateProvider(key = saveableStateKey) {
-        SetupScreenCleanup()
-        ModoScreenAndroidAdapter.get(this).ProvideAndroidIntegration(manualResumePause) {
-            Content(modifier)
+    // Read transition context from parent before resetting for children
+    val usesTransitionLifecycle = LocalInTransitionContext.current
+
+    // Reset for children to prevent propagation beyond this screen
+    CompositionLocalProvider(LocalInTransitionContext provides false) {
+        LocalSaveableStateHolder.currentOrThrow.SaveableStateProvider(key = saveableStateKey) {
+            SetupScreenCleanup()
+            ModoScreenAndroidAdapter.get(this).ProvideAndroidIntegration(usesTransitionLifecycle) {
+                Content(modifier)
+            }
         }
     }
 }

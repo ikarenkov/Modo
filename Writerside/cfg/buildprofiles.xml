@@ -1,19 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE buildprofiles SYSTEM "https://resources.jetbrains.com/writerside/1.0/build-profiles.dtd">
 <buildprofiles xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/build-profiles.xsd">
 
     <build-profile instance="modo-docs">
         <variables>
-            <noindex-content>false</noindex-content>
-            <product-web-url>https://github.com/ikarenkov/Modo</product-web-url>
+        <!-- Search Engine Indexing -->
+        <noindex-content>false</noindex-content>
 
-            <enable-browser-edits>true</enable-browser-edits>
-            <browser-edits-url>https://github.com/ikarenkov/Modo/blob/dev/Writerside/</browser-edits-url>
+        <!-- Product URLs -->
+        <product-web-url>https://github.com/ikarenkov/Modo</product-web-url>
 
-            <showDownloadButton>true</showDownloadButton>
-            <download-title>GitHub</download-title>
-            <download-page>%github_url%</download-page>
-        </variables>
+        <!-- Browser Edits (Edit on GitHub) -->
+        <enable-browser-edits>true</enable-browser-edits>
+        <browser-edits-url>https://github.com/ikarenkov/Modo/edit/dev/Writerside/</browser-edits-url>
+
+        <showDownloadButton>true</showDownloadButton>
+        <download-title>GitHub</download-title>
+        <download-page>%github_url%</download-page>
     </build-profile>
 
 </buildprofiles>
