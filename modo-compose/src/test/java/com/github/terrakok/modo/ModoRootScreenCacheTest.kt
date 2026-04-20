@@ -143,6 +143,7 @@ class ModoRootScreenCacheTest {
         Modo.rootScreens[ScreenKey("k")] = cached
 
         val newCandidate = RootScreen(MockScreen(ScreenKey("k")))
+
         @Suppress("UNCHECKED_CAST")
         val result = Modo.rootScreens.getOrPut(ScreenKey("k")) { newCandidate } as RootScreen<MockScreen>
 
