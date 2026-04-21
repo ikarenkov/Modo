@@ -1,13 +1,14 @@
 [versions]
 composeWheelPicker = "1.0.0-beta05"
 leakcanaryAndroid = "2.14"
-modo = "0.11.0-rc2"
+modo = "0.11.0"
 #noinspection AndroidGradlePluginVersion
 androidGradlePlugin = "8.13.2"
 nexusPublish = "2.0.0"
 detektComposeVersion = "0.3.20"
 detektVersion = "1.23.6"
 junit = "4.13.2"
+mockk = "1.13.12"
 androidxComposeBomModo = "2025.11.01"
 androidxComposeBomApp = "2025.11.01"
 androidxActivityCompose = "1.8.2"
@@ -49,6 +50,7 @@ detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", 
 leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroid" }
 test-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version = "5.10.1" }
 test-androidx-arch-core = { group = "androidx.arch.core", name = "core-testing", version = "2.2.0" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 
 debug-logcat = { group = "com.squareup.logcat", name = "logcat", version = "0.1" }
 

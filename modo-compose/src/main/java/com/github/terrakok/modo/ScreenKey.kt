@@ -18,10 +18,10 @@ internal val screenCounterKey = AtomicInteger(-1)
 fun generateScreenKey(): ScreenKey = ScreenKey("Screen#${screenCounterKey.incrementAndGet()}")
 
 /**
- * Restores the screen counter to the given value.
- * It's safe to call this multiple times, because it restores the value only if it's not already set.
+ * Restores the screen counter to [value] only if it hasn't been set yet (counter == -1).
+ * Logs a warning if the counter is already set to a different value.
  */
-internal fun restoreScreenCounter(value: Int) {
+internal fun restoreScreenCounterIfNeeded(value: Int) {
     if (screenCounterKey.get() == -1 || screenCounterKey.get() == value) {
         screenCounterKey.set(value)
     } else {

@@ -38,6 +38,7 @@ dependencies {
     testImplementation(libs.test.junit.jupiter)
     testImplementation(kotlin("test"))
     testImplementation(libs.test.androidx.arch.core)
+    testImplementation(libs.mockk)
 }
 
 tasks.withType(Test::class) {
