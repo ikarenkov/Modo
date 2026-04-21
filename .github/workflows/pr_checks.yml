@@ -23,7 +23,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: "Run static analysis"
-        run: ./gradlew detektAll mergeLintSarif
+        run: ./gradlew detektAll lintReportDebug mergeLintSarif
         continue-on-error: false
 
       - name: "Upload Detkt sarif results"

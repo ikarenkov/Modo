@@ -36,6 +36,7 @@ dependencies {
     implementation(libs.koin.compose)
 
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons)
 
     implementation(libs.debug.logcat)
     implementation(libs.kotlinx.coroutines.android)

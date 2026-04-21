@@ -13,6 +13,12 @@ dependencyGuard {
 
 android {
     namespace = "com.github.terrakok.modo.android.compose"
+
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+        }
+    }
 }
 
 dependencies {
@@ -31,6 +37,8 @@ dependencies {
 
     testImplementation(libs.test.junit.jupiter)
     testImplementation(kotlin("test"))
+    testImplementation(libs.test.androidx.arch.core)
+    testImplementation(libs.mockk)
 }
 
 tasks.withType(Test::class) {

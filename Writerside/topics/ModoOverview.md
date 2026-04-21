@@ -1,5 +1,3 @@
-Here's the improved version of your documentation text:
-
 # Modo Overview
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.terrakok/modo-compose)](https://repo1.maven.org/maven2/com/github/terrakok)

@@ -3,6 +3,7 @@ package com.github.terrakok.modo.sample.screens.base
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,33 +12,50 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.IntState
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.currentStateAsState
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.sample.SampleAppConfig
+import com.github.terrakok.modo.sample.components.BackButton
+import com.github.terrakok.modo.sample.logs.logcat
 import com.github.terrakok.modo.sample.randomBackground
 import com.github.terrakok.modo.sample.screens.ButtonsState
 import com.github.terrakok.modo.sample.screens.GroupedButtonsList
 import com.github.terrakok.modo.sample.screens.GroupedButtonsState
 import com.github.terrakok.modo.sample.screens.ModoButtonSpec
+import com.github.terrakok.modo.stack.LocalStackNavigation
+import com.github.terrakok.modo.stack.back
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import logcat.logcat
 
 internal const val COUNTER_DELAY_MS = 100L
 
@@ -47,10 +65,27 @@ internal fun Screen.ButtonsScreenContent(
     screenName: String,
     state: GroupedButtonsState,
     modifier: Modifier = Modifier,
+    windowInsets: WindowInsets = WindowInsets.systemBars,
+    logLifecycle: Boolean = true,
+    enableCounter: Boolean = true,
+    @Suppress("ComposableLambdaParameterNaming")
+    topRightButtonSlot: @Composable () -> Unit = {},
 ) {
-    LogLifecycle()
-    val counter by rememberCounterState()
-    ButtonsScreenContent(screenIndex, screenName, counter, screenKey, state, modifier)
+    if (logLifecycle) {
+        LogLifecycle()
+    }
+    val counterState = rememberCounterState()
+    ButtonsScreenContent(
+        screenIndex = screenIndex,
+        screenName = screenName,
+        counterState = counterState,
+        enableCounter = enableCounter,
+        screenKey = screenKey,
+        state = state,
+        topRightButtonSlot = topRightButtonSlot,
+        windowInsets = windowInsets,
+        modifier = modifier
+    )
 }
 
 @Composable
@@ -71,16 +106,23 @@ fun rememberCounterState(): IntState {
 internal fun ButtonsScreenContent(
     screenIndex: Int,
     screenName: String,
-    counter: Int,
+    counterState: IntState,
+    enableCounter: Boolean,
     screenKey: ScreenKey,
     state: GroupedButtonsState,
     modifier: Modifier = Modifier,
+    windowInsets: WindowInsets = WindowInsets.systemBars,
+    @Suppress("ComposableLambdaParameterNaming")
+    topRightButtonSlot: @Composable () -> Unit = {}
 ) {
     SampleScreenContent(
         screenIndex = screenIndex,
         screenName = screenName,
-        counter = counter,
+        counterState = counterState,
+        enableCounter = enableCounter,
         screenKey = screenKey,
+        topRightButtonSlot = topRightButtonSlot,
+        windowInsets = windowInsets,
         modifier = modifier,
     ) {
         GroupedButtonsList(
@@ -96,27 +138,51 @@ internal fun Screen.SampleScreenContent(
     screenName: String,
     screenKey: ScreenKey,
     modifier: Modifier = Modifier,
+    windowInsets: WindowInsets = WindowInsets.systemBars,
     content: @Composable ColumnScope.() -> Unit
 ) {
     LogLifecycle()
-    val counter by rememberCounterState()
-    SampleScreenContent(screenIndex, screenName, counter, screenKey, modifier, content)
+    val counterState = rememberCounterState()
+    SampleScreenContent(
+        screenIndex = screenIndex,
+        screenName = screenName,
+        counterState = counterState,
+        enableCounter = true,
+        screenKey = screenKey,
+        modifier = modifier,
+        windowInsets = windowInsets,
+        content = content
+    )
+}
+
+@Composable
+private fun CounterText(
+    counterState: IntState,
+    enableCounter: Boolean,
+    modifier: Modifier = Modifier
+) {
+    if (enableCounter) {
+        Text(
+            text = counterState.intValue.toString(),
+            modifier = modifier
+        )
+    }
 }
 
 @OptIn(ExperimentalModoApi::class)
 @Composable
-fun Screen.LogLifecycle() {
+fun Screen.LogLifecycle(prefix: String = "") {
     val lifecycleOwner = LocalLifecycleOwner.current
 
     // You will not be able to observe updates of lifecycleOwner when this content is not in the composition
     DisposableEffect(lifecycleOwner) {
-        logcat(tag = "LifecycleDebug") { "$screenKey DisposableEffect" }
+        logcat("LogLifecycle") { "$prefix DisposableEffect $lifecycleOwner".trim() }
         val observer = LifecycleEventObserver { _, event ->
-            logcat(tag = "LifecycleDebug") { "$screenKey DisposableEffect $event" }
+            logcat("LogLifecycle") { "$prefix DisposableEffect $event $lifecycleOwner".trim() }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
-            logcat(tag = "LifecycleDebug") { "$screenKey DisposableEffect onDispose" }
+            logcat("LogLifecycle") { "$prefix DisposableEffect.onDispose $lifecycleOwner".trim() }
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
@@ -131,21 +197,54 @@ fun Screen.LogLifecycle() {
 internal fun SampleScreenContent(
     screenIndex: Int,
     screenName: String,
-    counter: Int,
+    counterState: IntState,
+    enableCounter: Boolean,
     screenKey: ScreenKey,
     modifier: Modifier = Modifier,
+    windowInsets: WindowInsets = WindowInsets.systemBars,
+    topRightButtonSlot: @Composable () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateAsState()
+    val topLineColor by remember {
+        derivedStateOf {
+            when (lifecycleState) {
+                Lifecycle.State.RESUMED -> Color.Green
+                Lifecycle.State.STARTED -> Color.Yellow
+                Lifecycle.State.CREATED,
+                Lifecycle.State.INITIALIZED,
+                Lifecycle.State.DESTROYED -> Color.Black
+            }
+        }
+    }
     Box(
         modifier = modifier
             .randomBackground()
-            .windowInsetsPadding(WindowInsets.systemBars)
-            .padding(8.dp),
+            .drawWithContent {
+                val strokeWidth = 8.dp.toPx()
+                drawRect(
+                    color = topLineColor,
+                    size = Size(width = size.width, height = strokeWidth)
+                )
+                drawContent()
+            }
+            .windowInsetsPadding(windowInsets),
     ) {
-        Column {
-            Text(
-                text = counter.toString()
-            )
+        Column(Modifier.padding(8.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val stackNavigation = if (LocalInspectionMode.current) null else LocalStackNavigation.current
+                BackButton(
+                    onClick = { stackNavigation?.back() },
+                )
+                CounterText(
+                    counterState = counterState,
+                    enableCounter = enableCounter,
+                    modifier = Modifier.weight(1f)
+                )
+                topRightButtonSlot()
+            }
             Text(
                 text = "$screenName $screenIndex",
                 style = MaterialTheme.typography.h5,
@@ -168,9 +267,11 @@ internal fun SampleScreenContent(
 @Preview
 @Composable
 private fun ButtonsPreview() {
+    val counterState = remember { mutableIntStateOf(666) }
     ButtonsScreenContent(
         screenIndex = 0,
-        counter = 666,
+        counterState = counterState,
+        enableCounter = true,
         screenName = "ButtonsPreview",
         screenKey = ScreenKey("ScreenKey"),
         state = ButtonsState(
@@ -181,6 +282,14 @@ private fun ButtonsPreview() {
                 ModoButtonSpec("Button with a very long text") {},
             )
         ),
+        topRightButtonSlot = {
+            IconButton(onClick = {}) {
+                Icon(
+                    painter = rememberVectorPainter(image = Icons.Filled.ArrowDropDown),
+                    contentDescription = null
+                )
+            }
+        },
         modifier = Modifier.fillMaxSize()
     )
 }

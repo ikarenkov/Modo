@@ -1,13 +1,16 @@
 [versions]
 composeWheelPicker = "1.0.0-beta05"
 leakcanaryAndroid = "2.14"
-modo = "0.10.1"
-androidGradlePlugin = "8.13.0"
+modo = "0.11.0"
+#noinspection AndroidGradlePluginVersion
+androidGradlePlugin = "8.13.2"
+nexusPublish = "2.0.0"
 detektComposeVersion = "0.3.20"
 detektVersion = "1.23.6"
 junit = "4.13.2"
-androidxComposeBomModo = "2024.03.00"
-androidxComposeBomApp = "2024.06.00"
+mockk = "1.13.12"
+androidxComposeBomModo = "2025.11.01"
+androidxComposeBomApp = "2025.11.01"
 androidxActivityCompose = "1.8.2"
 androidxLifecycle = "2.7.0"
 androidxCore = "1.13.1"
@@ -18,7 +21,7 @@ androidTools = "31.4.0"
 kotlin = "2.0.21"
 kotlinCompilerExtension = "1.5.12"
 minSdk = "21"
-compileSdk = "34"
+compileSdk = "36"
 koin = "4.0.0"
 
 [libraries]
@@ -30,7 +33,8 @@ androidx-compose-foundation-beta = { group = "androidx.compose.foundation", name
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-compose-animation = { group = "androidx.compose.animation", name = "animation" }
 androidx-compose-material = { group = "androidx.compose.material", name = "material" }
-androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version = "1.2.1" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version = "1.4.0" }
+androidx-compose-material-icons = { group = "androidx.compose.material", name = "material-icons-core" }
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivityCompose" }
@@ -45,6 +49,8 @@ detekt-composeRules = { module = "io.nlopez.compose.rules:detekt", version.ref =
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detektVersion" }
 leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroid" }
 test-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version = "5.10.1" }
+test-androidx-arch-core = { group = "androidx.arch.core", name = "core-testing", version = "2.2.0" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 
 debug-logcat = { group = "com.squareup.logcat", name = "logcat", version = "0.1" }
 
@@ -70,6 +76,7 @@ modo-compose-library = { id = "modo-jetpack-compose-library" }
 modo-collectSarif = { id = "modo-collect-sarif" }
 
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detektVersion" }
+nexus-publish = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexusPublish" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

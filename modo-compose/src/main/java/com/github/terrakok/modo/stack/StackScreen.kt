@@ -225,8 +225,8 @@ data class DialogPlaceHolder(
     @Composable
     override fun Content(modifier: Modifier) {
         Box(
-            // ignore modifier, because it is just invisible placeholder
-            modifier
+            // Make it fill the screen to animate dialog transitions properly.
+            modifier.fillMaxSize()
         )
     }
 

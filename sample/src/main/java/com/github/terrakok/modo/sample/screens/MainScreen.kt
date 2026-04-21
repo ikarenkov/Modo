@@ -3,6 +3,7 @@ package com.github.terrakok.modo.sample.screens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -14,6 +15,7 @@ import com.github.terrakok.modo.sample.ModoLegacyIntegrationActivity
 import com.github.terrakok.modo.sample.ModoSampleActivity
 import com.github.terrakok.modo.sample.fragment.ModoFragment
 import com.github.terrakok.modo.sample.fragment.ModoFragmentIntegrationActivity
+import com.github.terrakok.modo.sample.fragment.ModoLegacyIntegrationFragment
 import com.github.terrakok.modo.sample.quickstart.QuickStartActivity
 import com.github.terrakok.modo.sample.screens.base.ButtonsScreenContent
 import com.github.terrakok.modo.sample.screens.containers.CustomStackSample
@@ -94,6 +96,8 @@ internal fun Screen.MainScreenContent(
     modifier: Modifier = Modifier,
     canOpenFragment: Boolean = false,
 ) {
+    val counterState = remember { mutableIntStateOf(0) }
+    counterState.intValue = counter
     ButtonsScreenContent(
         screenIndex = screenIndex,
         screenName = "MainScreen",
@@ -104,7 +108,8 @@ internal fun Screen.MainScreenContent(
             i = screenIndex,
             canOpenFragment = canOpenFragment
         ),
-        counter = counter,
+        counterState = counterState,
+        enableCounter = true,
         modifier = modifier
     )
 }
@@ -141,6 +146,7 @@ private fun rememberButtons(
                         ModoButtonSpec("Stack actions") { navigation?.forward(StackActionsScreen(i + 1)) },
                         ModoButtonSpec("HorizontalPager") { navigation?.forward(HorizontalPagerScreen()) },
                         ModoButtonSpec("Custom Stack") { navigation?.forward(CustomStackSample(i + 1)) },
+                        ModoButtonSpec("No animation Stack") { navigation?.forward(CustomStackSample(i + 1, hasAnimation = false)) },
                         ModoButtonSpec("Stacks in LazyColumn") { navigation?.forward(StackInLazyColumnScreen()) },
                         ModoButtonSpec("Dialogs & BottomSheets") { navigation?.forward(DialogsPlayground(i + 1)) },
                         ModoButtonSpec("Multiscreen") { navigation?.forward(SampleMultiScreen()) },
@@ -199,7 +205,10 @@ private fun rememberButtons(
                             navigation?.dispatch(OpenActivityAction<QuickStartActivity>(context))
                         },
                         ModoButtonSpec("Fragment integration") {
-                            navigation?.dispatch(OpenActivityAction<ModoFragmentIntegrationActivity>(context))
+                            context.startActivity(ModoFragmentIntegrationActivity.createIntent(context))
+                        },
+                        ModoButtonSpec("Legacy Fragment integration") {
+                            context.startActivity(ModoFragmentIntegrationActivity.createIntent(context, useLegacy = true))
                         },
                         activity?.let { activity ->
                             if (canOpenFragment) {
@@ -207,6 +216,18 @@ private fun rememberButtons(
                                     activity.supportFragmentManager.beginTransaction()
                                         .replace(android.R.id.content, ModoFragment())
                                         .addToBackStack("ModoFragment")
+                                        .commit()
+                                }
+                            } else {
+                                null
+                            }
+                        },
+                        activity?.let { activity ->
+                            if (canOpenFragment) {
+                                ModoButtonSpec("New legacy fragment") {
+                                    activity.supportFragmentManager.beginTransaction()
+                                        .replace(android.R.id.content, ModoLegacyIntegrationFragment())
+                                        .addToBackStack("ModoLegacyIntegrationFragment")
                                         .commit()
                                 }
                             } else {

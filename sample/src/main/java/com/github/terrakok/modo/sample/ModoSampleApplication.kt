@@ -2,9 +2,9 @@ package com.github.terrakok.modo.sample
 
 import android.app.Application
 import com.github.terrakok.modo.ModoDevOptions
+import com.github.terrakok.modo.sample.logs.logcat
 import logcat.AndroidLogcatLogger
 import logcat.LogPriority
-import logcat.logcat
 
 class ModoSampleApplication : Application() {
 
@@ -15,7 +15,16 @@ class ModoSampleApplication : Application() {
             throw throwable
         }
         ModoDevOptions.onIllegalClearState = ModoDevOptions.ValidationFailedStrategy { throwable ->
-            logcat(priority = LogPriority.ERROR) { "Cleaning state of composable, which still can be visible for user." }
+            throw throwable
+        }
+        ModoDevOptions.onIllegalLifecycleUpdate = ModoDevOptions.ValidationFailedStrategy { throwable ->
+            throw throwable
+        }
+        ModoDevOptions.onScreenDisposeListener = {
+            it.logcat { "Screen disposed" }
+        }
+        ModoDevOptions.onScreenPreDisposeListener = {
+            it.logcat { "Screen preDisposed" }
         }
     }
 }

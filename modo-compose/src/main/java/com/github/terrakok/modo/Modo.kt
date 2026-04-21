@@ -14,6 +14,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.github.terrakok.modo.Modo.rememberRootScreen
+import com.github.terrakok.modo.Modo.rootScreens
+import com.github.terrakok.modo.Modo.save
 import com.github.terrakok.modo.model.ScreenModelStore
 import com.github.terrakok.modo.util.getActivity
 import java.util.concurrent.ConcurrentHashMap
@@ -26,58 +29,71 @@ object Modo {
     /**
      * Contains root screens to priovide stability of returned instance when use [rememberRootScreen] and return a same instance in per a process.
      */
-    private val rootScreens: MutableMap<ScreenKey, RootScreen<*>> = ConcurrentHashMap()
+    @org.jetbrains.annotations.VisibleForTesting
+    internal val rootScreens: MutableMap<ScreenKey, RootScreen<*>> = ConcurrentHashMap()
 
     /**
      * Saves provided screen with nested graph to bundle for further restoration.
      */
+    @Deprecated("Use rememberRootScreen, which handles saving and restoring automatically. Will be removed in 1.0.")
     fun save(outState: Bundle, rootScreen: Screen?) {
         outState.putInt(MODO_SCREEN_COUNTER_KEY, screenCounterKey.get())
         outState.putParcelable(MODO_GRAPH, rootScreen)
     }
 
     /**
-     * Creates [RootScreen] provided by [rootScreenProvider], if there is no data in [savedState] or in-memory.
-     * Otherwise [RootScreen] is firstly taking from memoryr and then restored from savedState, if there is no RootScreen in memory.
-     * Returns same instance of [RootScreen] for same process. A new instance returned only after process death.
-     * @param savedState - container with modo state and graph
-     * @param rootScreenProvider invokes when [savedState] is null and [inMemoryScreen] is null and we need to provide root screen.
+     * Returns the [RootScreen] for this host (Activity/Fragment), creating it if necessary.
+     * Guarantees the same instance is returned within a single process — a new instance is only
+     * created after process death.
+     *
+     * There are three scenarios, resolved in priority order:
+     *
+     * **1. Bundle restore** (`savedState != null`):
+     * The host was recreated by the system (config change or process death).
+     * - Config change (same process): [rootScreens] already holds the live instance → returned from cache.
+     * - Process death: [rootScreens] is empty → the graph is deserialized from [savedState],
+     *   stored in [rootScreens], and returned. [screenCounterKey] is restored to avoid key collisions.
+     *
+     * **2. In-memory hit** (`savedState == null`, [inMemoryScreen] != null):
+     * The host's view was destroyed without saving state (e.g. a Fragment going to the back stack).
+     * The Fragment is still alive and holds the previous [RootScreen] reference.
+     * [inMemoryScreen] provides the key to retrieve the same instance from [rootScreens].
+     *
+     * **3. First initialization** (`savedState == null`, [inMemoryScreen] == null):
+     * Fresh start — [rootScreenProvider] is called to build the initial screen, a new [RootScreen]
+     * is created, stored in [rootScreens], and returned.
+     *
+     * @param savedState bundle produced by [save], or null on first launch / back-stack return.
+     * @param inMemoryScreen existing [RootScreen] held by a non-destroyed Fragment (scenario 2).
+     *   Must be null for Activities and for the very first Fragment creation.
+     * @param rootScreenProvider called only in scenario 3 to construct the initial root screen.
      */
+    @Deprecated("Use rememberRootScreen, which handles all lifecycle concerns automatically. Will be removed in 1.0.")
     fun <T : Screen> getOrCreateRootScreen(savedState: Bundle?, inMemoryScreen: RootScreen<T>?, rootScreenProvider: () -> T): RootScreen<T> {
-        // taking saved state to obtain screenKey
-        val modoGraph = savedState?.getParcelable<RootScreen<T>>(MODO_GRAPH)
-        return if (modoGraph != null) {
-            // If restoring after activity death, but not after process death, then [inMemoryScreen] is null, but we have cached object in rootScreens
-            // So we trying to restore it from memory and only if it is null - taking it from savedState.
-            val cachedRootScreen = rootScreens.get(modoGraph.screenKey)?.let { it as RootScreen<T> }
-            if (cachedRootScreen != null) {
-                cachedRootScreen
-            } else {
-                restoreScreenCounter(savedState.getInt(MODO_SCREEN_COUNTER_KEY))
-                modoGraph
-            }
+        val savedModoGraph = savedState?.getParcelable<RootScreen<T>>(MODO_GRAPH)
+        return if (savedModoGraph != null) {
+            // Scenario 1: bundle restore.
+            // Config change → cache hit, process death → cache miss, savedModoGraph is stored.
+            restoreScreenCounterIfNeeded(savedState.getInt(MODO_SCREEN_COUNTER_KEY))
+            @Suppress("UNCHECKED_CAST")
+            rootScreens.getOrPut(savedModoGraph.screenKey) { savedModoGraph } as RootScreen<T>
         } else {
-            // saved state is going to be null after taking fragment from backstack, beckause in this case
-            // 1. onSaveInstaneState is not called
-            // 2. View is destroyed
-            // 3. Fragment is not destroyed and have inMemoryScreen != null if it is not a first call
-            inMemoryScreen ?: RootScreen(rootScreenProvider())
-        }.also { rootScreen ->
-            rootScreens.put(rootScreen.screenKey, rootScreen)
+            // Scenarios 2 & 3: no saved state.
+            // savedState is null after back-stack return because onSaveInstanceState is not called
+            // when a Fragment is only stopped (not destroyed), so inMemoryScreen carries the reference.
+            val screen = inMemoryScreen ?: RootScreen(rootScreenProvider()) // scenario 3: first init
+            @Suppress("UNCHECKED_CAST")
+            rootScreens.getOrPut(screen.screenKey) { screen } as RootScreen<T>
         }
     }
-
-    @Deprecated(
-        "Renamed it getOrCreateRootScreen to except misunderstanding. Use getOrCreateRootScreen instead.",
-        ReplaceWith("Modo.getOrCreateRootScreen(savedState, inMemoryScreen, rootScreenProvider)")
-    )
-    fun <T : Screen> init(savedState: Bundle?, inMemoryScreen: RootScreen<T>?, rootScreenProvider: () -> T): RootScreen<T> =
-        getOrCreateRootScreen(savedState, inMemoryScreen, rootScreenProvider)
 
     /**
      * Must be called to clear all data from [ScreenModelStore], related with removed screens.
      */
-    fun <T : Screen> onRootScreenFinished(rootScreen: RootScreen<T>?) {
+    @Deprecated("Use rememberRootScreen, which handles cleanup automatically. Will be removed in 1.0.")
+    fun <T : Screen> onRootScreenFinished(rootScreen: RootScreen<T>?) = finishRootScreen(rootScreen)
+
+    private fun <T : Screen> finishRootScreen(rootScreen: RootScreen<T>?) {
         if (rootScreen != null) {
             Log.d("Modo", "rootScreen removing $rootScreen")
             rootScreens.remove(rootScreen.screenKey)
@@ -101,7 +117,7 @@ object Modo {
         DisposableEffect(rootScreen, this) {
             onDispose {
                 if (isFinishing) {
-                    onRootScreenFinished(rootScreen)
+                    finishRootScreen(rootScreen)
                 }
             }
         }
@@ -114,7 +130,7 @@ object Modo {
             key = MODO_SCREEN_COUNTER_KEY,
             saver = Saver(
                 restore = {
-                    restoreScreenCounter(it as Int)
+                    restoreScreenCounterIfNeeded(it as Int)
                     it
                 },
                 save = {
@@ -132,16 +148,16 @@ object Modo {
         val rootScreen = rememberSaveable(
             key = MODO_GRAPH,
             saver = Saver(
-                save = { rootScreen ->
-                    rootScreens.put(rootScreen.screenKey, rootScreen)
-                    rootScreen
-                },
-                restore = { rootScreen ->
-                    rootScreens.get(rootScreen.screenKey)?.let { it as RootScreen<T> } ?: rootScreen
+                save = { it },
+                restore = { saved ->
+                    @Suppress("UNCHECKED_CAST")
+                    rootScreens.getOrPut(saved.screenKey) { saved } as RootScreen<T>
                 }
             )
         ) {
-            RootScreen(rootScreenFactory())
+            RootScreen(rootScreenFactory()).also { newRoot ->
+                rootScreens[newRoot.screenKey] = newRoot
+            }
         }
         return rootScreen
     }
@@ -169,17 +185,9 @@ object Modo {
             if (!hasAnyObserver) {
                 hasAnyObserver = true
                 val activity = context.getActivity()!!
-                val lifecycleObserver = LifecycleEventObserver { owner, event ->
-                    // If parent activity is finishes - fragment also is finishing.
-                    // But if activity is not finishes, then it can be just fragment removal from backstack.
-                    // This check is not taking into account the case, when an activity is destroyed by system, but it is going to be restored.
-
-                    if (event == Lifecycle.Event.ON_DESTROY) {
-                        val activityFinishing = activity.isFinishing
-                        val fragmentRemovedFromBackStack = !activityFinishing && !activity.isChangingConfigurations && !isStateSaved
-                        if (activityFinishing || fragmentRemovedFromBackStack) {
-                            onRootScreenFinished(rootScreen)
-                        }
+                val lifecycleObserver = LifecycleEventObserver { _, event ->
+                    if (isFragmentClosing(event, activity)) {
+                        finishRootScreen(rootScreen)
                     }
                 }
                 lifecycle.addObserver(lifecycleObserver)
@@ -197,3 +205,15 @@ object Modo {
     }
 
 }
+
+/**
+ * Returns true when the fragment is being permanently destroyed and its state should be cleaned up.
+ * Returns false when the fragment will be restored (config change or system-initiated process death).
+ */
+fun Fragment.isFragmentClosing(event: Lifecycle.Event, activity: Activity): Boolean =
+// ON_DESTROY is the only moment when isStateSaved and isChangingConfigurations are reliable.
+// Activity finishing covers user-initiated close (back press, finish()).
+// The second condition covers fragment removal from backstack:
+    // no config change and state wasn't saved means the fragment won't be restored.
+    event == Lifecycle.Event.ON_DESTROY &&
+        (activity.isFinishing || (!activity.isChangingConfigurations && !isStateSaved))
