@@ -17,8 +17,3 @@ settings.xml
 
 # GPG
 *.gpg
-
-# Task working docs (opt-in commit per task by whitelisting the subfolder)
-tasks/*
-!tasks/navmodel-encapsulation/
-!tasks/.gitkeep
