@@ -24,6 +24,13 @@ import com.github.terrakok.modo.logs.devLogV
 import com.github.terrakok.modo.model.ScreenModelStore
 import com.github.terrakok.modo.model.dependenciesSortedByRemovePriority
 import com.github.terrakok.modo.util.currentOrThrow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.launch
 
 typealias RendererContent<State> = @Composable ComposeRendererScope<State>.(Modifier) -> Unit
 
@@ -151,24 +158,32 @@ class ComposeRendererScope<State : NavigationState>(
  */
 internal class ComposeRenderer<State : NavigationState>(
     private val containerScreen: ContainerScreen<*, *>,
-) : NavigationRenderer<State> {
+    navigationStateFlow: StateFlow<State>,
+) {
+    internal val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     private var lastState: State? = null
-    var state: State? by mutableStateOf(null, neverEqualPolicy())
+    var state: State by mutableStateOf(navigationStateFlow.value, neverEqualPolicy())
         private set
 
     // TODO: share removed screen for whole structure?
     private val removedScreens = mutableSetOf<Screen>()
 
-    override fun render(state: State) {
-        this.state?.let { currentState ->
-            removedScreens.addAll(calculateRemovedScreens(currentState, state))
+    init {
+        scope.launch {
+            navigationStateFlow.drop(1).collect { newState ->
+                removedScreens.addAll(calculateRemovedScreens(state, newState))
+                lastState = state
+                state = newState
+                // Handling a case when updating state doesn't cause UI to update. But if some screens was removed, we need to move them to destroy state.
+                // F.e. removing previous screen causes this case.
+                onPreDispose()
+            }
         }
-        lastState = this.state
-        this.state = state
-        // Handling a case when updating state doesn't cause UI to update. But if some screens was removed, we need to move them to destroy state.
-        // F.e. removing previous screen causes this case.
-        onPreDispose()
+    }
+
+    internal fun dispose() {
+        scope.cancel()
     }
 
     @Suppress("UnusedPrivateProperty", "SpreadOperator")
@@ -216,7 +231,7 @@ internal class ComposeRenderer<State : NavigationState>(
         }
 
         if (clearAll) {
-            state?.getChildScreens()?.clearStates(stateHolder)
+            state.getChildScreens().clearStates(stateHolder)
         }
         // There can be several transition of different screens on the screen,
         // so it is important properly clear screens that are not visible for user.
@@ -239,7 +254,7 @@ internal class ComposeRenderer<State : NavigationState>(
         }
 
         if (clearAll) {
-            state?.getChildScreens()?.onPreDispose()
+            state.getChildScreens().onPreDispose()
         }
         // There can be several transition of different screens on the screen,
         // so it is important properly clear screens that are not visible for user.
@@ -263,7 +278,10 @@ internal class ComposeRenderer<State : NavigationState>(
 
         ModoDevOptions.onScreenDisposeListener?.invoke(this)
         // clear nested screens using recursion
-        ((this as? ContainerScreen<*, *>)?.renderer as? ComposeRenderer<*>)?.clearScreens(stateHolder, clearAll = true)
+        (this as? ContainerScreen<*, *>)?.renderer?.let { nested ->
+            nested.clearScreens(stateHolder, clearAll = true)
+            nested.dispose()
+        }
     }
 
     // need for correct handling lifecycle
@@ -273,7 +291,7 @@ internal class ComposeRenderer<State : NavigationState>(
             .filterIsInstance<LifecycleDependency>()
             .forEach { it.onPreDispose() }
         // send onPreDispose to nested screens
-        ((this as? ContainerScreen<*, *>)?.renderer as? ComposeRenderer<*>)?.onPreDispose(clearAll = true)
+        (this as? ContainerScreen<*, *>)?.renderer?.onPreDispose(clearAll = true)
     }
 
     private fun calculateRemovedScreens(oldState: NavigationState, newState: NavigationState): List<Screen> {

@@ -2,8 +2,7 @@ package io.github.ikarenkov.workshop.screens.profile_setup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.terrakok.modo.navigationStateStateFlow
-import com.github.terrakok.modo.stack.StackNavContainer
+import com.github.terrakok.modo.stack.StackScreen
 import com.github.terrakok.modo.stack.StackState
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.forward
@@ -18,7 +17,7 @@ class ProfileSetupFlowViewModelFinal(
     private val restartFlow: Boolean,
     // Workshop 5.1.1 - take screens as parametrs
     private val profileSetupFlowScreen: ProfileSetupFlowScreenFinal,
-    private val parentNavigation: StackNavContainer,
+    private val parentNavigation: StackScreen,
     private val climberProfileRepository: ClimberProfileRepository,
 ) : ViewModel() {
 
@@ -30,7 +29,7 @@ class ProfileSetupFlowViewModelFinal(
 
     // Workshop 5.3 - define state using navigationStateFlow and climberProfileRepository.climberProfile
     val state: StateFlow<ProfileSetupContainerUiState> = combineStateFlow(
-        profileSetupFlowScreen.navigationStateStateFlow(viewModelScope),
+        profileSetupFlowScreen.navigationStateFlow,
         climberProfileRepository.climberProfile,
         viewModelScope,
     ) { navigationState, profile ->

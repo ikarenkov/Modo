@@ -33,8 +33,8 @@ import com.github.terrakok.modo.sample.screens.lifecycle.LifecycleSampleScreen
 import com.github.terrakok.modo.sample.screens.stack.StackActionsScreen
 import com.github.terrakok.modo.sample.screens.viewmodel.AndroidViewModelSampleScreen
 import com.github.terrakok.modo.stack.LocalStackNavigation
-import com.github.terrakok.modo.stack.StackNavContainer
 import com.github.terrakok.modo.stack.StackNavModel
+import com.github.terrakok.modo.stack.StackScreen
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.forward
 import com.github.terrakok.modo.util.getActivity
@@ -71,7 +71,7 @@ class MainScreen(
 internal fun Screen.MainScreenContent(
     screenIndex: Int,
     screenKey: ScreenKey,
-    navigation: StackNavContainer?,
+    navigation: StackScreen?,
     modifier: Modifier = Modifier,
     canOpenFragment: Boolean = false,
 ) {
@@ -92,7 +92,7 @@ internal fun Screen.MainScreenContent(
 internal fun Screen.MainScreenContent(
     screenIndex: Int,
     counter: Int,
-    navigation: StackNavContainer,
+    navigation: StackScreen,
     modifier: Modifier = Modifier,
     canOpenFragment: Boolean = false,
 ) {
@@ -118,7 +118,7 @@ internal fun Screen.MainScreenContent(
 @Composable
 private fun rememberButtons(
     screenKey: ScreenKey,
-    navigation: StackNavContainer?,
+    navigation: StackScreen?,
     i: Int,
     canOpenFragment: Boolean
 ): GroupedButtonsState {

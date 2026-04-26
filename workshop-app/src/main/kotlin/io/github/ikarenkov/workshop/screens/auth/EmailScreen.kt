@@ -20,7 +20,7 @@ import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.stack.LocalStackNavigation
-import com.github.terrakok.modo.stack.StackNavContainer
+import com.github.terrakok.modo.stack.StackScreen
 import com.github.terrakok.modo.stack.forward
 import kotlinx.parcelize.Parcelize
 
@@ -32,7 +32,7 @@ class EmailScreen(
 
     @Composable
     override fun Content(modifier: Modifier) {
-        val navigation: StackNavContainer = LocalStackNavigation.current
+        val navigation: StackScreen = LocalStackNavigation.current
         EmailScreenContent(
             modifier = modifier,
             onContinueClick = { email ->

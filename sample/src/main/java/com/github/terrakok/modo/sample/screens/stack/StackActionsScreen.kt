@@ -22,7 +22,7 @@ import com.github.terrakok.modo.sample.screens.dialogs.SampleDialogWithStack
 import com.github.terrakok.modo.stack.Back
 import com.github.terrakok.modo.stack.Forward
 import com.github.terrakok.modo.stack.LocalStackNavigation
-import com.github.terrakok.modo.stack.StackNavContainer
+import com.github.terrakok.modo.stack.StackScreen
 import com.github.terrakok.modo.stack.StackState
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.backTo
@@ -62,14 +62,15 @@ internal class StackActionsScreen(
 @Suppress("LongMethod", "MagicNumber")
 @Composable
 private fun rememberButtons(
-    navigation: StackNavContainer,
+    navigation: StackScreen,
     screenKey: ScreenKey,
     screenIndex: Int
 ): GroupedButtonsState {
     val coroutineScope = rememberCoroutineScope()
+    val navigationState = navigation.navigationState
     val isFirstScreen by remember {
         derivedStateOf {
-            navigation.navigationState.stack.first().screenKey == screenKey
+            navigationState.stack.first().screenKey == screenKey
         }
     }
     return remember(navigation, isFirstScreen) {
@@ -99,7 +100,7 @@ private fun rememberButtons(
                 }
             },
             ModoButtonSpec("Remove previous") {
-                val prevScreenIndex = navigation.navigationState.stack.lastIndex - 1
+                val prevScreenIndex = navigation.navigationStateFlow.value.stack.lastIndex - 1
                 navigation.removeScreens { pos, screen -> pos == prevScreenIndex }
             },
             ModoButtonSpec("Back to '3'") {

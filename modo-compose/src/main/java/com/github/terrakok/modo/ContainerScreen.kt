@@ -9,6 +9,9 @@ import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 val LocalContainerScreen = staticCompositionLocalOf<ContainerScreen<*, *>?> { null }
 
@@ -26,16 +29,15 @@ abstract class ContainerScreen<State : NavigationState, Action : NavigationActio
      */
     open val reducer: NavigationReducer<State, Action>? = null
 
-    internal val renderer: NavigationRenderer<State>?
-        get() = navModel.renderer
+    internal val renderer: ComposeRenderer<State> = ComposeRenderer(this, navModel.navigationStateFlow)
 
     final override val screenKey: ScreenKey = navModel.screenKey
 
+    /** Compose-observable view of the current navigation state. */
+    val navigationState: State get() = renderer.state
+
     init {
-        navModel.init(
-            reducerProvider = { reducer },
-            renderer = ComposeRenderer(this)
-        )
+        navModel.init(reducerProvider = { reducer })
     }
 
     /**
@@ -65,8 +67,7 @@ abstract class ContainerScreen<State : NavigationState, Action : NavigationActio
         modifier: Modifier = Modifier,
         content: RendererContent<State> = defaultRendererContent
     ) {
-        val composeRenderer = renderer as ComposeRenderer
-        composeRenderer.Content(screen, modifier, provideCompositionLocals(), content)
+        renderer.Content(screen, modifier, provideCompositionLocals(), content)
     }
 
     override fun toString(): String = this::class.java.simpleName + "(navModel: $navModel)"
@@ -76,7 +77,9 @@ abstract class ContainerScreen<State : NavigationState, Action : NavigationActio
 typealias ReducerProvider<State, Action> = () -> NavigationReducer<State, Action>?
 
 /**
- * Container for simple using [ContainerScreen] with [Parcelize]
+ * Pure UDF implementation of [NavigationContainer]. Holds state in a [MutableStateFlow] and mutates it
+ * exclusively through [dispatch]. Parcelable so it survives process death.
+ * Intended to be owned by a [ContainerScreen], which delegates [NavigationContainer] to it.
  */
 @Stable
 class NavModel<State : NavigationState, Action : NavigationAction<State>>(
@@ -84,41 +87,31 @@ class NavModel<State : NavigationState, Action : NavigationAction<State>>(
     val screenKey: ScreenKey = generateScreenKey()
 ) : NavigationContainer<State, Action>, Parcelable {
 
-    override var navigationState: State = initialState
-        get() = renderer?.state ?: field
-        set(value) {
-            field = value
-            renderer?.render(value)
-        }
+    private val _navigationState = MutableStateFlow(initialState)
+    override val navigationStateFlow: StateFlow<State> = _navigationState.asStateFlow()
 
     private var reducerProvider: ReducerProvider<State, Action>? = null
-    internal var renderer: ComposeRenderer<State>? = null
-        private set
 
-    internal fun init(
-        reducerProvider: ReducerProvider<State, Action>,
-        renderer: ComposeRenderer<State>
-    ) {
-        assert(this.reducerProvider == null && this.renderer == null) {
+    internal fun init(reducerProvider: ReducerProvider<State, Action>) {
+        assert(this.reducerProvider == null) {
             "Trying to initialize navigation model again"
         }
         this.reducerProvider = reducerProvider
-        this.renderer = renderer.also { it.render(navigationState) }
     }
 
     override fun dispatch(action: Action, vararg actions: Action) {
         val reducer = reducerProvider!!()
-        var state = reduce(reducer, navigationState, action)
+        var state = reduce(reducer, _navigationState.value, action)
         for (varargAction in actions) {
             state = reduce(reducer, state, varargAction)
         }
-        navigationState = state
+        _navigationState.value = state
     }
 
     override fun describeContents(): Int = 0
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeParcelable(navigationState, flags)
+        parcel.writeParcelable(_navigationState.value, flags)
         parcel.writeString(screenKey.value)
     }
 
@@ -131,7 +124,7 @@ class NavModel<State : NavigationState, Action : NavigationAction<State>>(
             // TODO: print logs when fallback to state
             ?: state
 
-    override fun toString(): String = "NavModel(navigationState=$navigationState, screenKey=$screenKey)"
+    override fun toString(): String = "NavModel(navigationState=${_navigationState.value}, screenKey=$screenKey)"
 
     companion object CREATOR : Parcelable.Creator<NavModel<*, *>> {
         override fun createFromParcel(parcel: Parcel): NavModel<NavigationState, *> {

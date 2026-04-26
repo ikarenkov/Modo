@@ -4,6 +4,11 @@ import android.os.Bundle
 import com.github.terrakok.modo.model.ScreenModelStore
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertNotSame
@@ -15,6 +20,7 @@ class ModoRootScreenCacheTest {
 
     @BeforeEach
     fun setup() {
+        Dispatchers.setMain(UnconfinedTestDispatcher())
         Modo.rootScreens.clear()
         screenCounterKey.set(-1)
         ScreenModelStore.removedScreenKeys.clear()
@@ -23,6 +29,11 @@ class ModoRootScreenCacheTest {
         ScreenModelStore.dependencyCounter.set(0L)
         ScreenModelStore.lastScreenModelKey.value = null
         ModoDevOptions.onIllegalScreenModelStoreAccess = ModoDevOptions.ValidationFailedStrategy { }
+    }
+
+    @AfterEach
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     // region Scenario 3: first initialization (savedState == null, inMemoryScreen == null)

@@ -29,7 +29,7 @@ import com.github.terrakok.modo.defaultRendererContent
 import com.github.terrakok.modo.generateScreenKey
 import kotlinx.parcelize.Parcelize
 
-val LocalStackNavigation: ProvidableCompositionLocal<StackNavContainer> = staticCompositionLocalOf {
+val LocalStackNavigation: ProvidableCompositionLocal<StackScreen> = staticCompositionLocalOf {
     error("There is no LocalStackNavigation in hierarchy, or maybe you override provideCompositionLocal and forgot to call supper.")
 }
 
@@ -51,7 +51,7 @@ abstract class StackScreen(
         TopScreenContent(modifier)
     }
 
-    override fun provideNavigationContainer(): ProvidedValue<StackNavContainer> =
+    override fun provideNavigationContainer(): ProvidedValue<StackScreen> =
         LocalStackNavigation provides this
 
     /**

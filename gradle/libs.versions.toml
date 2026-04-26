@@ -55,6 +55,7 @@ mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 debug-logcat = { group = "com.squareup.logcat", name = "logcat", version = "0.1" }
 
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.8.1" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version = "1.8.1" }
 
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }

@@ -9,7 +9,7 @@ import com.github.terrakok.modo.RendererContent
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.defaultRendererContent
 
-val LocalMultiScreenNavigation: ProvidableCompositionLocal<MultiScreenNavContainer> = staticCompositionLocalOf {
+val LocalMultiScreenNavigation: ProvidableCompositionLocal<MultiScreen> = staticCompositionLocalOf {
     error("There is no MultiScreenContainer in hierarchy, or maybe you override provideCompositionLocal and forgot to call supper.")
 }
 
