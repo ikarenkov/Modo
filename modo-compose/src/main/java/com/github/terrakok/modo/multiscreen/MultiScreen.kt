@@ -15,7 +15,7 @@ val LocalMultiScreenNavigation: ProvidableCompositionLocal<MultiScreen> = static
 
 abstract class MultiScreen(
     navigationModel: MultiScreenNavModel
-) : ContainerScreen<MultiScreenState, MultiScreenAction>(navigationModel), MultiScreenNavContainer {
+) : ContainerScreen<MultiScreenState>(navigationModel), MultiScreenNavContainer {
 
     @Composable
     override fun Content(modifier: Modifier) {

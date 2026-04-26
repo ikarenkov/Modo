@@ -8,6 +8,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
+import com.github.terrakok.modo.dispatch
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.sample.screens.ButtonsState
 import com.github.terrakok.modo.sample.screens.GroupedButtonsState

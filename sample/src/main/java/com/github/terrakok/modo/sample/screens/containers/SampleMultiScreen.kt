@@ -24,15 +24,11 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.multiscreen.MultiScreen
-import com.github.terrakok.modo.multiscreen.MultiScreenAction
 import com.github.terrakok.modo.multiscreen.MultiScreenNavModel
-import com.github.terrakok.modo.multiscreen.MultiScreenState
-import com.github.terrakok.modo.multiscreen.selectContainer
+import com.github.terrakok.modo.multiscreen.selectScreen
 import com.github.terrakok.modo.sample.components.CancelButton
 import com.github.terrakok.modo.sample.screens.MainScreen
-import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Suppress("MagicNumber")
@@ -48,18 +44,6 @@ internal class SampleMultiScreen(
     )
 ) : MultiScreen(navModel) {
 
-    @IgnoredOnParcel
-    override val reducer: NavigationReducer<MultiScreenState, MultiScreenAction> = NavigationReducer { action, state ->
-        if (action is RemoveTabAction && action.pos in state.screens.indices) {
-            state.copy(
-                screens = state.screens.filterIndexed { index, _ -> index != action.pos },
-                selected = if (state.selected == action.pos) 0 else state.selected
-            )
-        } else {
-            null
-        }
-    }
-
     @Composable
     override fun Content(modifier: Modifier) {
         var showAllStacks by rememberSaveable {
@@ -70,7 +54,7 @@ internal class SampleMultiScreen(
                 TopContent(showAllStacks)
                 if (navigationState.screens.size > 1) {
                     CancelButton(
-                        onClick = { dispatch(RemoveTabAction(navigationState.selected)) },
+                        onClick = { dispatch(RemoveTabReducer(navigationState.selected)) },
                         contentDescription = "Cansel screen",
                         modifier = Modifier
                             .align(Alignment.TopEnd)
@@ -91,12 +75,12 @@ internal class SampleMultiScreen(
                         modifier = Modifier.weight(1f),
                         isSelected = navigationState.selected == tabPos,
                         tabPos = tabPos,
-                        onTabClick = { selectContainer(tabPos) }
+                        onTabClick = { selectScreen(tabPos) }
                     )
                 }
                 Text(
                     modifier = Modifier
-                        .clickable { dispatch(AddTab(navigationState.screens.size.toString(), MainScreen(1))) }
+                        .clickable { addTab(navigationState.screens.size.toString(), MainScreen(1)) }
                         .padding(16.dp),
                     textAlign = TextAlign.Center,
                     text = "[+]"

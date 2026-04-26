@@ -157,7 +157,7 @@ class ComposeRendererScope<State : NavigationState>(
  *  2. Storing and clearing composable states inside [SaveableStateHolder]
  */
 internal class ComposeRenderer<State : NavigationState>(
-    private val containerScreen: ContainerScreen<*, *>,
+    private val containerScreen: ContainerScreen<State>,
     navigationStateFlow: StateFlow<State>,
 ) {
     internal val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -278,7 +278,7 @@ internal class ComposeRenderer<State : NavigationState>(
 
         ModoDevOptions.onScreenDisposeListener?.invoke(this)
         // clear nested screens using recursion
-        (this as? ContainerScreen<*, *>)?.renderer?.let { nested ->
+        (this as? ContainerScreen<*>)?.renderer?.let { nested ->
             nested.clearScreens(stateHolder, clearAll = true)
             nested.dispose()
         }
@@ -291,7 +291,7 @@ internal class ComposeRenderer<State : NavigationState>(
             .filterIsInstance<LifecycleDependency>()
             .forEach { it.onPreDispose() }
         // send onPreDispose to nested screens
-        (this as? ContainerScreen<*, *>)?.renderer?.onPreDispose(clearAll = true)
+        (this as? ContainerScreen<*>)?.renderer?.onPreDispose(clearAll = true)
     }
 
     private fun calculateRemovedScreens(oldState: NavigationState, newState: NavigationState): List<Screen> {

@@ -179,7 +179,8 @@ class ModoRootScreenCacheTest {
     // endregion
 
     private fun mockBundle(rootScreen: RootScreen<*>, counter: Int): Bundle = mockk {
-        every { getParcelable<RootScreen<*>>("MODO_GRAPH") } returns rootScreen
+        every { getParcelable<RootScreen<*>>("MODO_GRAPH", RootScreen::class.java) } returns rootScreen
+        every { @Suppress("DEPRECATION") getParcelable<RootScreen<*>>("MODO_GRAPH") } returns rootScreen
         every { getInt("MODO_SCREEN_COUNTER_KEY") } returns counter
     }
 }

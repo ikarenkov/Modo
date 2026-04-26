@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.NavModel
 import com.github.terrakok.modo.lazylist.screenItem
+import android.os.Parcelable
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.forward
 import io.github.ikarenkov.workshop.screens.TrainingRecommendationsDialogScreenFinal
@@ -18,10 +19,10 @@ import org.koin.core.parameter.parametersOf
 
 @Parcelize
 class EnhancedProfileScreenFinal(
-    private val navModel: NavModel<EnhancedProfileNavigationState, EnhancedProfileNavigationAction> = NavModel(EnhancedProfileNavigationState())
-) : ContainerScreen<EnhancedProfileNavigationState, EnhancedProfileNavigationAction>(
+    private val navModel: NavModel<EnhancedProfileNavigationState> = NavModel(EnhancedProfileNavigationState())
+) : ContainerScreen<EnhancedProfileNavigationState>(
     navModel
-) {
+), Parcelable {
 
     @Composable
     override fun Content(modifier: Modifier) {

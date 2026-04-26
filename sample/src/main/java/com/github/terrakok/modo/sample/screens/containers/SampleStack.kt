@@ -25,28 +25,24 @@ import com.github.terrakok.modo.sample.screens.base.LogLifecycle
 import com.github.terrakok.modo.sample.screens.dialogs.SampleBottomSheet
 import com.github.terrakok.modo.sample.screens.dialogs.SampleBottomSheetStack
 import com.github.terrakok.modo.stack.DialogPlaceHolder
+import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.stack.StackNavModel
-import com.github.terrakok.modo.stack.StackReducerAction
 import com.github.terrakok.modo.stack.StackScreen
 import com.github.terrakok.modo.stack.StackState
 import com.github.terrakok.modo.stack.back
 import kotlinx.parcelize.Parcelize
 
-class OpenActivityAction(
-    private val context: Context,
-    private val clazz: Class<*>
-) : StackReducerAction {
-    override fun reduce(oldState: StackState): StackState {
-        context.startActivity(
-            Intent(context, clazz)
-        )
-        return oldState
-    }
-
-    companion object {
-        inline operator fun <reified T : Activity> invoke(context: Context) = OpenActivityAction(context, T::class.java)
-    }
+fun OpenActivityAction(
+    context: Context,
+    clazz: Class<*>
+) = NavigationReducer<StackState> { oldState ->
+    context.startActivity(
+        Intent(context, clazz)
+    )
+    oldState
 }
+
+inline fun <reified T : Activity> OpenActivityAction(context: Context) = OpenActivityAction(context, T::class.java)
 
 @Parcelize
 open class SampleStack(

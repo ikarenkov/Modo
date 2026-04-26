@@ -1,18 +1,21 @@
 package com.github.terrakok.modo.list
 
 import com.github.terrakok.modo.NavigationContainer
-import com.github.terrakok.modo.ReducerAction
+import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 
-fun interface ListNavigationAction : ReducerAction<ListNavigationState> {
+@Deprecated("Use ListReducer instead.", ReplaceWith("ListReducer"))
+typealias ListNavigationAction = ListReducer
+
+fun interface ListReducer : NavigationReducer<ListNavigationState> {
 
     class RemoveScreens private constructor(
-        private val reducer: ReducerAction<ListNavigationState>
-    ) : ListNavigationAction {
+        private val reducer: NavigationReducer<ListNavigationState>
+    ) : ListReducer {
 
         constructor(removeCondition: (pos: Int, screen: Screen) -> Boolean) : this(
-            ReducerAction { oldState ->
+            NavigationReducer { oldState ->
                 ListNavigationState(
                     oldState.screens.filterIndexed { index, screen -> !removeCondition(index, screen) }
                 )
@@ -20,7 +23,7 @@ fun interface ListNavigationAction : ReducerAction<ListNavigationState> {
         )
 
         constructor(screenToRemove: Screen, vararg screensToRemove: Screen) : this(
-            ReducerAction { oldState ->
+            NavigationReducer { oldState ->
                 val screensToRemoveSet = screensToRemove.toMutableSet().apply { add(screenToRemove) }
                 ListNavigationState(
                     oldState.screens.filter { screen -> screen !in screensToRemoveSet }
@@ -36,7 +39,7 @@ fun interface ListNavigationAction : ReducerAction<ListNavigationState> {
 
         // Unable to use vararg because of https://youtrack.jetbrains.com/issue/KT-33565/Allow-vararg-parameter-of-inline-class-type
         constructor(screenKeysToRemove: Set<ScreenKey>) : this(
-            ReducerAction { oldState ->
+            NavigationReducer { oldState ->
                 ListNavigationState(
                     oldState.screens.filter { screen -> screen.screenKey !in screenKeysToRemove }
                 )
@@ -51,11 +54,11 @@ fun interface ListNavigationAction : ReducerAction<ListNavigationState> {
     }
 
     class AddScreens private constructor(
-        private val reducer: ReducerAction<ListNavigationState>
-    ) : ListNavigationAction {
+        private val reducer: NavigationReducer<ListNavigationState>
+    ) : ListReducer {
 
         constructor(pos: Int, screen: Screen, vararg screens: Screen) : this(
-            ReducerAction { oldState ->
+            NavigationReducer { oldState ->
                 val newScreensCount = screens.size + 1
                 ListNavigationState(
                     List(oldState.screens.size + newScreensCount) {
@@ -71,7 +74,7 @@ fun interface ListNavigationAction : ReducerAction<ListNavigationState> {
         )
 
         constructor(screen: Screen, vararg screens: Screen, addToEnd: Boolean = false) : this(
-            ReducerAction { oldState ->
+            NavigationReducer { oldState ->
                 ListNavigationState(
                     if (addToEnd) {
                         List(oldState.screens.size + screens.size + 1) {
@@ -98,17 +101,17 @@ fun interface ListNavigationAction : ReducerAction<ListNavigationState> {
     }
 
     class SetScreens private constructor(
-        private val reducer: ReducerAction<ListNavigationState>
-    ) : ListNavigationAction {
+        private val reducer: NavigationReducer<ListNavigationState>
+    ) : ListReducer {
 
         constructor(vararg screens: Screen) : this(
-            ReducerAction { _ ->
+            NavigationReducer { _ ->
                 ListNavigationState(screens.toList())
             }
         )
 
         constructor(screens: List<Screen>) : this(
-            ReducerAction { _ -> ListNavigationState(screens) }
+            NavigationReducer { _ -> ListNavigationState(screens) }
         )
 
         override fun reduce(oldState: ListNavigationState): ListNavigationState = reducer.reduce(oldState)
@@ -116,29 +119,29 @@ fun interface ListNavigationAction : ReducerAction<ListNavigationState> {
 
 }
 
-fun NavigationContainer<ListNavigationState, ListNavigationAction>.dispatch(action: (ListNavigationState) -> ListNavigationState) =
-    dispatch(ListNavigationAction(action))
+fun NavigationContainer<ListNavigationState>.dispatch(action: (ListNavigationState) -> ListNavigationState) =
+    dispatch(NavigationReducer(action))
 
-fun NavigationContainer<ListNavigationState, ListNavigationAction>.addScreens(pos: Int, screen: Screen, vararg screens: Screen) =
-    dispatch(ListNavigationAction.AddScreens(pos, screen, *screens))
+fun NavigationContainer<ListNavigationState>.addScreens(pos: Int, screen: Screen, vararg screens: Screen) =
+    dispatch(ListReducer.AddScreens(pos, screen, *screens))
 
-fun NavigationContainer<ListNavigationState, ListNavigationAction>.addScreens(screen: Screen, vararg screens: Screen, addToEnd: Boolean = false) =
-    dispatch(ListNavigationAction.AddScreens(screen, *screens, addToEnd = addToEnd))
+fun NavigationContainer<ListNavigationState>.addScreens(screen: Screen, vararg screens: Screen, addToEnd: Boolean = false) =
+    dispatch(ListReducer.AddScreens(screen, *screens, addToEnd = addToEnd))
 
-fun NavigationContainer<ListNavigationState, ListNavigationAction>.removeScreens(removeCondition: (pos: Int, screen: Screen) -> Boolean) =
-    dispatch(ListNavigationAction.RemoveScreens(removeCondition))
+fun NavigationContainer<ListNavigationState>.removeScreens(removeCondition: (pos: Int, screen: Screen) -> Boolean) =
+    dispatch(ListReducer.RemoveScreens(removeCondition))
 
-fun NavigationContainer<ListNavigationState, ListNavigationAction>.removeScreen(screenKeyToRemove: ScreenKey) =
-    dispatch(ListNavigationAction.RemoveScreens(screenKeyToRemove))
+fun NavigationContainer<ListNavigationState>.removeScreen(screenKeyToRemove: ScreenKey) =
+    dispatch(ListReducer.RemoveScreens(screenKeyToRemove))
 
-fun NavigationContainer<ListNavigationState, ListNavigationAction>.removeScreens(screenToRemove: Screen) =
-    dispatch(ListNavigationAction.RemoveScreens(screenToRemove))
+fun NavigationContainer<ListNavigationState>.removeScreens(screenToRemove: Screen) =
+    dispatch(ListReducer.RemoveScreens(screenToRemove))
 
-inline fun <reified T : Screen> NavigationContainer<ListNavigationState, ListNavigationAction>.removeScreens() =
-    dispatch(ListNavigationAction.RemoveScreens<T>())
+inline fun <reified T : Screen> NavigationContainer<ListNavigationState>.removeScreens() =
+    dispatch(ListReducer.RemoveScreens<T>())
 
-fun NavigationContainer<ListNavigationState, ListNavigationAction>.setScreens(vararg screens: Screen) =
-    dispatch(ListNavigationAction.SetScreens(*screens))
+fun NavigationContainer<ListNavigationState>.setScreens(vararg screens: Screen) =
+    dispatch(ListReducer.SetScreens(*screens))
 
-fun NavigationContainer<ListNavigationState, ListNavigationAction>.removeAllScreens() =
-    dispatch(ListNavigationAction.SetScreens())
+fun NavigationContainer<ListNavigationState>.removeAllScreens() =
+    dispatch(ListReducer.SetScreens())

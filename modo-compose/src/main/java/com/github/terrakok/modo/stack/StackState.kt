@@ -8,14 +8,14 @@ import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.Screen
 import kotlinx.parcelize.Parcelize
 
-typealias StackNavModel = NavModel<StackState, StackAction>
+typealias StackNavModel = NavModel<StackState>
 
-fun StackNavModel(stack: List<Screen>): StackNavModel = StackNavModel(StackState(stack))
-fun StackNavModel(screen: Screen): StackNavModel = StackNavModel(listOf(screen))
-fun StackNavModel(vararg screens: Screen): StackNavModel = StackNavModel(screens.toList())
+fun StackNavModel(stack: List<Screen>): StackNavModel = NavModel(StackState(stack))
+fun StackNavModel(screen: Screen): StackNavModel = NavModel(StackState(listOf(screen)))
+fun StackNavModel(vararg screens: Screen): StackNavModel = NavModel(StackState(screens.toList()))
 
 @Stable
-interface StackNavContainer : NavigationContainer<StackState, StackAction>
+interface StackNavContainer : NavigationContainer<StackState>
 
 @Parcelize
 data class StackState(

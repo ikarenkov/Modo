@@ -13,21 +13,28 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-val LocalContainerScreen = staticCompositionLocalOf<ContainerScreen<*, *>?> { null }
+val LocalContainerScreen = staticCompositionLocalOf<ContainerScreen<*>?> { null }
 
-fun interface ReducerAction<State : NavigationState> : NavigationAction<State> {
-    fun reduce(oldState: State): State
-}
+@Deprecated(
+    message = "Use NavigationReducer instead",
+    replaceWith = ReplaceWith("NavigationReducer<State>")
+)
+typealias ReducerAction<State> = NavigationReducer<State>
 
 @Stable
-abstract class ContainerScreen<State : NavigationState, Action : NavigationAction<State>>(
-    private val navModel: NavModel<State, Action>
-) : Screen, NavigationContainer<State, Action> by navModel {
+abstract class ContainerScreen<State : NavigationState>(
+    private val navModel: NavModel<State>
+) : Screen, NavigationContainer<State> by navModel {
 
     /**
      * The reducer that can be used to control state updates.
      */
-    open val reducer: NavigationReducer<State, Action>? = null
+    @Deprecated(
+        message = "Custom navigation behavior should move from screen-level external reducers to dispatch-time reducers. " +
+            "This property is no longer used by the navigation system.",
+        level = DeprecationLevel.ERROR
+    )
+    open val reducer: NavigationReducer<State>? = null
 
     internal val renderer: ComposeRenderer<State> = ComposeRenderer(this, navModel.navigationStateFlow)
 
@@ -35,10 +42,6 @@ abstract class ContainerScreen<State : NavigationState, Action : NavigationActio
 
     /** Compose-observable view of the current navigation state. */
     val navigationState: State get() = renderer.state
-
-    init {
-        navModel.init(reducerProvider = { reducer })
-    }
 
     /**
      * This function can be used to provide composition locals for inner screens.
@@ -54,7 +57,7 @@ abstract class ContainerScreen<State : NavigationState, Action : NavigationActio
      * Provides composition local for the nested hierarchy to receive NavigationContainer.
      * @see com.github.terrakok.modo.stack.LocalStackNavigation
      */
-    open fun provideNavigationContainer(): ProvidedValue<out NavigationContainer<*, *>>? = null
+    open fun provideNavigationContainer(): ProvidedValue<out NavigationContainer<*>>? = null
 
     /**
      * Use this function to render the content of nested screens. It provides correct work of [rememberSaveable] by using [SaveableStateHolder].
@@ -74,38 +77,22 @@ abstract class ContainerScreen<State : NavigationState, Action : NavigationActio
 
 }
 
-typealias ReducerProvider<State, Action> = () -> NavigationReducer<State, Action>?
-
 /**
  * Pure UDF implementation of [NavigationContainer]. Holds state in a [MutableStateFlow] and mutates it
  * exclusively through [dispatch]. Parcelable so it survives process death.
  * Intended to be owned by a [ContainerScreen], which delegates [NavigationContainer] to it.
  */
 @Stable
-class NavModel<State : NavigationState, Action : NavigationAction<State>>(
+class NavModel<State : NavigationState>(
     initialState: State,
     val screenKey: ScreenKey = generateScreenKey()
-) : NavigationContainer<State, Action>, Parcelable {
+) : NavigationContainer<State>, Parcelable {
 
     private val _navigationState = MutableStateFlow(initialState)
     override val navigationStateFlow: StateFlow<State> = _navigationState.asStateFlow()
 
-    private var reducerProvider: ReducerProvider<State, Action>? = null
-
-    internal fun init(reducerProvider: ReducerProvider<State, Action>) {
-        assert(this.reducerProvider == null) {
-            "Trying to initialize navigation model again"
-        }
-        this.reducerProvider = reducerProvider
-    }
-
-    override fun dispatch(action: Action, vararg actions: Action) {
-        val reducer = reducerProvider!!()
-        var state = reduce(reducer, _navigationState.value, action)
-        for (varargAction in actions) {
-            state = reduce(reducer, state, varargAction)
-        }
-        _navigationState.value = state
+    override fun dispatch(reducer: NavigationReducer<State>) {
+        _navigationState.value = reducer.reduce(_navigationState.value)
     }
 
     override fun describeContents(): Int = 0
@@ -115,24 +102,15 @@ class NavModel<State : NavigationState, Action : NavigationAction<State>>(
         parcel.writeString(screenKey.value)
     }
 
-    private fun reduce(reducer: NavigationReducer<State, Action>?, state: State, action: Action): State =
-        reducer?.reduce(action, state)
-            ?: when (action) {
-                is ReducerAction<*> -> (action as? ReducerAction<State>)?.reduce(state)
-                else -> null
-            }
-            // TODO: print logs when fallback to state
-            ?: state
-
     override fun toString(): String = "NavModel(navigationState=${_navigationState.value}, screenKey=$screenKey)"
 
-    companion object CREATOR : Parcelable.Creator<NavModel<*, *>> {
-        override fun createFromParcel(parcel: Parcel): NavModel<NavigationState, *> {
+    companion object CREATOR : Parcelable.Creator<NavModel<*>> {
+        override fun createFromParcel(parcel: Parcel): NavModel<NavigationState> {
             val state = parcel.readParcelable<NavigationState>(NavModel::class.java.classLoader)!!
             val screenKey = parcel.readString()!!
             return NavModel(state, ScreenKey(screenKey))
         }
 
-        override fun newArray(size: Int): Array<NavModel<*, *>?> = arrayOfNulls(size)
+        override fun newArray(size: Int): Array<NavModel<*>?> = arrayOfNulls(size)
     }
 }

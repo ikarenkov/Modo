@@ -39,7 +39,7 @@ val LocalStackNavigation: ProvidableCompositionLocal<StackScreen> = staticCompos
 @Stable
 abstract class StackScreen(
     navigationModel: StackNavModel
-) : ContainerScreen<StackState, StackAction>(navigationModel), StackNavContainer {
+) : ContainerScreen<StackState>(navigationModel), StackNavContainer {
 
     open val defaultBackHandler: Boolean = true
 
@@ -51,7 +51,7 @@ abstract class StackScreen(
         TopScreenContent(modifier)
     }
 
-    override fun provideNavigationContainer(): ProvidedValue<StackScreen> =
+    override fun provideNavigationContainer(): ProvidedValue<out StackNavContainer> =
         LocalStackNavigation provides this
 
     /**

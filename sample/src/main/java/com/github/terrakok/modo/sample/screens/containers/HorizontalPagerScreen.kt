@@ -1,5 +1,6 @@
 package com.github.terrakok.modo.sample.screens.containers
 
+import android.os.Parcelable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -26,17 +27,18 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.NavModel
-import com.github.terrakok.modo.list.ListNavigationAction
+import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.list.ListNavigationState
 import com.github.terrakok.modo.list.removeScreens
 import com.github.terrakok.modo.sample.components.CancelButton
 import com.github.terrakok.modo.sample.screens.MainScreen
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class HorizontalPagerScreen(
-    private val navModel: NavModel<ListNavigationState, ListNavigationAction> = NavModel(
+    private val navModel: NavModel<ListNavigationState> = NavModel(
         ListNavigationState(
             listOf(
                 SampleStack(MainScreen(0)),
@@ -45,7 +47,7 @@ class HorizontalPagerScreen(
             )
         )
     )
-) : ContainerScreen<ListNavigationState, ListNavigationAction>(navModel) {
+) : ContainerScreen<ListNavigationState>(navModel), Parcelable {
 
     @Composable
     override fun Content(modifier: Modifier) {
@@ -75,7 +77,13 @@ class HorizontalPagerScreen(
                     )
                 }
                 IconButton(
-                    onClick = { dispatch(AddStack) },
+                    onClick = {
+                        dispatch { oldState ->
+                            ListNavigationState(
+                                oldState.screens + SampleStack(MainScreen(0))
+                            )
+                        }
+                    },
                     modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
                 ) {
                     Icon(painter = rememberVectorPainter(image = Icons.Default.Add), contentDescription = "Add")
@@ -100,9 +108,4 @@ class HorizontalPagerScreen(
         }
     }
 
-    object AddStack : ListNavigationAction {
-        override fun reduce(oldState: ListNavigationState): ListNavigationState = ListNavigationState(
-            oldState.screens + SampleStack(MainScreen(0))
-        )
-    }
 }

@@ -7,15 +7,15 @@ import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.Screen
 import kotlinx.parcelize.Parcelize
 
-typealias ListNavModel = NavModel<ListNavigationState, ListNavigationAction>
+typealias ListNavModel = NavModel<ListNavigationState>
 
 fun ListNavModel(screens: List<Screen>): ListNavModel = NavModel(ListNavigationState(screens = screens))
 
-interface ListNavigationContainer : NavigationContainer<ListNavigationState, ListNavigationAction>
+interface ListNavigationContainer : NavigationContainer<ListNavigationState>
 
 abstract class ListNavigationContainerScreen(
     navModel: ListNavModel
-) : ListNavigationContainer, ContainerScreen<ListNavigationState, ListNavigationAction>(navModel)
+) : ListNavigationContainer, ContainerScreen<ListNavigationState>(navModel)
 
 @Parcelize
 data class ListNavigationState(

@@ -20,8 +20,8 @@ data class RootScreenState<T : Screen>(
  */
 @Parcelize
 class RootScreen<T : Screen> internal constructor(
-    private val navModel: NavModel<RootScreenState<T>, NavigationAction<RootScreenState<T>>>
-) : ContainerScreen<RootScreenState<T>, NavigationAction<RootScreenState<T>>>(
+    private val navModel: NavModel<RootScreenState<T>>
+) : ContainerScreen<RootScreenState<T>>(
     navModel
 ) {
 

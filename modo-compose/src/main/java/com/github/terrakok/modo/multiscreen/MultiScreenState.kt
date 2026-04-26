@@ -7,9 +7,9 @@ import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.Screen
 import kotlinx.parcelize.Parcelize
 
-typealias MultiScreenNavModel = NavModel<MultiScreenState, MultiScreenAction>
+typealias MultiScreenNavModel = NavModel<MultiScreenState>
 
-interface MultiScreenNavContainer : NavigationContainer<MultiScreenState, MultiScreenAction>
+interface MultiScreenNavContainer : NavigationContainer<MultiScreenState>
 
 fun MultiScreenNavModel(
     screens: List<Screen>,

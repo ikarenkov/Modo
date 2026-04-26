@@ -1,16 +1,17 @@
 package com.github.terrakok.modo.stack
 
-import com.github.terrakok.modo.NavigationAction
+import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.NavigationContainer
 import com.github.terrakok.modo.ReducerAction
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 
-interface StackAction : NavigationAction<StackState>
+@Deprecated("Use StackReducer instead.", ReplaceWith("StackReducer"))
+fun interface StackReducerAction : ReducerAction<StackState>
 
-fun interface StackReducerAction : StackAction, ReducerAction<StackState>
+fun interface StackReducer : NavigationReducer<StackState>
 
-class SetStack(val state: StackState) : StackReducerAction {
+class SetStack(val state: StackState) : StackReducer {
     @Suppress("SpreadOperator")
     constructor(screen: Screen, vararg screens: Screen) : this(
         StackState(listOf(screen, *screens))
@@ -20,14 +21,14 @@ class SetStack(val state: StackState) : StackReducerAction {
         state
 }
 
-class Forward(val screen: Screen, vararg val screens: Screen) : StackReducerAction {
+class Forward(val screen: Screen, vararg val screens: Screen) : StackReducer {
     @Suppress("SpreadOperator")
     override fun reduce(oldState: StackState): StackState = StackState(
         oldState.stack + listOf(screen, *screens)
     )
 }
 
-class Replace(val screen: Screen, vararg val screens: Screen) : StackReducerAction {
+class Replace(val screen: Screen, vararg val screens: Screen) : StackReducer {
     @Suppress("SpreadOperator")
     override fun reduce(oldState: StackState): StackState = if (oldState.stack.isNotEmpty()) {
         StackState(
@@ -45,7 +46,7 @@ class Replace(val screen: Screen, vararg val screens: Screen) : StackReducerActi
 class BackTo(
     val backToCondition: (pos: Int, screen: Screen) -> Boolean,
     val including: Boolean = false
-) : StackReducerAction {
+) : StackReducer {
 
     constructor(screenKey: ScreenKey, including: Boolean = false) : this(
         { _, screen ->
@@ -78,17 +79,17 @@ class BackTo(
     }
 
     companion object {
-        inline operator fun <reified T : Screen> invoke(including: Boolean = false): StackReducerAction = BackTo(
+        inline operator fun <reified T : Screen> invoke(including: Boolean = false): StackReducer = BackTo(
             { _, screen -> screen is T },
             including
         )
 
-        operator fun invoke(including: Boolean = false, condition: (pos: Int, screen: Screen) -> Boolean): StackReducerAction =
+        operator fun invoke(including: Boolean = false, condition: (pos: Int, screen: Screen) -> Boolean): StackReducer =
             BackTo(condition, including)
     }
 }
 
-class RemoveScreens(val condition: (pos: Int, screen: Screen) -> Boolean) : StackReducerAction {
+class RemoveScreens(val condition: (pos: Int, screen: Screen) -> Boolean) : StackReducer {
     override fun reduce(oldState: StackState): StackState = StackState(
         oldState.stack.filterIndexed { i, screen -> !condition(i, screen) }
     )
@@ -101,7 +102,7 @@ class RemoveScreens(val condition: (pos: Int, screen: Screen) -> Boolean) : Stac
 class Back(
     private val screensToDrop: Int = 1,
     private val canEmptyStack: Boolean = false
-) : StackReducerAction {
+) : StackReducer {
     override fun reduce(oldState: StackState): StackState =
         if (canEmptyStack || oldState.stack.size > 1) {
             StackState(oldState.stack.dropLast(screensToDrop))
@@ -110,28 +111,28 @@ class Back(
         }
 }
 
-fun StackNavContainer.dispatch(action: (StackState) -> StackState) = dispatch(StackReducerAction(action))
+fun StackNavContainer.dispatch(action: (StackState) -> StackState) = dispatch(NavigationReducer(action))
 
-fun NavigationContainer<StackState, StackAction>.forward(screen: Screen, vararg screens: Screen) = dispatch(Forward(screen, *screens))
-fun NavigationContainer<StackState, StackAction>.replace(screen: Screen, vararg screens: Screen) = dispatch(Replace(screen, *screens))
-fun NavigationContainer<StackState, StackAction>.setStack(screen: Screen, vararg screens: Screen) = dispatch(SetStack(screen, *screens))
-fun NavigationContainer<StackState, StackAction>.setState(state: StackState) = dispatch(SetStack(state))
-fun NavigationContainer<StackState, StackAction>.clearStack() = dispatch(SetStack(StackState()))
+fun NavigationContainer<StackState>.forward(screen: Screen, vararg screens: Screen) = dispatch(Forward(screen, *screens))
+fun NavigationContainer<StackState>.replace(screen: Screen, vararg screens: Screen) = dispatch(Replace(screen, *screens))
+fun NavigationContainer<StackState>.setStack(screen: Screen, vararg screens: Screen) = dispatch(SetStack(screen, *screens))
+fun NavigationContainer<StackState>.setState(state: StackState) = dispatch(SetStack(state))
+fun NavigationContainer<StackState>.clearStack() = dispatch(SetStack(StackState()))
 
-inline fun <reified T : Screen> NavigationContainer<StackState, StackAction>.backTo(including: Boolean = false) = dispatch(BackTo<T>(including))
-fun NavigationContainer<StackState, StackAction>.backTo(screen: Screen, including: Boolean = false) = dispatch(BackTo(screen, including))
-fun NavigationContainer<StackState, StackAction>.backTo(screenKey: ScreenKey, including: Boolean = false) = dispatch(BackTo(screenKey, including))
-fun NavigationContainer<StackState, StackAction>.backTo(pos: Int, including: Boolean = false) = backTo(including) { backToPos, _ -> pos == backToPos }
-fun NavigationContainer<StackState, StackAction>.backTo(including: Boolean = false, backToCondition: (pos: Int, screen: Screen) -> Boolean) =
+inline fun <reified T : Screen> NavigationContainer<StackState>.backTo(including: Boolean = false) = dispatch(BackTo<T>(including))
+fun NavigationContainer<StackState>.backTo(screen: Screen, including: Boolean = false) = dispatch(BackTo(screen, including))
+fun NavigationContainer<StackState>.backTo(screenKey: ScreenKey, including: Boolean = false) = dispatch(BackTo(screenKey, including))
+fun NavigationContainer<StackState>.backTo(pos: Int, including: Boolean = false) = backTo(including) { backToPos, _ -> pos == backToPos }
+fun NavigationContainer<StackState>.backTo(including: Boolean = false, backToCondition: (pos: Int, screen: Screen) -> Boolean) =
     dispatch(BackTo(including, backToCondition))
 
-fun NavigationContainer<StackState, StackAction>.backToRoot() = backTo(0)
+fun NavigationContainer<StackState>.backToRoot() = backTo(0)
 
-fun NavigationContainer<StackState, StackAction>.removeScreens(condition: (pos: Int, screen: Screen) -> Boolean) = dispatch(RemoveScreens(condition))
+fun NavigationContainer<StackState>.removeScreens(condition: (pos: Int, screen: Screen) -> Boolean) = dispatch(RemoveScreens(condition))
 
 /**
  * @param screensToDrop count of screens to drop from top of the stack
  * @param canEmptyStack if true, then stack can be empty after this action
  */
-fun NavigationContainer<StackState, StackAction>.back(screensToDrop: Int = 1, canEmptyStack: Boolean = false) =
+fun NavigationContainer<StackState>.back(screensToDrop: Int = 1, canEmptyStack: Boolean = false) =
     dispatch(Back(screensToDrop, canEmptyStack))

@@ -1,6 +1,7 @@
 package com.github.terrakok.modo
 
 import android.app.Activity
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.compose.runtime.Composable
@@ -35,7 +36,10 @@ object Modo {
     /**
      * Saves provided screen with nested graph to bundle for further restoration.
      */
-    @Deprecated("Use rememberRootScreen, which handles saving and restoring automatically. Will be removed in 1.0.")
+    @Deprecated(
+        "Use rememberRootScreen, which handles saving and restoring automatically. Will be removed in 1.0.",
+        ReplaceWith("this.rememberRootScreen { rootScreen }")
+    )
     fun save(outState: Bundle, rootScreen: Screen?) {
         outState.putInt(MODO_SCREEN_COUNTER_KEY, screenCounterKey.get())
         outState.putParcelable(MODO_GRAPH, rootScreen)
@@ -68,9 +72,19 @@ object Modo {
      *   Must be null for Activities and for the very first Fragment creation.
      * @param rootScreenProvider called only in scenario 3 to construct the initial root screen.
      */
-    @Deprecated("Use rememberRootScreen, which handles all lifecycle concerns automatically. Will be removed in 1.0.")
+    @Deprecated(
+        "Use rememberRootScreen, which handles all lifecycle concerns automatically. Will be removed in 1.0.",
+        ReplaceWith("this.rememberRootScreen(rootScreenProvider)")
+    )
     fun <T : Screen> getOrCreateRootScreen(savedState: Bundle?, inMemoryScreen: RootScreen<T>?, rootScreenProvider: () -> T): RootScreen<T> {
-        val savedModoGraph = savedState?.getParcelable<RootScreen<T>>(MODO_GRAPH)
+        val savedModoGraph = savedState?.let {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                it.getParcelable(MODO_GRAPH, RootScreen::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                it.getParcelable(MODO_GRAPH)
+            }
+        } as? RootScreen<T>
         return if (savedModoGraph != null) {
             // Scenario 1: bundle restore.
             // Config change → cache hit, process death → cache miss, savedModoGraph is stored.
@@ -90,7 +104,10 @@ object Modo {
     /**
      * Must be called to clear all data from [ScreenModelStore], related with removed screens.
      */
-    @Deprecated("Use rememberRootScreen, which handles cleanup automatically. Will be removed in 1.0.")
+    @Deprecated(
+        "Use rememberRootScreen, which handles cleanup automatically. Will be removed in 1.0.",
+        ReplaceWith("Modo.rememberRootScreen")
+    )
     fun <T : Screen> onRootScreenFinished(rootScreen: RootScreen<T>?) = finishRootScreen(rootScreen)
 
     private fun <T : Screen> finishRootScreen(rootScreen: RootScreen<T>?) {
@@ -201,7 +218,7 @@ object Modo {
 
     private fun clearScreenModel(screen: Screen) {
         ScreenModelStore.remove(screen)
-        (screen as? ContainerScreen<*, *>)?.navigationState?.getChildScreens()?.forEach(::clearScreenModel)
+        (screen as? ContainerScreen<*>)?.navigationState?.getChildScreens()?.forEach(::clearScreenModel)
     }
 
 }

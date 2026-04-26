@@ -29,9 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.NavModel
-import com.github.terrakok.modo.NavigationAction
+import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.NavigationState
-import com.github.terrakok.modo.ReducerAction
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import kotlinx.parcelize.Parcelize
@@ -45,10 +44,9 @@ internal data class CustomContainerState(
     override fun getChildScreens(): List<Screen> = screens
 }
 
-internal interface CustomContainerAction : NavigationAction<CustomContainerState>
-internal fun interface CustomContainerReducerAction : CustomContainerAction, ReducerAction<CustomContainerState>
+internal fun interface CustomContainerReducer : NavigationReducer<CustomContainerState>
 
-internal class RemoveScreen(val screenKey: ScreenKey) : CustomContainerReducerAction {
+internal class RemoveScreen(val screenKey: ScreenKey) : CustomContainerReducer {
     override fun reduce(oldState: CustomContainerState): CustomContainerState = CustomContainerState(
         oldState.screens.filter { it.screenKey != screenKey }
     )
@@ -61,8 +59,8 @@ internal val LocalSampleCustomNavigation = compositionLocalOf<SampleCustomContai
 
 @Parcelize
 internal class SampleCustomContainerScreen(
-    private val navModel: NavModel<CustomContainerState, CustomContainerAction> = NavModel(CustomContainerState(listOf(InnerScreen())))
-) : ContainerScreen<CustomContainerState, CustomContainerAction>(navModel) {
+    private val navModel: NavModel<CustomContainerState> = NavModel(CustomContainerState(listOf(InnerScreen())))
+) : ContainerScreen<CustomContainerState>(navModel) {
 
     override fun provideCompositionLocals(): Array<ProvidedValue<*>> =
         arrayOf(LocalSampleCustomNavigation provides this)
@@ -103,11 +101,9 @@ internal class SampleCustomContainerScreen(
             Column {
                 Button(
                     onClick = {
-                        navModel.dispatch(
-                            CustomContainerReducerAction { state ->
-                                CustomContainerState(listOf(InnerScreen()) + state.screens)
-                            }
-                        )
+                        navModel.dispatch { state ->
+                            CustomContainerState(listOf(InnerScreen()) + state.screens)
+                        }
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -115,11 +111,9 @@ internal class SampleCustomContainerScreen(
                 }
                 Button(
                     onClick = {
-                        navModel.dispatch(
-                            CustomContainerReducerAction { state ->
-                                CustomContainerState(state.screens.reversed())
-                            }
-                        )
+                        navModel.dispatch { state ->
+                            CustomContainerState(state.screens.reversed())
+                        }
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {

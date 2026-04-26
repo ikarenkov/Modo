@@ -5,13 +5,13 @@ import com.github.terrakok.modo.ScreenKey
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class ListNavigationActionAddScreensTest {
+class ListReducerAddScreensTest {
 
     @Test
     fun `When add screen to empty list - Then screen is added`() {
         val screen = MockScreen(ScreenKey("1"))
         val oldState = ListNavigationState(emptyList())
-        val action = ListNavigationAction.AddScreens(screen)
+        val action = ListReducer.AddScreens(screen)
 
         val newState = action.reduce(oldState)
 
@@ -25,7 +25,7 @@ class ListNavigationActionAddScreensTest {
     fun `When add screen to empty list by pos - Then screen is added`() {
         val screen = MockScreen(ScreenKey("1"))
         val oldState = ListNavigationState(emptyList())
-        val action = ListNavigationAction.AddScreens(pos = 0, screen)
+        val action = ListReducer.AddScreens(pos = 0, screen)
 
         val newState = action.reduce(oldState)
 
@@ -40,7 +40,7 @@ class ListNavigationActionAddScreensTest {
         val screen1 = MockScreen(ScreenKey("1"))
         val screen2 = MockScreen(ScreenKey("2"))
         val oldState = ListNavigationState(listOf(screen1))
-        val action = ListNavigationAction.AddScreens(pos = 1, screen2)
+        val action = ListReducer.AddScreens(pos = 1, screen2)
 
         val newState = action.reduce(oldState)
 
@@ -56,7 +56,7 @@ class ListNavigationActionAddScreensTest {
         val screen2 = MockScreen(ScreenKey("2"))
         val screen3 = MockScreen(ScreenKey("3"))
         val oldState = ListNavigationState(emptyList())
-        val action = ListNavigationAction.AddScreens(screen1, screen2, screen3)
+        val action = ListReducer.AddScreens(screen1, screen2, screen3)
 
         val newState = action.reduce(oldState)
 
@@ -74,7 +74,7 @@ class ListNavigationActionAddScreensTest {
         val screen4 = MockScreen(ScreenKey("4"))
         val screen5 = MockScreen(ScreenKey("5"))
         val oldState = ListNavigationState(listOf(screen1, screen5))
-        val action = ListNavigationAction.AddScreens(pos = 1, screen2, screen3, screen4)
+        val action = ListReducer.AddScreens(pos = 1, screen2, screen3, screen4)
 
         val newState = action.reduce(oldState)
 
@@ -90,7 +90,7 @@ class ListNavigationActionAddScreensTest {
         val screen2 = MockScreen(ScreenKey("2"))
         val screen3 = MockScreen(ScreenKey("3"))
         val oldState = ListNavigationState(emptyList())
-        val action = ListNavigationAction.AddScreens(pos = 0, screen1, screen2, screen3)
+        val action = ListReducer.AddScreens(pos = 0, screen1, screen2, screen3)
 
         val newState = action.reduce(oldState)
 
@@ -106,7 +106,7 @@ class ListNavigationActionAddScreensTest {
         val screen2 = MockScreen(ScreenKey("2"))
         val screen3 = MockScreen(ScreenKey("3"))
         val oldState = ListNavigationState(listOf())
-        val action = ListNavigationAction.AddScreens(screen1, screen2, screen3, addToEnd = true)
+        val action = ListReducer.AddScreens(screen1, screen2, screen3, addToEnd = true)
 
         val newState = action.reduce(oldState)
 
@@ -122,7 +122,7 @@ class ListNavigationActionAddScreensTest {
         val screen2 = MockScreen(ScreenKey("2"))
         val screen3 = MockScreen(ScreenKey("3"))
         val oldState = ListNavigationState(listOf())
-        val action = ListNavigationAction.AddScreens(screen1, screen2, screen3)
+        val action = ListReducer.AddScreens(screen1, screen2, screen3)
 
         val newState = action.reduce(oldState)
 
@@ -138,7 +138,7 @@ class ListNavigationActionAddScreensTest {
         val screen2 = MockScreen(ScreenKey("2"))
         val screen3 = MockScreen(ScreenKey("3"))
         val oldState = ListNavigationState(listOf(screen1))
-        val action = ListNavigationAction.AddScreens(screen2, screen3, addToEnd = true)
+        val action = ListReducer.AddScreens(screen2, screen3, addToEnd = true)
 
         val newState = action.reduce(oldState)
 
@@ -154,7 +154,7 @@ class ListNavigationActionAddScreensTest {
         val screen2 = MockScreen(ScreenKey("2"))
         val screen3 = MockScreen(ScreenKey("3"))
         val oldState = ListNavigationState(listOf(screen3))
-        val action = ListNavigationAction.AddScreens(screen1, screen2)
+        val action = ListReducer.AddScreens(screen1, screen2)
 
         val newState = action.reduce(oldState)
 
