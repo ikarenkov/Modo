@@ -27,7 +27,6 @@ import com.github.terrakok.modo.stack.StackScreen
 import com.github.terrakok.modo.stack.StackState
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.backTo
-import com.github.terrakok.modo.stack.dispatch
 import com.github.terrakok.modo.stack.forward
 import com.github.terrakok.modo.stack.removeScreens
 import com.github.terrakok.modo.stack.replace
@@ -101,7 +100,7 @@ private fun rememberButtons(
                 }
             },
             ModoButtonSpec("Remove previous") {
-                val prevScreenIndex = navigation.navigationStateFlow.value.stack.lastIndex - 1
+                val prevScreenIndex = navigation.stateFlow.value.stack.lastIndex - 1
                 navigation.removeScreens { pos, screen -> pos == prevScreenIndex }
             },
             ModoButtonSpec("Back to '3'") {

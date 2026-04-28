@@ -36,7 +36,7 @@ abstract class ContainerScreen<State : NavigationState>(
     )
     open val reducer: NavigationReducer<State>? = null
 
-    internal val renderer: ComposeRenderer<State> = ComposeRenderer(this, navModel.navigationStateFlow)
+    internal val renderer: ComposeRenderer<State> = ComposeRenderer(this, navModel.stateFlow)
 
     final override val screenKey: ScreenKey = navModel.screenKey
 
@@ -89,7 +89,7 @@ class NavModel<State : NavigationState>(
 ) : NavigationContainer<State>, Parcelable {
 
     private val _navigationState = MutableStateFlow(initialState)
-    override val navigationStateFlow: StateFlow<State> = _navigationState.asStateFlow()
+    override val stateFlow: StateFlow<State> = _navigationState.asStateFlow()
 
     override fun dispatch(reducer: NavigationReducer<State>) {
         _navigationState.value = reducer.reduce(_navigationState.value)

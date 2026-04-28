@@ -158,12 +158,12 @@ class ComposeRendererScope<State : NavigationState>(
  */
 internal class ComposeRenderer<State : NavigationState>(
     private val containerScreen: ContainerScreen<State>,
-    navigationStateFlow: StateFlow<State>,
+    stateFlow: StateFlow<State>,
 ) {
     internal val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     private var lastState: State? = null
-    var state: State by mutableStateOf(navigationStateFlow.value, neverEqualPolicy())
+    var state: State by mutableStateOf(stateFlow.value, neverEqualPolicy())
         private set
 
     // TODO: share removed screen for whole structure?
@@ -171,7 +171,7 @@ internal class ComposeRenderer<State : NavigationState>(
 
     init {
         scope.launch {
-            navigationStateFlow.drop(1).collect { newState ->
+            stateFlow.drop(1).collect { newState ->
                 removedScreens.addAll(calculateRemovedScreens(state, newState))
                 lastState = state
                 state = newState

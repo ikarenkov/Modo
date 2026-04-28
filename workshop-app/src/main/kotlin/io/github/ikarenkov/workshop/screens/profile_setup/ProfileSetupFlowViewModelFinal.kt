@@ -29,7 +29,7 @@ class ProfileSetupFlowViewModelFinal(
 
     // Workshop 5.3 - define state using navigationStateFlow and climberProfileRepository.climberProfile
     val state: StateFlow<ProfileSetupContainerUiState> = combineStateFlow(
-        profileSetupFlowScreen.navigationStateFlow,
+        profileSetupFlowScreen.stateFlow,
         climberProfileRepository.climberProfile,
         viewModelScope,
     ) { navigationState, profile ->

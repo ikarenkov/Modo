@@ -71,7 +71,7 @@ class ComposeRendererDisposalTest {
 
             override fun writeToParcel(parcel: Parcel, flags: Int) {}
         }
-        return ComposeRenderer(containerScreen, navModel.navigationStateFlow)
+        return ComposeRenderer(containerScreen, navModel.stateFlow)
     }
 
     @Parcelize
