@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,8 +32,8 @@ import com.github.terrakok.modo.sample.screens.base.LogLifecycle
 import com.github.terrakok.modo.sample.screens.dialogs.SampleBottomSheet
 import com.github.terrakok.modo.sample.screens.dialogs.SampleBottomSheetStack
 import com.github.terrakok.modo.stack.DialogPlaceHolder
+import androidx.compose.runtime.getValue
 import com.github.terrakok.modo.NavigationReducer
-import com.github.terrakok.modo.sample.components.NavigationTreeStrip
 import com.github.terrakok.modo.stack.StackNavModel
 import com.github.terrakok.modo.stack.StackScreen
 import com.github.terrakok.modo.stack.StackState
@@ -87,14 +86,7 @@ open class SampleStack(
                         .align(Alignment.TopEnd)
                 )
             }
-            NavigationTreeStrip(
-                this@SampleStack,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Bottom))
-            )
         }
-
     }
 
     @OptIn(ExperimentalModoApi::class)

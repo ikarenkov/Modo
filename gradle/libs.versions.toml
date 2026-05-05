@@ -23,6 +23,7 @@ kotlinCompilerExtension = "1.5.12"
 minSdk = "21"
 compileSdk = "36"
 koin = "4.0.0"
+datastorePreferences = "1.1.1"
 
 [libraries]
 androidx-compose-bom-modo = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBomModo" }
@@ -67,6 +68,7 @@ compose-compile-gradlePlugin = { group = "org.jetbrains.kotlin.plugin.compose", 
 
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
+datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 [plugins]
 modo-detekt = { id = "modo-detekt" }
 modo-android-library = { id = "modo-android-library" }

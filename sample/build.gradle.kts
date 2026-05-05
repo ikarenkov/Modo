@@ -37,6 +37,7 @@ dependencies {
 
     implementation(libs.debug.logcat)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.datastore.preferences)
 
     debugImplementation(libs.leakcanary.android)
 }
