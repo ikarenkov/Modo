@@ -2,13 +2,18 @@ package com.github.terrakok.modo
 
 import android.os.Parcelable
 import androidx.compose.runtime.Stable
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.shareIn
 
 /**
  * State of navigation used in [NavigationContainer]. Can be any type.
@@ -69,21 +74,17 @@ fun <State : NavigationState> NavigationContainer<State>.dispatch(
 }
 
 /**
- * Observes navigation state changes across the entire subtree rooted at this container.
+ * Cold [Flow] that observes navigation state changes across the entire subtree rooted at this container.
  *
- * Emits the current state on subscription, and re-emits whenever this container or *any* descendant
+ * Emits the current state on collection, and re-emits whenever this container or *any* descendant
  * [NavigationContainer] dispatches. Observers are expected to re-walk via [NavigationState.getChildScreens]
  * to inspect the updated tree — emissions carry the root state, not nested states.
  *
- * Resubscription semantics: [flatMapLatest] cancels and rebuilds the inner subscription tree
- * whenever this container's own state changes, so subscriptions to removed children are
- * abandoned and newly added children are picked up automatically.
- *
- * To turn this into a hot [StateFlow], wrap the result with `stateIn(scope, started, initial)`
- * at the call site — the sharing policy is a consumer concern.
+ * Because this is a cold flow, no [CoroutineScope] is needed at the call site. Use [subtreeStateFlow]
+ * for a hot [StateFlow] with a synchronously accessible current value.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-fun NavigationContainer<*>.subtreeStateFlow(): Flow<NavigationState> =
+fun NavigationContainer<*>.subtreeFlow(): Flow<NavigationState> =
     stateFlow.flatMapLatest { state ->
         flow {
             emit(state)
@@ -93,11 +94,41 @@ fun NavigationContainer<*>.subtreeStateFlow(): Flow<NavigationState> =
             // outer flatMapLatest, not by branching here.
             state.getChildScreens()
                 .filterIsInstance<NavigationContainer<*>>()
-                .map { it.subtreeStateFlow().drop(1) }
+                .map { it.subtreeFlow().drop(1) }
                 .merge()
                 .collect { emit(state) }
         }
     }
+
+/**
+ * Hot [StateFlow] that observes navigation state changes across the entire subtree rooted at this container.
+ *
+ * Emits the current root state on collection, and re-emits whenever this container or *any* descendant
+ * [NavigationContainer] dispatches. Observers are expected to re-walk via [NavigationState.getChildScreens]
+ * to inspect the updated tree — emissions carry the root state, not nested states.
+ *
+ * Note: unlike a typical [StateFlow], same-value re-emissions are NOT deduplicated — a nested dispatch
+ * does not change the root state object but must still trigger observers.
+ *
+ * @param scope the [CoroutineScope] that keeps the returned [StateFlow] active.
+ * @param started controls when upstream collection starts and stops; defaults to [SharingStarted.Eagerly].
+ */
+fun NavigationContainer<*>.subtreeStateFlow(
+    scope: CoroutineScope,
+    started: SharingStarted = SharingStarted.Eagerly
+): StateFlow<NavigationState> {
+    // SharedFlow(replay=1) preserves all emissions without equals-based deduplication,
+    // which is required because nested dispatches re-emit the unchanged root state as a signal.
+    val shared: SharedFlow<NavigationState> = subtreeFlow().shareIn(scope, started, replay = 1)
+    return object : StateFlow<NavigationState> {
+        override val value: NavigationState
+            get() = shared.replayCache.firstOrNull() ?: stateFlow.value
+        override val replayCache: List<NavigationState>
+            get() = shared.replayCache.ifEmpty { listOf(stateFlow.value) }
+        override suspend fun collect(collector: FlowCollector<NavigationState>): Nothing =
+            shared.collect(collector)
+    }
+}
 
 /**
  * Migration shim for the dev-branch `navigationStateFlow()` extension that produced a
@@ -116,4 +147,4 @@ fun NavigationContainer<*>.subtreeStateFlow(): Flow<NavigationState> =
 )
 @Suppress("UNCHECKED_CAST", "unused")
 fun <State : NavigationState> NavigationContainer<State>.navigationStateFlow(): Flow<State> =
-    subtreeStateFlow() as Flow<State>
+    subtreeFlow() as Flow<State>

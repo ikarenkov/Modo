@@ -9,8 +9,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
@@ -35,10 +37,10 @@ fun NavigationTreeStrip(
     modifier: Modifier = Modifier,
     visibleScreens: Int = 2,
 ) {
-    val state by produceState<NavigationState?>(initialValue = null, container) {
-        container.subtreeStateFlow().collect { value = it }
-    }
-    val text = state?.compactRender(visibleScreens).orEmpty()
+    val scope = rememberCoroutineScope()
+    val stateFlow = remember(container) { container.subtreeStateFlow(scope) }
+    val state by stateFlow.collectAsState()
+    val text = state.compactRender(visibleScreens)
     AnimatedContent(
         targetState = text,
         transitionSpec = { fadeIn() togetherWith fadeOut() using SizeTransform(clip = true) },
