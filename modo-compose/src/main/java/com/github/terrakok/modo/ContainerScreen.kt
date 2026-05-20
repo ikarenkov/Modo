@@ -82,7 +82,6 @@ abstract class ContainerScreen<State : NavigationState>(
  * exclusively through [dispatch]. Parcelable so it survives process death.
  * Intended to be owned by a [ContainerScreen], which delegates [NavigationContainer] to it.
  */
-@Stable
 class NavModel<State : NavigationState>(
     initialState: State,
     val screenKey: ScreenKey = generateScreenKey()
