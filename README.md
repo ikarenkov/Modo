@@ -27,21 +27,20 @@ Each integration of Modo is a
 * Each node is a <code>Screen</code> or <code>ContainerScreen</code>.
 * Leaf nodes are <code>Screen</code>s.
 * Inner nodes are <code>ContainerScreen</code>s. They can contain other <code>Screen</code>s or <code>ContainerScreen</code>s in their <code>
-  navigationState</code>.
+  NavigationState</code>.
 * The root node is a <code>RootScreen</code>. You can have multiple roots in your app.
   See <a href="https://ikarenkov.github.io/Modo/how-to-integrate-modo-to-your-app.html">How to integrate Modo</a> for details.
 
 ## State Defines UI
 
 * `NavigationState` defines the UI:
-    * The initial state is defined in the constructor of `ContainerScreen` by `navModel: NavModel<State, Action>`.
-    * To update the state, use `dispatch(action: Action)` on `NavigationContainer`, or use the built-in extension functions
+    * The initial state is defined in the constructor of `ContainerScreen` by `navModel: NavModel<State>`.
+    * To update the state, dispatch a lambda that calculates the new state from the old one, or use the built-in extension functions
       for [StackScreen](modo-compose/src/main/java/com/github/terrakok/modo/stack/StackActions.kt)
       and [MultiScreen](modo-compose/src/main/java/com/github/terrakok/modo/multiscreen/MultiScreenActions.kt).
 * There are `Screen` and `ContainerScreen`:
     * `ContainerScreen` can contain and render child screens.
     * There are some built-in implementations of `ContainerScreen` like `StackScreen` and `MultiScreen`.
-* You can easily create custom `Action` by extending `Action` or `ReducerAction`.
 
 # For Maintainers
 

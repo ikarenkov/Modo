@@ -48,13 +48,13 @@ structures. [`StackScreen`](StackScreen.md) and `MultiScreen` are built-in imple
 
 ![diagram_2.png](diagram_2.png){ height = 300 }
 
-Each ContainerScreen is defined by two typed parameters: State and Action.
+Each ContainerScreen is parameterized by its `State` type.
 
 ```kotlin
 @Stable
-abstract class ContainerScreen<State : NavigationState, Action : NavigationAction<State>>(
-    private val navModel: NavModel<State, Action>
-) : Screen, NavigationContainer<State, Action> by navModel 
+abstract class ContainerScreen<State : NavigationState>(
+    private val navModel: NavModel<State>
+) : Screen, NavigationContainer<State> by navModel 
 ```
 
 { collapsible="true" default-state="collapsed" collapsed-title="ContainerScreen"}
@@ -62,7 +62,7 @@ abstract class ContainerScreen<State : NavigationState, Action : NavigationActio
 <procedure>
 <title>State</title>
 <p>
-<code>NavigationState</code> - a class that can contain nested screens and other additional information. The state can be updated by calling <code>dispatch(action)</code>.
+<code>NavigationState</code> - a class that can contain nested screens and other additional information. The state can be updated by calling <code>dispatch(reducer)</code>.
 </p>
 <code-block lang="kotlin" collapsible="true" default-state="collapsed" collapsed-title-line-number="2">
 @Parcelize
@@ -81,10 +81,9 @@ Read the <a href="#state-update">State Update</a> section for more details.
 </procedure>
 
 <procedure>
-<title>Action</title>
+<title>Reducer</title>
 <p>
-<code>NavigationAction</code> - a marker interface to distinguish actions for this container on a specific <code>State</code>. You can also use 
-<code>ReducerAction</code> to define actions with an in-place update function:
+<code>NavigationReducer</code> - a pure state transformer that takes the old state and returns the new one. Dispatch it via <code>dispatch(reducer)</code> to update the container's state:
 <code-block src="SampleAction.kt" lang="kotlin" collapsible="true" default-state="collapsed" include-lines="1-12"/>
 
 </p>
@@ -106,18 +105,27 @@ The built-in `StackScreen` and `MultiScreen` use `InternalContent` under the hoo
 
 ## State Update
 
-To update the state of a `ContainerScreen`, use `dispatch(action: Action)`.
-There are two ways to define your action:
+The simplest way to update a `ContainerScreen`'s state is to dispatch a lambda that calculates the new state from the old one. For example, to push two new screens onto a `StackScreen`:
 
-### ReducerAction (Recommended)
+```kotlin
+stackContainer.dispatch { oldState ->
+    StackState(oldState.stack + listOf(NextScreen(), AnotherScreen()))
+}
+```
 
-ReducerAction allows defining the update function in-place.
-<code-block src="SampleAction.kt" lang="kotlin" collapsible="true" default-state="collapsed" include-lines="1-12"/>
+The built-in containers already expose convenience extension functions for the most common operations, so the same change can be written as:
 
-### Custom Reducer + Action
+```kotlin
+stackContainer.forward(NextScreen(), AnotherScreen())
+```
 
-You can provide a reducer in your <code>ContainerScreen</code> implementation.
-<code-block src="SampleAction.kt" lang="kotlin" collapsible="true" default-state="collapsed" include-lines="13-42"/>
+Explore the available commands in [`StackActions.kt`](%github_code_url%modo-compose/src/main/java/com/github/terrakok/modo/stack/StackActions.kt) (`forward`, `back`, `replace`, …) and [`MultiScreenActions.kt`](%github_code_url%modo-compose/src/main/java/com/github/terrakok/modo/multiscreen/MultiScreenActions.kt).
+
+If you need reusable or parameterized state changes, define your own `NavigationReducer<State>`. Pick whichever shape fits your code:
+
+- named instances on an object (the `SampleReducer` / `SampleReducers` example above)
+- a class with constructor parameters — see [`RemoveTabReducer`](%github_code_url%sample/src/main/java/com/github/terrakok/modo/sample/screens/containers/RemoveTabReducer.kt) in the sample app
+- your own extension functions on a typed `NavigationContainer<YourState>` for ergonomic call sites
 
 ## Root Screen
 

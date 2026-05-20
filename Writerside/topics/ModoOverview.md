@@ -39,15 +39,11 @@ Modo is an easy-to-use library. Here are some of the most-used features of Modo 
   val onForwardClick = { stackNavigation.forward(SampleScreen()) }
   ```
 
-* You can easily change `NavigationState` as needed by calling `dispatch(action: (StackState) -> StackState)` on `NavigationContainer`:
+* For arbitrary state changes the built-in commands don't cover, pass a lambda that calculates the new state from the old one. For example, to remove every `LoginScreen` from the stack:
 
   ```kotlin
   navigation.dispatch { oldState ->
-      StackState(
-          oldState.stack.filterIndexed { index, screen ->
-              index % 2 == 0 && screen != oldState.stack.last()
-          }
-      )
+      StackState(oldState.stack.filter { it !is LoginScreen })
   }
   ```
 
