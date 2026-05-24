@@ -131,18 +131,42 @@ fun NavigationContainer<*>.subtreeStateFlow(
 }
 
 /**
- * Migration shim for the dev-branch `navigationStateFlow()` extension that produced a
- * `snapshotFlow { navigationState }` flow. The new API splits that into two operations,
- * so this shim makes silent migration impossible.
+ * Migration shim for the previous `navigationState` property on [NavigationContainer]. Pick the
+ * replacement that matches the consumer's actual intent:
  *
- * - For per-container observation: use the [NavigationContainer.stateFlow] property.
- * - For whole-subtree observation (the previous behavior when consumers walked `getChildScreens()`):
- *   use [subtreeStateFlow].
+ * - [NavigationContainer.stateFlow].value — one-shot read of this container's state.
+ * - `stateFlow.collectAsState()` — Compose-reactive read of this container's state.
+ * - [subtreeStateFlow] — hot StateFlow observing this container AND every nested container.
+ * - [subtreeFlow] — cold Flow equivalent of [subtreeStateFlow], no scope required.
+ * - Or change the declared type to the concrete ContainerScreen subtype (StackScreen,
+ *   MultiScreen, ...) which still exposes Compose-reactive `navigationState`.
+ */
+@Deprecated(
+    message = "navigationState was removed from NavigationContainer. Pick a migration:\n" +
+        " - stateFlow.value             — one-shot read of this container's state\n" +
+        " - stateFlow.collectAsState()  — Compose-reactive read of this container's state\n" +
+        " - subtreeStateFlow(scope)     — hot StateFlow observing this container AND every nested container (whole subtree)\n" +
+        " - subtreeFlow()               — cold Flow equivalent of subtreeStateFlow, no scope required\n" +
+        " - or change the declared type to the concrete ContainerScreen subtype (StackScreen, MultiScreen, ...) " +
+        "which still exposes Compose-reactive navigationState.",
+    replaceWith = ReplaceWith("stateFlow.value"),
+    level = DeprecationLevel.ERROR,
+)
+@Suppress("unused")
+val <State : NavigationState> NavigationContainer<State>.navigationState: State
+    get() = stateFlow.value
+
+/**
+ * Migration shim for the dev-branch `navigationStateFlow()` extension that produced a
+ * `snapshotFlow { navigationState }` flow. The closest replacement is the per-container
+ * [NavigationContainer.stateFlow] property; for whole-subtree observation use [subtreeFlow]
+ * (cold) or [subtreeStateFlow] (hot).
  */
 @Deprecated(
     message = "Replaced by the `stateFlow` property (per-container) and " +
-        "`subtreeStateFlow()` (whole subtree). The previous snapshotFlow-based extension is gone.",
-    replaceWith = ReplaceWith("subtreeStateFlow()"),
+        "`subtreeFlow( сс                        ии  )` / `subtreeStateFlow(scope)` (whole subtree). " +
+        "The previous snapshotFlow-based extension is gone.",
+    replaceWith = ReplaceWith("stateFlow"),
     level = DeprecationLevel.ERROR,
 )
 @Suppress("UNCHECKED_CAST", "unused")
