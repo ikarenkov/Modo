@@ -120,15 +120,14 @@ fun NavigationContainer<*>.subtreeFlow(): Flow<NavigationState> =
  * does not change the root state object but must still trigger observers.
  *
  * @param scope the [CoroutineScope] that keeps the returned [StateFlow] active.
- * @param started controls when upstream collection starts and stops; defaults to [SharingStarted.Eagerly].
  */
-fun NavigationContainer<*>.subtreeStateFlow(
-    scope: CoroutineScope,
-    started: SharingStarted = SharingStarted.Eagerly
-): StateFlow<NavigationState> {
+fun NavigationContainer<*>.subtreeStateFlow(scope: CoroutineScope): StateFlow<NavigationState> {
     // SharedFlow(replay=1) preserves all emissions without equals-based deduplication,
     // which is required because nested dispatches re-emit the unchanged root state as a signal.
-    val shared: SharedFlow<NavigationState> = subtreeFlow().shareIn(scope, started, replay = 1)
+    // Started eagerly so `.value` / `.collect` always observe at least the initial root state without
+    // a first-subscriber timing window.
+    val shared: SharedFlow<NavigationState> =
+        subtreeFlow().shareIn(scope, SharingStarted.Eagerly, replay = 1)
     return object : StateFlow<NavigationState> {
         override val value: NavigationState
             get() = shared.replayCache.firstOrNull() ?: stateFlow.value
