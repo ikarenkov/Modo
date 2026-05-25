@@ -178,6 +178,6 @@ val <State : NavigationState> NavigationContainer<State>.navigationState: State
     replaceWith = ReplaceWith("stateFlow"),
     level = DeprecationLevel.ERROR,
 )
-@Suppress("UNCHECKED_CAST", "unused")
+@Suppress("unused")
 fun <State : NavigationState> NavigationContainer<State>.navigationStateFlow(): Flow<State> =
-    subtreeFlow() as Flow<State>
+    stateFlow
