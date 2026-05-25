@@ -1,0 +1,28 @@
+{
+    "permissions": {
+        "allow": [
+            "Bash(git show:*)",
+            "Bash(git log:*)",
+            "Bash(git diff:*)",
+            "Bash(git status)",
+            "Bash(git blame:*)",
+            "Bash(sed -n:*)",
+            "Bash(head:*)",
+            "Bash(tail:*)",
+            "Bash(cat:*)",
+            "Bash(wc:*)",
+            "Bash(xxd:*)",
+            "Bash(file:*)",
+            "Bash(ls:*)",
+            "Bash(rg:*)",
+            "Bash(grep:*)",
+            "Bash(jq:*)",
+            "Bash(diff:*)",
+            "Bash(pwd)"
+        ],
+        "deny": [
+            "Read(./local.properties)",
+            "Read(**/local.properties)"
+        ]
+    }
+}
