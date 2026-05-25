@@ -50,6 +50,15 @@ fun interface NavigationReducer<State : NavigationState> {
 interface NavigationContainer<State : NavigationState> {
     val stateFlow: StateFlow<State>
 
+    /**
+     * Atomically applies [reducer] to the current state.
+     *
+     * Reducers MUST be pure functions of their input state: on contended dispatches the
+     * implementation may invoke the reducer multiple times (compare-and-set retry) before
+     * one application wins and is published. Any side effect performed inside the reducer
+     * will therefore execute an unspecified number of times — perform side effects outside
+     * the reducer (e.g. before/after calling [dispatch]).
+     */
     fun dispatch(reducer: NavigationReducer<State>)
 }
 

@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 val LocalContainerScreen = staticCompositionLocalOf<ContainerScreen<*>?> { null }
 
@@ -91,7 +92,7 @@ class NavModel<State : NavigationState>(
     override val stateFlow: StateFlow<State> = _navigationState.asStateFlow()
 
     override fun dispatch(reducer: NavigationReducer<State>) {
-        _navigationState.value = reducer.reduce(_navigationState.value)
+        _navigationState.update { reducer.reduce(it) }
     }
 
     override fun describeContents(): Int = 0
