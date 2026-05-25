@@ -18,6 +18,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import com.github.terrakok.modo.Modo.rememberRootScreen
 import com.github.terrakok.modo.Modo.rootScreens
 import com.github.terrakok.modo.Modo.save
+import com.github.terrakok.modo.lifecycle.LifecycleDependency
 import com.github.terrakok.modo.model.ScreenModelStore
 import com.github.terrakok.modo.util.getActivity
 import java.util.concurrent.ConcurrentHashMap
@@ -114,7 +115,7 @@ object Modo {
         if (rootScreen != null) {
             Log.d("Modo", "rootScreen removing $rootScreen")
             rootScreens.remove(rootScreen.screenKey)
-            clearScreenModel(rootScreen)
+            rootScreen.clearFullTree()
         }
     }
 
@@ -216,11 +217,17 @@ object Modo {
         return rootScreen
     }
 
-    private fun clearScreenModel(screen: Screen) {
-        ScreenModelStore.remove(screen)
-        (screen as? ContainerScreen<*>)?.navigationState?.getChildScreens()?.forEach(::clearScreenModel)
-    }
+}
 
+/**
+ * Final-tier teardown for a root subtree, run when there is no parent renderer to drive the
+ * in-tree cleanup cascade. Cancels every nested [ComposeRenderer] coroutine scope, evicts
+ * [ScreenModelStore] entries, and dispatches `ON_DESTROY` through each screen's
+ * [LifecycleDependency] — the bits that outlive the composition's own teardown.
+ */
+internal fun ContainerScreen<*>.clearFullTree() {
+    onPreDispose()
+    clearState(stateHolder = null)
 }
 
 /**

@@ -225,8 +225,8 @@ internal class ComposeRenderer<State : NavigationState>(
      * @param stateHolder - SaveableStateHolder that contains screen states
      * @param clearAll - forces to remove all screen states that renderer holds (removed and "displayed")
      */
-    private fun clearScreens(stateHolder: SaveableStateHolder, clearAll: Boolean = false) {
-        fun Iterable<Screen>.clearStates(stateHolder: SaveableStateHolder) = forEach { screen ->
+    internal fun clearScreens(stateHolder: SaveableStateHolder?, clearAll: Boolean = false) {
+        fun Iterable<Screen>.clearStates(stateHolder: SaveableStateHolder?) = forEach { screen ->
             screen.clearState(stateHolder)
         }
 
@@ -248,7 +248,7 @@ internal class ComposeRenderer<State : NavigationState>(
      * Called onPreDispose for removed screens, that are not presented in [preDisposeProtectedScreens] (not displayed on screen).
      * @param clearAll - forces to call onPreDispose on all children screen states that renderer holds (removed and "displayed")
      */
-    private fun onPreDispose(clearAll: Boolean = false) {
+    internal fun onPreDispose(clearAll: Boolean = false) {
         fun Iterable<Screen>.onPreDispose() = forEach { screen ->
             screen.onPreDispose()
         }
@@ -262,41 +262,50 @@ internal class ComposeRenderer<State : NavigationState>(
         safeToRemove.onPreDispose()
     }
 
-    private fun Screen.clearState(stateHolder: SaveableStateHolder) {
-        // It's important to do this check for debug purpose, because we must guaranty that Screen is cleaned only if it is not displaying anymore.
-        // But it seems like it is not working with movable content, so this one is going to be triggered.
-        if (this in cleanupProtectedScreens) {
-            ModoDevOptions.onIllegalClearState.validationFailed(
-                IllegalStateException(
-                    "Trying to remove clean state of the screen $this, why this screen still is visible for User."
-                )
-            )
-        }
-        ScreenModelStore.remove(this)
-        stateHolder.removeState(saveableStateKey)
-        stateHolder.removeState(overlaySaveableStateKey)
-
-        ModoDevOptions.onScreenDisposeListener?.invoke(this)
-        // clear nested screens using recursion
-        (this as? ContainerScreen<*>)?.renderer?.let { nested ->
-            nested.clearScreens(stateHolder, clearAll = true)
-            nested.dispose()
-        }
-    }
-
-    // need for correct handling lifecycle
-    private fun Screen.onPreDispose() {
-        devLogI(TAG) { "onPreDispose $screenKey" }
-        dependenciesSortedByRemovePriority()
-            .filterIsInstance<LifecycleDependency>()
-            .forEach { it.onPreDispose() }
-        // send onPreDispose to nested screens
-        (this as? ContainerScreen<*>)?.renderer?.onPreDispose(clearAll = true)
-    }
-
     private fun calculateRemovedScreens(oldState: NavigationState, newState: NavigationState): List<Screen> {
         val newChainSet = newState.getChildScreens()
         return oldState.getChildScreens().filter { it !in newChainSet }
     }
 
+}
+
+/**
+ * Dispatches `onPreDispose` to [this] screen's [LifecycleDependency] (so user code observing
+ * `ON_DESTROY` runs) and then cascades into nested renderers' children.
+ */
+internal fun Screen.onPreDispose() {
+    devLogI(TAG) { "onPreDispose $screenKey" }
+    dependenciesSortedByRemovePriority()
+        .filterIsInstance<LifecycleDependency>()
+        .forEach { it.onPreDispose() }
+    (this as? ContainerScreen<*>)?.renderer?.onPreDispose(clearAll = true)
+}
+
+/**
+ * Removes [this] screen's [ScreenModelStore] entries, evicts its slots from [stateHolder] (when
+ * provided), fires [ModoDevOptions.onScreenDisposeListener], and recurses into any nested
+ * renderer to clean its children + dispose its scope.
+ *
+ * @param stateHolder caller-owned [SaveableStateHolder] to evict slots from. Pass null when the
+ *   holder is dying with its composition (root teardown).
+ */
+internal fun Screen.clearState(stateHolder: SaveableStateHolder?) {
+    // It's important to do this check for debug purpose, because we must guaranty that Screen is cleaned only if it is not displaying anymore.
+    // But it seems like it is not working with movable content, so this one is going to be triggered.
+    if (this in cleanupProtectedScreens) {
+        ModoDevOptions.onIllegalClearState.validationFailed(
+            IllegalStateException(
+                "Trying to remove clean state of the screen $this, why this screen still is visible for User."
+            )
+        )
+    }
+    ScreenModelStore.remove(this)
+    stateHolder?.removeState(saveableStateKey)
+    stateHolder?.removeState(overlaySaveableStateKey)
+
+    ModoDevOptions.onScreenDisposeListener?.invoke(this)
+    (this as? ContainerScreen<*>)?.renderer?.let { nested ->
+        nested.clearScreens(stateHolder, clearAll = true)
+        nested.dispose()
+    }
 }
