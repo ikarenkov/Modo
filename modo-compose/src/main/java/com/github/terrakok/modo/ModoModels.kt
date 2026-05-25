@@ -172,7 +172,7 @@ val <State : NavigationState> NavigationContainer<State>.navigationState: State
  */
 @Deprecated(
     message = "Replaced by the `stateFlow` property (per-container) and " +
-        "`subtreeFlow( сс                        ии  )` / `subtreeStateFlow(scope)` (whole subtree). " +
+        "`subtreeFlow()` / `subtreeStateFlow(scope)` (whole subtree). " +
         "The previous snapshotFlow-based extension is gone.",
     replaceWith = ReplaceWith("stateFlow"),
     level = DeprecationLevel.ERROR,
