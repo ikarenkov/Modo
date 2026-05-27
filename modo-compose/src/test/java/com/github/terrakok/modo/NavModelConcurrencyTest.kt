@@ -1,8 +1,8 @@
 package com.github.terrakok.modo
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import kotlinx.parcelize.Parcelize
 import org.junit.jupiter.api.Test

@@ -61,15 +61,17 @@ class ComposeRendererDisposalTest {
     private fun createTestRenderer(): ComposeRenderer<MockNavigationState> {
         val state = MockNavigationState()
         val navModel: NavModel<MockNavigationState> = NavModel(state)
+
         @Suppress("UNCHECKED_CAST")
-        val containerScreen = object : ContainerScreen<MockNavigationState>(navModel),
+        val containerScreen = object :
+            ContainerScreen<MockNavigationState>(navModel),
             Parcelable {
             @Composable
             override fun Content(modifier: Modifier) = Unit
 
             override fun describeContents(): Int = 0
 
-            override fun writeToParcel(parcel: Parcel, flags: Int) {}
+            override fun writeToParcel(parcel: Parcel, flags: Int) = Unit
         }
         return ComposeRenderer(containerScreen, navModel.stateFlow)
     }

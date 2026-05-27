@@ -1,7 +1,7 @@
 package com.github.terrakok.modo.stack
 
-import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.NavigationContainer
+import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.ReducerAction
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey

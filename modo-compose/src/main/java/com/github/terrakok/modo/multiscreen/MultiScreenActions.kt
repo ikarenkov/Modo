@@ -1,9 +1,7 @@
 package com.github.terrakok.modo.multiscreen
 
-import com.github.terrakok.modo.NavigationAction
 import com.github.terrakok.modo.NavigationContainer
 import com.github.terrakok.modo.NavigationReducer
-import com.github.terrakok.modo.ReducerAction
 
 @Deprecated("Use MultiScreenReducer instead.", ReplaceWith("MultiScreenReducer"))
 typealias MultiScreenReducerAction = MultiScreenReducer

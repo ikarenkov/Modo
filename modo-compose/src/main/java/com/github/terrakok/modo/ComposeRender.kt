@@ -175,7 +175,8 @@ internal class ComposeRenderer<State : NavigationState>(
                 removedScreens.addAll(calculateRemovedScreens(state, newState))
                 lastState = state
                 state = newState
-                // Handling a case when updating state doesn't cause UI to update. But if some screens was removed, we need to move them to destroy state.
+                // Handling a case when updating state doesn't cause UI to update. But if some
+                // screens were removed, we need to move them to destroy state.
                 // F.e. removing previous screen causes this case.
                 onPreDispose()
             }
