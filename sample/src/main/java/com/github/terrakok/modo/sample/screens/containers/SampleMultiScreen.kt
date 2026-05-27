@@ -80,7 +80,7 @@ internal class SampleMultiScreen(
                 }
                 Text(
                     modifier = Modifier
-                        .clickable { addTab(navigationState.screens.size.toString(), MainScreen(1)) }
+                        .clickable { addTab(MainScreen(1)) }
                         .padding(16.dp),
                     textAlign = TextAlign.Center,
                     text = "[+]"

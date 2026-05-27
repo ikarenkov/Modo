@@ -47,7 +47,6 @@ internal object RemovableItemContainerReducers {
 
 @Parcelize
 internal class RemovableItemContainerScreen(
-    private val useCustomReducer: Boolean = false,
     private val navModel: NavModel<RemovableItemContainerState> = NavModel(
         RemovableItemContainerState(
             NestedScreen(canBeRemoved = false),

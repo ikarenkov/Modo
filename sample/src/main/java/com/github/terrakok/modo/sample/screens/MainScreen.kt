@@ -151,10 +151,7 @@ private fun rememberButtons(
                         ModoButtonSpec("Dialogs & BottomSheets") { navigation?.forward(DialogsPlayground(i + 1)) },
                         ModoButtonSpec("Multiscreen") { navigation?.forward(SampleMultiScreen()) },
                         ModoButtonSpec("Custom Container Actions") { navigation?.forward(SampleCustomContainerScreen()) },
-                        ModoButtonSpec("Removable screen") { navigation?.forward(RemovableItemContainerScreen(useCustomReducer = false)) },
-                        ModoButtonSpec("Removable screen with reducer") {
-                            navigation?.forward(RemovableItemContainerScreen(useCustomReducer = true))
-                        },
+                        ModoButtonSpec("Removable screen") { navigation?.forward(RemovableItemContainerScreen()) },
                         ModoButtonSpec("List navigation") {
                             navigation?.forward(SampleListNavigation())
                         },
