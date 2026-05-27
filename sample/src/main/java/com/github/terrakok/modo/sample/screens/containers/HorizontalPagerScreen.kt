@@ -27,13 +27,11 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.NavModel
-import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.list.ListNavigationState
 import com.github.terrakok.modo.list.removeScreens
 import com.github.terrakok.modo.sample.components.CancelButton
 import com.github.terrakok.modo.sample.screens.MainScreen
 import kotlinx.coroutines.launch
-import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

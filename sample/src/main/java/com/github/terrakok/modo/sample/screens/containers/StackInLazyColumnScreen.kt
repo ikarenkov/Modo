@@ -31,7 +31,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.ContainerScreen
-import android.os.Parcelable
 import com.github.terrakok.modo.lazylist.screenItems
 import com.github.terrakok.modo.list.ListNavModel
 import com.github.terrakok.modo.list.ListNavigationState
