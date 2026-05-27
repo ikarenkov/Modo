@@ -1,5 +1,6 @@
 package io.github.ikarenkov.workshop.screens.profile
 
+import android.os.Parcelable
 import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -8,7 +9,6 @@ import androidx.compose.ui.Modifier
 import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.NavModel
 import com.github.terrakok.modo.lazylist.screenItem
-import android.os.Parcelable
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.forward
 import io.github.ikarenkov.workshop.screens.TrainingRecommendationsDialogScreenFinal
@@ -22,7 +22,8 @@ class EnhancedProfileScreenFinal(
     private val navModel: NavModel<EnhancedProfileNavigationState> = NavModel(EnhancedProfileNavigationState())
 ) : ContainerScreen<EnhancedProfileNavigationState>(
     navModel
-), Parcelable {
+),
+    Parcelable {
 
     @Composable
     override fun Content(modifier: Modifier) {

@@ -1,5 +1,6 @@
 package io.github.ikarenkov.workshop.screens.profile
 
+import android.os.Parcelable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -23,7 +24,6 @@ import com.github.terrakok.modo.NavModel
 import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.Screen
-import android.os.Parcelable
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.forward
 import io.github.ikarenkov.workshop.domain.ClimbingType
