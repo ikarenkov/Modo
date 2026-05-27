@@ -34,6 +34,7 @@ import kotlinx.parcelize.Parcelize
 import org.koin.androidx.compose.koinViewModel
 
 @Parcelize
+@Suppress("Wrapping")
 class EnhancedProfileScreen(
     private val navModel: NavModel<EnhancedProfileNavigationState> = NavModel(
         // TODO: Workshop 6.2.4 - set initial state

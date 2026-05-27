@@ -78,7 +78,7 @@ class SettingsDialog(
 }
 
 @Composable
-private fun SettingsBody(onCloseClick: () -> Unit) {
+internal fun SettingsBody(onCloseClick: () -> Unit) {
     Column(modifier = Modifier.padding(24.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
