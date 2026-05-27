@@ -32,7 +32,7 @@ import com.github.terrakok.modo.sample.screens.lifecycle.KeyboardWithLifecycleSc
 import com.github.terrakok.modo.sample.screens.lifecycle.LifecycleSampleScreen
 import com.github.terrakok.modo.sample.screens.stack.StackActionsScreen
 import com.github.terrakok.modo.sample.screens.viewmodel.AndroidViewModelSampleScreen
-import com.github.terrakok.modo.stack.LocalStackNavigation
+import com.github.terrakok.modo.stack.LocalStackScreen
 import com.github.terrakok.modo.stack.StackNavModel
 import com.github.terrakok.modo.stack.StackScreen
 import com.github.terrakok.modo.stack.back
@@ -60,7 +60,7 @@ class MainScreen(
         MainScreenContent(
             screenIndex = screenIndex,
             screenKey = screenKey,
-            navigation = LocalStackNavigation.current,
+            navigation = LocalStackScreen.current,
             modifier = modifier,
             canOpenFragment = canOpenFragment,
         )

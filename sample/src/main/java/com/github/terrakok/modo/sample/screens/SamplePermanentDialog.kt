@@ -13,7 +13,7 @@ import com.github.terrakok.modo.DialogScreen
 import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
-import com.github.terrakok.modo.stack.LocalStackNavigation
+import com.github.terrakok.modo.stack.LocalStackScreen
 import kotlinx.parcelize.Parcelize
 
 @OptIn(ExperimentalModoApi::class)
@@ -41,7 +41,7 @@ class SamplePermanentDialog(
                 .clip(RoundedCornerShape(16.dp))
                 .background(Color.White)
         ) {
-            MainScreenContent(i, screenKey, LocalStackNavigation.current, modifier)
+            MainScreenContent(i, screenKey, LocalStackScreen.current, modifier)
         }
     }
 }

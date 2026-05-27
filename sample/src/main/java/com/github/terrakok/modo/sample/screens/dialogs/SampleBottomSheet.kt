@@ -14,7 +14,7 @@ import com.github.terrakok.modo.ExperimentalModoApi
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.sample.screens.MainScreenContent
-import com.github.terrakok.modo.stack.LocalStackNavigation
+import com.github.terrakok.modo.stack.LocalStackScreen
 import com.github.terrakok.modo.stack.back
 import kotlinx.parcelize.Parcelize
 
@@ -46,7 +46,7 @@ class SampleBottomSheet(
     @Composable
     override fun Content(modifier: Modifier) {
         SetupSystemBar()
-        val navigation = LocalStackNavigation.current
+        val navigation = LocalStackScreen.current
         val state = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.HalfExpanded)
         LaunchedEffect(key1 = state.currentValue) {
             if (state.currentValue == ModalBottomSheetValue.Hidden) {

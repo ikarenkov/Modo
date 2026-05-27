@@ -22,7 +22,7 @@ import com.github.terrakok.modo.sample.screens.dialogs.SampleDialog
 import com.github.terrakok.modo.sample.screens.dialogs.SampleDialogWithStack
 import com.github.terrakok.modo.stack.Back
 import com.github.terrakok.modo.stack.Forward
-import com.github.terrakok.modo.stack.LocalStackNavigation
+import com.github.terrakok.modo.stack.LocalStackScreen
 import com.github.terrakok.modo.stack.StackScreen
 import com.github.terrakok.modo.stack.StackState
 import com.github.terrakok.modo.stack.back
@@ -51,7 +51,7 @@ internal class StackActionsScreen(
             screenName = "StackActionsScreen",
             screenIndex = screenIndex,
             state = rememberButtons(
-                LocalStackNavigation.current,
+                LocalStackScreen.current,
                 screenKey,
                 screenIndex
             )
