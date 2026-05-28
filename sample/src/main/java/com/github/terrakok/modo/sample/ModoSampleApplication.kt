@@ -8,7 +8,7 @@ import kotlinx.coroutines.MainScope
 import logcat.AndroidLogcatLogger
 import logcat.LogPriority
 
-private val Application.dataStore by preferencesDataStore(name = "sample_settings")
+internal val Application.dataStore by preferencesDataStore(name = "sample_settings")
 
 class ModoSampleApplication : Application() {
 
