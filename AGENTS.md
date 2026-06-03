@@ -43,6 +43,8 @@ Per-release notes live at `changelogs/<version>.md` (e.g. `changelogs/0.12.0.md`
 
 The in-progress changelog is `changelogs/<version>.md` where `<version>` is whatever `modo = "<version>"` currently is in `gradle/libs.versions.toml`. If that file doesn't exist yet, create it. If that version is already released (file exists *and* the version is on Maven Central), the change belongs to the *next* release — bump `modo` in `libs.versions.toml` and create a fresh changelog. Match the section structure (`## Architecture refactor`, `## API changes`, `## Deprecations`, `## Sample app changes`, `## Test changes`, `## Repo meta`) of the previous release file; omit sections that don't apply.
 
+Do **not** include a trailing `## What's Changed` / `**Full Changelog**` block in `changelogs/<version>.md` — the `GitHub Release` workflow appends GitHub's auto-generated equivalent. Including one in the file produces a duplicate on the release page.
+
 To cut a release: ensure `changelogs/<version>.md` is complete, then run the `Publish` and `GitHub Release` workflows. See `PUBLISHING.md` for the full procedure.
 
 ## Non-trivial work
