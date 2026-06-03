@@ -35,6 +35,16 @@ formatting in the file you're editing.
 - Breaking API changes on public types (`NavigationContainer`, `Screen`, `NavModel`, etc.) require a deliberate decision — surface in a task doc (see
   *Non-trivial work* below) before implementing.
 
+## Releases & changelogs
+
+Per-release notes live at `changelogs/<version>.md` (e.g. `changelogs/0.12.0.md`). The `GitHub Release` workflow expects this exact path; a missing file fails the release.
+
+**Append entries as you work, not at release time.** When you make a user-visible change — new/changed public API, deprecation, behavior change, notable bug fix, sample-app feature — add a bullet to the in-progress changelog in the same task. Defer-and-batch produces "what changed since last release? let me grep git log" archaeology; we explicitly avoid that.
+
+The in-progress changelog is `changelogs/<version>.md` where `<version>` is whatever `modo = "<version>"` currently is in `gradle/libs.versions.toml`. If that file doesn't exist yet, create it. If that version is already released (file exists *and* the version is on Maven Central), the change belongs to the *next* release — bump `modo` in `libs.versions.toml` and create a fresh changelog. Match the section structure (`## Architecture refactor`, `## API changes`, `## Deprecations`, `## Sample app changes`, `## Test changes`, `## Repo meta`) of the previous release file; omit sections that don't apply.
+
+To cut a release: ensure `changelogs/<version>.md` is complete, then run the `Publish` and `GitHub Release` workflows. See `PUBLISHING.md` for the full procedure.
+
 ## Non-trivial work
 
 For multi-step tasks (refactors, architectural investigations, work likely to span sessions), we use a task-folder workflow — see the **task-workflow
