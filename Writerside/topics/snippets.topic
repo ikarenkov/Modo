@@ -20,7 +20,7 @@
             <step>Each node is a <code>Screen</code> or <code>ContainerScreen</code>.</step>
             <step>Leaf nodes are <code>Screen</code>s.</step>
             <step>Inner nodes are <code>ContainerScreen</code>s. They can contain other <code>Screen</code>s or <code>ContainerScreen</code>s in their
-                <code>navigationState</code>.
+                <code>NavigationState</code>.
             </step>
             <step>The root node is a <code>RootScreen</code>. You can have multiple roots in your app. See <a
                     href="How-to-integrate-modo-to-your-app.md">How to integrate Modo</a> for details.

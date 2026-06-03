@@ -39,6 +39,7 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation(libs.test.androidx.arch.core)
     testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
 }
 
 tasks.withType(Test::class) {

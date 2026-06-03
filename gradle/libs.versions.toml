@@ -1,7 +1,7 @@
 [versions]
 composeWheelPicker = "1.0.0-beta05"
 leakcanaryAndroid = "2.14"
-modo = "0.11.0"
+modo = "0.12.0-rc1"
 #noinspection AndroidGradlePluginVersion
 androidGradlePlugin = "8.13.2"
 nexusPublish = "2.0.0"
@@ -23,6 +23,7 @@ kotlinCompilerExtension = "1.5.12"
 minSdk = "21"
 compileSdk = "36"
 koin = "4.0.0"
+datastorePreferences = "1.1.1"
 
 [libraries]
 androidx-compose-bom-modo = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBomModo" }
@@ -55,6 +56,7 @@ mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 debug-logcat = { group = "com.squareup.logcat", name = "logcat", version = "0.1" }
 
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.8.1" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version = "1.8.1" }
 
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
@@ -66,6 +68,7 @@ compose-compile-gradlePlugin = { group = "org.jetbrains.kotlin.plugin.compose", 
 
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
+datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 [plugins]
 modo-detekt = { id = "modo-detekt" }
 modo-android-library = { id = "modo-android-library" }

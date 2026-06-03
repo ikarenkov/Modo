@@ -2,7 +2,7 @@ package io.github.ikarenkov.workshop.screens.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.terrakok.modo.ReducerAction
+import com.github.terrakok.modo.NavigationReducer
 import io.github.ikarenkov.workshop.core.mapStateFlow
 import io.github.ikarenkov.workshop.data.ClimberProfileRepository
 import io.github.ikarenkov.workshop.domain.ClimberProfile
@@ -26,7 +26,7 @@ class EnhancedProfileViewModelFinal(
         viewModelScope.launch {
             climberProfileRepository.climberProfile.collect { profile ->
                 enhancedProfileScreenFinal.dispatch(
-                    EnhancedProfileNavigationAction(
+                    EnhancedProfileNavigationReducer(
                         showClimberProfile = profile.dateOfBirth != null,
                         showBoulderLever = profile.boulderLevel.hasAllGrades(),
                         showLeadLevel = profile.sportLevel.hasAllGrades()
@@ -49,11 +49,11 @@ class EnhancedProfileViewModelFinal(
     )
 }
 
-class EnhancedProfileNavigationAction(
+class EnhancedProfileNavigationReducer(
     private val showClimberProfile: Boolean,
     private val showLeadLevel: Boolean,
     private val showBoulderLever: Boolean,
-) : ReducerAction<EnhancedProfileNavigationState> {
+) : NavigationReducer<EnhancedProfileNavigationState> {
     override fun reduce(oldState: EnhancedProfileNavigationState): EnhancedProfileNavigationState = oldState.copy(
         climbingProfileScreen = if (showClimberProfile) {
             oldState.climbingProfileScreen ?: ClimberPersonalInfoScreen()
@@ -71,5 +71,4 @@ class EnhancedProfileNavigationAction(
             null
         }
     )
-
 }

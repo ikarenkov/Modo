@@ -42,6 +42,7 @@ fun LifecycleEventsHistory(
     enabled: Boolean = SampleAppConfig.displayLifecycleEvents,
     lifecycleEventsHistory: SnapshotStateList<Lifecycle.Event>? = null,
     fontSize: TextUnit = 16.sp,
+    maxLines: Int = Int.MAX_VALUE,
 ) {
     if (enabled && !LocalInspectionMode.current) {
         val lifecycleEventsHistory = lifecycleEventsHistory ?: viewModel<LifecycleEventsViewModel>(key = key).lifecycleEventsHistory
@@ -72,7 +73,7 @@ fun LifecycleEventsHistory(
                     )
                 }
         ) {
-            for (item in lifecycleEventsHistory) {
+            for (item in lifecycleEventsHistory.takeLast(maxLines)) {
                 Text(text = item.name, fontSize = fontSize)
                 if (item == Lifecycle.Event.ON_STOP) {
                     Divider(
@@ -89,8 +90,10 @@ fun LifecycleEventsHistory(
 fun BoxScope.LifecycleEventsHistory(
     modifier: Modifier = Modifier,
     alignment: Alignment = Alignment.TopEnd,
+    maxLines: Int = Int.MAX_VALUE,
 ) = LifecycleEventsHistory(
     fontSize = 8.sp,
+    maxLines = maxLines,
     modifier = modifier
         .background(Color.White.copy(alpha = 0.5f))
         .align(alignment)

@@ -1,0 +1,103 @@
+name: Publish
+run-name: Publish ${{ inputs.ref }} to Sonatype staging
+
+# Manual-only release workflow.
+#
+# What it does:
+#  1. Builds the release AAR + sources + javadoc.
+#  2. Signs artifacts with GPG.
+#  3. Uploads to a Sonatype staging repository and closes it for validation.
+#
+# What it does NOT do:
+#  - It does not auto-release to Maven Central. After the workflow succeeds,
+#    open https://central.sonatype.com/publishing, review the deployment,
+#    and click "Publish" (or "Drop" to discard). Once published, the version
+#    is immutable.
+#
+# Security:
+#  - Secrets are scoped to the `maven-central` environment, which must be
+#    configured in repo settings with required reviewers — the job will pause
+#    for human approval before any secret is exposed to the runner.
+#  - Action references use version tags for consistency with other workflows
+#    in this repo. For stronger supply-chain hardening, pin all `uses:` lines
+#    to a commit SHA and enable Dependabot for actions.
+#
+# See PUBLISHING.md for setup instructions (required secrets and how to
+# generate them).
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref to publish (tag, branch, or commit SHA)"
+        required: true
+        default: "dev"
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Publish to Sonatype staging
+    runs-on: ubuntu-latest
+    environment: maven-central
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout ${{ inputs.ref }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Decode signing key
+        env:
+          SIGNING_KEY_BASE64: ${{ secrets.SIGNING_KEY_BASE64 }}
+        run: |
+          if [ -z "${SIGNING_KEY_BASE64:-}" ]; then
+            echo "::error::SIGNING_KEY_BASE64 secret is not set"
+            exit 1
+          fi
+          mkdir -p "$RUNNER_TEMP/signing"
+          printf '%s' "$SIGNING_KEY_BASE64" | base64 --decode > "$RUNNER_TEMP/signing/secring.gpg"
+          chmod 600 "$RUNNER_TEMP/signing/secring.gpg"
+          echo "SIGNING_SECRET_KEY_RING_FILE=$RUNNER_TEMP/signing/secring.gpg" >> "$GITHUB_ENV"
+
+      - name: Publish to staging and close
+        env:
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+        run: |
+          ./gradlew --no-daemon clean \
+            modo-compose:bundleReleaseAar \
+            publishAllPublicationsToSonatypeRepository \
+            closeSonatypeStagingRepository
+
+      - name: Wipe signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/signing/secring.gpg"
+
+      - name: Summary
+        if: success()
+        run: |
+          {
+            echo "### Staged for Maven Central"
+            echo
+            echo "Artifacts have been uploaded to a Sonatype staging repository and validated."
+            echo
+            echo "**Next:** open https://central.sonatype.com/publishing, review the deployment,"
+            echo "and click **Publish** to release — or **Drop** to discard."
+            echo
+            echo "Once published, the version is immutable."
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -30,7 +30,14 @@ import com.github.terrakok.modo.generateScreenKey
 import kotlinx.parcelize.Parcelize
 
 val LocalStackNavigation: ProvidableCompositionLocal<StackNavContainer> = staticCompositionLocalOf {
-    error("There is no LocalStackNavigation in hierarchy, or maybe you override provideCompositionLocal and forgot to call supper.")
+    error("There is no LocalStackNavigation in hierarchy, or maybe you override provideCompositionLocal and forgot to call super.")
+}
+
+/**
+ * Provides the nearest [StackScreen] in the composition.
+ */
+val LocalStackScreen: ProvidableCompositionLocal<StackScreen> = staticCompositionLocalOf {
+    error("There is no LocalStackScreen in hierarchy. Wrap in StackScreen or provide it manually.")
 }
 
 /**
@@ -39,7 +46,7 @@ val LocalStackNavigation: ProvidableCompositionLocal<StackNavContainer> = static
 @Stable
 abstract class StackScreen(
     navigationModel: StackNavModel
-) : ContainerScreen<StackState, StackAction>(navigationModel), StackNavContainer {
+) : ContainerScreen<StackState>(navigationModel), StackNavContainer {
 
     open val defaultBackHandler: Boolean = true
 
@@ -51,8 +58,13 @@ abstract class StackScreen(
         TopScreenContent(modifier)
     }
 
-    override fun provideNavigationContainer(): ProvidedValue<StackNavContainer> =
+    override fun provideNavigationContainer(): ProvidedValue<out StackNavContainer> =
         LocalStackNavigation provides this
+
+    override fun provideCompositionLocals(): Array<ProvidedValue<*>> = arrayOf(
+        LocalStackNavigation provides this,
+        LocalStackScreen provides this,
+    )
 
     /**
      * The palace holder screen that is used to support animation of showing first dialog appearance.

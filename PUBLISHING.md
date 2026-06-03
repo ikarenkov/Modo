@@ -2,7 +2,48 @@
 
 This guide is for library maintainers who need to publish new versions of Modo to Maven Central.
 
-## Prerequisites
+The recommended path is **CI-based publishing** via the [`Publish` GitHub Actions workflow](.github/workflows/release.yml) — secrets stay in GitHub, the run is gated behind a manually-approved environment, and the laptop is not involved. Local publishing remains supported as a fallback (see *Option 1 / Option 2* below).
+
+## CI-based publishing (recommended)
+
+### One-time repository setup
+
+1. **Create the `maven-central` environment** (Settings → Environments → New environment).
+   - Add yourself (and any co-maintainers) as **required reviewers**. The publish job will pause until a reviewer approves, so secrets are never exposed to the runner without a human in the loop.
+   - Optionally restrict the environment to specific branches/tags.
+
+2. **Add the following secrets to the `maven-central` environment** (Settings → Environments → maven-central → Add secret):
+
+   | Secret | Where to get it |
+   |---|---|
+   | `SONATYPE_USERNAME` | Central Portal → Account → Generate User Token → name |
+   | `SONATYPE_PASSWORD` | Central Portal → Account → Generate User Token → token value |
+   | `SIGNING_KEY_ID` | Last 8 hex chars of your GPG key fingerprint (`gpg --list-keys --keyid-format=short`) |
+   | `SIGNING_PASSWORD` | Passphrase for the GPG key |
+   | `SIGNING_KEY_BASE64` | Base64 of your `secring.gpg` file: `gpg --export-secret-keys <key-id> \| base64` (single line; the workflow handles both wrapped and unwrapped input) |
+
+   Treat all five as production credentials. Rotate the Sonatype token every 6-12 months by regenerating it in Central Portal and updating the secret.
+
+3. **Bump the version** in `gradle/libs.versions.toml` and merge to the target branch (usually `dev` or a release branch).
+
+### Running a release
+
+1. Go to **Actions → Publish → Run workflow**.
+2. Pick the ref to publish (tag, branch, or commit SHA).
+3. The job will pause for environment approval — approve it.
+4. When the job finishes, open <https://central.sonatype.com/publishing>:
+   - Find the deployment in **VALIDATED** state.
+   - Review the artifacts (AAR, `-sources.jar`, `-javadoc.jar`, POM, and `.asc` signatures for each).
+   - Click **Publish** to release to Maven Central, or **Drop** to discard.
+5. After publishing, tag the commit (`git tag v<x.y.z>` + `git push --tags`) and draft a GitHub Release using the matching `changelogs/<x.y.z>.md`.
+
+### Supply-chain hardening (optional but recommended)
+
+- Pin every `uses:` line in the workflow to a commit SHA (current style is version tags, matched to existing workflows in this repo).
+- Enable Dependabot for GitHub Actions so SHA pins stay current.
+- Keep 2FA on the GitHub account.
+
+## Local publishing (fallback)
 
 ### 1. Credentials Setup
 
@@ -28,9 +69,9 @@ Update the version in `gradle/libs.versions.toml`:
 modo = "x.y.z"  # Update this
 ```
 
-## Publishing Workflows
+### Publishing commands
 
-### Option 1: Manual Release (Recommended)
+#### Option 1: Manual Release (Recommended for local)
 
 This workflow publishes to a staging repository and validates artifacts, but requires manual approval before releasing to Maven Central.
 
@@ -58,7 +99,7 @@ This workflow publishes to a staging repository and validates artifacts, but req
 - ✅ Safer for production releases
 - ⚠️ Remember: Once published, versions are **immutable**
 
-### Option 2: Automatic Release
+#### Option 2: Automatic Release
 
 This workflow automatically publishes to Maven Central after validation, with no manual review step.
 
@@ -137,5 +178,6 @@ This project uses:
 - **`maven-publish` plugin**: Creates and signs artifacts (configured in `PublishingPlugin.kt`)
 - **`gradle-nexus/publish-plugin`**: Manages Nexus staging workflow (configured in root `build.gradle.kts`)
 - **OSSRH Staging API compatibility endpoint**: Bridges old Gradle plugins with new Central Portal
+- **`.github/workflows/release.yml`**: Manual `workflow_dispatch` job that runs the staging publish under a gated `maven-central` environment; downstream publication to Central is still a manual step in the Sonatype UI.
 
 The migration from OSSRH to Central Portal is complete, using the compatibility endpoint to maintain existing workflow.

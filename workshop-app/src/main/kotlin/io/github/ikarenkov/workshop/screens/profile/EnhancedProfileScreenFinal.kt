@@ -1,5 +1,6 @@
 package io.github.ikarenkov.workshop.screens.profile
 
+import android.os.Parcelable
 import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -18,10 +19,11 @@ import org.koin.core.parameter.parametersOf
 
 @Parcelize
 class EnhancedProfileScreenFinal(
-    private val navModel: NavModel<EnhancedProfileNavigationState, EnhancedProfileNavigationAction> = NavModel(EnhancedProfileNavigationState())
-) : ContainerScreen<EnhancedProfileNavigationState, EnhancedProfileNavigationAction>(
+    private val navModel: NavModel<EnhancedProfileNavigationState> = NavModel(EnhancedProfileNavigationState())
+) : ContainerScreen<EnhancedProfileNavigationState>(
     navModel
-) {
+),
+    Parcelable {
 
     @Composable
     override fun Content(modifier: Modifier) {

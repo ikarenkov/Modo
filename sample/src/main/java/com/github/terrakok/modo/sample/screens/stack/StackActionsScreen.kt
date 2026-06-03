@@ -8,6 +8,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
+import com.github.terrakok.modo.dispatch
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.sample.screens.ButtonsState
 import com.github.terrakok.modo.sample.screens.GroupedButtonsState
@@ -21,12 +22,11 @@ import com.github.terrakok.modo.sample.screens.dialogs.SampleDialog
 import com.github.terrakok.modo.sample.screens.dialogs.SampleDialogWithStack
 import com.github.terrakok.modo.stack.Back
 import com.github.terrakok.modo.stack.Forward
-import com.github.terrakok.modo.stack.LocalStackNavigation
-import com.github.terrakok.modo.stack.StackNavContainer
+import com.github.terrakok.modo.stack.LocalStackScreen
+import com.github.terrakok.modo.stack.StackScreen
 import com.github.terrakok.modo.stack.StackState
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.backTo
-import com.github.terrakok.modo.stack.dispatch
 import com.github.terrakok.modo.stack.forward
 import com.github.terrakok.modo.stack.removeScreens
 import com.github.terrakok.modo.stack.replace
@@ -51,7 +51,7 @@ internal class StackActionsScreen(
             screenName = "StackActionsScreen",
             screenIndex = screenIndex,
             state = rememberButtons(
-                LocalStackNavigation.current,
+                LocalStackScreen.current,
                 screenKey,
                 screenIndex
             )
@@ -62,14 +62,15 @@ internal class StackActionsScreen(
 @Suppress("LongMethod", "MagicNumber")
 @Composable
 private fun rememberButtons(
-    navigation: StackNavContainer,
+    navigation: StackScreen,
     screenKey: ScreenKey,
     screenIndex: Int
 ): GroupedButtonsState {
     val coroutineScope = rememberCoroutineScope()
+    val navigationState = navigation.navigationState
     val isFirstScreen by remember {
         derivedStateOf {
-            navigation.navigationState.stack.first().screenKey == screenKey
+            navigationState.stack.first().screenKey == screenKey
         }
     }
     return remember(navigation, isFirstScreen) {
@@ -99,7 +100,7 @@ private fun rememberButtons(
                 }
             },
             ModoButtonSpec("Remove previous") {
-                val prevScreenIndex = navigation.navigationState.stack.lastIndex - 1
+                val prevScreenIndex = navigation.stateFlow.value.stack.lastIndex - 1
                 navigation.removeScreens { pos, screen -> pos == prevScreenIndex }
             },
             ModoButtonSpec("Back to '3'") {

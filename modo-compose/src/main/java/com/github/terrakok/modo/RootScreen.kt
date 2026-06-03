@@ -19,9 +19,10 @@ data class RootScreenState<T : Screen>(
  * Screen for single source of providing [LocalSaveableStateHolder]. Should be used with [Modo.rememberRootScreen] or [Modo.getOrCreateRootScreen].
  */
 @Parcelize
+@Suppress("MemberExtensionConflict")
 class RootScreen<T : Screen> internal constructor(
-    private val navModel: NavModel<RootScreenState<T>, NavigationAction<RootScreenState<T>>>
-) : ContainerScreen<RootScreenState<T>, NavigationAction<RootScreenState<T>>>(
+    private val navModel: NavModel<RootScreenState<T>>
+) : ContainerScreen<RootScreenState<T>>(
     navModel
 ) {
 

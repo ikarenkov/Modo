@@ -33,8 +33,8 @@ import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.lazylist.screenItems
 import com.github.terrakok.modo.list.ListNavModel
-import com.github.terrakok.modo.list.ListNavigationAction
 import com.github.terrakok.modo.list.ListNavigationState
+import com.github.terrakok.modo.list.addScreens
 import com.github.terrakok.modo.list.removeScreens
 import com.github.terrakok.modo.sample.components.CancelButton
 import com.github.terrakok.modo.sample.screens.MainScreen
@@ -53,9 +53,8 @@ class StackInLazyColumnScreen(
             }
         }
     )
-) : ContainerScreen<ListNavigationState, ListNavigationAction>(
-    navModel
-) {
+) : ContainerScreen<ListNavigationState>(navModel) {
+
     @OptIn(ExperimentalFoundationApi::class)
     @Suppress("LongMethod")
     @Composable
@@ -63,7 +62,7 @@ class StackInLazyColumnScreen(
         val lazyColumnState = rememberLazyListState()
         Scaffold(
             floatingActionButton = {
-                FloatingActionButton(onClick = { dispatch(ListNavigationAction.AddScreens(SampleStack(MainScreen(0)))) }) {
+                FloatingActionButton(onClick = { addScreens(SampleStack(MainScreen(0)), addToEnd = true) }) {
                     Icon(painter = rememberVectorPainter(image = Icons.Default.Add), contentDescription = "Add screen")
                 }
             },
@@ -90,7 +89,7 @@ class StackInLazyColumnScreen(
                             .padding(horizontal = 16.dp)
                             .fillMaxWidth(),
                         onClick = {
-                            dispatch(ListNavigationAction.AddScreens(pos = 0, SampleStack(MainScreen(0))))
+                            addScreens(pos = 0, SampleStack(MainScreen(0)))
                         }
                     ) {
                         Text(text = "Add item", modifier = Modifier.align(Alignment.CenterVertically))
@@ -124,7 +123,7 @@ class StackInLazyColumnScreen(
                             .fillMaxWidth()
                             .windowInsetsPadding(WindowInsets.navigationBars),
                         onClick = {
-                            dispatch(ListNavigationAction.AddScreens(SampleStack(MainScreen(0))))
+                            addScreens(SampleStack(MainScreen(0)), addToEnd = true)
                         }
                     ) {
                         Text(text = "Add item", modifier = Modifier.align(Alignment.CenterVertically))

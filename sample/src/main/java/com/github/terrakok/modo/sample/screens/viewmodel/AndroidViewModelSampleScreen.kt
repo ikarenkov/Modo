@@ -13,7 +13,7 @@ import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.sample.screens.MainScreenContent
 import com.github.terrakok.modo.sample.screens.base.COUNTER_DELAY_MS
-import com.github.terrakok.modo.stack.LocalStackNavigation
+import com.github.terrakok.modo.stack.LocalStackScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
@@ -32,7 +32,7 @@ internal class AndroidViewModelSampleScreen(
         val viewModel: SampleViewModel = viewModel {
             SampleViewModel(screenPos, createSavedStateHandle())
         }
-        MainScreenContent(screenPos, viewModel.stateFlow.collectAsState().value, LocalStackNavigation.current, modifier)
+        MainScreenContent(screenPos, viewModel.stateFlow.collectAsState().value, LocalStackScreen.current, modifier)
     }
 
 }

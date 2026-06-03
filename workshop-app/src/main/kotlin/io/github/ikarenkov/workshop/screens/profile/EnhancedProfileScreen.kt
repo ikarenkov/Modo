@@ -1,5 +1,6 @@
 package io.github.ikarenkov.workshop.screens.profile
 
+import android.os.Parcelable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.terrakok.modo.ContainerScreen
 import com.github.terrakok.modo.NavModel
-import com.github.terrakok.modo.NavigationAction
+import com.github.terrakok.modo.NavigationReducer
 import com.github.terrakok.modo.NavigationState
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.stack.LocalStackNavigation
@@ -33,8 +34,9 @@ import kotlinx.parcelize.Parcelize
 import org.koin.androidx.compose.koinViewModel
 
 @Parcelize
+@Suppress("Wrapping")
 class EnhancedProfileScreen(
-    private val navModel: NavModel<EnhancedProfileNavigationState, EnhancedProfileNavigationActionNoOp> = NavModel(
+    private val navModel: NavModel<EnhancedProfileNavigationState> = NavModel(
         // TODO: Workshop 6.2.4 - set initial state
         EnhancedProfileNavigationState(
             ClimberPersonalInfoScreen(),
@@ -43,9 +45,9 @@ class EnhancedProfileScreen(
         )
     )
 // TODO: Workshop 6.2.1 - inherit from ContainerScreen
-) : ContainerScreen<EnhancedProfileNavigationState, EnhancedProfileNavigationActionNoOp>(
+) : ContainerScreen<EnhancedProfileNavigationState>(
     navModel
-) {
+), Parcelable {
 
     @Composable
     override fun Content(modifier: Modifier) {
@@ -146,7 +148,8 @@ data class EnhancedProfileNavigationState(
 }
 
 // TODO: Workshop 6.2.3 - define navigation action
-class EnhancedProfileNavigationActionNoOp : NavigationAction<EnhancedProfileNavigationState>
+@Deprecated("Use NavigationReducer directly.")
+fun interface EnhancedProfileNavigationAction : NavigationReducer<EnhancedProfileNavigationState>
 
 @Preview
 @Composable

@@ -18,14 +18,14 @@ val stackScreen = DefaultStackScreen(
 )
 ```
 
-You can change the stack by calling `dispatch(Action)` on `NavigationContainer<StackState, StackAction>`.
+You can change the stack by dispatching a `StackReducer` on `StackNavContainer` (an alias for `NavigationContainer<StackState>`).
 
-For a convenient way to update the state, there is a function `dispatch(action: (StackState) -> StackState)` that allows you to change the state
+For a convenient way to update the state, there is a function `dispatch(reducer: (StackState) -> StackState)` that allows you to change the state
 according to your needs. There is also a list of built-in commands.
 
-## Built-in Navigation Actions
+## Built-in Stack Commands
 
-Modo provides a list of built-in actions for stack navigation. You can explore the available
+Modo provides a list of built-in commands (extension functions on `StackNavContainer`) for stack navigation. You can explore the available
 commands [here](%github_code_url%modo-compose/src/main/java/com/github/terrakok/modo/stack/StackActions.kt). Some of them include:
 
 * `forward(screen: Screen, vararg screens: Screen)` - Adds the given screens to the top of the stack.

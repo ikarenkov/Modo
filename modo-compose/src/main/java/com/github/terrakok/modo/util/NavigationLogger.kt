@@ -18,7 +18,7 @@ private fun getNavigationStateString(prefix: String, navigationState: Navigation
         is StackState -> {
             navigationState.stack.map { screen ->
                 when (screen) {
-                    is ContainerScreen<*, *> -> buildString {
+                    is ContainerScreen<*> -> buildString {
                         append(prefix)
                         append(screen.screenKey)
                         appendLine()
@@ -35,7 +35,7 @@ private fun getNavigationStateString(prefix: String, navigationState: Navigation
             append(prefix)
             append(screen.screenKey)
             appendLine()
-            if (screen is ContainerScreen<*, *>) {
+            if (screen is ContainerScreen<*>) {
                 append(getNavigationStateString("$prefix|  ", screen.navigationState))
             }
         }
