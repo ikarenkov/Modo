@@ -1,0 +1,146 @@
+name: GitHub Release
+run-name: GH Release from ${{ inputs.ref }}
+
+# Tags the chosen ref with `v<version>` (where version comes from
+# gradle/libs.versions.toml) and creates a GitHub Release that combines:
+#   1. The hand-written changelog at `changelogs/<version>.md`
+#   2. GitHub's auto-generated "What's Changed" section between the previous
+#      v-tag and this one.
+#
+# Typical flow:
+#   1. Bump `modo = "X.Y.Z"` in gradle/libs.versions.toml, commit, merge to dev.
+#   2. Publish to Maven Central via the `Publish` workflow (separate concern).
+#   3. Run this workflow with ref = dev (or release branch). Done.
+#
+# Pre-conditions checked at runtime:
+#   - `changelogs/<version>.md` exists.
+#   - Either the `v<version>` tag does not exist yet, or it exists but no
+#     GitHub release has been created for it yet (retry-friendly).
+#
+# Versions containing `-` (e.g. `0.12.0-rc1`) are marked as pre-release.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref to release (branch, tag, or commit SHA)"
+        required: true
+        default: "dev"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+
+      - name: Resolve version and changelog
+        id: meta
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(awk -F'"' '/^modo[[:space:]]*=/ {print $2; exit}' gradle/libs.versions.toml)
+          if [ -z "$VERSION" ]; then
+            echo "::error::Could not read 'modo' version from gradle/libs.versions.toml"
+            exit 1
+          fi
+          TAG="v$VERSION"
+          CHANGELOG="changelogs/${VERSION}.md"
+          if [ ! -f "$CHANGELOG" ]; then
+            echo "::error::Changelog not found: $CHANGELOG"
+            exit 1
+          fi
+
+          # Retry-friendly: allow re-run if tag was created but release wasn't.
+          # Fail only if both already exist.
+          if git rev-parse "refs/tags/$TAG" >/dev/null 2>&1; then
+            if gh release view "$TAG" >/dev/null 2>&1; then
+              echo "::error::Release $TAG already exists. Bump version in libs.versions.toml."
+              exit 1
+            fi
+            CREATE_TAG=false
+            echo "Tag $TAG already exists; will reuse and only create the release."
+          else
+            CREATE_TAG=true
+          fi
+
+          {
+            echo "tag=$TAG"
+            echo "version=$VERSION"
+            echo "changelog=$CHANGELOG"
+            echo "create_tag=$CREATE_TAG"
+            if [[ "$VERSION" == *-* ]]; then
+              echo "prerelease=true"
+            else
+              echo "prerelease=false"
+            fi
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create and push tag
+        if: steps.meta.outputs.create_tag == 'true'
+        env:
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          # Identity recommended by actions/checkout README:
+          # https://github.com/actions/checkout#push-a-commit-using-the-built-in-token
+          # Email format is {user.id}+{user.login}@users.noreply.github.com.
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "$TAG"
+          git push origin "$TAG"
+
+      - name: Resolve previous tag
+        id: prev
+        env:
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          PREV=$(git tag --list 'v*' --sort=-v:refname \
+            | grep -v "^${TAG}$" \
+            | head -n 1 || true)
+          echo "tag=$PREV" >> "$GITHUB_OUTPUT"
+
+      - name: Compose release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.meta.outputs.tag }}
+          PREV: ${{ steps.prev.outputs.tag }}
+          CHANGELOG: ${{ steps.meta.outputs.changelog }}
+        run: |
+          if [ -n "$PREV" ]; then
+            AUTO=$(gh api -X POST "/repos/$GITHUB_REPOSITORY/releases/generate-notes" \
+              -f tag_name="$TAG" \
+              -f previous_tag_name="$PREV" \
+              -q .body)
+          else
+            AUTO=$(gh api -X POST "/repos/$GITHUB_REPOSITORY/releases/generate-notes" \
+              -f tag_name="$TAG" \
+              -q .body)
+          fi
+          {
+            cat "$CHANGELOG"
+            echo
+            echo "---"
+            echo
+            echo "$AUTO"
+          } > /tmp/notes.md
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.meta.outputs.tag }}
+          PRERELEASE: ${{ steps.meta.outputs.prerelease }}
+        run: |
+          ARGS=( --title "$TAG" --notes-file /tmp/notes.md )
+          if [ "$PRERELEASE" = "true" ]; then
+            ARGS+=( --prerelease )
+          fi
+          gh release create "$TAG" "${ARGS[@]}"
+          echo "Released **$TAG**" >> "$GITHUB_STEP_SUMMARY"
