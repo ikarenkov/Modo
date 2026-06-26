@@ -35,6 +35,10 @@ formatting in the file you're editing.
 - Breaking API changes on public types (`NavigationContainer`, `Screen`, `NavModel`, etc.) require a deliberate decision — surface in a task doc (see
   *Non-trivial work* below) before implementing.
 
+## Commit messages
+
+Keep them concise: state what was done. Add a line of detail only when *why* isn't obvious from the change itself — skip the explanation for self-evident edits.
+
 ## Releases & changelogs
 
 Per-release notes live at `changelogs/<version>.md` (e.g. `changelogs/0.12.0.md`). The `GitHub Release` workflow expects this exact path; a missing file fails the release.

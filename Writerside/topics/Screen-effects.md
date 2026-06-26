@@ -1,5 +1,3 @@
-Here’s the improved version of your documentation text:
-
 # Screen Effects
 
 Modo provides a [set of side effects](%github_code_url%modo-compose/src/main/java/com/github/terrakok/modo/lifecycle) that are similar to
