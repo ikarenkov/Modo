@@ -1,5 +1,3 @@
-Here's the improved version of your documentation text:
-
 # Quick Start Guide
 
 <list columns="2">
